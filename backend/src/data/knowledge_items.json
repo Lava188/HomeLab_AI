@@ -1,0 +1,203 @@
+[
+    {
+      "id": "kb_001",
+      "section": "pre_test_guides",
+      "title": "Nhịn ăn trước xét nghiệm mỡ máu",
+      "content": "Một số xét nghiệm mỡ máu có thể cần nhịn ăn trước khi lấy mẫu. Người dùng nên uống nước lọc nếu được phép và làm theo hướng dẫn cụ thể của cơ sở y tế trước khi đến giờ lấy mẫu.",
+      "tags": ["nhin_an", "mo_mau", "xet_nghiem_mau"],
+      "test_types": ["lipid_panel"],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_002",
+      "section": "pre_test_guides",
+      "title": "Chuẩn bị trước xét nghiệm đường huyết",
+      "content": "Với một số xét nghiệm đường huyết, người dùng có thể được yêu cầu nhịn ăn trong một khoảng thời gian nhất định trước khi lấy mẫu. Cần xác nhận trước với cơ sở y tế để biết yêu cầu cụ thể của loại xét nghiệm được chỉ định.",
+      "tags": ["duong_huyet", "nhin_an", "chuan_bi"],
+      "test_types": ["glucose_test"],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_003",
+      "section": "pre_test_guides",
+      "title": "Uống nước trước khi lấy mẫu máu",
+      "content": "Trong nhiều trường hợp, người dùng có thể uống nước lọc trước khi lấy mẫu máu, trừ khi có hướng dẫn khác từ cơ sở y tế. Nước lọc có thể giúp cơ thể dễ chịu hơn và hỗ trợ quá trình lấy mẫu thuận lợi hơn.",
+      "tags": ["uong_nuoc", "lay_mau_mau", "huong_dan"],
+      "test_types": ["blood_test_general"],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_004",
+      "section": "pre_test_guides",
+      "title": "Mang giấy tờ khi sử dụng dịch vụ lấy mẫu tại nhà",
+      "content": "Người dùng nên chuẩn bị thông tin cá nhân cơ bản, số điện thoại liên hệ và các giấy tờ hoặc chỉ định liên quan nếu có. Điều này giúp quá trình xác nhận thông tin và lấy mẫu diễn ra nhanh hơn.",
+      "tags": ["giay_to", "lay_mau_tai_nha", "xac_nhan_thong_tin"],
+      "test_types": [],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_005",
+      "section": "pre_test_guides",
+      "title": "Tránh vận động mạnh trước khi lấy mẫu",
+      "content": "Người dùng nên hạn chế vận động mạnh ngay trước thời điểm lấy mẫu nếu chưa được hướng dẫn khác. Việc nghỉ ngơi và giữ trạng thái ổn định có thể giúp quá trình lấy mẫu diễn ra thuận lợi hơn.",
+      "tags": ["van_dong", "lay_mau", "chuan_bi"],
+      "test_types": ["blood_test_general"],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_006",
+      "section": "pre_test_guides",
+      "title": "Thông báo thuốc đang sử dụng trước xét nghiệm",
+      "content": "Người dùng nên thông báo với cơ sở y tế về các thuốc hoặc thực phẩm bổ sung đang dùng nếu có liên quan đến xét nghiệm. Không nên tự ý ngừng thuốc nếu chưa có hướng dẫn chuyên môn.",
+      "tags": ["thuoc_dang_dung", "luu_y", "xet_nghiem"],
+      "test_types": [],
+      "risk_level": "medium",
+      "source": "internal"
+    },
+    {
+      "id": "kb_007",
+      "section": "service_faq",
+      "title": "Quy trình đặt lịch lấy mẫu tại nhà",
+      "content": "Người dùng cung cấp loại xét nghiệm, thời gian mong muốn, địa chỉ và thông tin liên hệ. Hệ thống sẽ xác nhận lại thông tin trước khi tạo lịch hẹn lấy mẫu tại nhà.",
+      "tags": ["dat_lich", "lay_mau_tai_nha", "quy_trinh"],
+      "test_types": [],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_008",
+      "section": "service_faq",
+      "title": "Thông tin cần có để tạo lịch hẹn",
+      "content": "Để tạo lịch hẹn, hệ thống thường cần ít nhất loại xét nghiệm, ngày giờ mong muốn, địa chỉ lấy mẫu và số điện thoại liên hệ. Nếu thiếu thông tin, chatbot sẽ hỏi bổ sung từng bước.",
+      "tags": ["tao_lich", "slot_filling", "thong_tin_bat_buoc"],
+      "test_types": [],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_009",
+      "section": "service_faq",
+      "title": "Xác nhận lịch hẹn sau khi đặt",
+      "content": "Sau khi người dùng cung cấp đủ thông tin, hệ thống sẽ hiển thị lại nội dung lịch hẹn để xác nhận. Lịch chỉ nên được coi là hoàn tất sau bước xác nhận và lưu thành công.",
+      "tags": ["xac_nhan_lich", "booking", "luu_lich"],
+      "test_types": [],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_010",
+      "section": "service_faq",
+      "title": "Đổi lịch lấy mẫu đã đặt",
+      "content": "Người dùng có thể yêu cầu đổi lịch bằng cách cung cấp thông tin lịch hiện tại và thời gian mới mong muốn. Hệ thống cần kiểm tra lại thông tin trước khi cập nhật lịch.",
+      "tags": ["doi_lich", "reschedule", "cap_nhat_lich"],
+      "test_types": [],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_011",
+      "section": "service_faq",
+      "title": "Hủy lịch lấy mẫu đã đặt",
+      "content": "Người dùng có thể yêu cầu hủy lịch bằng cách cung cấp thông tin nhận diện lịch hẹn như số điện thoại, thời gian đã đặt hoặc mã lịch nếu có. Hệ thống nên xác nhận lại trước khi hủy.",
+      "tags": ["huy_lich", "cancel_booking", "xac_nhan"],
+      "test_types": [],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_012",
+      "section": "service_faq",
+      "title": "Khu vực phục vụ lấy mẫu tại nhà",
+      "content": "Dịch vụ lấy mẫu tại nhà chỉ nên xác nhận khi địa chỉ người dùng nằm trong khu vực hỗ trợ. Nếu địa chỉ ngoài phạm vi phục vụ, chatbot cần thông báo rõ và hướng dẫn liên hệ thêm.",
+      "tags": ["khu_vuc_phuc_vu", "dia_chi", "pham_vi"],
+      "test_types": [],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_013",
+      "section": "service_faq",
+      "title": "Thời gian nhân viên đến lấy mẫu",
+      "content": "Thời gian đến lấy mẫu phụ thuộc vào khung giờ người dùng chọn và khả năng phục vụ của hệ thống. Chatbot nên xác nhận đây là thời gian mong muốn và việc chốt lịch phụ thuộc vào kết quả lưu lịch thành công.",
+      "tags": ["khung_gio", "nhan_vien", "lay_mau"],
+      "test_types": [],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_014",
+      "section": "service_faq",
+      "title": "Trường hợp người dùng chưa biết chọn xét nghiệm nào",
+      "content": "Nếu người dùng chưa biết nên chọn xét nghiệm nào, chatbot chỉ nên tư vấn ở mức cơ bản và khuyến khích người dùng liên hệ cơ sở y tế để được hướng dẫn phù hợp. Chatbot không nên chẩn đoán hoặc chỉ định thay cho nhân viên y tế.",
+      "tags": ["chua_biet_chon_xet_nghiem", "gioi_han_tu_van", "an_toan"],
+      "test_types": [],
+      "risk_level": "medium",
+      "source": "internal"
+    },
+    {
+      "id": "kb_015",
+      "section": "service_faq",
+      "title": "Thông tin liên hệ khi cần hỗ trợ thêm",
+      "content": "Nếu chatbot không xử lý được yêu cầu hoặc thiếu thông tin quan trọng, hệ thống nên hướng người dùng đến kênh hỗ trợ phù hợp như tổng đài hoặc nhân viên phụ trách dịch vụ.",
+      "tags": ["ho_tro_them", "fallback", "human_handoff"],
+      "test_types": [],
+      "risk_level": "low",
+      "source": "internal"
+    },
+    {
+      "id": "kb_016",
+      "section": "red_flags",
+      "title": "Đau ngực kéo dài",
+      "content": "Nếu người dùng mô tả đau ngực kéo dài, chatbot không nên tư vấn sâu hoặc trì hoãn xử lý. Hệ thống cần ưu tiên khuyến nghị người dùng đi khám ngay hoặc liên hệ cơ sở y tế khẩn cấp.",
+      "tags": ["dau_nguc", "canh_bao", "khan_cap"],
+      "test_types": [],
+      "risk_level": "high",
+      "source": "internal"
+    },
+    {
+      "id": "kb_017",
+      "section": "red_flags",
+      "title": "Khó thở",
+      "content": "Nếu người dùng cho biết đang khó thở hoặc thở bất thường, chatbot cần ưu tiên phản hồi an toàn và khuyến nghị đi khám ngay. Không nên tiếp tục tư vấn thông thường trong tình huống này.",
+      "tags": ["kho_tho", "red_flag", "uu_tien_an_toan"],
+      "test_types": [],
+      "risk_level": "high",
+      "source": "internal"
+    },
+    {
+      "id": "kb_018",
+      "section": "red_flags",
+      "title": "Ngất hoặc lú lẫn bất thường",
+      "content": "Nếu người dùng nhắc đến ngất, lú lẫn bất thường hoặc mất ý thức, chatbot cần khuyến nghị tìm hỗ trợ y tế khẩn cấp càng sớm càng tốt. Đây không phải tình huống phù hợp để chatbot tư vấn thông thường.",
+      "tags": ["ngat", "lu_lan", "mat_y_thuc"],
+      "test_types": [],
+      "risk_level": "high",
+      "source": "internal"
+    },
+    {
+      "id": "kb_019",
+      "section": "red_flags",
+      "title": "Co giật",
+      "content": "Nếu người dùng mô tả co giật, chatbot cần dừng hướng tư vấn thông thường và khuyến nghị liên hệ cấp cứu hoặc cơ sở y tế gần nhất. Không nên đưa ra hướng dẫn điều trị chuyên môn.",
+      "tags": ["co_giat", "cap_cuu", "khong_tu_van_sau"],
+      "test_types": [],
+      "risk_level": "high",
+      "source": "internal"
+    },
+    {
+      "id": "kb_020",
+      "section": "red_flags",
+      "title": "Chảy máu nhiều hoặc không cầm được",
+      "content": "Nếu người dùng cho biết đang chảy máu nhiều hoặc khó cầm máu, chatbot cần ưu tiên khuyến nghị đến cơ sở y tế ngay. Hệ thống không nên tiếp tục cung cấp tư vấn thông thường trong tình huống này.",
+      "tags": ["chay_mau", "nguy_hiem", "di_kham_ngay"],
+      "test_types": [],
+      "risk_level": "high",
+      "source": "internal"
+    }
+  ]
+  

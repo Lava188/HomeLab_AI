@@ -1,72 +1,123 @@
 export interface Message {
-    id: string;
-    role: 'user' | 'assistant';
-    text: string;
-    timestamp: string;
-    citations?: string[];
+  id: string;
+  role: 'user' | 'assistant';
+  text: string;
+  timestamp: string;
+  citations?: string[];
+}
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+const CHAT_SESSION_KEY = 'homelab_chat_session_id';
+
+type BackendChatData = {
+  sessionId?: string;
+  reply?: string;
+  timestamp?: string;
+  meta?: {
+    knowledgeItem?: {
+      source?: string | null;
+    };
+  };
+};
+
+type BackendChatResponse = {
+  success: boolean;
+  data?: BackendChatData;
+  message?: string;
+};
+
+function generateSessionId() {
+  return `fe_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function getOrCreateSessionId() {
+  const existingSessionId = localStorage.getItem(CHAT_SESSION_KEY);
+
+  if (existingSessionId) {
+    return existingSessionId;
   }
-  
-  export const mockSendMessage = async (text: string): Promise<Message> => {
-    // Simulate network delay (700-1200ms)
-    const delay = Math.floor(Math.random() * 500) + 700;
-    await new Promise((resolve) => setTimeout(resolve, delay));
-  
-    // 30% chance to return citations
-    const hasCitations = Math.random() < 0.3;
-    const citations = hasCitations ? ['KB-12', 'KB-07'] : undefined;
-  
-    const now = new Date();
-    const timestamp = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  
+
+  const newSessionId = generateSessionId();
+  localStorage.setItem(CHAT_SESSION_KEY, newSessionId);
+  return newSessionId;
+}
+
+export function clearChatSession() {
+  localStorage.removeItem(CHAT_SESSION_KEY);
+}
+
+function buildTimestamp(isoTimestamp?: string) {
+  const date = isoTimestamp ? new Date(isoTimestamp) : new Date();
+
+  if (Number.isNaN(date.getTime())) {
+    return new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  return date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+export const mockSendMessage = async (text: string): Promise<Message> => {
+  const sessionId = getOrCreateSessionId();
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: text,
+        sessionId,
+      }),
+    });
+
+    const result: BackendChatResponse = await response.json();
+
+    if (!response.ok || !result.success || !result.data) {
+      return {
+        id: Date.now().toString(),
+        role: 'assistant',
+        text:
+          result.message ||
+          'Không thể kết nối tới HomeLab backend. Vui lòng thử lại.',
+        timestamp: buildTimestamp(),
+      };
+    }
+
+    if (result.data.sessionId) {
+      localStorage.setItem(CHAT_SESSION_KEY, result.data.sessionId);
+    }
+
+    const citations = result.data.meta?.knowledgeItem?.source
+      ? [result.data.meta.knowledgeItem.source]
+      : undefined;
+
     return {
       id: Date.now().toString(),
       role: 'assistant',
-      text: `This is a simulated response to: "${text}". Please consult a healthcare professional for actual medical advice.`,
-      timestamp,
+      text:
+        result.data.reply ||
+        'HomeLab hiện chưa có phản hồi phù hợp cho yêu cầu này.',
+      timestamp: buildTimestamp(result.data.timestamp),
       citations,
     };
-  };
-  
-  /*
-  Initial example messages for testing:
-  [
-    {
-      id: '1',
-      role: 'user',
-      text: 'Hi, I need to book a blood test.',
-      timestamp: '10:00 AM'
-    },
-    {
-      id: '2',
+  } catch (error) {
+    console.error('mockSendMessage error:', error);
+
+    return {
+      id: Date.now().toString(),
       role: 'assistant',
-      text: 'Hello! I can help you with that. What kind of blood test are you looking for?',
-      timestamp: '10:01 AM'
-    },
-    {
-      id: '3',
-      role: 'user',
-      text: 'A standard lipid panel.',
-      timestamp: '10:02 AM'
-    },
-    {
-      id: '4',
-      role: 'user',
-      text: 'Do I need to fast?',
-      timestamp: '10:02 AM'
-    },
-    {
-      id: '5',
-      role: 'assistant',
-      text: 'Yes, for a standard lipid panel, you typically need to fast for 9-12 hours before the test. You may drink water.',
-      timestamp: '10:03 AM',
-      citations: ['KB-04', 'KB-19']
-    },
-    {
-      id: '6',
-      role: 'assistant',
-      text: 'Would you like to schedule it for tomorrow morning?',
-      timestamp: '10:03 AM'
-    }
-  ]
-  */
-  
+      text:
+        'Không thể gọi API backend lúc này. Vui lòng kiểm tra backend server và thử lại.',
+      timestamp: buildTimestamp(),
+    };
+  }
+};
