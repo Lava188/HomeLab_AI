@@ -1,0 +1,424 @@
+[
+  {
+    "id": "kb_v1_001",
+    "doc_id": "nice_sepsis_overview_doc_001",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "source_url": "https://www.nice.org.uk/guidance/ng253",
+    "section": "red_flags",
+    "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+    "content": "Nếu một người có dấu hiệu nhiễm trùng và đồng thời cảm thấy rất mệt, rất yếu hoặc diễn tiến xấu nhanh, cần nghĩ đến khả năng bệnh nặng hơn bình thường và nên được đánh giá y tế sớm.",
+    "source_excerpt": "Could this be sepsis? \nPeople have the right to be involved in discussions and make informed decisions \nabout their care, as described in NICE's information on making decisions about your \ncare. \nMaking decisions using NICE guidelines explains how we use words to show the \nstrength (or certainty) of our recommendations, and has information about \nprescribing medicines (including off-label use), professional guidelines, standards \nand laws (including on consent and mental capacity), and safeguarding. \nHealthcare professionals should follow our general guidelines for people delivering \ncare: \n• Babies, children and young people's experience of healthcare \n• Decision making and mental capacity \n• Medicines adherence \n• Medicines optimisation \n• Multimorbidity \n• Patient experience in adult NHS services \n• Shared decision making. \n1.1 When to suspect sepsis \n1.1.1 Think 'could this be sepsis?' if a person presents with symptoms or signs that \nindicate possible infection. [2016] \n1.1.2 Take into account that people with sepsis may have non-specific, non-localised \npresentations, for example feeling very unwell, and may not have a high \nSuspected sepsis in people aged 16 or over: recogni",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "high",
+    "tags": [
+      "sepsis",
+      "red_flags",
+      "infection"
+    ],
+    "keywords": [
+      "nhiễm trùng nặng",
+      "sepsis",
+      "dấu hiệu nặng"
+    ],
+    "test_types": [],
+    "faq_type": "red_flag_general",
+    "safety_notes": "Không dùng nội dung này để tự kết luận sepsis.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_002",
+    "doc_id": "nice_sepsis_overview_doc_001",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "source_url": "https://www.nice.org.uk/guidance/ng253",
+    "section": "red_flags",
+    "title": "Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng",
+    "content": "Một số dấu hiệu bên ngoài có thể làm tăng mức độ cảnh giác gồm da tái xám hoặc lốm đốm bất thường, tím môi hoặc tím lưỡi, ban không mất màu khi ấn, hoặc có dấu hiệu nhiễm trùng da và vết thương. Khi các dấu hiệu này xuất hiện kèm người bệnh xấu đi nhanh, cần được đánh giá y tế sớm.",
+    "source_excerpt": "1.3.3 Examine people with suspected sepsis for: \n• mottled or ashen appearance \n• cyanosis of the skin, lips or tongue \n• non-blanching petechial or purpuric rash \n• any breach of skin integrity (for example, cuts, burns or skin infections) \n• other rash indicating potential infection. \nFor signs and symptoms of meningococcal disease, see the NICE guideline \non bacterial meningitis and meningococcal disease. [2016, amended 2024] \n1.3.4 Ask the person or their family or carers how often the person urinated in the past \n18 hours. [2016] \n1.3.5 Ask the person with suspected sepsis and their family or carers about any recent \nfever or rigors. [2016] \n1.3.6 Ask the person or their family or carers if the person has recently presented (for \nexample to their GP or to hospital) with symptoms or signs that could indicate \nsepsis. [2024] \nFor a short explanation of why the committee made the 2024 recommendation and \nhow it might affect practice, see the rationale and impact section on initial \nassessment and examination. \nFull details of the evidence and the committee's discussion are in evidence review C: \nearly management of suspected sepsis (except antibiotic therapy) in the NEWS2 \npopula",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "high",
+    "tags": [
+      "sepsis",
+      "red_flags",
+      "skin_signs"
+    ],
+    "keywords": [
+      "da tái xám",
+      "tím môi",
+      "ban không mất màu",
+      "nhiễm trùng nặng"
+    ],
+    "test_types": [],
+    "faq_type": "red_flag_signs",
+    "safety_notes": "Không dùng để chẩn đoán. Nếu người bệnh xấu nhanh, cần đi cấp cứu.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_003",
+    "doc_id": "nice_sepsis_overview_doc_001",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "source_url": "https://www.nice.org.uk/guidance/ng253",
+    "section": "red_flags",
+    "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+    "content": "Ngay cả khi đánh giá trước đó chưa cho thấy nguy cơ cao, mức độ lo ngại vẫn tăng lên nếu người bệnh xuất hiện da tái xám hoặc lốm đốm, ban không mất màu khi ấn, tím môi hoặc tím lưỡi, hoặc tình trạng xấu đi và không cải thiện như mong đợi.",
+    "source_excerpt": "1.6.3 Consider evaluating the person's risk of severe illness or death from sepsis as \nbeing higher than suggested by their NEWS2 score alone if any of the following is \npresent: \n• mottled or ashen appearance \n• non-blanching petechial or purpuric rash \n• cyanosis of skin, lips or tongue. [2024] \n1.6.4 Consider evaluating the person's risk of severe illness or death from sepsis as \nbeing higher than suggested by their NEWS2 score alone if there is cause for \nconcern because of deterioration or lack of improvement of the person's \ncondition since: \n• any previous NEWS2 score was calculated \n• any interventions have taken place. \nThis should include taking into account any NEWS2 score calculated or \nintervention carried out before initial assessment in the emergency \ndepartment. [2024] \nFor a short explanation of why the committee made the 2024 recommendations and \nhow they might affect practice, see the rationale and impact section on evaluating risk \nlevel in people with suspected sepsis in acute hospital settings, acute mental health \nsettings and ambulances. \nFull details of the evidence and the committee's discussion are in evidence review A: \nstratifying risk of severe illness",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "high",
+    "tags": [
+      "sepsis",
+      "red_flags",
+      "deterioration"
+    ],
+    "keywords": [
+      "xấu đi nhanh",
+      "không cải thiện",
+      "tím môi",
+      "ban không mất màu"
+    ],
+    "test_types": [],
+    "faq_type": "red_flag_signs",
+    "safety_notes": "Nếu có dấu hiệu xấu đi nhanh, cần được đánh giá y tế khẩn cấp.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_004",
+    "doc_id": "nice_sepsis_overview_doc_001",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "source_url": "https://www.nice.org.uk/guidance/ng253",
+    "section": "red_flags",
+    "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+    "content": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển đến cơ sở cấp cứu ngay bằng phương thức phù hợp. Với chatbot HomeLab, nội dung này chỉ nên dùng để tăng mức độ cảnh báo và hướng người dùng đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
+    "source_excerpt": "When to transfer immediately to an acute hospital setting \nIn community and custodial settings \n1.7.1 If they meet any high-risk criteria, refer people aged 16 or over with suspected \nsepsis in the community and in custodial settings for emergency medical care \n(see table 1). \nUse the most appropriate means of transport (usually 999 ambulance). \nEmergency care requires facilities for resuscitation to be available and, depending \non local services, may be an emergency department or medical admissions unit. \n[2016, amended 2024] \n1.7.2 Pre-alert secondary care (through GP or ambulance service) when any high-risk \ncriteria are met in a person aged 16 or over with suspected sepsis in the \ncommunity or in a custodial setting and transfer them immediately. [2016, \namended 2024] \nIn acute mental health settings \n1.7.3 For people in an acute mental health setting who are aged 16 or over and are at \nhigh risk of severe illness or death from sepsis, refer for emergency medical care. \n[2024, amended 2025] \nFor a short explanation of why the committee made this recommendation and how it \nmight affect practice, see the rationale and impact section on when to transfer \nimmediately: people in men",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "high",
+    "tags": [
+      "sepsis",
+      "red_flags",
+      "emergency_transfer"
+    ],
+    "keywords": [
+      "nguy cơ cao",
+      "nhiễm trùng nặng",
+      "chuyển cấp cứu"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Chatbot chỉ cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_005",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Xét nghiệm máu là gì",
+    "content": "Xét nghiệm máu là một xét nghiệm y khoa phổ biến, thường được dùng để kiểm tra sức khỏe tổng quát hoặc hỗ trợ tìm nguyên nhân của một số triệu chứng. Khi làm xét nghiệm, nhân viên y tế sẽ lấy một lượng máu nhỏ để gửi đến phòng xét nghiệm.",
+    "source_excerpt": "A blood test is often done to check your health, or to find out why you're having certain symptoms. It involves having a small amount of your blood taken for testing.\nWhy a blood test is done\nThere are lots of reasons why you may need a blood test.\nA blood test may be done to:\ncheck your general health\nfind out if symptoms you're having are caused by certain conditions\nfind out if you're more likely to get a condition\nfind out how well a condition is being treated or managed\nHow to book a blood test\nIf a healthcare professional such as a GP, nurse or specialist thinks you need a blood test they will tell you how to book one.\nSome GP surgeries or hospitals allow you to book a blood test online.\nTypes of blood test\nBlood tests can check for different things depending on your symptoms, any conditions you have, and any medicines you’re taking.\nCommon types of blood test\nTest\nWhy it's done\nFull blood count (FBC)\nMeasures the number of blood cells in your blood to check for blood conditions such as\niron deficiency anaemia\nBlood glucose\nMeasures your blood sugar levels to check for or manage\ndiabetes\nUrea and electrolytes, or renal panel\nChecks if the amount of certain substances in your ",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "test_explainers"
+    ],
+    "keywords": [
+      "xét nghiệm máu",
+      "blood test"
+    ],
+    "test_types": [],
+    "faq_type": "general_info",
+    "safety_notes": "",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_006",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Vì sao bác sĩ có thể chỉ định xét nghiệm máu",
+    "content": "Xét nghiệm máu có thể được chỉ định để kiểm tra sức khỏe chung, hỗ trợ tìm nguyên nhân triệu chứng, đánh giá nguy cơ của một số bệnh hoặc theo dõi hiệu quả điều trị. Kết quả xét nghiệm cần được giải thích trong bối cảnh lâm sàng cụ thể.",
+    "source_excerpt": "A blood test is often done to check your health, or to find out why you're having certain symptoms. It involves having a small amount of your blood taken for testing.\nWhy a blood test is done\nThere are lots of reasons why you may need a blood test.\nA blood test may be done to:\ncheck your general health\nfind out if symptoms you're having are caused by certain conditions\nfind out if you're more likely to get a condition\nfind out how well a condition is being treated or managed\nHow to book a blood test\nIf a healthcare professional such as a GP, nurse or specialist thinks you need a blood test they will tell you how to book one.\nSome GP surgeries or hospitals allow you to book a blood test online.\nTypes of blood test\nBlood tests can check for different things depending on your symptoms, any conditions you have, and any medicines you’re taking.\nCommon types of blood test\nTest\nWhy it's done\nFull blood count (FBC)\nMeasures the number of blood cells in your blood to check for blood conditions such as\niron deficiency anaemia\nBlood glucose\nMeasures your blood sugar levels to check for or manage\ndiabetes\nUrea and electrolytes, or renal panel\nChecks if the amount of certain substances in your ",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "test_explainers"
+    ],
+    "keywords": [
+      "vì sao cần xét nghiệm máu",
+      "lý do làm blood test"
+    ],
+    "test_types": [],
+    "faq_type": "general_info",
+    "safety_notes": "Không tự diễn giải kết quả xét nghiệm mà không có tư vấn y tế.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_007",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Một số loại xét nghiệm máu thường gặp",
+    "content": "Một số xét nghiệm máu thường gặp gồm công thức máu, đường huyết, mỡ máu, chức năng thận và hormone tuyến giáp. Mỗi xét nghiệm phục vụ một mục đích khác nhau, vì vậy người dùng nên làm theo chỉ định phù hợp từ nhân viên y tế.",
+    "source_excerpt": "A blood test is often done to check your health, or to find out why you're having certain symptoms. It involves having a small amount of your blood taken for testing.\nWhy a blood test is done\nThere are lots of reasons why you may need a blood test.\nA blood test may be done to:\ncheck your general health\nfind out if symptoms you're having are caused by certain conditions\nfind out if you're more likely to get a condition\nfind out how well a condition is being treated or managed\nHow to book a blood test\nIf a healthcare professional such as a GP, nurse or specialist thinks you need a blood test they will tell you how to book one.\nSome GP surgeries or hospitals allow you to book a blood test online.\nTypes of blood test\nBlood tests can check for different things depending on your symptoms, any conditions you have, and any medicines you’re taking.\nCommon types of blood test\nTest\nWhy it's done\nFull blood count (FBC)\nMeasures the number of blood cells in your blood to check for blood conditions such as\niron deficiency anaemia\nBlood glucose\nMeasures your blood sugar levels to check for or manage\ndiabetes\nUrea and electrolytes, or renal panel\nChecks if the amount of certain substances in your ",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "test_explainers"
+    ],
+    "keywords": [
+      "công thức máu",
+      "đường huyết",
+      "mỡ máu",
+      "lipid profile",
+      "blood glucose"
+    ],
+    "test_types": [],
+    "faq_type": "test_meaning",
+    "safety_notes": "",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_008",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Cần chuẩn bị gì trước khi xét nghiệm máu",
+    "content": "Trước một số xét nghiệm máu, người làm xét nghiệm có thể cần nhịn ăn hoặc tạm ngừng một số thuốc theo hướng dẫn của nhân viên y tế. Không nên tự ý ngừng thuốc nếu chưa được hướng dẫn cụ thể.",
+    "source_excerpt": "A blood test is often done to check your health, or to find out why you're having certain symptoms. It involves having a small amount of your blood taken for testing.\nWhy a blood test is done\nThere are lots of reasons why you may need a blood test.\nA blood test may be done to:\ncheck your general health\nfind out if symptoms you're having are caused by certain conditions\nfind out if you're more likely to get a condition\nfind out how well a condition is being treated or managed\nHow to book a blood test\nIf a healthcare professional such as a GP, nurse or specialist thinks you need a blood test they will tell you how to book one.\nSome GP surgeries or hospitals allow you to book a blood test online.\nTypes of blood test\nBlood tests can check for different things depending on your symptoms, any conditions you have, and any medicines you’re taking.\nCommon types of blood test\nTest\nWhy it's done\nFull blood count (FBC)\nMeasures the number of blood cells in your blood to check for blood conditions such as\niron deficiency anaemia\nBlood glucose\nMeasures your blood sugar levels to check for or manage\ndiabetes\nUrea and electrolytes, or renal panel\nChecks if the amount of certain substances in your ",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "pre_test_guides"
+    ],
+    "keywords": [
+      "nhịn ăn trước xét nghiệm",
+      "chuẩn bị trước xét nghiệm máu"
+    ],
+    "test_types": [],
+    "faq_type": "preparation",
+    "safety_notes": "Chỉ thực hiện nhịn ăn hoặc điều chỉnh thuốc khi đã được hướng dẫn bởi cơ sở y tế.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_009",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Sau khi xét nghiệm máu và khi nhận kết quả",
+    "content": "Sau xét nghiệm máu, vùng lấy máu có thể hơi đau, bầm hoặc sưng nhẹ trong vài ngày. Kết quả có thể có sau vài ngày hoặc vài tuần tùy loại xét nghiệm. Nếu không hiểu kết quả, người dùng nên trao đổi với nhân viên y tế thay vì tự kết luận.",
+    "source_excerpt": "A blood test is often done to check your health, or to find out why you're having certain symptoms. It involves having a small amount of your blood taken for testing.\nWhy a blood test is done\nThere are lots of reasons why you may need a blood test.\nA blood test may be done to:\ncheck your general health\nfind out if symptoms you're having are caused by certain conditions\nfind out if you're more likely to get a condition\nfind out how well a condition is being treated or managed\nHow to book a blood test\nIf a healthcare professional such as a GP, nurse or specialist thinks you need a blood test they will tell you how to book one.\nSome GP surgeries or hospitals allow you to book a blood test online.\nTypes of blood test\nBlood tests can check for different things depending on your symptoms, any conditions you have, and any medicines you’re taking.\nCommon types of blood test\nTest\nWhy it's done\nFull blood count (FBC)\nMeasures the number of blood cells in your blood to check for blood conditions such as\niron deficiency anaemia\nBlood glucose\nMeasures your blood sugar levels to check for or manage\ndiabetes\nUrea and electrolytes, or renal panel\nChecks if the amount of certain substances in your ",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "test_results"
+    ],
+    "keywords": [
+      "kết quả xét nghiệm máu",
+      "sau khi lấy máu"
+    ],
+    "test_types": [],
+    "faq_type": "results",
+    "safety_notes": "Không tự chẩn đoán dựa trên kết quả xét nghiệm đơn lẻ.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_010",
+    "doc_id": "chest_pain_doc_001",
+    "source_id": "chest_pain",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/chest-pain/",
+    "section": "red_flags",
+    "title": "Khi nào đau ngực cần gọi cấp cứu ngay",
+    "content": "Cần gọi cấp cứu ngay nếu đau hoặc tức ngực xuất hiện đột ngột và không hết, có cảm giác bóp nghẹt, đè nặng hoặc nóng rát, đặc biệt nếu cơn đau lan ra tay, cổ, hàm, bụng hoặc lưng. Nguy cơ cũng cao hơn nếu đau ngực đi kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở.",
+    "source_excerpt": "Most chest pain is not a sign of anything serious but get medical advice just in case. Get immediate medical help if you think you're having a heart attack.\nImmediate action required:\nCall 999 if:\nyou get sudden pain or discomfort in your chest that does not go away – the pain can feel like squeezing or pressure inside your chest, burning or indigestion\nyou get pain that spreads to your left or right arm, or your neck, jaw, stomach or back\nyou have chest pain and you feel sweaty, sick, light headed or short of breath\nYou could be having a heart attack. Call 999 straight away as you need immediate treatment in hospital.\nNon-urgent advice:\nSee a GP if:\nyou have chest pain that comes and goes\nyou have chest pain that goes away quickly but you're still worried\nIt's important to get medical advice to make sure it's nothing serious.\nCommon causes of chest pain\nChest pain has many different causes. In most cases, chest pain is not caused by a heart problem.\nYour symptoms might give you an idea of the cause. Do not self-diagnose – see a GP if you're worried.\nChest pain symptoms and possible causes\nChest pain symptoms\nPossible cause\nStarts after eating, bringing up food or bitter tasting fl",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "high",
+    "tags": [
+      "chest_pain",
+      "red_flags"
+    ],
+    "keywords": [
+      "đau ngực",
+      "cấp cứu",
+      "call emergency"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Nếu có dấu hiệu nghiêm trọng, cần gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_011",
+    "doc_id": "chest_pain_doc_001",
+    "source_id": "chest_pain",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/chest-pain/",
+    "section": "red_flags",
+    "title": "Khi nào đau ngực nên đi khám sớm",
+    "content": "Nếu đau ngực xuất hiện rồi tự hết, đau ngực đến rồi đi, hoặc bạn vẫn còn lo lắng dù triệu chứng không kéo dài, bạn nên đi khám sớm để được đánh giá.",
+    "source_excerpt": "Most chest pain is not a sign of anything serious but get medical advice just in case. Get immediate medical help if you think you're having a heart attack.\nImmediate action required:\nCall 999 if:\nyou get sudden pain or discomfort in your chest that does not go away – the pain can feel like squeezing or pressure inside your chest, burning or indigestion\nyou get pain that spreads to your left or right arm, or your neck, jaw, stomach or back\nyou have chest pain and you feel sweaty, sick, light headed or short of breath\nYou could be having a heart attack. Call 999 straight away as you need immediate treatment in hospital.\nNon-urgent advice:\nSee a GP if:\nyou have chest pain that comes and goes\nyou have chest pain that goes away quickly but you're still worried\nIt's important to get medical advice to make sure it's nothing serious.\nCommon causes of chest pain\nChest pain has many different causes. In most cases, chest pain is not caused by a heart problem.\nYour symptoms might give you an idea of the cause. Do not self-diagnose – see a GP if you're worried.\nChest pain symptoms and possible causes\nChest pain symptoms\nPossible cause\nStarts after eating, bringing up food or bitter tasting fl",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "high",
+    "tags": [
+      "chest_pain",
+      "red_flags"
+    ],
+    "keywords": [
+      "đau ngực đi khám",
+      "đau ngực kéo dài"
+    ],
+    "test_types": [],
+    "faq_type": "urgent_advice",
+    "safety_notes": "Không nên trì hoãn thăm khám nếu triệu chứng tái diễn hoặc khiến bạn lo ngại.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_012",
+    "doc_id": "chest_pain_doc_001",
+    "source_id": "chest_pain",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/chest-pain/",
+    "section": "red_flags",
+    "title": "Đau ngực có thể do nhiều nguyên nhân và không nên tự chẩn đoán",
+    "content": "Đau ngực có thể liên quan đến nhiều nguyên nhân khác nhau, từ vấn đề cơ xương, khó tiêu, nhiễm trùng đến bệnh tim. Vì triệu chứng có thể chồng lấp, người dùng không nên tự chẩn đoán nguyên nhân chỉ dựa vào cảm giác chủ quan.",
+    "source_excerpt": "Most chest pain is not a sign of anything serious but get medical advice just in case. Get immediate medical help if you think you're having a heart attack.\nImmediate action required:\nCall 999 if:\nyou get sudden pain or discomfort in your chest that does not go away – the pain can feel like squeezing or pressure inside your chest, burning or indigestion\nyou get pain that spreads to your left or right arm, or your neck, jaw, stomach or back\nyou have chest pain and you feel sweaty, sick, light headed or short of breath\nYou could be having a heart attack. Call 999 straight away as you need immediate treatment in hospital.\nNon-urgent advice:\nSee a GP if:\nyou have chest pain that comes and goes\nyou have chest pain that goes away quickly but you're still worried\nIt's important to get medical advice to make sure it's nothing serious.\nCommon causes of chest pain\nChest pain has many different causes. In most cases, chest pain is not caused by a heart problem.\nYour symptoms might give you an idea of the cause. Do not self-diagnose – see a GP if you're worried.\nChest pain symptoms and possible causes\nChest pain symptoms\nPossible cause\nStarts after eating, bringing up food or bitter tasting fl",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "high",
+    "tags": [
+      "chest_pain",
+      "red_flags"
+    ],
+    "keywords": [
+      "nguyên nhân đau ngực",
+      "không tự chẩn đoán đau ngực"
+    ],
+    "test_types": [],
+    "faq_type": "safety_boundary",
+    "safety_notes": "Chatbot không dùng để xác định nguyên nhân đau ngực.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_013",
+    "doc_id": "shortness_of_breath_doc_001",
+    "source_id": "shortness_of_breath",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/shortness-of-breath/",
+    "section": "red_flags",
+    "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+    "content": "Cần hỗ trợ khẩn cấp ngay nếu khó thở nặng, thở hổn hển, nghẹt thở, không nói được thành câu, ngực nặng hoặc đau lan ra tay, lưng, cổ hoặc hàm. Đây cũng là tình huống nguy hiểm nếu môi hoặc da rất nhợt, tím hoặc xám, hoặc người bệnh đột ngột lú lẫn.",
+    "source_excerpt": "Shortness of breath might not be anything to worry about, but sometimes it can be serious and you'll need to get medical help.\nImmediate action required:\nCall 999 or go to A&E immediately if:\nyou have severe difficulty breathing – you’re gasping, choking or not able to get words out\nyour chest feels tight or heavy\nyou have pain that spreads to your arms, back, neck and jaw\nyour lips or skin are turning very pale, blue or grey – on brown or black skin, this may be easier to see on the palms of the hands\nyou feel suddenly confused\nFind your nearest A&E\nInformation:\nDo not drive to A&E. Ask someone to drive you or call 999 and ask for an ambulance.\nBring any medicines you take with you.\nImmediate action required:\nCall 999 or go to A&E immediately if your child:\nhas difficulty breathing – they may make grunting noises or suck their stomach in under their ribcage\nhas lips or skin that are turning very pale, blue or grey – on brown or black skin, this may be easier to see on the palms of the hands\nis suddenly confused (agitated, behaving oddly or crying constantly)\nis limp, floppy or not responding like they normally do - their head may fall to the side, backwards or forwards, or they ma",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "high",
+    "tags": [
+      "shortness_of_breath",
+      "red_flags"
+    ],
+    "keywords": [
+      "khó thở",
+      "cấp cứu",
+      "thở gấp"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Nếu có dấu hiệu nặng, cần gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay.",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_014",
+    "doc_id": "shortness_of_breath_doc_001",
+    "source_id": "shortness_of_breath",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/shortness-of-breath/",
+    "section": "red_flags",
+    "title": "Khi nào khó thở cần được đánh giá y tế sớm",
+    "content": "Bạn nên được đánh giá y tế sớm nếu khó thở hơn bình thường, ho ra máu, đau hoặc sưng một chân, hồi hộp trống ngực, hoặc khó thở kéo dài và ngày càng nặng hơn.",
+    "source_excerpt": "Shortness of breath might not be anything to worry about, but sometimes it can be serious and you'll need to get medical help.\nImmediate action required:\nCall 999 or go to A&E immediately if:\nyou have severe difficulty breathing – you’re gasping, choking or not able to get words out\nyour chest feels tight or heavy\nyou have pain that spreads to your arms, back, neck and jaw\nyour lips or skin are turning very pale, blue or grey – on brown or black skin, this may be easier to see on the palms of the hands\nyou feel suddenly confused\nFind your nearest A&E\nInformation:\nDo not drive to A&E. Ask someone to drive you or call 999 and ask for an ambulance.\nBring any medicines you take with you.\nImmediate action required:\nCall 999 or go to A&E immediately if your child:\nhas difficulty breathing – they may make grunting noises or suck their stomach in under their ribcage\nhas lips or skin that are turning very pale, blue or grey – on brown or black skin, this may be easier to see on the palms of the hands\nis suddenly confused (agitated, behaving oddly or crying constantly)\nis limp, floppy or not responding like they normally do - their head may fall to the side, backwards or forwards, or they ma",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "high",
+    "tags": [
+      "shortness_of_breath",
+      "red_flags"
+    ],
+    "keywords": [
+      "khó thở đi khám",
+      "ho ra máu",
+      "sưng chân",
+      "hồi hộp"
+    ],
+    "test_types": [],
+    "faq_type": "urgent_advice",
+    "safety_notes": "",
+    "review_status": "approved",
+    "use_in_v1": true
+  },
+  {
+    "id": "kb_v1_015",
+    "doc_id": "shortness_of_breath_doc_001",
+    "source_id": "shortness_of_breath",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/shortness-of-breath/",
+    "section": "red_flags",
+    "title": "Không nên tự chẩn đoán nguyên nhân khó thở",
+    "content": "Khó thở có thể liên quan đến nhiều nguyên nhân khác nhau như hen, nhiễm trùng ngực, lo âu, bệnh phổi hoặc bệnh tim. Vì vậy, người dùng không nên tự xác định nguyên nhân nếu chưa được đánh giá y tế.",
+    "source_excerpt": "Shortness of breath might not be anything to worry about, but sometimes it can be serious and you'll need to get medical help.\nImmediate action required:\nCall 999 or go to A&E immediately if:\nyou have severe difficulty breathing – you’re gasping, choking or not able to get words out\nyour chest feels tight or heavy\nyou have pain that spreads to your arms, back, neck and jaw\nyour lips or skin are turning very pale, blue or grey – on brown or black skin, this may be easier to see on the palms of the hands\nyou feel suddenly confused\nFind your nearest A&E\nInformation:\nDo not drive to A&E. Ask someone to drive you or call 999 and ask for an ambulance.\nBring any medicines you take with you.\nImmediate action required:\nCall 999 or go to A&E immediately if your child:\nhas difficulty breathing – they may make grunting noises or suck their stomach in under their ribcage\nhas lips or skin that are turning very pale, blue or grey – on brown or black skin, this may be easier to see on the palms of the hands\nis suddenly confused (agitated, behaving oddly or crying constantly)\nis limp, floppy or not responding like they normally do - their head may fall to the side, backwards or forwards, or they ma",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "high",
+    "tags": [
+      "shortness_of_breath",
+      "safety_boundary"
+    ],
+    "keywords": [
+      "nguyên nhân khó thở",
+      "không tự chẩn đoán khó thở"
+    ],
+    "test_types": [],
+    "faq_type": "safety_boundary",
+    "safety_notes": "Chatbot không dùng để chẩn đoán nguyên nhân khó thở.",
+    "review_status": "approved",
+    "use_in_v1": true
+  }
+]

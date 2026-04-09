@@ -1,0 +1,2815 @@
+Guidance on regulations 
+for the 
+Transport of 
+Infectious 
+Substances 
+ 
+2021-2022 
+ 
+ 
+ 
+Applicable as from 1 January 2021 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+Guidance on regulations 
+for the 
+Transport of 
+Infectious 
+Substances 
+ 
+2021-2022 
+ 
+ 
+ 
+Applicable as from 1 January 2021 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+Guidance on regulations for the transport of infectious substances 2021-2022 
+ 
+ISBN 978-92-4-001972-0 (electronic version) 
+ISBN 978-92-4-001973-7 (print version) 
+ 
+© World Health Organization 2021 
+ 
+Some rights reserved. This work is available under the Creative Commons Attribution-
+NonCommercial-ShareAlike 3.0 IGO licence (CC BY-NC-SA 3.0 IGO; 
+https://creativecommons.org/licenses/by-nc-sa/3.0/igo). 
+ 
+Under the terms of this licence, you may copy, redistribute and adapt the work for non-commercial 
+purposes, provided the work is appropriately cited, as indicated below. In any use of this work, there 
+should be no suggestion that WHO endorses any specific organization, products or services. The use 
+of the WHO logo is not permitted. If you adapt the work, then you must license your work under the 
+same or equivalent Creative Commons licence. If you create a translation of this work, you should 
+add the following disclaimer along with the suggested citation: “This translation was not created by 
+the World Health Organization (WHO). WHO is not responsible for the content or accuracy of this 
+translation. The original English edition shall be the binding and authentic edition”. 
+ 
+Any mediation relating to disputes arising under the licence shall be conducted in accordance with the 
+mediation rules of the World Intellectual Property Organization 
+(http://www.wipo.int/amc/en/mediation/rules/). 
+ 
+Suggested citation. Guidance on regulations for the transport of infectious substances 2021-2022. 
+Geneva: World Health Organization; 2021. Licence: CC BY-NC-SA 3.0 IGO. 
+ 
+Cataloguing-in-Publication (CIP) data. CIP data are available at http://apps.who.int/iris. 
+ 
+Sales, rights and licensing. To purchase WHO publications, see http://apps.who.int/bookorders. To 
+submit requests for commercial use and queries on rights and licensing, see 
+http://www.who.int/about/licensing. 
+ 
+Third-party materials. If you wish to reuse material from this work that is attributed to a third party, 
+such as tables, figures or images, it is your responsibility to determine whether permission is needed 
+for that reuse and to obtain permission from the copyright holder. The risk of claims resulting from 
+infringement of any third-party-owned component in the work rests solely with the user. 
+General disclaimers. The designations employed and the presentation of the material in this 
+publication do not imply the expression of any opinion whatsoever on the part of WHO concerning 
+the legal status of any country, territory, city or area or of its authorities, or concerning the 
+delimitation of its frontiers or boundaries. Dotted and dashed lines on maps represent approximate 
+border lines for which there may not yet be full agreement. 
+ 
+The mention of specific companies or of certain manufacturers’ products does not imply that they are 
+endorsed or recommended by WHO in preference to others of a similar nature that are not mentioned. 
+Errors and omissions excepted, the names of proprietary products are distinguished by initial capital 
+letters. 
+All reasonable precautions have been taken by WHO to verify the information contained in this 
+publication. However, the published material is being distributed without warranty of any kind, either 
+expressed or implied. The responsibility for the interpretation and use of the material lies with the 
+reader. In no event shall WHO be liable for damages arising from its use. 
+
+iii 
+ 
+Contents 
+Foreword ............................................................................................................................................ v 
+Acknowledgements .......................................................................................................................... vi 
+Section 1: Transport Regulations .................................................................................................... 1 
+1.1 International Regulations ........................................................................................................ 1 
+1.2 Modal Agreements ................................................................................................................. 1 
+1.3 National regulations ................................................................................................................ 3 
+1.4 Operator/Carrier Variations .................................................................................................... 3 
+1.5 Supplementary Regulations .................................................................................................... 4 
+1.6 Special Provisions .................................................................................................................. 4 
+1.7 Dangerous Goods Security ..................................................................................................... 4 
+Section 2: Transport Stakeholders .................................................................................................. 5 
+2.1 The Shipper ............................................................................................................................ 5 
+2.2 The Packaging Supplier .......................................................................................................... 5 
+2.3 The Operator/Carrier .............................................................................................................. 6 
+2.4 The Receiver ........................................................................................................................... 6 
+Section 3: Training ............................................................................................................................ 7 
+Section 4: Defining a Material for Transport ................................................................................. 9 
+4.1 Cultures .................................................................................................................................. 9 
+4.2 Patient specimens ................................................................................................................... 9 
+4.3 Biological products ................................................................................................................. 9 
+4.4 Medical or clinical wastes .................................................................................................... 10 
+4.5 Medical Devices or Equipment ............................................................................................ 10 
+4.6 Exceptions ............................................................................................................................ 11 
+4.6.1 Exempt Human or Exempt Animal Specimens..................................................................... 12 
+4.6.2 Used Medical Devices or Equipment ................................................................................... 12 
+Section 5: Classification of Infectious Substances ........................................................................ 13 
+5.1 Dangerous Goods Classes & Divisions ................................................................................ 13 
+5.2 Infectious Substance Categories ........................................................................................... 14 
+5.2.1 Category A ............................................................................................................................ 14 
+5.2.2 Category B ............................................................................................................................ 15 
+Section 6: Preparing Packaging Requirements ............................................................................ 17 
+6.1 A Basic Triple Packaging System ........................................................................................ 18 
+6.2 Packing Instruction P650 (Category B Infectious Substance Requirements)....................... 19 
+6.3 Packing Instruction P620 (Category A Packaging Requirements) ....................................... 20 
+6.4 Packing Instruction P621 (Medical or Clinical Waste Requirements) ................................. 23 
+6.5 Packing with Coolants .......................................................................................................... 23 
+6.5.1 Wet Ice ................................................................................................................................. 24 
+6.5.2 Dry Ice .................................................................................................................................. 24 
+6.5.3 Liquid Nitrogen..................................................................................................................... 24 
+6.5.4 Dry Shippers ......................................................................................................................... 24 
+6.6 Packing with Stabilizers ....................................................................................................... 25 
+6.7 Packing in Overpacks ........................................................................................................... 25 
+6.8 Re-cycling Packaging ........................................................................................................... 25 
+Section 7: Marking & Labelling .................................................................................................... 26 
+7.1 Marks .................................................................................................................................... 26 
+7.2 Labels ................................................................................................................................... 27 
+7.2.1 Hazard labels ........................................................................................................................ 28 
+7.2.2 Handling labels ..................................................................................................................... 29 
+
+iv 
+ 
+Section 8: Documenting Shipments ............................................................................................... 30 
+8.1 Dangerous Goods Transport Document (DGTD) ................................................................ 30 
+8.2 Air Waybill ........................................................................................................................... 33 
+8.3 Spill clean-up procedure ....................................................................................................... 34 
+References ........................................................................................................................................ 36 
+Annex 1: Link to International Regulations & Modal Agreements ........................................... 37 
+Annex 2: Special Provisions ........................................................................................................... 38 
+Annex 3: Indicative List of Biological Agents sub-classified as Category A. ............................. 41 
+Annex 4: Packing Instructions ....................................................................................................... 43 
+A4.1 Packing Instruction P620 ................................................................................................... 43 
+A4.2 Packing Instruction P650 ................................................................................................... 44 
+A4.3 Packing Instruction P621 ................................................................................................... 46 
+A4.4 Packing Instruction PI954 ................................................................................................. 46 
+ 
+ 
+
+v 
+ 
+Foreword 
+This publication offers practical guidance to facilitate compliance with applicable international 
+regulations for the transport of infectious substances by all modes of transport and includes the 
+changes that apply from 1 January 2021. Existing national and international regulatory framework 
+for transport of infectious substances are included to provide information for classifying, identifying, 
+packaging, marking, labelling, documenting and refrigerating infectious substances for 
+transportation and ensuring their safe delivery. 
+ 
+The information in this publication targets all stakeholders involved in the shipping of infectious 
+substances such as the shipper, the packaging supplier, the operator/carrier and the receiver. 
+The 2021/2022 edition of this document went through several WHO-internal review/clearance 
+processes plus an organizational review by International Air Transport Association (IATA) in official 
+relations with the World Health Organization (WHO) under the Framework of Engagement with non-
+State Actors. 
+ 
+The content of this document is crosslinked to diverse WHO and other activities, ranging from 
+biosafety and the WHO Infectious Substances Shipping Training (ISST; not open to all) to any other 
+programmes that require off-site transport of infectious substances for further processing, storage 
+or disposal. 
+ 
+The biannual update of this document reflects the changes in the source documents. The current 
+revision replaces the document issued by the WHO in 2019 (document 
+WHO/WHE/CPI/2019.20). When using this publication, reference must be made to the applicable 
+national and international regulations. 
+ 
+ 
+
+vi 
+ 
+Acknowledgements 
+ 
+The following people contributed to this guidance: Kazunobu Kojima, Lisa Stevens, Rica Zinsky. 
+The international air transport association (IATA) reviewed this document. 
+ 
+This document has been produced with the financial assistance of the European Union. The views 
+expressed herein can in no way be taken to reflect the official opinion of the European Union. 
+ 
+
+1 
+ 
+Section 1: Transport Regulations 
+1.1 International Regulations 
+Work with biological agents, including diagnostic activities, biomedical research and pharmaceutical 
+manufacturing, plays a key role in the detection and prevention of outbreaks of emerging and highly 
+infectious disease and reduction of other risks to international health security. Facilities handling 
+biological agents have a responsibility to ensure that biological agents are identified, safely stored, 
+and controlled in adequately equipped facilities according to best practices. 
+ 
+Whilst materials containing biological agents are being transported, there exists a likelihood of 
+exposure for the people and the environment through which the material passes. To appropriately 
+control and reduce this risk, various international groups have developed recommendations and/or 
+regulations, that outline the way in which infectious substances should be packaged, ma rked, 
+labelled and documented, to ensure safety and containment throughout the transport process. 
+ 
+One of the most widely known and referenced set of recommendations are the “Recommendations 
+on the Transport of Dangerous Goods —Model Regulations (2 1st revised edition) (1).” (hereinafter 
+referred to as the “UN Model Regulations”). These recommendations are made by the Committee of 
+Experts on the Transport of Dangerous Goods (UNCETDG), a committee of the United Nations 
+Economic and Social Council, comprising expert advisors from various countries, non-governmental 
+organizations and specialized agencies including WHO representatives. The recommendations are 
+continuously reviewed, in two -yearly cycles, and updated by the committee in light of technical 
+progress, the introduction of new substances or materials, modern pressures on transport systems, 
+and emerging safety requirements for people, property and the environment. 
+ 
+The UN Model Regulations aim to provide a minimum set of provisions to follow to safely transport 
+any dangerous goods, which includes infectious substances. The use of this same set of provisions as 
+a basis across various national and international regulations aims to introduce provide conformity and 
+harmonization across them all. However, t he UN model regulations provide a certain degree of 
+flexibility so that the basics may still be adapted to fit local needs and special requirements for 
+overcoming barriers in transport . Adapted versions may then be adopted by governments and/or 
+international organizations as mandatory, or legally binding regulations for the transport of dangerous 
+goods. The subsequent implementation of, and compliance with adopted regulations may be 
+overseen by independent bodies or national authorities, as designated by the relevant governing 
+body. 
+ 
+1.2 Modal Agreements 
+Whilst the UN Model Regulations are general enough to cover all modes of transport, they are most 
+commonly reflected in international law through international modal agreements, which adapt and 
+publish guidelines or regulations specialized for a specific mode of transport. Some of the most 
+common modal agreements for the transport of dangerous goods are described in Table 1. References 
+and online links to these agreements may also be found in Annex 1 of this document. 
+ 
+ 
+
+2 
+ 
+Mode of 
+Transport 
+International Modal Agreements 
+Air The Technical Instructions for the Safe Transport of Dangerous Goods by Air (2) (hereinafter 
+referred to as the “ICAO technical Instructions”) are a detailed set of instructions deemed 
+necessary for the safe international tran sport of dangerous goods by air. Published by 
+the International Civil Aviation Organization (ICAO), t hese legally binding international 
+regulations apply on all international flights. They are regularly reviewed and updated based 
+on comments received from States and interested international organizations, including WHO, 
+or based on recommendations of the UNCETDG or the International Atomic Energy Agency 
+(IAEA). 
+ 
+The International Air Transport Association (IATA) also publish Dangerous Goods Regulations 
+(3) (DGR), that incorporate the ICAO provisions and may add further restrictions stemming 
+from operational considerations. DGR also present state and operator variations. IATA DGR are 
+applicable to its member and some other airlines as well as all shippers and agents that offer 
+consignments of dangerous goods to these operators. 
+ 
+For national flights, i.e. flights within one country, national civil aviation authorities may apply 
+national legislation. This is normally based on the ICAO provisions, but may incorporate 
+variations. State and operator variations are published in both the ICAO Technical Instructions 
+and in the IATA Dangerous Goods Regulations. 
+ 
+Rail A set of regulations concerning the International Carriage of Dangerous Goods by Rail (4) (RID) 
+has been created by the Intergovernmental Organisation for international Carriage by Rail 
+(OTIF) and applies to countries in Europe, the Middle East and North Africa. RID also applies 
+to domestic transport in the European Union through Council Directive 2008/68/EC (5). 
+ 
+Road The Agreement concerning the International Carriage of Dangerous Goods by Road (6) (ADR) 
+applies to signatory countries. In addition, modified versions of the convention are being used 
+by countries in South America and South-East Asia. ADR also applies to domestic transport in 
+the European Union through Council Directive 2008/68/EC. 
+ 
+Sea The International Maritime Dangerous Goods Code (7) published by the International 
+Maritime Organization (IMO) is of mandatory application for all contracting parties to the 
+International Convention for the Safety of Life at Sea (SOLAS). 
+ 
+Post The Letter post manual published by the Universal Postal Union (UPU) reflects the UN 
+Model Regulations by using the ICAO technical instructions as the basis for shipments. 
+ 
+It should be noted that some i nfectious substances considered to be of a high -risk category 
+(known as “Category A Infectious Substances ”) will not be accepted for shipment through 
+postal services. Some i nfectious substances in lower risk categories ( such as “Biological 
+Substance, Category B – UN3373” or “Patient specimens”) may be shipped by registered air 
+mail. For more information on infectious substances categories, please refer to Section 5.2. 
+ 
+Local/international restrictions may also be in force. Prior contact should therefore be 
+made with the national public operators for registered mail to ascertain whether the 
+packaged material will be accepted by the postal service in question. 
+ 
+Table 1: A summary of the modal agreements containing relevant dangerous good regulations. 
+ 
+ 
+ 
+
+3 
+ 
+1.3 National regulations 
+Many countries adopt the UN Model Regulations in their entirety to stand as their national 
+dangerous goods legislation, whilst others apply variations that suit local conditions and 
+requirements. National authorities should be able to provide details of their own national 
+requirements to relevant users. 
+ 
+Where national regulations do not exist, the international modal agreements described above should 
+be followed. Should multiple regulations apply to a single shipment of infectious substances, the most 
+stringent ones should be applied. 
+ 
+ 
+Figure 1: An example of a national variation requirement. Taken from the ICAO Technical Instructions. 
+ 
+1.4 Operator/Carrier Variations 
+Transport of infectious substances is of international concern due to the public health impact/effects 
+and needs. Much of the transport/logistics chain, however, is not a public health service, and also 
+includes industries of a commercial nature. In many cases safety is a key factor, not for health 
+concerns, but also for reasons of reputability and trust. For this rea son, although modal agreements 
+and national regulations exist to appropriately address safety procedures, companies operating 
+commercial enterprises (for example airlines, couriers) may enforce additional safety requirements 
+for shipments in their carriage, aiming to achieve a high level of accountability for their clients. 
+ 
+Although not usually legally binding, failure to comply with such variations may result in a refusal of 
+service between that enterprise and the person trying to send the infectious sub stances. Failure to 
+comply with operator/carrier variations is generally the most common reason for delayed or refused 
+shipments. Furthermore, a commercial enterprise that does not wish to carry particular dangerous 
+goods is under no legal obligation to do so, even if compliance with applicable regulations is met. 
+ 
+ICAO and IATA list the main operator/carrier restrictions in force among airlines. Some airlines will not 
+carry dangerous goods at all, while others will carry only a very limited range of goods. An example of 
+one such restriction can be seen in Figure 2. As carrier restrictions for the different modes of transport 
+are not published centrally, harmonization between stakeholders is essential. 
+ 
+BZ (Blue Dart Aviation Ltd.) 
+… 
+BZ-07 Dangerous goods listed in the List of High Consequence dangerous goods will not be accepted 
+for carriage. However, dangerous goods of Division 6.2, infectious substances in category A (UN 
+2814 and UN 2900) and substances of Division 6.1 in Packing Group I will be acce pted subject to 
+prior approval by Blue Dart. 
+… 
+Figure 2: An example of an operator/carrier variation. As seen in the IATA Dangerous Goods Regulations. 
+ 
+ 
+
+4 
+ 
+1.5 Supplementary Regulations 
+Particularly where international transport is concerned, regulations over and above those for safety 
+in transport may apply. This includes regulations for import/export licens ing, licenc ing to 
+carry/hold/store certain biological agent s, or agricultural and environment safety regulations, for 
+example. 
+ 
+Supplementary regulations may be applied by a variety of government departments , or several 
+different agencies. It is the responsibility of the shipper (person sending the shipment) to ensure they 
+are aware of, and comply with, all applicable regulations. 
+ 
+1.6 Special Provisions 
+“Special Provisions” is a term used to describe certain circumstances or procedures that are not 
+covered in standard regulations. These provisions are therefore needed to supplement or modify the 
+original regulations to appropriate ship the dangerous good to which it applies. 
+ 
+Tables list ing special provisions appl icable to dangerous good may be found in most international 
+regulation documents, including the UN Model Regulations. A short list of special provisions that may 
+be applicable to infectious substances shipments is also provided in Annex 2 of this document. 
+ 
+1.7 Dangerous Goods Security 
+High consequence dangerous goods are those which have the potential for misuse in a terrorist event 
+and which may, as a result, produce serious consequences such as mass casualties or mass 
+destruction. Division 6.2 infectious substances of Category A (UN 2814 and UN 2900) and medica l 
+waste of Category A (UN 3549) are considered high consequence dangerous goods. 
+ 
+Shippers, operators and others (including infrastructure managers) engaged in the transport of high 
+consequence dangerous goods should adopt, implement and comply with a security plan . As a 
+minimum, the security plan should consist of the following elements: 
+• specific allocat ion of responsibilities for security to competent and qualified persons with 
+appropriate authority to carry out their responsibilities; 
+• records of dangerous goods or types of dangerous goods transported; 
+• review of current operations and assessment of vulnerabilities, including inter-modal transfer, 
+temporary transit storage, handling and distribution as appropriate; 
+• clear statement of measures including training policies (including response to higher threat 
+conditions, new employee/employment verifications etc.), operating practices (e.g. access to 
+dangerous goods in temporary storage proximity to vulnerable infrastructure etc.), equipment 
+and resources that are to be used to reduce security risks; 
+• effective and up to date procedures for reporting and dealing with security threats, breaches 
+of security or security incidents; 
+• procedures for the evaluation and testing of security plans and procedures for periodic review 
+and update of the plans; 
+• measures to ensure the security of transport information contained in the plan; and 
+• measures to ensure that the distribution of the transport information is limited as far as 
+possible (such measures shall not preclude provision of transport documentation). 
+ 
+
+5 
+ 
+Section 2: Transport Stakeholders 
+From the time an infectious substance is packed until it reaches its destination, many different 
+stakeholders may have participated in the transport process. The efficient transfer of infectious 
+substances requires good coordination and harmonization between all parties involved in the 
+shipment. This includes t he person or institution sending the substance, the com mercial entities 
+involved in carrying the package, and the person or institution receiving the substance. 
+ 
+An overview of the responsibilities of the some of the primary stakeholders involved in the transport 
+process are provided below. 
+ 
+2.1 The Shipper 
+• May also be known as the consignor or the sender. 
+• Ensures the correct identification, classification, packaging, marking, labelling, and 
+documentation of all infectious substances destined for transport. 
+• Ensures that packaging selected is suitable, and compliant, for the substances being shipped. 
+• Confirms with the national authorities that the material may be legally exported 
+• Makes themselves aware of all regulations applicable to their shipment, based upon the place 
+or origin, transit, destination and/or mode of transport. 
+• Explore whether additional approvals are required, such as export permits. 
+• Makes primary contact with the receiver of the package to ensure they are able and prepared 
+to receive the shipment. 
+• Ensures that the package is prepared in accordance with the instructions from the package 
+manufacturer. 
+• Makes advance arrangements with the carrier to ensure: 
+o There are no additional operator variations applicable to the shipment. 
+o The shipment will be accepted for appropriate transport. 
+o The shipment is undertaken by the most direct routing (direct transport if possible). 
+• Prepares necessary documentation, including permits, dispatch and shipping documents , 
+retaining a copy of each. 
+• Notifies the receiver of transportation arrangements once these have been made, well in 
+advance of the expected arrival time. 
+2.2 The Packaging Supplier 
+• Manufactures and tests lines of packaging materials according to applicable regulations. 
+• Makes available test reports and results on request to users of their packages, and/or national 
+competent authorities. 
+• Provides instructions to users regarding the procedures to be followed, and additional 
+components needed, to ensure their packaging materials are capable of meeting performance 
+requirements. 
+• If required, is registered with a quality assurance program me as directed by national 
+competent authorities. 
+ 
+ 
+
+6 
+ 
+2.3 The Operator/Carrier 
+• May include logistician s, courier compan ies, airline freight forwarder s or other transport 
+operators. 
+• May p rovide advice to the sender regarding the necessary shipping documents and 
+instructions for their completion. 
+• May provide advice to the sender about correct packaging. 
+• Assists the sender in arranging the most direct routing and then confirms the routing. 
+• Maintains and archives copies of the documentation for shipment and transport. 
+ 
+NOTE: The shipper is responsible for ensuring the 
+package and documentation is prepared in compliance 
+with the regulations, on top of any advice received from 
+the carrier. 
+ 
+2.4 The Receiver 
+• May also be known as the consignee, importer, or 
+buyer. 
+• Confirms with the national authorities that the 
+substance may be legally imported. 
+• Obtains the necessary authorization(s) from 
+national authorities for the receipt of the substance, for example importation permits. These 
+may need to be provided to the sender, as applicable. 
+• Arranges for the most timely and efficient collection on arrival. 
+• Acknowledges receipt to the sender. 
+ 
+Consignor: The person or organization 
+responsible for sending the shipment, 
+also known as the shipper or sender. 
+ 
+Consignee: The person or organization 
+responsible for receipt of the 
+shipment, may also be known as the 
+receiver or buyer. 
+ 
+Consignment: A package, or group of 
+packages (shipment), destined for 
+delivery. 
+
+7 
+ 
+Section 3: Training 
+Before a consignment of dangerous goods is offered for transport, all relevant persons involved in its 
+preparation must have received training to enable them to carry out their responsibilities. Where the 
+organization responsible for preparing the shipment does not have appropriately trained staff, the 
+“relevant persons” may be interpreted as those contracted to act on the shipper's behalf and 
+undertake the shipper's responsibilities in the preparati on of the shipment. However, such persons 
+must still be able to fulfil applicable training requirements. 
+ 
+Personnel should be trained in a manner 
+which corresponds to their contractual 
+responsibilities. Therefore, the content of 
+the training provided should be 
+determined by analysing their assigned 
+roles and responsibilities as part of their 
+job description. In some cases, this should 
+be determined by the employer but in 
+others it will be stipulated and/or 
+governed by national competent 
+authorities. Employees should only ever 
+carry out functions for which the required 
+training has been provided OR be 
+appropriately supervised and signed off by 
+another competent individual. 
+ 
+According to the UN Model Regulations, all 
+individuals involved in the transport of 
+dangerous goods sh all be trained in the 
+contents of dangerous goods 
+requirements commensurate with their 
+responsibilities, which should include the 
+following areas: 
+ 
+1. General awareness & familiarization training – This should involve familiarization with the 
+general provisions of dangerous goods transport requirements, including: 
+a. Description of the classes of dangerous goods 
+b. Labelling, marking and placarding 
+c. Packaging 
+d. Segregation 
+e. Compatibility of dangerous goods 
+f. Purpose and content of dangerous goods documentation 
+g. Descriptions of available emergency response documents 
+ 
+2. Function-specific training - Personnel must be competent to perform any functions for which 
+they are responsible prior to performing any of these functions. For example, a shipper of a 
+public health institution may n eed to be trained on the details of classification, packing, 
+labelling, marking and documenting dangerous goods, whilst a carrier may require more 
+training on acceptance, handling, loading, stowing and logistics procedures. Function-specific 
+competencies should be appropriately supervised until competency is assured, which may 
+There are a wide range of stakeholders who m ust be 
+trained appropriately for the safe and compliant 
+shipment of infectious substances including: 
+ 
+- The p ersons or organizations undertaking the 
+responsibilities of the shipper, 
+- Staff of t ransport operators (drivers, pilots, 
+captains etc.) 
+- Ground handling agencies which perform, on 
+behalf of the operator s/carriers, the accepting, 
+handling, loading, unloading dangerous goods 
+packages 
+- Individuals involved in transferring, processing 
+or screening of cargo or mail such as security 
+staff 
+- Freight forwarders. 
+- Designated postal operators. 
+The ICAO technical instructions provide a more detailed 
+overview on the various aspects of dangerous goods 
+transport that various types of personnel should be 
+familiar with to be considered competent to ship 
+dangerous goods. 
+
+8 
+ 
+require the completion of approved training courses and/or passing examinations and for on 
+the job assessment. 
+ 
+3. Safety training – including: 
+a. Methods and procedures for avoiding accidents (proper use of package handling 
+equipment and appropriate methods of stowage of dangerous goods) 
+b. Emergency response information and how to use it 
+c. General dangers and hazards of the various dangerous goods classes 
+d. Prevention of exposure to hazards including the use of personal protective equipment 
+e. Procedures to be followed in the event of unintentional release or exposure to any 
+dangerous goods 
+ 
+It should be noted that most modal agreements include provisions that require the testing and 
+verification of an individual’s knowledge and competency in the aforementioned areas for any person 
+involved in dangerous goods transportation. For example, the UN Model Regulations stipulate that 
+anyone involved in the shipment of high consequence dangerous goods (refer to Section 1.7 of this 
+document), which includes division 6.2 infectious substances of Category A (UN2814 and UN2900) and 
+medical waste of Category A (UN3549) must undertake appropriate training and provide t raining 
+records on request. 
+ 
+Records of training conducted should be kept by the employer and should be able to make these 
+available on request of the employee or a national competent authority, as they may need to be 
+verified upon new appointment or acquisition of new responsibilities. Training should be periodically 
+supplemented with retraining, as deemed necessary by the competent authority. Typically, training 
+and competency testing should be repeated at least every 2 years (24 months) but may vary for 
+different modes of transport. Dangerous goods training programmes may be subject to review and 
+approval by the relevant national competent authorities. 
+ 
+
+9 
+ 
+Section 4: Defining a Material for Transport 
+For the purpose of transport, materials or products which are known to contain, or are reasonably 
+expected to contain, biological agents that cause disease in humans or animals (i.e. pathogens) are 
+known as Infectious S ubstances. Pathogens are defined as micro -organisms (including bacteria, 
+viruses, parasites, f ungi) and other agents such as prions, which can cause disease in humans or 
+animals. In this context, the terms “infectious substances”, “infectious materials” or “infectious 
+products” are considered to be synonymous. 
+ 
+Before beginning the transportation process, it is important to define what is being shipped, and 
+whether this is, in fact, an infectious substance. Provided below are several products which may fall 
+under the definition of an infectious substances, under certain circumstances. 
+ 
+4.1 Cultures 
+Culture is a method by which biological agents are 
+intentionally propagated, under controlled laboratory 
+conditions, inside a designated medium or in animals. This 
+results in a concentrated collection of cultivated biological 
+agents known as cultures, which may be used in research, 
+diagnostics or stored in culture collections. Any cultured 
+biological agent capable of causing disease in humans or 
+animals will fall un der the definition of infectious 
+substances. 
+ 
+4.2 Patient specimens 
+Products or materials that are collected directly from 
+humans or animals for the purpose of research and/or 
+diagnostic investigations are known as patient specimens. 
+These may be referred to as patient samples, diagnostic 
+specimens or diagnostic samples. This includes, but is not 
+limited to, body fluids (excreta, secreta, blood/blood 
+products), tissues or body parts collected in containers, on 
+swabs, or submerged in preservative medias. As with 
+cultures, if the patient specimen contains biological agents 
+capable of causing disease in humans or animals, they will 
+be defined as infectious substances. 
+ 
+4.3 Biological products 
+Substances or materials that are derived from living organisms (e.g. bacteria, fungi, vaccines, animals, 
+humans etc) and are extracted and/or purified for use as a preventative, therapeutic or diagnostic tool 
+are known as biological products. This may include - but is not limited to - antitoxins, vaccines or 
+vaccine components etc. It is important to note, that due to their importance in disease treatment 
+and prevention, some biological products may be governed by special requirements or licen sing 
+agreements set out by national authorities. In this case, their manufacture and distribution could be 
+subject to regulations that differ from, or be in addition to, those set out for infectious substances. 
+ 
+ 
+Infected Live Animals: 
+Live animals (including those which 
+have been genetically modified) which 
+have been infected with a biological 
+agent must be transported in 
+accordance with appropriate 
+regulations in its country of origin, 
+transit and/or destination. Such 
+regulations are usually associated with 
+proper animal care, and as such, 
+infectious substances transport 
+regulations will not generally be 
+applicable. Live animals must NOT be 
+used as a means to transport infectious 
+substances unless such substances 
+cannot be consigned by any other 
+means. 
+A live animal that has been 
+intentionally infected and is known or 
+suspected to contain an infectious 
+substance may only be transported by 
+air under terms and conditions 
+approved by the appropriate national 
+authority of the States of origin, transit, 
+destination and operator. 
+ 
+ 
+
+10 
+ 
+4.4 Medical or clinical wastes 
+In treating patients (humans or animals) and conducting laboratory activities, consumables are used 
+and waste is generated that is contaminated by reagents, liquids, tissues, cultures and other products. 
+If this waste contains biological agents, capable of causing di sease in humans or animals, then this 
+medical or clinical waste is an infectious substance. 
+ 
+Medical or clinical wastes containing: 
+• Category A infectious substances must be assigned to UN 2814, UN 2900 or UN 3549, as 
+appropriate. Solid medical waste containing Category A infectious substances generated from 
+the medical treatment of humans or veterinary treatment of animals may be assigned to UN 
+3549. The UN 3549 entry must not be used for waste from bioresearch or liquid waste; 
+• Category B infectious substances must be assigned to UN 3291. 
+ 
+Medical or clinical wastes which are reasonably believed to have a low probability of containing 
+infectious substances must be assigned to UN 3291. For the assignment, international, regional or 
+national waste catalogues may be taken into account. 
+ 
+Note: 
+The proper shipping name for UN 3291 is Biomedical waste, 
+n.o.s., Clinical waste, unspecified, n.o.s. or Medical waste, n.o.s. 
+or Regulated medical waste, n.o.s. 
+ 
+Decontaminated medical or clinical wastes which previously 
+contained in fectious substances are not subject to the 
+Regulations unless they meet the criteria for inclusion in another 
+class of dangerous goods. 
+ 
+4.5 Medical Devices or Equipment 
+Similar to medical or clinical wastes, medical devices or equipment which have been contaminated by 
+biological agents, during patient treatment or laboratory processes, may be defined as infectious 
+substances, should the biological agents contained within them be capable of causing disease in 
+humans or animals. 
+ 
+ 
+ 
+Note: Genetically modified organisms (GMOs) or microorganisms (GMMOs) are animals, plants, 
+biological agents or cellular materials which have been subject to a genetic modification which is 
+different from their natural state. 
+ 
+Genetically modified organisms and micro-organisms which do not meet the definition of toxic or 
+infectious substances must be assigned to UN 3245. 
+ 
+COVID-19 vaccines containing GMOs or GMMOs, including those in clinical trials, are not subject to the 
+Dangerous Goods Regulations. 
+ 
+For an introduction to UN numbers and other dangerous goods classes, consult the section below on 
+classification. For more detailed information on non-infectious GMOs/GMMOS, please consult the UN 
+model regulations. 
+ 
+N.O.S. is an abbreviation 
+meaning ‘not otherwise 
+specified’. Other proper shipping 
+names for medical or clinical 
+wastes may be applicable to 
+shipments for other modes of 
+transport. Applicable regulations 
+should be consulted to establish 
+the correct proper shipping name 
+to use. 
+
+11 
+ 
+ 
+4.6 Exceptions 
+There are some circumstances where, although the material or product being shipped falls under one 
+of the definitions above, it will not meet the definition for an infectious substance due to the 
+confirmed absence of biological agents, or that the fact that any biological agents present are known 
+to be incapable of causing disease in humans or animals (i.e. non -pathogenic OR inactivat ed or 
+neutralized through a decontamination process). 
+ 
+In such cases, the materials or products are NOT considered to pose a health risk and are therefore 
+not subject to transport regulations providing certain provisions are followed , unless it meets the 
+criteria for a ‘dang erous goods’ in another class. Specific examples of these complete exceptions 
+include: 
+ 
+- Cultures where the biological agent is non-pathogenic to humans or animals. 
+- Patient specimens for faecal occult blood screening samples, or testing using a dried blood 
+spot. 
+- Biological products such as blood/blood products for transfusion or body parts for transplant. 
+- Medical or clinical waste which has been appropriately decontaminated using inactivation 
+methods such as autoclaving or incineration. 
+- Medical Equipment which has been drained and confirmed to be free of any contaminated 
+liquid. 
+Note: Certain packaging requirements apply 
+ 
+- Environmental samples (e.g. food, soil, water) shipped for investigational purposes, but which 
+are not thought to pose a risk of infection to humans or animals, also fall under this definition. 
+ 
+However, in the instance that these exemptions be transported by air, modal regulations stipulate 
+that they must be transported using a basic triple packaging system. The package must consist of three 
+components: a leak -proof primary receptacle, a leak -proof secondary packaging and an outer 
+packaging of adequate strength for its capacity, mass and intended use and with at least one surface 
+having minimum dimensions of 100 mm × 100 mm. 
+ 
+For liquids, absorbent material in sufficient quantity to absorb the entire contents must be placed 
+between the primary receptacle(s) and the secondary packaging so that, during transport, any release 
+or leak of a liquid substance will not reach the outer packaging and will not compromise the integrity 
+of the cushioning material. Once contained in an appropriate triple packaging system, exempt 
+specimens are not subject to any other infectious substances regulations. For more detailed 
+information on the components of an appropriate triple packaging system, please refer to Section 6.1. 
+on packaging. 
+
+12 
+ 
+4.6.1 Exempt Human or Exempt Animal Specimens 
+Exempt human specimens and exempt animal specimens are patient specimens, for which there is a 
+minimal likelihood that pathogenic biological agents are present . This special type of ‘exemption’ 
+includes specimens being transported for testing that is unrelated to infectious disease, such as blood 
+or urine markers (e.g. cholesterol, glucose, hormones, pregnancy, drug 
+and alcohols), biopsies (e.g. antigenic markers for certain cancers) o r 
+immunological investigations (e.g. vaccine-induced immunity or auto -
+immune responses) where infection is not suspected. So und, 
+professional judge ment is required to determine whether a patient 
+specimen may be exempted under this definition, based upon known 
+medical history, symptoms, individual circumstances of the source 
+(human or animal) and endemic local conditions. 
+ 
+Patient samples which have been professionally defined as e xempt 
+human specimens or exempt animal specimens must be contained in the 
+same basic triple packaging system described for air transport of other 
+exemptions, irrespective of the mode of transport being used. More 
+information on the basic triple packaging system may be found in Section 6.1. 
+ 
+The outer most layer of the package must be marked with the words Exempt human specimen or 
+Exempt animal specimen, as appropriate. Exempt human specimens and exempt animal specimens 
+which have been appropriate marked and labelled would then be considered safe for transport, and 
+not subject to further infectious substance regulations. 
+ 
+4.6.2 Used Medical Devices or Equipment 
+Medical devices or equipment potentially contaminated 
+with or containing infectious substances which are being 
+transported for disinfection, cleaning, sterilization, repair 
+or evaluation must be packaged in such a way that, under 
+normal transpor t conditions, they cannot break, be 
+punctured or leak their contents. 
+ 
+Packagings must be marked with the words “USED 
+MEDICAL DEVICE” OR “USED MEDICAL EQUIPMENT”., as 
+appropriate. 
+ 
+This exception does not apply to: 
+a) medical waste (UN 3291 and UN 3549); 
+b) medical devices or equipment contaminated 
+with or containing infectious substances in 
+Category A (UN 2814 or UN 2900); and 
+c) medical devices or equipment contaminated with or containing other dangerous goods that 
+meet the definition of another hazard class. 
+ 
+Note: This definition does 
+not apply to Medical or 
+clinical wastes with a low 
+likelihood of pathogenic 
+biological agents being 
+present which should 
+continue to be sub -
+classified as infectious 
+substances under the 
+applicable nomenclature 
+described in Section 
+5.2.2. 
+ 
+More detailed explanations of the type of 
+packaging appropriate for used medical 
+devices or equipment can be found in the 
+following chapters UN Model 
+Regulations: 
+ 
+4.1.1.1 & 4.1.1.2: General provisions for 
+the packing of dangerous goods in 
+packagings, including IBCs and large 
+packagings. 
+ 
+6.1.4: Requirements for packagings. (type 
+specific) 
+ 
+6.6.5: Test requirements for large 
+packagings. 
+ 
+
+13 
+ 
+Section 5: Classification of Infectious Substances 
+Should professional judgement find that the material to be shipped is reasonably expected to contain 
+biological agents capable of causing disease in humans or animals, and cannot be defined as an 
+exemption, it is an infectious substance. Classification of an infectious substance must therefore be 
+made, according to the materials composition and the level of risk it poses to human or animal health. 
+It is this classification that will be used to assign the substance a proper shipping name and a UN 
+number that will be used in all aspects of the package preparation including its packaging composition, 
+marking, labelling, and for documentation purposes. 
+ 
+5.1 Dangerous Goods Classes & Divisions 
+The first step of classification is to assign a class and division. An overview of all the different dangerous 
+goods classes may be seen in Table 2. 
+ 
+Dangerous Goods Class 
+Class 1: Explosives 
+ 
+Class 2: Gases 
+ 
+Class 3: Flammable Liquids 
+ 
+Class 4: Flammable Solids; Substances Liable to Spontaneous Combustion; Substances which, in 
+Contact with Water, Emit Flammable Gases 
+ 
+Class 5: Oxidising Substances and Organic Peroxides 
+ 
+Class 6: Toxic and Infectious Substances 
+ Division 6.1: Toxic Substances 
+ Division 6.2: Infectious Substances 
+ 
+Class 7: Radioactive Material 
+ 
+Class 8: Corrosive Substances 
+ 
+Class 9: Miscellaneous Dangerous Substances and Articles, Including Environmentally Hazardous 
+Substances. 
+Table 2: An overview of Dangerous Goods Classes and Divisions. Please note that divisions for classes other 
+than Class 6 are not listed in this table. For more detailed information on other dangerous goods classes and 
+divisions, please refer to the UN Model Regulations. 
+ 
+All infectious substances are assigned to Dangerous Goods Division 6.2. Infectious substances are 
+substances which are known or are reasonably expected to contain pathogens. Pathogens are 
+defined as micro-organisms (including bacteria, viruses, parasites, fungi) and other agents such as 
+prions, which can cause disease in humans or animals. 
+ 
+Note: 
+Toxins from plant, animal or bacterial sources which do not contain any infectious substances or toxins 
+that are not contained in substances which are infectious substances should be considered for 
+classification in Division 6.1 and assigned to UN 3172. 
+
+14 
+ 
+ 
+For transport purposes, infectious substances should never be packaged together with goods from 
+other classes. However, in some cases substances from other classes may be employed for cooling 
+and/or preservation purposes. This includes flammable liquids (included in Class 3 e.g. ethanol, 
+methanol, pyridine), or dry ice (a carbon dioxide solid included in Class 9). More details about how to 
+treat these substances when shipped together with an infecti ous substance is discussed later in 
+Sections 6.5 and 6.6. 
+ 
+5.2 Infectious Substance Categories 
+Once classified as a dangerous good under Division 6.2 , the material must then be further sub -
+classified based upon the material composition, the type of biological agent present, and the severity 
+or harm that may be caused by that biological agent . The following sections provide an overview of 
+the various sub -classifications of infectious substances, including the official nomenclature (proper 
+shipping name and UN number) that should be assigned to them for transport purposes. A simplified 
+summary of how to classify and sub-classify infectious substances is also provided in Figure 3. 
+ 
+5.2.1 Category A 
+An infectious substance which is transported in a form that, when exposure to it occurs, is capable of 
+causing permanent disability, life-threatening or fatal disease in otherwise healthy humans or animals. 
+In other words, if the substance were released from the craft carrying it 
+and/or protective packaging used during the transportation, it could 
+have severe consequences on the health of any humans or animals that 
+came in contact with it. 
+ 
+Any of the material definitions from the above paragraphs 4.1 to 4.5 may 
+be sub -classified as Category A should it be known, or reasonably 
+expected to contain a biological agent that meets the criteria above. 
+Indicative lists of the biological agents that may meet the criteria for a 
+Category A infectious substance are provided in many transport 
+regulations and modal agreements. A copy of the indicative list from the 
+UN Model Regulations is provided in Annex 3 of this document. It is 
+important to note, however, that many biological agents in this list will 
+only meet the definition for a Category A infectious substance when 
+being transported as cultures. 
+ 
+There are two different UN numbers and proper shipping names associated with Category A infectious 
+substances: 
+ 
+- Infectious substances capable of causing disease in humans, or both humans and animals, are 
+assigned to UN 2814, and a proper shipping name of INFECTIOUS SUBSTANCE, AFFECTING 
+HUMANS. 
+ 
+- Infectious substances capable of causing disease only in animals are assigned to UN 2900, with 
+the proper shipping name of INFECTIOUS SUBSTANCE, AFFECTING ANIMALS only (The proper 
+shipping name is shown in bold (dark) type or in capital letters, whereas th e descriptive text 
+is shown in light type or lowercase letters within the respective dangerous goods regulations). 
+ 
+- The technical name of the hazardous biological agent present contained within the infectious 
+substance must be provided in (parentheses) after the proper shipping name on the dangerous 
+It should be noted that 
+not all ‘forms’ of an 
+infectious substance 
+render it capable of 
+causing infection in 
+exposed individuals, even 
+when the same biological 
+agent is present. For 
+example, Mycobacterium 
+tuberculosis is only 
+considered capable of 
+causing severe harm to 
+exposed individuals if it 
+were transported as 
+cultures. 
+
+15 
+ 
+goods transport document, if known, but need not be shown on the package . For example: 
+UN 2814, Infectious substance affecting humans (Mycobacterium tuberculosis cultures). 
+ 
+- If the bio logical agent is unknow n but is thought to meet the definition for Category A 
+infectious substance, ‘suspected Category A infectious substance’ must be provided in 
+parentheses after the proper shipping name on the dangerous goods transport document, but 
+need not be shown on the package. 
+Medical or clinical wastes containing: 
+a) Category A infectious substances must be assigned to UN 2814, UN 2900 or UN 3549, as 
+appropriate. Medical waste , Category A , AFFECTING HUMANS solid or MEDICAL WASTE, 
+CATEGORY A, AFFECTING ANIMALS only, solid . Infectious substances generated from the 
+medical treatment of humans or veterinary treatment of animals may be assigned to UN 3549. 
+The UN 3549 entry must not be used for waste from bioresearch or liquid waste . This UN 
+number is forbidden as cargo in air transport, unless prior approval is obtained from the 
+appropriate authority of the State of origin a nd the State of the operator under the written 
+conditions established by those authorities; 
+b) Category B infectious substances must be assigned to UN 3291. 
+ 
+Medical or clinical wastes which are reasonably believed to have a low probability of containing 
+infectious substances must be assigned to UN 3291 . For the assignment, international, regional or 
+national waste catalogues may be taken into account. 
+ 
+Ultimately, accurate sub-classification of an infectious substance as Category A, and assignment of the 
+appropriate UN number and proper shipping name, requires sound professional judgement. New or 
+emerging pathogens may not appear in indicative lists, although their biological characteristics are 
+similar to those associated with Category A. 
+ 
+A pathogen risk assessment must be performed, to determine whether the unknown biological agents 
+within the infectious substance are capable of causing seve re harm to humans and/or animals, and 
+based upon known medical histories , symptoms, endemic local conditions and the source or origins 
+of the infectious substance. If there is any uncertainty around whether the infectious substance meets 
+the criteria for Category A, a cautious approach should be taken, and Category A assigned. 
+ 
+5.2.2 Category B 
+Infectious substances are sub-classified as Category B when they contain biological agents, capable 
+of causing infect ion in humans or animals, but NOT meeting the criteria for Category A (i.e. the 
+consequences of an infection are not considered severely disabling or life-threatening). 
+ 
+With the exception of substances containing high risk biological agents, in forms listed in Annex 3, 
+most shipments of infectious substances can be transported under Category B. 
+ 
+- The UN number and proper shipping name for most shipments of Category B infectious 
+substances is UN 3373, BIOLOGICAL SUBSTANCE, CATEGORY B. 
+ 
+- If the infectious substances are defined as clinical or medical wastes, and contain an infectious 
+biological agent (even a minimal likelihood) which does not fit the criteria for Category A, they 
+must be assigned to UN 3291 and given a proper shipping name which reflects their contents 
+and/or origin. According to the UN Model Regulations, proper shipping names may include: 
+
+16 
+ 
+o BIOMEDICAL WASTE, N.O.S. 
+o CLINICAL WASTE, UNSPECIFIED, N.O.S. 
+o MEDICAL WASTE, N.O.S. 
+o REGULATED MEDICAL WASTE, N.O.S. 
+ 
+Figure 3: A simplified overview of the process of defining and classifying infectious substances. 
+ 
+
+17 
+ 
+Section 6: Preparing Packaging Requirements 
+When moved betwe en the point of origin, cargo transport units, warehouses and its destination, a 
+package of infectious substances can be subject to challenges, including movement, vibrations, 
+changes of temperature, humidity and pressure. It is therefore 
+essential that the packaging used to contain infectious substances 
+during transport is of good quality and strong enough to withstand 
+the challenges that could be faced. For this reason, infectious 
+substances must be contained in a triple -layered packaging 
+system, where redundant layers of packaging and sufficient 
+amounts of absorbent material can be used to control leakages and/or breaches of containment. 
+ 
+A basic triple packaging system, as described in Section 
+6.1, can be used to transport exempt human specimens 
+or exempt animal specimens by all modes of transport . 
+Triple packaging systems with more specific and detailed 
+requirements are required for infectious substances 
+sub-classified as Category A, Category B or Medical 
+Waste, Category A, affecting humans/animals under 
+UN3549. These additional requirements not only ensure 
+safe containment in various modes of transport, but also 
+help stakeholders in being able to verify that the 
+packaging material used is of an a ppropriate str ength 
+and quality. Further specifications for the triple 
+packaging system may also be required if other 
+dangerous goods are present, such as when dry ice is 
+used as a coolant. 
+ 
+The UN Model regulations, as well as other modal agreements, produce information sheets that 
+outline the detail ed packaging requirements for various classificati ons and sub-classifications of 
+dangerous goods. These instruction sheets are generally referred to as ‘packing instructions’, of which 
+four may be applicable to the shipment of infectious substances. These include: 
+ 
+- P620 for Category A Infectious Substances 
+- P650 for Category B infectious substances assigned to UN3373; and 
+- P621 for Medical or Clinical Wastes containing a Category B infectious substance (assigned to 
+UN3291) 
+- P622 for Medical waste, Category A, affecting humans or Medical waste, Category A, affecting 
+animals (assigned to UN3549) 
+ 
+A packing instruction, PI954, is also provided in the ICAO Technical Instructions for the use of dry ice 
+as a coolant, which may be applicable to infectious substances being transported by air. 
+ 
+An overview of the contents of some of these packing instruction requirements are provided in the 
+following section, with additional information relating to the marking and labelling requirements in 
+section 7. 
+ 
+The carriage of infectious 
+substances as hand carriage on 
+passenger aircraft – even in 
+diplomatic pouches – is strictly 
+prohibited. 
+For the purpose of transport, any material 
+defined that falls under the definition of 
+‘Exempt Human Specimen’ or ‘Exempt 
+Animal Specimen’ can be transported in a 
+triple-layer packaging system like the one 
+described here without being subject to 
+any further infectious substance 
+regulations. 
+ 
+There is no limit to the quantity of exempt 
+human or animal specimen that may be 
+carried per package, on any mode of 
+transport. 
+ 
+
+18 
+ 
+6.1 A Basic Triple Packaging System 
+As the name suggested, a ny package used to contain an infectious substance must be comprised of 
+three layers: 
+ 
+1. The primary receptacle, containing the infectious substance, must be watertight, and 
+impermeable to the substance held within (i.e. leakproof – for liquid, or sift-proof – for solids). 
+The primary receptacle should be appropriately labelled as to content. 
+ 
+The primary receptacle must not become 
+punctured, broken, weakened or affected 
+by contact with the infectious substance. 
+For example, the primary receptacle 
+should no t be corroded by preservation 
+media used to hold a patient specimen. 
+ 
+If the infectious substance contains a 
+liquid, or semi -liquid substance, the 
+primary receptacle must be wrapped in 
+enough absorbent material to absorb all 
+the fluid in the rare event of a breakage or 
+leakage. 
+ 
+2. A second watertight, leakproof or sift -
+proof container should then be used to 
+enclose and pro tect the primary 
+receptacle, and its absorbent material. 
+ 
+Several primary receptacles may be placed 
+in a single secondary container, provided 
+they are all infectious substances of the 
+same class. If the primary receptacle is 
+fragile, each must be wrapped and placed 
+in the secondary container individually, or 
+in a way tha t prevents contact between 
+them. Cushioning 
+material may be required to secure the 
+primary receptacles within the secondary 
+container 
+ 
+3. A third, outer layer of packaging is used to 
+protect the seco ndary container from 
+physical damage while in transit. It must 
+therefore be of an appropriate strength 
+for the weight, size and composition of the 
+inner packages to be protected. At least 
+one surface of the outer packaging must 
+have a minimum dimension of 100 mm × 
+100 mm. 
+ 
+ 
+Figure 4: examples of basic triple packaging materials 
+ 
+
+19 
+ 
+Specimen data forms, letters, supplementary documentation and other types of information that 
+identify or describe the infectious substance should be placed between the secondary container and 
+outer layers of packaging. If necessary, these documents may be taped to the secondary container. 
+ 
+6.2 Packing Instruction P650 (Category B Infectious Substance 
+Requirements) 
+Packing instruction P650 provides a slightly more detailed set of triple packaging requirement s than 
+that of the basic triple packaging system. Infectious substances sub-classified as Biological Substance, 
+Category B (UN3373) and packaged in accordance with P650 may be considered safe and compliant 
+for all modes of transportation and are not subject to any other 
+packaging requirement outlined in the UN model regulations, 
+for example the more detailed testing and approval processes 
+which will be required for packaging of Category A infectious 
+substances. For this reason, it is generally feasible to source 
+P650 compliant packaging materials from local manufacturers 
+and/suppliers. In this case, the manufacturers/supplier should 
+provide clear instructions for the user (shipper, sender or 
+consignee) on how to correctly fill and close the package 
+ensuring full compliance with P650. 
+ 
+It should be noted that t here is no comprehensive list of 
+suppliers of packagings that comply with Packing Instructions 
+P650 or P620. However, an Internet search using a suitable 
+international or national search engine usually provides 
+appropriate information, as well as access to national 
+regulations. Search phrases such as “UN packaging” and “UN 
+infectious substance packaging” produce extensive results. 
+Carriers and forwarding agents (couriers or logistics companies) should also be able to supply details 
+of local suppliers or local companies that can provide such information. 
+ 
+In addition to the basic triple packaging system, additional stipulations outlined in P650 include: 
+ 
+- For surface transport, either the secondary or outer packaging must be rigid (i.e. the 
+secondary packaging must be rigid, if the outer packaging is soft OR the outer packaging must 
+be rigid, if the secondary container is soft ). The latter is the most commonly applied 
+arrangement, as a rigid outer packaging is always required for air transport. 
+ 
+- The complete triple package must be capable of passing a 1.2m ‘drop test’, to prove that is of 
+an appropriate strength and quality. 
+ 
+- The primary receptacle OR the secondary packaging must 
+be capable of withstanding internal pressure of 95kPa 
+(0.95 bar). Th is must be tested using an appropriate 
+methodology, which is based on the receptacle or 
+packaging type being used: for example, internal hydraulic 
+or pneumatic pressure gauges, or external vacuum 
+testing. 
+Quantity Limits (Category B) 
+ 
+For shipments being carried by air 
+(passenger or cargo aircraft), the 
+primary inner receptacle must not 
+contain more than 1L and the 
+outer packaging must not contain 
+more than 4L of material. This 
+excludes any quantity of coolants 
+used, such as dry ice or liquid 
+nitrogen. 
+ 
+For shipments being carried via 
+surface transport (road, rail or 
+maritime), there are no quantity 
+limits per package. 
+Further details on test 
+requirements, such as for drop-
+testing and pressure 
+differential testing are outlined 
+in Chapter 6.3 (6.3.5.3) of the 
+UN model regulations. 
+ 
+
+20 
+ 
+ 
+Figure 5. Example of triple packaging materials that may be used to 
+comply with P650 for Category B infectious substances. 
+ 
+ 
+6.3 Packing Instruction P620 (Category A Packaging Requirements) 
+Packing instruction P620 outlines the requirements and special packaging provisions that must be met 
+for ‘approval’ for use with Category A infectious substances. In addition to the components of a basic 
+triple packaging system, packaging for Category A infectious substances must include the following: 
+ 
+1. Primary Receptacle 
+a. Whatever the intended temperature of the consignment, the primary receptacle OR 
+the secondary packaging must be capable of withstanding a pressure differential of 
+not less than 95kPA (0.95 bar), as well as temperatures in the range of -40°C to +55°C. 
+b. When the shipment is being carried at ambient temperature (or above), the primary 
+receptacle must be glass, metal or plastic. Positive means of ensuring a leakproof seal 
+should be provided e.g. a heat seal, skirted stopper, or metal crimp seal. If screw caps 
+are used, they must be secured by positive means e.g. paraffin sealing tape, tape, or 
+manufactured locking closure. 
+c. Lyophilized substances may also be transported in primary receptacles that are flame-
+sealed glass ampoules or rubber-stopped glass vials fitted with metal seals. 
+ 
+ 
+
+21 
+ 
+2. Secondary Container 
+a. As already stated above, either the primary receptacle or this secondary container 
+must be capable of withstanding a pressure differential of not less than 95kPA (0.95 
+bar), and temperatures in the range of -40°C to +55°C. 
+ 
+ 
+3. Third, Outer Packaging 
+a. Must be rigid. 
+b. The smallest external dimension shall be not less than 100 mm. 
+c. An itemized list of contents shall be enclosed between the secondary container and 
+outer packaging, including the proper shipping name and technical name in 
+parentheses of the biological agent present in the infectious substance. When the 
+infectious substance to be transported are unknown, but suspected of meeting the 
+criteria for inclusion in Category A, the words “suspected Category A i nfectious 
+substance” must be shown in parentheses following the proper shipping name. 
+ 
+ 
+Figure 6: An example of triple packaging materials that may be used for Category A infectious substances 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+22 
+ 
+The ability of packagings for Category A infectious substances to 
+meet the requirements above must als o be properly verified. The 
+UN Model regulations stipulate that Category A infectious 
+substances must only be transported in a triple packaging system 
+which has been tested according to the ‘ Requirements for the 
+Construction and Testing of Packagings for Division 6.2 Infectious 
+Substances of Category A . which detail the challenges and 
+conditions that must be applied to the complete triple packaging 
+system in order to verify the material quality. The tests described 
+include dropping, stacking and puncture te sts, and the application 
+of pressure, water spray and cold/high temperatures. For more 
+details on the specific testing requirements, please consult Chapter 
+6.3 (6.3.5.3) of the UN model regulations. 
+ 
+Given the detailed and technical nature of the testing required, the 
+manufacture of Category A ‘approved’ packagings is generally 
+performed by dedicated packaging specialists and governed by a 
+quality assurance program, overseen by a competent authority. 
+Manufacturers should be able to demonstrate compliance with the 
+requirements, by providing documentation and evidence of the 
+methods used, and results obtained from package testing. Packagings which have been manufactured 
+(and approved) in accordance with t he UN model regulations requirements are then to be marked 
+with the United Nations Packaging Symbol, followed by a series of numerals and symbols that provide 
+information on how, when and where the packaging was manufactured and approved. 
+ 
+Figure 7. A description of the features of the UN specification mark for Category A infectious substances 
+packaging (for UN 2814 and UN 2900). 
+ 
+1 
+ 
+4G/Class 6.2/21/GB/2470 
+ 2 3 4 5 6 
+ 
+This mark comprises: 
+1. The United Nations packaging symbol 
+2. An indication of the type of packaging (in this example a fibreboard box (4G)) 
+3. An indication that the packaging has been specially tested to ensure that it meets the 
+requirements for Category A infectious substances (Class 6.2) 
+4. The last two digits of the year of manufacture (in this example 2021) 
+5. The competent state authority that has authorized the allocation of the mark (in this example 
+GB, signifying Great Britain) 
+6. The manufacturer’s code specified by the competent authority (in this example 2470) 
+Quantity Limits (Category A) 
+ 
+For shipments being carried in 
+the cargo hold of passenger 
+aircraft, no more than 50mL or 
+50g of Category A infectious 
+substance per package is 
+allowed. 
+ 
+For shipments being carried on 
+a cargo only aircraft, no more 
+than 4L or 4kg of Category A 
+infectious substance per 
+package is allowed. 
+ 
+For shipments being carried 
+via surface transport (road, rail 
+or maritime), there are no 
+quantity limits per package. 
+ 
+
+23 
+ 
+6.4 Packing Instruction P621 (Medical or Clinical Waste 
+Requirements) 
+Medical or Clinical waste which contains biological agents consistent with classification of Category B 
+infectious substances, is assigned to UN3291. UN3291 is then subject to the packaging requirements 
+outlined in the UN Model Regulations P621. 
+ 
+Medical or Clinical waste classified under UN3291 does not have to conform to a triple layer of 
+packaging. Packagings for UN3291 m ay comprise various types including drums, boxes or jerricans, 
+provided that these packagings conform to the general provision s outlined in the UN Model 
+Regulations for a “Packing group II” level of performance. Packing group II performance levels may 
+differ for liquid or solid infectious substances. It should be noted that infectious substances containing 
+liquid must be packed with sufficient absorbent material to absorb all liquid present. 
+ 
+Finally, packagings for UN3291 (Biomedical Waste, n.o.s, Clinical Waste, Unspecified, n.o.s, Medical 
+Waste, n.o.s. and Regulated Medical Waste, n.o.s.) intended to contain sharp objects, such as broken 
+glass and needles, must be resistant to puncture and retain liquids under the performance test 
+conditions for the packaging 
+ 
+6.5 Packing with Coolants 
+A ‘coolant’ (also known as a refrigerant) is a substance which is used to maintain a cool temperature 
+around the dangerous goods, to preserve its integrity until it reaches its final destination. Many of the 
+most commonly used coolants are themselves dangerous goods of other classes. Therefore, in 
+addition to following the requirements of the relevant packing instructions for infectious substances 
+(i.e. P620, P621 and P650), other packing requirements specific to these substances may need to be 
+observed. 
+ 
+Some of the general requirements for packaging used to contain infectious substances together with 
+a coolant material include: 
+ 
+- Packaging used must be capable of maintaining integrity at the temperature afforded by the 
+coolant. 
+- The coolant must be placed between the secondary container and outer packaging, or in an 
+overpack used to transport multiple packages together 
+(for more information on overpacks, see section 6.7). 
+- Persons handling the packa ges should be appropriately 
+trained on the coolants in use. 
+- Coordination between the shipper and carrier should 
+ensure that the cargo transport unit being used to carry 
+the packages is well ventilated for the coolants in use. 
+This is especially important in the case of air transport, to ensure ventilation safety procedures 
+are followed. The carrier may also need to ensure cargo transport units are appropriately 
+marked with warning and hazard labels. 
+ 
+An overview for some of the more specific packing requi rements for the commonly used coolants is 
+provided in the following section . Additional requirements necessary for the marking, labelling and 
+documentation of packages containing coolants will be briefly described in later Section 7. However, 
+for detailed information, the relevant chapters of the UN Model Regulations should be consulted. 
+ 
+Special provisions applicable to 
+the use of dangerous goods as 
+coolants may be found in 
+Chapter 5.5.3 of the UN Model 
+regulations. 
+
+24 
+ 
+6.5.1 Wet Ice 
+‘Wet Ice’ is the term used to describe frozen, solid water. Wet ice is not considered a dangerous good 
+and is therefore not assigned a proper shipping name or UN number. If wet ice is used, the outer 
+packaging must be leak-proof to prevent water leakage, as ice will melt over time. 
+ 
+6.5.2 Dry Ice 
+Dry Ice is one of the most commonly used coolants for the transport of infectious substances. Dry ice 
+belongs to Dangerous Goods Class 9: Miscellaneous Dangerous Substances and Articles, Including 
+Environmentally Hazardous Substances. It is assigned the proper shipping name “Dry Ice” or “Carbon 
+Dioxide, Solid” and the UN number UN 1845. 
+ 
+Both P620 and P650 include packaging requirements for infectious 
+substances shipped with dry ice. Both packing instructions describe 
+the importance of ensuring that t he outer packaging must be 
+comprised of a material which permits the release of carbon dioxide 
+gas, such as Styrofoam. This is because dry ice sublimates over time, 
+turning from carbon dioxide solid into carbon dioxide g as, which is 
+heavier than air and can create a build-up of pressure that could lead 
+to an explosion if not effectively released. For this reason, adequate 
+ventilation safety procedures should be followed for the cargo 
+transport unit carrying the package. Inserts or supporting material for the secondary container should 
+be considered, to ensure it remains secure inside the outer package even once the dry ice has 
+dispersed. 
+ 
+6.5.3 Liquid Nitrogen 
+Liquid nitrogen is also commonly used in the transport of infectious substances and belongs to 
+Dangerous Goods Class 2: Gases. It is assigned the proper shipping name “Nitrogen refrigerated 
+liquid” and the UN Number UN 1977. Liquid nitrogen is used when extremely low temperatures are 
+required to maintain the integrity of the shipment. For this reason, both the primary and secondary 
+packaging must be able to withstand such a temperature extremity without damage. 
+ 
+Due to their detail and complexity, this docu ment does not provide further guidance on the 
+regulations applicable to shipments of liquid nitrogen (except for the use of liquid nitrogen as part of 
+dry shippers as described in Section 6.5.4). For more detailed information about shipments using free 
+liquid nitrogen as a coolant, please consult directly the UN model regulations, and/or other applicable 
+modal agreements. 
+ 
+6.5.4 Dry Shippers 
+A dry shipper is a specialized outer packaging material which is insulated with a layer of liquid nitrogen 
+fully absorbed into a porous material. The careful design ensures that liquid nitrogen is kept well 
+contained inside the walls of the outer layer, ev en when its orientation is changed, and pressure is 
+prevented from building up inside. 
+ 
+Liquid nitrogen contained in a properly manufactured dry shipper is not subject to any other 
+dangerous goods requirements. This means that the package would not be sub ject to the detailed 
+requirements of free liquid nitrogen whilst still maintaining the extremely low temperatures liquid 
+nitrogen can afford. 
+ 
+The dry shipper must be appropriately marked and labelled to indicate the presence of infectious 
+substances inside. For more information, please refer to Section 7 on marking and labelling. The use 
+of a dry shipper also needs to be indicated appropriately in shipment documentation, which is 
+The ICAO Technical 
+Instructions provides a 
+specific packing instruction, 
+PI954, which describes the 
+necessary requirements for 
+any dangerous goods 
+shipment containing dry ice 
+when transported by air. 
+
+25 
+ 
+described in more detail in Section 8. 
+ 
+6.6 Packing with Stabilizers 
+A stabilizer is a chemical substance, placed together with the 
+infectious substance in the primary receptacles, and is used for 
+maintaining viability, preventing degradation or preserving 
+antigen integrity. Stab ilizers commonly used with infectious 
+substances include sorbitol, fetal bovine serum (FBS), alcohols, 
+alcohol solutions or formaldehydes. 
+As with coolants, stabilizers may themselves be dangerous 
+goods assigned to different dangerous goods classes. 
+ 
+Other dangerous goods must not be packed in the same 
+packaging as Division 6.2 Infectious Substances unless they are necessary for maintaining the viability, 
+stabilizing or preventing degradation or neutralizing the hazards of the infectious substances. A 
+quantity of 30 mL or less of dangerous goods included in Classes 3 (e.g. alcohols) , 8 (e.g. 
+formaldehydes) or 9 permitted as “Dangerous Goods in Excepted Quantities” may be packed in each 
+primary receptacle containing infectious substances. When these small quantities of dangerous goods 
+are packed with infectious substances in accordance with packing instruction P620 or P650, no other 
+requirements in the dangerous goods Regulations need to be met. For more detailed information on 
+excepted quantities of dangerous goods, please refer to Chapter 3.5 of the UN Model Regulations. 
+ 
+6.7 Packing in Overpacks 
+"Overpack" is an enclosure used by a single shipper to contain one or more packages and to form one 
+handling unit for convenience of handling and stowage. If dry ice is being used to protect contents, 
+the overpacks may be comprised of insulated vessels or flasks to allow dissipation of carbon dioxide 
+gas. 
+ 
+Whenever an overpack is used, the required marks and labels shown on the packages of infectious 
+substance inside must be repeated on the outermost layer of the overpack (unless already clearly 
+visible, for example through a clear plastic wrapping) . Overpacks must be marked with the word 
+“OVERPACK” in lettering at least 12mm high. 
+ 
+6.8 Re-cycling Packaging 
+Packaging materials can be returned or reused. Before an empty packaging is returned to the 
+consignor, or sent elsewhere, it must be disinfected or sterilised to nullify any hazard and any label or 
+mark indicating that it contained an infectious substance must be removed or obliterated. If the 
+packaging is being re-used, the shipper must ensure that all marks and labels reflect the substances 
+actually being shipped and not the substance it was used for previously. 
+ 
+Re-used packaging must maintain their ability to comply with relevant quality testing procedures 
+outlines in later sections on Category A and Category B packaging requirements. If packaging material 
+becomes damaged or reduced in strength, it should no longer be used. 
+ 
+ 
+ 
+Subject to the susceptibility of each 
+biological agent, some stabilizers may 
+cause inactivation of the biological 
+agent, removing its ability to cause 
+infection in humans or animals. In this 
+case, sound professional judgement 
+may be used to reclassify the 
+substance under the definition of an 
+exemption. 
+
+26 
+ 
+Section 7: Marking & Labelling 
+Once the correct packaging materials have been assembled, they must be properly marked and 
+labelled to provide information about the contents of the package, the nature of the hazard, and the 
+packaging standards that have been applied. All marks and labels must be placed in a way that is 
+clearly visible and not covered by any other label or mark. 
+ 
+7.1 Marks 
+Examples of all marks that may be applicable to infectious substances shipments are provided in Table 
+3. 
+ 
+The following ‘Marks’ must be provided on the 
+outer package of all infectious substances: 
+ 
+• The shipper’s (sender’s, consignor’s) 
+name and address 
+ 
+• The receiver’s (consignee’s) name and 
+address 
+ 
+• The UN number of the infectious 
+substance, followed by the proper 
+shipping name of the substance . 
+Technical names need not be shown on 
+the package. 
+ 
+• When a coolant is used (e.g. dry ice) , the 
+UN number and the proper shipping name 
+of the coolant must be provided, followed 
+by the words ‘ AS COOLANT’. In addition, 
+the net quantity of coolant present 
+should be provided. 
+ 
+In addition, the following marks may apply, depending upon the infectious substance classification: 
+ 
+For Category A infectious substances: 
+ 
+• The UN packaging symbol and certification marks 
+(numerals and letters) must be displayed. NOTE: If an 
+overpack is being used, the UN packaging symbol and 
+certification marks will not appear on the overpack. 
+ 
+• The name and telephone number of a person responsible, 
+knowledgeable about the shipment, must be provided. 
+ 
+For Category B infectious substances - the mark shown below in Figure 9 must be used: 
+ 
+4G/CLASS 
+6.2/21/GB/2470 
+ 
+u 
+n 
+‘NET quantity’ refers to the weight or volume 
+of the dangerous goods contained in a 
+package, excluding the weight or volume of 
+any packaging material. 
+ 
+The net quantity of dry ice may be particularly 
+important for handling of the shipment as, 
+along with the thermal capabilities of the 
+packaging, it will determine how long a cool 
+temperature can be maintained for preserving 
+or stabilizing the infectious substance in 
+transit. In some cases, the net quantity of dry 
+ice may need to be replenished whilst in 
+transit to maintain cold chain through a long 
+journey. 
+ 
+The net quantity of the infectious substance is 
+also important for biosecurity and chain of 
+custody purposes, as well as providing 
+information for assessing biosafety risks if a 
+spillage or leakage were to occur. 
+Figure 8: The UN Specification Mark 
+ 
+
+27 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+‘To’ and ‘From’ marks 
+required for all packages, 
+showing the name and 
+address of the shipper 
+and receiver. 
+ 
+ 
+The UN number and 
+Proper Shipping Name 
+marks (for Category A 
+packages) 
+ 
+The UN number and 
+Proper Shipping Name 
+marks. 
+(for Category B packages 
+sub-classified as 
+UN3373.) 
+ 
+A 24-hour emergency 
+contact person must be 
+marked on all Category A 
+infectious substance 
+packages. 
+ 
+Marking of UN 
+specification packagings, 
+indicating outer 
+packaging has been 
+tested according to UN 
+standard is required for 
+all Category A infectious 
+substance packages. 
+ 
+The UN Number, proper 
+shipping name followed 
+by the words “AS 
+COOLANT”. The net 
+quantity of coolant 
+present should also be 
+provided. 
+Table 3: Marks associated with infectious substances shipments. 
+ 
+7.2 Labels 
+There are two types of labels that may need to be used for packages of infectious substances. 
+ 
+ 
+SHIPPER 
+PETER SMITH 
+TIMELY LOGISTICS 
+BP 102 
+I-0956666 NOLAND 
+Netherlands 
+RECEIVER 
+AB JONES 
+STONE LAB 
+RUE DE L’ESSAI 
+F-9867 ADIEU 
+France 
+EMERGENCY 
+CONTACT 24H/24H 
+Dr RED PEPPER: 
++67 56 45 34 23 
+4G/CLASS 
+6.2/21/GB/2470 
+u 
+n 
+UN1845 
+ 
+CARBON 
+DIOXIDE, SOLID 
+ 
+AS COOLANT 
+ 
+Net 3 kg 
+• Specifications: the width of the line forming the square must 
+be at least 2 mm, and the letters/numbers must be at least 6 
+mm high. For air transport, each side of the square shall have 
+a minimum dimension of 50 mm x 50 mm. 
+ 
+• Colour: No colour is specified, however the mark must be 
+displayed on the outer packaging , on a background of 
+contrasting colour, and be clearly visible and legible. 
+ 
+• The Proper Shipping Name ( BIOLOGICAL SUBSTANCE, 
+CATEGORY B) in letters at least 6 mm high must be displayed 
+adjacent to the mark. 
+ 
+• 
+ 
+Figure 9: An example of the mark 
+that must be used for Category B 
+Infectious Substances 
+ 
+
+28 
+ 
+7.2.1 Hazard labels 
+Hazard labels are always presented in the form of a square set at an angle of 45° (diamond- shaped). 
+ 
+The minimum dimensions are 100mm x 100mm. If the package is 
+very small, the label size may be reduced proportionately, 
+provided all elements of the label are easily visible. 
+ 
+ONE hazard label(s) for each dangerous good in the package 
+(unless specifically exempted) must be affixed. This means there 
+may be more than one hazard label required if the infectious 
+substance is being shipped with a coolant (e.g. dry ice.). 
+ 
+Examples of hazard labels that may be applicable to 
+infectious substances shipments may be seen in Table 4. 
+ 
+ 
+ Label: Infectious substances hazard label. 
+ 
+Required for: Compulsory for all packages containing Category A infectious 
+substances. 
+ 
+Specifications: The upper half of the diamond must display three crescents 
+superimposed on a black circle. The lower half of the diamond should bear 
+the inscriptions: “INFECTIOUS SUBSTANCE” and “In case of damage or 
+leakage immediately notify Public Health Authority” in black colour. A 
+number ‘6’ must be displayed in the bottom corner. 
+ 
+Colour: White background, Black writing 
+ 
+ Label: Miscellaneous Dangerous Good hazard label. 
+ 
+Required for: infectious substance packages containing Class 9 substances, 
+namely dry ice, as coolant. 
+ 
+Specifications: The upper portion must contain 7 vertical stripes, and an 
+underlined number ‘9’ must appear in the bottom corner. 
+ 
+Colour: White background, Black writing. 
+ 
+ Label: Non-flammable, non-toxic gas hazard label. 
+ 
+Required for: Infectious substances packages containing a Class 2, Division 
+2.2 compressed gas as a coolant, namely liquid nitrogen. 
+ 
+Specifications: Must show a symbol of a gas cylinder, with the number ‘2’ 
+in the bottom corner. 
+ 
+Colour: Green, with writing in black or white 
+ 
+Table 4: Hazard Labels Applicable to Infectious Substances Shipments 
+ 
+ 
+ 
+ 
+Figure 10: Template for hazard 
+labels. 
+ 
+
+29 
+ 
+ 
+7.2.2 Handling labels 
+Handling labels may be found in various shapes, either alone or in addition to hazard labels, depending 
+upon the nature and quantity of dangerous goods present. 
+ 
+ 
+ 
+ 
+ 
+Label: Orientation Arrows 
+ 
+Required for: Indicating the presence of a liquid in the package, requiring 
+the packages only be handled in the upright position to prevent leakage. 
+For infectious substances, orientation arrows are required when in primary 
+receptacles exceeding 50mL. Not required for UN3373 packages. 
+ 
+Specifications: The label must show two arrows pointing in the correct 
+upright direction. They shall be rectangular and of a size that is clearly 
+visible, commensurate with the size of the package. The label must appear 
+on two opposite vertical sides of the package (minimum dimensions 74mm 
+x 105mm) . A rectangular border around the arrows is optional. 
+ 
+Colour: Black OR Red arrows on a white, or suitably contrasting, 
+background. 
+ 
+ 
+Label: Cargo Aircraft Only (CAO) Label 
+ 
+Required for: indicating a package of infectious substances contains more 
+than the quantity limits for passenger aircraft and are therefore eligible for 
+transport by cargo aircraft only. 
+ 
+Specifications: Minimum dimensions of the label are 120mm on the 
+horizontal axis and 110mm on the vertical axis. For small packages, these 
+dimensions may be reduced by half. 
+ 
+Colour: Orange background, Black writing. 
+ 
+ 
+Label: Cryogenic liquid warning label. 
+ 
+Required for: Infectious substances packages, being transported by air, 
+containing cryogenic liquids (deeply refrigerated liquefied gases) as a 
+coolant (e.g. liquid nitrogen). This label must be used in addition to the 
+hazard label for non-flammable, non-toxic gases. This label is NOT required 
+for specialized insulated packagings for liquid nitrogen, known as dry 
+shippers, which are discussed in more detail in Section 4.3.5 on coolants. 
+ 
+Specifications: Minimum dimensions of 74mm on the horizontal axis and 
+105mm on the vertical axis. The words “Caution – may cause cold burn 
+injuries if spilled or leaked” are optional and may be included. 
+ 
+Colour: Green background, with white writing. 
+ 
+Table 5: Handling labels that may be applicable to infectious substances shipments. 
+ 
+ 
+ 
+
+30 
+ 
+Section 8: Documenting Shipments 
+In most cases, the person preparing the infectious substance for shipment (i.e. the shipper, sender or 
+consignor) will not be the person who transports and delivers the package to the fin al destination. 
+Therefore, it is important that this person prepares any documentation required by applicable 
+regulations to inform those who will be transporting the package (i.e. the carrier, courier or logistician) 
+about how the package was prepared and the dangerous goods that it contains. 
+ 
+Any information provided in transport documents should be easy to 
+read and resilient (i.e. permanent ink that cannot be easily removed). 
+The page number and total number of pages or “Page 1 of 1 pages” if 
+there is no extension list must appear on the dangerous goods 
+transport document. Copies of any transport documents must be 
+retained by the sender for a minimum period of three months 
+following the shipment , though different time periods may be 
+required under certain modal agreements or variations. 
+ 
+In some instances, certificates of approval are required from national 
+competent authorities to ship an infectious substance . Generally, 
+these do not need to accompany a shipment, but the shipper must be 
+able to make them available on request. 
+ 
+The following sections describe some of the mostly commonly 
+required documents for the shipment of infectious substances. 
+ 
+8.1 Dangerous Goods Transport Document (DGTD) 
+As outlined in the UN Model Regulations, a certain minimum set of information should be recorded 
+for any infectious substance in the form of a “Dangerous Goods Transport Document” (DGTD). A DGTD 
+is required for all shipments of Category A infectious substances (UN2814 and UN2900) and for 
+Medical or Clinical Wastes (UN3291 and UN35 49). However, Category B infectious substances 
+assigned to UN3373 which are packaged according to packing instruction P650 are said to no longer 
+be subject to these requirements of the UN model regulations, meaning a DGTD is NOT required. 
+ 
+According to the UN Model Regulations, the DGTD may take any form, as long as the minimum 
+information requirements (as outline in the section below) are met. However, m odal agreements or 
+national regulations may also stipulate their own formats for this document , such as the commonly 
+used “Dangerous Goods Declaration (DGD)” form used for air transport. Equivalent variations may be 
+required for shipments by road, sea or rail as described in the relevant modal agreements. 
+ 
+The following information is considered the minimum to meet the UN Model Regulation s 
+requirements for a DGTD for documenting a shipment of infectious substances . However , i t is 
+important to ensure that other regulations for documentation applicable to the shipment are also 
+consulted to ensure any other essential information stipulated by these are also included. For 
+example, shipments by air require additional information such as departure and arrival airport 
+information, reference numbers for other transport documents such as an Air Waybill . This is 
+discussed in further detail within Section 8.3. Shippers should check with their carrier/operator to 
+ensure the correct form of the document is used, and for any s pecial instructions that must be 
+followed to ensure it is filled in correctly. 
+ 
+In some cases, electronic 
+data processing (EDP) or 
+electronic data 
+interchanges (EDI) may be 
+used as an alternative to 
+paper documentation but 
+must be done only with the 
+pre-approval of the carrier. 
+Electronic signatures and 
+initials for certifications or 
+declarations in this case 
+will be acceptable. 
+However, the shipper must 
+always be able to produce a 
+paper document copy of all 
+information upon request. 
+
+31 
+ 
+1. The Sender & Receiver information - The name and address of the shipper (consignor) and the 
+receiver (consignee) of the dangerous goods shall be included. 
+ 
+For infectious su bstances packages, the name and contact phone number for a ‘ person 
+responsible’, knowledgeable about the infectious substance, must also be provided (who may 
+be the same or different to the shipper or receiver), and should be available for contact at all 
+times throughout the shipment process. 
+ 
+ 
+Figure 11: An example of emergency contact information to be provided on a DGTD 
+ 
+2. The Date – That the transport document (or electronic copy of it) was signed. 
+ 
+3. A description of the dangerous goods should include the following information in the following 
+order: 
+ 
+a. UN Number (e.g. UN2814, UN2900) 
+b. Proper Shipping Name (e.g. INFECTIOUS SUBSTANCE, AFFECTING HUMANS. ). For 
+Category A infectious substances, the technical name must follow the proper shipping 
+name in parentheses. (When the infectious substances to be transported are 
+unknown, but suspected of meeting the criteria for inclusion in Category A and 
+assigned to UN 2814 or UN 2900, the words “suspected category A infectious 
+substance” must be shown, in parentheses, following the proper shipping name on 
+the Shipper's Declaration for Dangerous Goods, but not on the outer packagings). 
+c. The primary hazard Class and/or division (i.e. Division 6.2) 
+d. The subsidiary ha zard class (NOTE infectious substances do not have subsidiary 
+hazards. However, this may be applicable to other 
+dangerous goods which present multiple hazards . For 
+example, methanol is class 3, subsidiary hazard class 
+6.1) 
+e. If applicable, the applicable packing group for the 
+substance or article which may be preceded by “PG” (e.g. “PG II”). (NOTE infectious 
+substances are not assigned packing groups). 
+f. Any other descriptive information required under other applicable national or 
+international regulations. 
+A description of each dangerous good present in the package is required. Therefore, if a coolant such 
+as dry ice is present, two entries will be required under this description. 
+ 
+ 
+ 
+ 
+ 
+e.g. UN2814, INFECTIOUS 
+SUBSTANCE, AFFECTING 
+HUMANS (Dengue virus) , 
+DIVISION 6.2 
+
+32 
+ 
+4. Type and NET quantity of dangerous goods for each package 
+The number of packages, the type/material of outer packaging 
+used (e.g. fibreboard box, plastic drum 
+etc) and the net quantity of the 
+dangerous good in each package must be 
+provided. Quantity should be given by 
+volume (e.g. mL, L) or mass (e.g. g, kg) as 
+appropriate. 
+ 
+If more than one dangerous good is present (e.g. dry ice) then 
+this information for each dangerous good must be provided. If a 
+dry shipper or an overpack is used, this should also be indicated 
+here, following the type and quantity of the individual packages 
+contained within. 
+ 
+5. Handling Requirements – Actions, if any, that are required to be taken by the carrier in the 
+treatment of the package. This may be stipulated by the carrier or national/international authorities, 
+but should include as a minimum: 
+g. Supplementary requires for handling (loading, st owing, unloading etc) . If none are 
+required, a statement saying ‘No such requirements are necessary’ should be 
+provided. 
+h. Any restrictions that apply on the mode of transportation that can/must be used. 
+i. Whatever the routing used, transport must be made by the quickest possible routing. 
+If tran sshipment is necessary, precautions must be taken to ensure special care, 
+expeditious handling and monitoring of the substance in transit. 
+j. Emergency arrangements applicable to the package. 
+ 
+6. Emergency Response Information 
+All shipments of infectious substances in Category A must have the name and telephone number of a 
+person responsible for the shipment marked on the package(s) and on the Shipper’s Declaration (in 
+the “Additional Handling Information” section). For infectious substances in Category B, UN 3373, the 
+name and telephone number of a person responsible must be provided on the air waybill or on the 
+package. 
+In addition to emergency contact information, appropriate information should be immediately 
+available for carriers to use in emergency response to accidents or incidents involving infectious 
+substances packages during transport. 
+This may include contact information for public health authorities, medical or first aid requirements 
+(e.g. prophylaxis for exposed persons) or procedures for spill clean-up. 
+ 
+7. Certification (Shipper ´s Declaration) A statement 
+should be given on the document from the shipper, 
+acknowledging that the package has been prepared 
+according to the applicable requirements. This 
+statement must be signed and dated. For air transport 
+the following additional statement is required: “I 
+declare that all of the applicable air transport 
+requirements have been met.” 
+NET refers to the total 
+quantity of the 
+dangerous good alone 
+for exam ple, 40mL net 
+quantity of a bacterial 
+culture. 
+GROSS refers to the total 
+mass of the package for 
+example, 50g (0.05kg) of 
+culture, in 1kg of dry ice 
+wrapped in 1kg of 
+packaging mat erials = 
+gross quantity of 2.05kg. 
+e.g. 150mL each 
+packed in 3 solid 
+plastic boxes (3 x 
+plastic boxes x 
+150ml) 
+ 
+“I hereby declare that the contents of this 
+consignment are fully and accurately 
+described above by the proper shipping 
+name, and are classified, packaged, marked 
+and labelled/placarded, and are in all 
+respects in proper condition for transport 
+according to applicable international and 
+national government regulations.” 
+
+33 
+ 
+ 
+Figure 12: An example of a signed and dated shippers declaration. 
+8.2 Air Waybill 
+An air waybill is a commonly requested shipping document that is part of the general condition of 
+carriage for any goods via international air transport. Therefore, an air waybill must accompany all 
+shipments of infectious substance s, even if a DG TD has already been filled. It is common industry 
+practice for the shipper or shipper’s agent/freight forwarder to be the one to prepare the air waybill. 
+ 
+The format of the air waybill will vary across 
+different operators and countries. Much like the 
+DGTD, the air waybill will contain a number of 
+general sections outlining the various 
+information of the shipment, such as the shipper 
+and receivers name and address, carrier 
+information, quantities and types of packages 
+etc. 
+ 
+However, there are two main sections pertaining 
+to the nature of the hazard that must be carefully 
+filled for infectious substances: 
+ 
+ 
+1. “Handling Information” Box 
+a. For Category A Infectious 
+Substances – The statement “ Dangerous Goods as per associated Shippers 
+Declaration” must be provided. If applicable (i.e. the volume of substance is >50mL) 
+the statement “Cargo Aircraft Only” or “CAO” must also be provided. 
+ 
+b. For Category B Infectious Substances the name and telephone number for a ‘person 
+responsible’, knowledgeable about the shipment and available throughout the 
+shipment process, must be provided on the air waybill or on the package. 
+ 
+2. “Nature and Quantity of Goods” Box 
+a. For Category A infectious substances – A general description of the substance can be 
+provided, such as “ laboratory samples ”, “ pathology samples ”, or “ infectious 
+substance” 
+ 
+b. For Category B infectious substances – The UN Number, proper shipping name 
+(“UN3373” “Biological Substance Category B”) and number of packages must be 
+provided (unless these are the only packages within the consignment) . If the 
+substance is being shipped with dry ice, the UN Number, proper shipping name and 
+net quantity of dry ice should also be provided. 
+Shipments of all goods by air are accompanied 
+with an air waybill, even if they do not contain 
+dangerous goods. 
+ 
+Even exempt human and exempt animal 
+specimens, exempted from all other regulations, 
+may be accompanied by an air waybill. 
+ 
+For these shipments, the phrase “exempt 
+specimens” should be provided in the nature and 
+quantity of goods box of the air waybill. 
+ 
+If shipped with coolant, the proper shipping 
+name, UN number and net quantity of coolant in 
+the package should also be provided. 
+
+34 
+ 
+ 
+ 
+Figure 13: An example of an Air Waybill filled for a Category A Infectious Substance. 
+ 
+8.3 Spill clean-up procedure 
+As part of the minimum information to be recorded on a DGTD, emergency response information 
+should be available for relevant personnel in the event a breach of packaging should take place. The 
+following ‘spill clean -up procedure’ has been adapted from info rmation present in Laboratory 
+biosafety manual, 4th ed. (8), Geneva, World Health Organization, 2004, and represents an example of 
+information that could be helpful for emergency response to an infectious substances spill. 
+ 
+The appropriate response in the event of exposure to any infectious substance is to wash or disinfect 
+the affected area as soon as possible, regardless of the nature of the agent. 
+ 
+Even if an infectious substance comes into contact with broken skin, washing of the affected area 
+with soap and water or with an antiseptic solution can reduce the risk of infection. 
+ 
+Medical advice should be obtained any time there is a suspected exposure to infectious substances 
+resulting from a damaged package. 
+ 
+The following procedure for clean-up can be used for spills of all infectious substances including blood. 
+The person must be trained on such procedure before performing these steps: 
+1. Wear gloves and protecting clothing, including face and eye protection if indicated. 
+2. Cover the spill with a cloth or paper towels to contain it. 
+3. Pour an appropriate disinfectant over the cloth or paper towels and the immediately 
+surrounding area (5% bleach solutions are generally appropriate, but for spills on aircraft, 
+quaternary ammonium disinfectants should be used). 
+4. Apply the disinfectant concentrically beginning at the outer margin of the spill area, working 
+towards the centre. 
+5. After about 30 min, clear away the materials. If there is broken glass or other sharps are 
+involved, use a dustpan or a piece of stiff cardboard to collect the materials and deposit them 
+into a puncture-resistant container for disposal. 
+6. Clean and disinfect the area of the spillage (if necessary, repeat steps 2–5). 
+7. Dispose of contaminated materials into a leak-proof, puncture-resistant waste disposal 
+container. 
+8. After successful disinfection, report the incident to the competent authority and inform them 
+that the site has been decontaminated. 
+
+35 
+ 
+Detailed information on disinfectants and their recommended use can be found in Laboratory 
+biosafety manual, 4th ed. (8), Geneva, World Health Organization, 2020. 
+ 
+ 
+
+36 
+ 
+References 
+1. United Nations. Recommendations on the transport of dangerous goods: model regulations, 21st 
+revised edition. New York, Geneva: United Nations; 2019 
+(http://www.unece.org/trans/danger/danger.html, accessed 31 December 2020). 
+2. Technical instructions for the safe transport of dangerous goods by air (Doc 9284), 2017 -2018 edition. 
+Montreal: International Civil Aviation Organization; 2017 
+(http://www.icao.int/safety/DangerousGoods/Pages/technical -instructions.aspx, accessed 31 
+December 2020). 
+3. Dangerous Goods Regulations. International Air Transport Association 
+(https://www.iata.org/en/publications/dgr/, accessed 31 December 2020). 
+4. Regulation concerning the international carriage of dangerous goods by rail (RID). Berne: 
+Intergovernmental Organisation for International Carriage by Rail; 2019
+(http://otif.org/en/?page_id=1105, accessed 31 December 2020). 
+5. Directive 2008/68/EC of the European Parliament and of the Council of 24 September 2008 on the 
+inland transport of dangerous goods (Council Directive 2008/68/EC) (https://eur-lex.europa.eu/legal-
+content/EN/ALL/?uri=CELEX%3A32008L0068, accessed 31 December 2020) 
+6. ADR, applicable as from 1 January 2019. European agreement concerning the international carriage of 
+dangerous goods by road, Volumes I and II. New York and Geneva: United Na tions; 2019. 
+(http://www.unece.org/trans/danger/publi/adr/ adr2019/19contentse.html , accessed 31 December 
+2020). 
+7. IMDG code. International maritime dangerous goods code: incorporating amendment 39 -18. 2018 
+edition. London: International Maritime Organization; 2018 
+(http://www.imo.org/en/Publications/IMDGCode/Pages/Default.aspx , accessed 6 December 2019). 
+8. Laboratory biosafety manual, fourth edition. Geneva: World Health Organization; 2020 (Laboratory 
+biosafety manual, fourth edition and associated monographs). 
+ 
+
+37 
+ 
+Annex 1: Link to International Regulations & Modal 
+Agreements 
+Please note, all websites are current as of 31st December 2020 
+ 
+The United Nations dangerous goods web site provides comprehensive detail concerning the United 
+Nations Recommendations on the Transport of Dangerous Goods. It also provides links to the modal 
+agencies: 
+http://www.unece.org/trans/danger/danger.html 
+ 
+The site below provides the full text of the United Nations Recommendations, which can be 
+downloaded in PDF format. 
+https://www.unece.org/trans/danger/publi/unrec/rev21/21files_e.html 
+ 
+The site below provides the full text of the Agreement concerning the International Carriage of 
+Dangerous Goods by Road (ADR) of 2021 including corrigendas. 
+https://unece.org/transportdangerous-goods/adr-2021-files 
+ 
+Country specific information and competent authorities for the enforcement of the ADR can be found 
+at: 
+http://www.unece.org/trans/danger/publi/adr/country-info_e.html 
+ 
+Other modal agreements may be available for purchase by accessing the following websites: 
+ 
+Air ICAO Technical Instructions may be sought from: 
+ 
+http://www.icao.int/safety/DangerousGoods/Pages/technical -instructions.aspx 
+ 
+Copies of state variations may be found at: 
+ 
+http://www.icao.int/safety/DangerousGoods/Pages/StateVariationPage.aspx 
+Rail Regulations concerning the International Carriage of Dangerous Goods by Rail (RID) 2021 can be 
+found at: 
+ 
+http://otif.org/en/?page_id=1105 
+ 
+ 
+RID is primarily for the countries of Europe, North Africa and the Middle East. There are a 
+number of countries (mainly Eastern Europe and Asia that apply RID through the Organization for 
+Cooperation of Railways (OSJD); details of RID membership can be found at: 
+ 
+http://otif.org/en/?page_id=51 
+ 
+Sea Please contact the International Maritime Organization at: 
+ 
+https://www.imo.org/en/publications/Pages/IMDG%20Code.aspx 
+ 
+Post Please contact the Universal Postal Union at: 
+ 
+https://www.upu.int/en/Contact-us 
+ 
+ 
+ 
+
+38 
+ 
+Annex 2: Special Provisions 
+“Special Provisions” is a term used to describe certain circumstances or procedures that are not 
+covered in standard regulations. These provisions are therefore needed to supplement or modify 
+the original regulations to appropriately ship the dangerous goods to which it applies. 
+ 
+The following special provisions (as listed in the UN Model Regulations) may be applicable to some 
+shipments of infectious substances. Numbers in parentheses ( ) indicate an equivalent special 
+provision number for shipments being carried by air (as listed in the ICAO Technical Instructions and 
+IATA DGR). Air specific provisions are listed at the end. 
+ 
+144 (A58) An aqueous solution containing not more than 24% alcohol by volume is not subject 
+to Dangerous Goods Regulations. 
+ 
+A218 (395) This entry must only be used for solid medical waste of Category A transported for 
+disposal. 
+ 
+219 (A47) Genetically modified micro-organisms (GMMOs) and genetically modified organisms 
+(GMOs) packed and marked in accordance with Packing Instruction 959 are not 
+subject to any other requirements in the Dangerous Goods Regulations. 
+ 
+223 (A3) If the chemical or physical properties of a substance covered by this description are 
+such that, when tested, it does not meet the established defining criteria for the class 
+or division listed in column 3 of the dangerous goods list, or any other class or division, 
+it is not subject to Dangerous Goods Regulations. 
+ 
+276 (A27) This includes any substance which is not covered by any of the other classes but which 
+has narcotic, noxious or other properties such that, in the event of spillage or leakage 
+on an aircraft, extreme annoyance or discomfort could be caused to crew members 
+so as to prevent the correct performance of assigned duties. 
+ 
+279 (A113) The substance is assigned to this classification or packing group based on human 
+experience rather than the strict application of classification criteria set out in the 
+Dangerous Goods Regulations. 
+ 
+318 (A140) For the purposes of documentation, the proper shipping name must be supplemented 
+with the technical name. Technical names need not be shown on the package. When 
+the infectious substances to be transported are unknown, but suspected of meeting 
+the criteria for inclusion in category A and assignment to UN 2814 or UN 2900, the 
+words “suspected category A infectious substance” must be shown, in parenthesis, 
+following the proper shipping name on the transport document, but not on the outer 
+packagings. 
+ 
+Air Transport specific special provisions applicable to some infectious substances shipments may 
+include (the ICAO Technical Instructions): 
+ 
+A2 This article or substance (applies to UN3539 MEDICAL WASTE, CATEGORY A, AFFECTING 
+HUMANS or MEDICAL WASTE, CATEGORY A, A FFECTING ANIMALS) may be transported on 
+cargo aircraft, only with the prior approval of the appropriate authority of the State of origin 
+and the State of the operator under the written conditions established by those authorities. 
+ 
+
+39 
+ 
+Where States, other than the State of origin and the State of the operator, have lodged a variation 
+advising that they require prior approval of shipments made under this Special Provision, approval 
+must also be obtained from the States of transit, overflight and destination, as appropriate. 
+ 
+In each case, a copy of the document(s) of approval, showing the quantity limitations and the packing 
+requirements, must accompany the consignment. 
+ 
+A48 Packaging tests are not considered necessary. 
+ 
+A81 The quantity limits shown in columns 12 and 14 do not apply to body parts, organs or whole 
+bodies. 
+Note: 
+Blood, urine and other body fluids are not considered “body parts” for the purposes of this special 
+provision. 
+Transport in accordance with this Special Provision m ust be noted on the Shipper's Declaration for 
+Dangerous Goods. 
+ 
+A117 Wastes containing Category A infectious substances must be assigned to UN 2814 or UN 2900. 
+Wastes transported under UN 3291 are wastes containing infectious substances in Category 
+B or wa stes that are reasonably believed to have a low probability of containing infectious 
+substances. Decontaminated wastes, which previously contained infectious substances, may 
+be considered as not subject to these Regulations unless the criteria of another C lass or 
+Division are met. 
+ 
+A151 When dry ice is used as a refrigerant for other than dangerous goods loaded in a unit load 
+device or other type of pallet, the quantity limits per package shown in columns 12 and 14 of 
+the table in Annex 5 for dry ice do not apply. In such case, the unit load device or other type 
+of pallet must be identified to the operator and must allow the venting of the carbon dioxide 
+gas to prevent a dangerous build-up of pressure. 
+ 
+A152 Insulated packagings conforming to the requirements of Packing Instruction 202 containing 
+refrigerated liquid nitrogen fully absorbed in a porous material are not subject to Dangerous 
+Goods Regulations provided the design of the insulated packaging would not allow the build-
+up of pressure within the container and would not permit the release of any refrigerated liquid 
+nitrogen irrespective of the orientation of the insulated packaging and any outer packaging or 
+overpack used is closed in a way that will not allow the build -up of pressure within that 
+packaging or overpack. When used to contain substances not subject to Dangerous Goods 
+Regulations, the words “Not Restricted” and the special provision number A152 must be 
+provided on the air waybill when an air waybill is issued. 
+ 
+A180 Non-infectious specimens, such as specimens of mammals, birds, amphibians, reptiles, fish, 
+insects and other invertebrates containing small quantities of UN 1170 (Ethanol), UN 1198 
+(Formaldehyde solution, flammable), UN 1987 (Alcohols, n.o.s.) or UN 1219 (Isopropanol) are 
+not subject to the Dangerous Goods Regulations provided the following packing and marking 
+requirements are met: 
+a) specimens are: 
+1. wrapped in paper towel and/or cheesecloth moistened with alcohol or an 
+alcohol solution and then placed in a plastic bag that is heat-sealed. Any free 
+liquid in the bag must not exceed 30 mL; or 
+2. placed in vials or other rigid containers with no more than 30 mL of alcohol or 
+an alcohol solution; 
+
+40 
+ 
+ 
+b) the prepared specimens are then placed in a plastic bag that is then heat-sealed; 
+ 
+c) the bagged specimens are then placed inside another plastic bag with absorbent 
+material then heat-sealed; 
+ 
+d) the finished bag is then placed in a strong outer packaging with suitable cushioning 
+material; 
+ 
+e) the total q uantity of flammable liquid per outer packaging must not exceed 1 litre; 
+and 
+ 
+f) the completed package is marked “scientific research specimens, not restricted. 
+Special Provision A180 applies”. 
+ 
+The words “not restricted” and the special provision number A180 must be included in the description 
+of the substance on the air waybill when an air waybill is issued. 
+ 
+A220 Packages containing COVID-19 vaccines accompanied by data loggers and/or cargo tracking 
+devices containing lithium batteries are not subject t o the marking and documentation 
+requirements of Section II of Packing Instruction 967 or 970, as applicable. 
+ 
+ 
+
+41 
+ 
+Annex 3: Indicative List of Biological Agents sub-classified 
+as Category A. 
+INDICATIVE EXAMPLES OF INFECTIOUS SUBSTANCES INCLUDED IN CATEGORY A IN ANY FORM UNLESS 
+OTHERWISE INDICATED 
+UN Number and Proper 
+Shipping Name 
+ 
+Microorganism 
+UN 2814 
+Infectious substance, 
+affecting humans 
+Bacillus anthracis (cultures only) 
+Brucella abortus (cultures only) 
+Brucella melitensis (cultures only) 
+Brucella suis (cultures only) 
+Burkholderia mallei – Pseudomonas mallei – Glanders (cultures only) 
+Burkholderia pseudomallei – Pseudomonas pseudomallei (cultures only) 
+Chlamydia psittaci – avian strains (cultures only) 
+Clostridium botulinum (cultures only) 
+Coccidioides immitis (cultures only) 
+Coxiella burnetii (cultures only) 
+Crimean-Congo haemorrhagic fever virus 
+Dengue virus (cultures only) 
+Eastern equine encephalitis virus (cultures only) 
+Escherichia coli, verotoxigenic (cultures only) 
+Ebola virus 
+Flexal virus 
+Francisella tularensis (cultures only) 
+Guanarito virus 
+Hantaan virus 
+Hantaviruses causing haemorrhagic fever with renal syndrome 
+Hendra virus 
+Hepatitis B virus (cultures only) 
+Herpes B virus (cultures only) 
+Human immunodeficiency virus (cultures only) 
+Highly pathogenic avian influenza virus (cultures only) 
+Japanese Encephalitis virus (cultures only) 
+Junin virus 
+Kyasanur Forest disease virus 
+Lassa virus 
+Machupo virus 
+Marburg virus 
+Monkeypox virus 
+Mycobacterium tuberculosis (cultures only) 
+Nipah virus 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+42 
+ 
+INDICATIVE EXAMPLES OF INFECTIOUS SUBSTANCES INCLUDED IN CATEGORY A IN ANY FORM 
+UNLESS OTHERWISE INDICATED (Continued) 
+ Omsk haemorrhagic fever virus 
+Poliovirus (cultures only) 
+Rabies virus (cultures only) 
+Rickettsia prowazekii (cultures only) 
+Rickettsia rickettsii (cultures only) 
+Rift Valley fever virus (cultures only) 
+Russian spring-summer encephalitis virus (cultures only) 
+Sabia virus 
+Shigella dysenteriae type 1 (cultures only)1 
+Tick-borne encephalitis virus (cultures only) 
+Variola virus 
+Venezuelan equine encephalitis virus (cultures only) 
+West Nile virus (cultures only) 
+Yellow fever virus (cultures only) 
+Yersinia pestis (cultures only) 
+UN 2900 
+Infectious 
+substance, 
+affecting animals 
+African swine fever virus (cultures only) 
+Avian paramyxovirus Type 1 – Velogenic Newcastle disease virus (cultures only) 
+Classical swine fever virus (cultures only) 
+Foot and mouth disease virus (cultures only) 
+Goatpox virus (cultures only) 
+Lumpy skin disease virus (cultures only) 
+Mycoplasma mycoides – Contagious bovine pleuropneumonia (cultures only) 
+Peste des petits ruminants virus (cultures only) 
+Rinderpest virus (cultures only) 
+Sheep-pox virus (cultures only) 
+ 
+Swine vesicular disease virus (cultures only) 
+Vesicular stomatitis virus (cultures only) 
+ 
+ 
+
+43 
+ 
+Annex 4: Packing Instructions 
+The following annex provides the four packing instructions that may be relevant to the transport of infectious 
+substances. Please note for Annex 4.1 – 4.3 (P620, P650 & P621) these are as provided in the UN Model 
+Regulations. Additional requirements may exist in equivalent packing instructions in modal agreements (e.g. 
+PI620, PI650 for air transport). 
+ 
+Annex 4.4 is as provided in the ICAO technical instructions. There is no equivalent for this packing instruction i n 
+the UN Model Regulations. 
+ 
+A4.1 Packing Instruction P620 
+P620 PACKING INSTRUCTION P620 
+This instruction applies to UN 2814 and UN 2900. 
+The following packagings are authorized provided the special packing provisions described below are met: 
+Packagings meeting the requirements of Chapter 6.3 and approved accordingly consisting of: 
+(a) Inner packagings comprising: 
+(i) leakproof primary receptacle(s); 
+(ii) a leakproof secondary packaging; 
+(iii) other than for solid infectious substances, an absorbent material in sufficient quantity to 
+absorb the entire contents placed between the primary receptacle(s) and the secondary 
+packaging; if multiple fragile primary receptacles are placed in a single secondary packaging, 
+they shall be either individually wrapped or separated so as to prevent contact between them; 
+(b) A rigid outer packaging. 
+Drums (1A1, 1A2, 1B1, 1B2, 1N1, 1N2, 1H1, 1H2, 1D, 1G); Boxes (4A, 4B, 4N, 4C1, 4C2, 4D, 4F, 4G, 4H1, 4H2); 
+Jerricans (3A1, 3A2, 3B1, 3B2, 3H1, 3H2). 
+ 
+The smallest external dimension shall be not less than 100 mm (4 in). 
+Additional requirements: 
+1. Inner packagings containing infectious substances shall not be consolidated with inner packagings 
+containing unrelated types of goods. Complete packages may be overpacked in accordance with the 
+provisions of 1.2.1 and 5.1.2; such an overpack may contain dry ice. 
+2. Other than for exceptional consignments, e.g. whole organs which require special packaging, the 
+following additional requirements shall apply: 
+(a) Substances consigned at ambient temperatures or at a higher temperature. Primary 
+receptacles shall be of glass, metal or plastics. Positive means of ensuring a leakproof seal shall 
+be provided, 
+e.g. a heat seal, a skirted stopper or a metal crimp seal. If screw caps are used, they shall be 
+secured by positive means, e.g., tape, paraffin sealing tape or manufactured locking cl osure; 
+(b) Substances consigned refrigerated or frozen. Ice, dry ice or other refrigerant shall be placed 
+around the secondary packaging(s) or alternatively in an overpack with one or more complete 
+packages marked in accordance with 6.3.3. Interior supports shall be provided to secure 
+secondary packaging(s) or packages in position after the ice or dry ice has dissipated. If ice is 
+used, the outer packaging or overpack shall be leakproof. If dry ice is used, the outer packaging 
+or overpack shall permit the release of carbon dioxide gas. The primary receptacle and the 
+secondary packaging shall maintain their integrity at the temperature of the refrigerant used; 
+(c) Substances consigned in liquid nitrogen. Plastics primary receptacles capable of withstanding 
+very low temperature shall be used. The secondary packaging shall also be capable of 
+withstanding very low temperatures, and in most cases will need to be fitted over the primary 
+receptacle individually. Provisions for the consignment of liquid nitrogen s hall also be fulfilled. 
+The primary receptacle and the secondary packaging shall maintain their integrity at the 
+temperature of the liquid nitrogen; 
+(d) Lyophilized substances may also be transported in primary receptacles that are flame -sealed 
+glass ampoules or rubber-stoppered glass vials fitted with metal seals. 
+
+44 
+ 
+ 
+ 
+3. Whatever the intended temperature of the consignment, the primary receptacle or the secondary 
+packaging shall be capable of withstanding without leakage an internal pressure producing a 
+pressure differential of not less than 95 kPa and temperatures in the range -40 °C to +55 °C (-40 °F 
+to +130 °F). 
+4. Other dangerous goods shall not be packed in the same packaging as Division 6.2 infectious 
+substances unless they are necessary for maintaining the viability, stabilizing or preventing 
+degradation or neutralizing the hazards of the infectious substances. A quantity of 30 ml or less of 
+dangerous goods included in Classes 3 (flammable liquids), 8 (corrosive substances) or 9 
+(miscellaneous dangerous substances and articles, including environmentally hazardous 
+substances) may be packed in each primary receptacle containing infectious substances. These 
+small quantities of dangerous goods of Classes 3, 8 or 9 are not subject to any additional 
+requirements of these Regulations when packed in accordance with this packing instruction. 
+5. Alternative packagings for the transport of animal material may be authorized by the competent 
+authority in accordance with the provisions of 4.1.3.7. 
+ 
+ 
+Special packing provisions 
+1. Shippers of infectious substances shall ensure that packages are prepared in such a manner that 
+they arrive at their destination in good condition and present no hazard to persons or animals 
+during transport. 
+2. An itemized list of contents shall be enclosed between the secondary packaging and the outer 
+packaging. When the infectious substances to be transported are unknown, but suspected of 
+meeting the criteria for inclusion in category A, the words "suspected category A infectious 
+substance" shall be shown, in parenthesis, following the proper shipping name on the document 
+inside the outer packaging. 
+3. Before an empty packaging is returned to the shipper, or sent elsewhere, it must be disinfected or 
+sterilized to nullify any hazard and any label or mark indicating that it had contained an infectious 
+substance must be removed or obliterated. 
+ 
+ 
+A4.2 Packing Instruction P650 
+P650 Packing Instructions P650 
+This packing instruction applies to UN3373 
+(1) The packaging shall be of good quality, strong enough to withstand the shocks and loadings 
+normally encountered during transport, including trans-shipment between cargo transport 
+units and between transport units and warehouses as well as any removal from a pallet or 
+overpack for subsequent manual or mechanical handling. Packagings shall be constructed and 
+closed to prevent any loss of contents that might be caused under normal conditions of 
+transport by vibration or by changes in temperature, humidity or pressure. 
+ 
+(2) The packaging shall consist of at least three components: 
+(a) a primary receptacle, 
+(b) a secondary packaging, and 
+(c) an outer packaging 
+ 
+ of which either the secondary or the outer packaging shall be rigid. 
+ 
+(3) Primary receptacles shall be packed in secondary packagings in such a way that, under normal 
+conditions of transport, they cannot break, be punctured or leak their contents into the 
+secondary packaging. Secondary packagings shall be secured in outer packagings with suitable 
+cushioning material. Any leakage of the contents shall not compromise the integrity of the 
+cushioning material or of the outer packaging. 
+ 
+
+45 
+ 
+(4) For transport, the mark illustrated below must be displayed on the external surface of the 
+outer packaging on a background of a contrasting colour and must be clearly visible and 
+legible. The mark must be in the form of a square set at an angle of 45 (diamond-shaped) 
+with each side having a length of at least 50 mm; the width of the line must be at least 2 mm 
+and the letters and numbers must be at least 6 mm high. The entire mark must appear on one 
+side of the package. The proper shipping name “BIOLOGICAL SUBSTANCE, CATEGORY B” in 
+letters at least 6 mm high must be marked on the outer packaging adjacent to the diamond-
+shaped mark. 
+ 
+ 
+(5) At least one surface of the outer packaging must have a minimum dimension of 100 mm × 100 
+mm. 
+ 
+(6) The completed package shall be capable of successfully passing the drop test in 6.3.5.3 as 
+specified in 6.3.5.2 of these Regulations at a height of 1.2 m. Following the appropriate drop 
+sequence, there shall be no leakage from the primary receptacle(s) which shall remain 
+protected by absorbent material, when required, in the secondary packaging. 
+(7) For liquid substances 
+(a) The primary receptacle(s) shall be leakproof; 
+(b) The secondary packaging shall be leakproof; 
+(c) If multiple fragile primary receptacles are placed in a single seconda ry packaging, they 
+shall be either individually wrapped or separated to prevent contact between them; 
+(d) Absorbent material shall be placed between the primary receptacle(s) and the secondary 
+packaging. The absorbent material shall be in quantity sufficient to absorb the entire contents 
+of the primary receptacle(s) so that any release of the liquid substance will not compromise 
+the integrity of the cushioning material or of the outer packaging; 
+(e) The primary receptacle or the secondary packaging shall be capable of withstanding, 
+without leakage, an internal pressure of 95 kPa (0.95 bar). 
+ 
+(8) For solid substances 
+(a) The primary receptacle(s) shall be siftproof; 
+(b) The secondary packaging shall be siftproof; 
+(c) If multiple fragile primary receptacles are placed in a single secondary packaging, they 
+shall be either individually wrapped or separated to prevent contact between them. 
+(e) If there is any doubt as to whether or not residual liquid may be present in the primary 
+receptacle during transport then a packaging suitable for liquids, including absorbent 
+materials, shall be used. 
+ 
+(9) Refrigerated or frozen specimens: Ice, dry ice and liquid nitrogen 
+(a) When dry ice or liquid nitrogen is used as a coolant, the requirements of 5.5.3 shall apply. 
+When used, ice shall be placed outside the secondary packagings or in the outer packaging or 
+an overpack. Interior supports shall be provided to secure the secondary packagings in the 
+original position. If ice is used, the outside packaging or overpack shall be leak proof. 
+(b) The primary receptacle and the secondary packaging shall maintain their integrity at the 
+temperature of the refrigerant used as well as the temperatures and the pressures which 
+could result if refrigeration were lost. 
+ 
+
+46 
+ 
+(10) When packages are placed in an overpack, the package marks required by this packing 
+instruction shall either be clearly visible or be reproduced on the outside of the overpack. 
+ 
+(11) Infectious substances assigned to UN 3373 which are packed and marked in accordance with 
+this packing instruction are not subject to any other requirement in these Regulations. 
+ 
+(12) Clear instructions on filling and closing such packages shall be provided by packaging 
+manufacturers and subsequent distributors to the consignor or to the person who prepa res 
+the package (e.g. patient) to enable the package to be correctly prepared for transport. 
+ 
+Other dangerous goods must not be packed in the same packaging as Division 6.2 infectious substances 
+unless they are necessary for maintaining the viability, stabilizing or preventing degradation or neutralizing 
+the hazards of the infectious substances. A quantity of 30 ml or less of dangerous goods included in Classes 
+3 (flammable liquids), 8 (corrosives) or 9 (miscellaneous dangerous substances and articles, incl uding 
+environmentally hazardous substances) permitted as excepted quantities may be packed in each primary 
+receptacle containing infectious substances. When these small quantities of dangerous goods are packed 
+with infectious substances in accordance with this packing instruction no other requirements in these 
+Instructions need be met. 
+ 
+A4.3 Packing Instruction P621 
+P621 Packing Instruction P621 
+This packing instruction applies to UN3291 
+ 
+The following packagings are authorized provided that the general provisions of 4.1.1 except 4.1.1.15 and 
+4.1.3 are met: 
+ 
+(1) Provided that there is sufficient absorbent material to absorb the entire amount of liquid present 
+and the packaging is capable of retaining liquids: 
+Drums (1A2, 1B2, 1N2, 1H2, 1D, 1G); 
+Boxes (4A, 4B, 4N, 4C1, 4C2, 4D, 4F, 4G, 4H1, 4H2); 
+Jerricans (3A2, 3B2, 3H2). 
+Packagings shall conform to the packing group II performance level for solids. 
+ 
+(2) For packages containing larger quantities of liquid: 
+Drums (1A1, 1A2, 1B1, 1B2, 1N1, 1N2, 1H1, 1H2, 1D, 1G); 
+Jerricans (3A1, 3A2, 3B1, 3B2, 3H1, 3H2); 
+Composites (6HA1, 6HB2, 6HG1, 6HH1, 6HD1, 6HA2, 6HB2, 6HC, 6HD2, 6HG2, 6HH2, 6PA1, 6PB1, 
+6PG1, 6PD1, 6PH1, 6PH2, 6PA2, 6PB2, 6PC, 6PG2 or 6PD2). 
+Packagings shall conform to the packing group II performance level for liquids. 
+ 
+Consignments of clinical waste and medical waste must be prepared in such a manner that they 
+arrive at their destination in good condition and present no hazard to persons or animals during 
+transport. 
+Additional requirement: 
+Packagings intended to contain sharp objects such as broken glass and needles must be resistant to 
+puncture and retain liquids under the performance test conditions in chapter 6.1. 
+A4.4 Packing Instruction PI954 
+Packing Instruction 954 
+Passenger and cargo aircraft for UN 1845 only 
+ 
+General requirements 
+ 
+ Part 4, Chapter 1 requirements must be met, including: 
+
+47 
+ 
+ 
+(1) Compatibility requirements 
+— Substances must be compatible with their packagings as required by 4;1.1.3. 
+ 
+(2) Closure requirements 
+— Closures must meet the requirements of 4;1.1.4. 
+ 
+UN number and proper shipping name 
+ 
+Quantity — 
+passenger 
+ 
+Quantity — cargo 
+UN 1845 Carbon dioxide, solid or Dry ice 200 kg 200 kg 
+ 
+ 
+ADDITIONAL PACKING REQUIREMENTS 
+ In packages: 
+ 
+(a) must be packed in accordance with the general packing requirements of 4;1 and be in packaging 
+designed and constructed to permit the release of carbon dioxide gas to prevent a build -up of pressure 
+that could rupture the packaging; 
+ 
+(b) the shipper must make arrangements with the operator(s) for each shipment, to ensure that 
+ventilation safety procedures are followed; 
+ 
+(c) the Shipper's Declaration requirements are only applicable when the Carbon dioxide, solid (dry ice) is 
+used as a refrigerant for dangerous goods that require a Shipper's Declaration or when Carbon dioxide, 
+solid (dry ice) used as a refrigerant for substances or articles not subject to these Regulations is 
+described on a Shipper's Declaration; 
+ 
+(d) the dangerous goods transport document requirements of 5;4 are not applicable provided alternative 
+written documentation is provided describing the contents. The information on the document must be 
+shown in the location provided for the description of the goods. Where an agreement exists with the 
+operator, the shipper may provide the information by electronic data processing (EDP) or electronic 
+data interchange (EDI) techniques. The information required is as follows and should be shown in t he 
+following order: 
+(1) UN 1845; 
+(2) Carbon dioxide, solid or Dry ice; 
+(3) the number of packages and the net quantity of dry ice in each package; and 
+ 
+(e) the net mass of the Carbon dioxide, solid or Dry ice must be marked on the outside of the package. 
+When packages are placed in an overpack, the overpack must be marked on the outside with the total 
+net quantity of dry ice in the overpack. 
+ 
+Dry ice used for other than dangerous goods may be shipped in a unit load device or other type of pallet 
+prepared by a single shipper provided that: 
+ 
+(a) the shipper has made prior arrangements with the operator; 
+(b) the unit load device, or other type of pallet, must allow the venting of the carbon dioxide gas to 
+prevent a dangerous build-up of pressure (the marking requirements of 5;2 and the labelling 
+requirements of 5;3 do not apply to the unit load device); 
+(c) the unit load device must not contain dangerous goods other than UN 3373, Biological substance, 
+Category B or ID 8000, Consumer commodity. Where the unit load device contains UN 3373 or ID 
+8000, the provisions of these Regulations that apply to those substances must be met in addition 
+to the provisions set out in this packing instruction; and 
+(d) the shipper must provide the operator with written documentation or, where agreed with the 
+operator, information by EDP or EDI techniques, stating the total quantity of the dry ice contained 
+in the unit load device or other type of pallet. 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+For more information, contact: 
+ 
+World Health Organization 
+Emergency Preparedness (WPE) 
+Global Infectious Hazards Preparedness (GIH) 
+Biosecurity and Health Security Interface (BSI) 
+ 
+20 avenue Appia 
+1211 Geneva 27 
+Switzerland 
+ 
+E-mail: e-ISST@who.int 
+ 
+https://www.who.int/activities/safeguarding-
+biosafety-and-biosecurity-in-laboratories

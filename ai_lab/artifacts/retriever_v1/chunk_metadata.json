@@ -1,0 +1,167 @@
+[
+  {
+    "chunk_id": "kb_v1_001_c1",
+    "kb_id": "kb_v1_001",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "section": "red_flags",
+    "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+    "risk_level": "high",
+    "faq_type": "red_flag_general",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_002_c1",
+    "kb_id": "kb_v1_002",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "section": "red_flags",
+    "title": "Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng",
+    "risk_level": "high",
+    "faq_type": "red_flag_signs",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_003_c1",
+    "kb_id": "kb_v1_003",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "section": "red_flags",
+    "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+    "risk_level": "high",
+    "faq_type": "red_flag_signs",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_004_c1",
+    "kb_id": "kb_v1_004",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "section": "red_flags",
+    "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+    "risk_level": "high",
+    "faq_type": "emergency_warning",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_005_c1",
+    "kb_id": "kb_v1_005",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "section": "test_explainers",
+    "title": "Xét nghiệm máu là gì",
+    "risk_level": "low",
+    "faq_type": "general_info",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_006_c1",
+    "kb_id": "kb_v1_006",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "section": "test_explainers",
+    "title": "Vì sao bác sĩ có thể chỉ định xét nghiệm máu",
+    "risk_level": "low",
+    "faq_type": "general_info",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_007_c1",
+    "kb_id": "kb_v1_007",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "section": "test_explainers",
+    "title": "Một số loại xét nghiệm máu thường gặp",
+    "risk_level": "low",
+    "faq_type": "test_meaning",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_008_c1",
+    "kb_id": "kb_v1_008",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "section": "test_explainers",
+    "title": "Cần chuẩn bị gì trước khi xét nghiệm máu",
+    "risk_level": "low",
+    "faq_type": "preparation",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_009_c1",
+    "kb_id": "kb_v1_009",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "section": "test_explainers",
+    "title": "Sau khi xét nghiệm máu và khi nhận kết quả",
+    "risk_level": "low",
+    "faq_type": "results",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_010_c1",
+    "kb_id": "kb_v1_010",
+    "source_id": "chest_pain",
+    "source_name": "NHS",
+    "section": "red_flags",
+    "title": "Khi nào đau ngực cần gọi cấp cứu ngay",
+    "risk_level": "high",
+    "faq_type": "emergency_warning",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_011_c1",
+    "kb_id": "kb_v1_011",
+    "source_id": "chest_pain",
+    "source_name": "NHS",
+    "section": "red_flags",
+    "title": "Khi nào đau ngực nên đi khám sớm",
+    "risk_level": "high",
+    "faq_type": "urgent_advice",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_012_c1",
+    "kb_id": "kb_v1_012",
+    "source_id": "chest_pain",
+    "source_name": "NHS",
+    "section": "red_flags",
+    "title": "Đau ngực có thể do nhiều nguyên nhân và không nên tự chẩn đoán",
+    "risk_level": "high",
+    "faq_type": "safety_boundary",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_013_c1",
+    "kb_id": "kb_v1_013",
+    "source_id": "shortness_of_breath",
+    "source_name": "NHS",
+    "section": "red_flags",
+    "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+    "risk_level": "high",
+    "faq_type": "emergency_warning",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_014_c1",
+    "kb_id": "kb_v1_014",
+    "source_id": "shortness_of_breath",
+    "source_name": "NHS",
+    "section": "red_flags",
+    "title": "Khi nào khó thở cần được đánh giá y tế sớm",
+    "risk_level": "high",
+    "faq_type": "urgent_advice",
+    "use_in_v1": true
+  },
+  {
+    "chunk_id": "kb_v1_015_c1",
+    "kb_id": "kb_v1_015",
+    "source_id": "shortness_of_breath",
+    "source_name": "NHS",
+    "section": "red_flags",
+    "title": "Không nên tự chẩn đoán nguyên nhân khó thở",
+    "risk_level": "high",
+    "faq_type": "safety_boundary",
+    "use_in_v1": true
+  }
+]

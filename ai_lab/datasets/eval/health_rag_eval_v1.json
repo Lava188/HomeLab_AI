@@ -1,0 +1,35 @@
+[
+  {"query":"xét nghiệm máu là gì","expected_chunk_ids":["kb_v1_005_c1"],"expected_source_id":"blood_tests","expected_section":"test_explainers"},
+  {"query":"blood test là gì","expected_chunk_ids":["kb_v1_005_c1"],"expected_source_id":"blood_tests","expected_section":"test_explainers"},
+  {"query":"vì sao bác sĩ chỉ định xét nghiệm máu","expected_chunk_ids":["kb_v1_006_c1"],"expected_source_id":"blood_tests","expected_section":"test_explainers"},
+  {"query":"lý do cần làm xét nghiệm máu","expected_chunk_ids":["kb_v1_006_c1"],"expected_source_id":"blood_tests","expected_section":"test_explainers"},
+  {"query":"một số loại xét nghiệm máu thường gặp","expected_chunk_ids":["kb_v1_007_c1"],"expected_source_id":"blood_tests","expected_section":"test_explainers"},
+  {"query":"công thức máu đường huyết mỡ máu là những xét nghiệm nào","expected_chunk_ids":["kb_v1_007_c1"],"expected_source_id":"blood_tests","expected_section":"test_explainers"},
+  {"query":"cần chuẩn bị gì trước khi xét nghiệm máu","expected_chunk_ids":["kb_v1_008_c1"],"expected_source_id":"blood_tests","expected_section":"test_explainers"},
+  {"query":"trước khi xét nghiệm máu có cần nhịn ăn không","expected_chunk_ids":["kb_v1_008_c1"],"expected_source_id":"blood_tests","expected_section":"test_explainers"},
+  {"query":"sau khi xét nghiệm máu thì bao lâu có kết quả","expected_chunk_ids":["kb_v1_009_c1"],"expected_source_id":"blood_tests","expected_section":"test_explainers"},
+  {"query":"kết quả xét nghiệm máu khi nào có","expected_chunk_ids":["kb_v1_009_c1"],"expected_source_id":"blood_tests","expected_section":"test_explainers"},
+
+  {"query":"khi nào đau ngực cần gọi cấp cứu","expected_chunk_ids":["kb_v1_010_c1"],"expected_source_id":"chest_pain","expected_section":"red_flags"},
+  {"query":"đau ngực lan ra tay và khó thở có nguy hiểm không","expected_chunk_ids":["kb_v1_010_c1"],"expected_source_id":"chest_pain","expected_section":"red_flags"},
+  {"query":"đau ngực lúc có lúc không có nên đi khám sớm không","expected_chunk_ids":["kb_v1_011_c1"],"expected_source_id":"chest_pain","expected_section":"red_flags"},
+  {"query":"đau ngực rồi tự hết nhưng vẫn lo thì nên làm gì","expected_chunk_ids":["kb_v1_011_c1"],"expected_source_id":"chest_pain","expected_section":"red_flags"},
+  {"query":"đau ngực có thể do nhiều nguyên nhân và không nên tự chẩn đoán","expected_chunk_ids":["kb_v1_012_c1"],"expected_source_id":"chest_pain","expected_section":"red_flags"},
+  {"query":"không nên tự kết luận nguyên nhân đau ngực đúng không","expected_chunk_ids":["kb_v1_012_c1"],"expected_source_id":"chest_pain","expected_section":"red_flags"},
+
+  {"query":"khó thở khi nào cần hỗ trợ khẩn cấp","expected_chunk_ids":["kb_v1_013_c1"],"expected_source_id":"shortness_of_breath","expected_section":"red_flags"},
+  {"query":"khó thở nặng tím môi và lú lẫn có cần cấp cứu không","expected_chunk_ids":["kb_v1_013_c1"],"expected_source_id":"shortness_of_breath","expected_section":"red_flags"},
+  {"query":"khó thở kéo dài và nặng dần có cần đi khám sớm không","expected_chunk_ids":["kb_v1_014_c1"],"expected_source_id":"shortness_of_breath","expected_section":"red_flags"},
+  {"query":"khó thở kèm ho ra máu hoặc sưng một chân thì sao","expected_chunk_ids":["kb_v1_014_c1"],"expected_source_id":"shortness_of_breath","expected_section":"red_flags"},
+  {"query":"không nên tự chẩn đoán nguyên nhân khó thở","expected_chunk_ids":["kb_v1_015_c1"],"expected_source_id":"shortness_of_breath","expected_section":"red_flags"},
+  {"query":"khó thở có thể do nhiều nguyên nhân khác nhau đúng không","expected_chunk_ids":["kb_v1_015_c1"],"expected_source_id":"shortness_of_breath","expected_section":"red_flags"},
+
+  {"query":"dấu hiệu nhiễm trùng nặng cần được đánh giá sớm","expected_chunk_ids":["kb_v1_001_c1"],"expected_source_id":"nice_sepsis_overview","expected_section":"red_flags"},
+  {"query":"người có dấu hiệu nhiễm trùng và rất mệt rất yếu thì sao","expected_chunk_ids":["kb_v1_001_c1"],"expected_source_id":"nice_sepsis_overview","expected_section":"red_flags"},
+  {"query":"da tái xám tím môi ban không mất màu có phải dấu hiệu đáng lo không","expected_chunk_ids":["kb_v1_002_c1"],"expected_source_id":"nice_sepsis_overview","expected_section":"red_flags"},
+  {"query":"những dấu hiệu bên ngoài nào làm tăng cảnh giác nhiễm trùng nặng","expected_chunk_ids":["kb_v1_002_c1"],"expected_source_id":"nice_sepsis_overview","expected_section":"red_flags"},
+  {"query":"tình trạng xấu đi nhanh và không cải thiện có làm tăng mức độ lo ngại không","expected_chunk_ids":["kb_v1_003_c1"],"expected_source_id":"nice_sepsis_overview","expected_section":"red_flags"},
+  {"query":"dù trước đó chưa quá xấu nhưng nếu tím môi và không cải thiện thì sao","expected_chunk_ids":["kb_v1_003_c1"],"expected_source_id":"nice_sepsis_overview","expected_section":"red_flags"},
+  {"query":"khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng thì cần chuyển cấp cứu ngay","expected_chunk_ids":["kb_v1_004_c1"],"expected_source_id":"nice_sepsis_overview","expected_section":"red_flags"},
+  {"query":"nguy cơ cao của nhiễm trùng nặng có cần đi cấp cứu không","expected_chunk_ids":["kb_v1_004_c1"],"expected_source_id":"nice_sepsis_overview","expected_section":"red_flags"}
+]

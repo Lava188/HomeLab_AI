@@ -1,0 +1,369 @@
+Office of the Deputy Director of Infectious Diseases 
+Specimen Storage and Shipping Guidance 
+ 
+This job aid defines the criteria to properly ship biological specimens to the Centers for Disease Control and Prevention (CDC). Failure to 
+satisfy these criteria will result in the rejection of submitted specimens by CDC. 
+ 
+Submitters should also refer to guidance and federal regulatory standards external to this procedure for the transport of biological 
+specimens (e.g., IATA, DOT, etc.). Per International Air Transport Association (IATA) regulation, a dangerous goods certificate of training 
+is required for any person who submits dangerous goods to a public carrier for transportation. 
+ 
+For all information about the storage of samples prior to shipment, refer directly to the Test Directory and test-specific guidance. 
+ 
+Step 1: Determine the mode of transport for the package 
+ 
+Step 2: Determine the classification of the package contents 
+ 
+Step 3: Pack the specimen(s) 
+ 
+Step 4: Label, mark, and document the package 
+ 
+ 
+ 
+
+ 
+2 
+ 
+ Office of the Deputy Director of Infectious Diseases 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Step 1: Determine the 
+Mode of Transport for the 
+Package 
+ 
+The mode of transport will dictate 
+the federal transport regulations 
+that should be followed. Submitters 
+should review federal regulatory 
+standards external to this procedure 
+for the transport of biological 
+specimens (e.g., IATA, DOT, USPS, 
+etc.). 
+Specimens should be shipped with 
+overnight shipping when possible or 
+if required for the specific testing 
+requested. 
+ 
+Step 2: Determine the 
+Classification of the 
+Package Contents 
+ 
+Submitters should reference 
+external regulatory standards 
+if they are uncertain of 
+specimen classification. There 
+are three classifications for 
+biological specimens: 
+Category A, Category B, and 
+Exempt Specimen. 
+ 
+Step 3: Pack the Specimen(s) 
+ 
+The mode of transport and the specimen 
+classification determine the packing 
+requirements. Submitters may reference IATA’s 
+packing instructions (PI), which are followed by 
+most submitting laboratories. Regardless of 
+classification, all specimen submissions must 
+include a primary receptacle, secondary 
+packaging, a secondary container, and rigid, outer 
+packaging. The submitter should reference CDC-
+defined temperature ranges for specimen storage 
+to decide on proper specimen shipping conditions 
+and materials relative to ambient, room-
+temperature, refrigerated, or frozen specimens.
+ 
+ 
+
+ 
+3 
+ 
+ Office of the Deputy Director of Infectious Diseases 
+Packing Frozen Specimens: 
+• Ensure that specimens are frozen at the required temperature (e.g., <-20°C, <-70°C) prior to packing. 
+• Within the secondary container, place sufficient dry ice to surround the sealed secondary packaging, and add further insulation. 
+It is important to note that surrounding the secondary packaging on all sides with the dry ice has shown to improve the length 
+of time the specimen remains frozen during transit. Dry ice: 
+o Should not come in direct contact with the primary receptacle. 
+o Should not be used as a substitute for padding, as it will dissipate during transport. 
+o Must not adversely affect the specimen(s) being shipped. 
+o Will sublimate at a rate of 5 -10 pounds every 24 hours; therefore 5 -10 pounds of dry ice is required in an overnight 
+shipment. 
+• Secondary packaging must be surrounded by an outer, secondary container (i.e., a Styrofoam cooler) with walls that a re, at 
+minimum, two inches thick. 
+ 
+ 
+ 
+ 
+ 
+ 
+Absorbent 
+materials 
+Styrofoam 
+cooler/ 
+secondary 
+container 
+Secondary 
+packaging cap 
+ 
+Leakproof/ 
+siftproof 
+primary 
+receptacle 
+Cushioning 
+materials 
+Leakproof/ 
+siftproof 
+secondary 
+packaging 
+Rigid outer 
+packaging 
+Documentation 
+ 
+Dry Ice 
+Leakproof/ 
+siftproof 
+primary 
+receptacle 
+ 
+Category A 
+Category B 
+Leakproof/ 
+siftproof 
+secondary 
+packaging 
+Dry Ice Documentation 
+ 
+Styrofoam 
+cooler/ 
+secondary 
+container Rigid outer 
+packaging 
+
+ 
+4 
+ 
+ Office of the Deputy Director of Infectious Diseases 
+Packing Refrigerated Specimens: 
+• Ensure that specimens are at 2-8°C prior to shipment. 
+• Surround sealed secondary packaging (e.g., sealed biohazard bag) with refrigerated or frozen cold packs and further insulation 
+(and do not use damaged or leaking cold packs or wet ice). 
+o Note: It will be crucial for the submitter to consider the distance and expected duration of travel, as well as the 
+season/outdoor temperature, to decide whether refrigerated or frozen cold packs should be used (e.g., where overnight 
+shipping is not available, and/or during summer months, submitters may opt to include frozen cold packs). 
+• Ensure that secondary packaging is surrounded by an outer, secondary container (i.e., a Styrofoam cooler) with walls that are, at 
+minimum, two inches thick. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Absorbent 
+materials 
+Leakproof
+/ siftproof 
+secondary 
+packaging 
+Styrofoam 
+Cooler/ 
+secondary 
+container 
+ 
+Rigid outer 
+packaging 
+Secondary 
+packaging cap 
+ Leakproof
+/ siftproof 
+primary 
+receptacle 
+Documentation 
+ 
+Refrigerated 
+or frozen 
+cold packs 
+Leakproof/ 
+siftproof 
+secondary 
+packaging 
+ 
+Leakproof
+/ siftproof 
+primary 
+receptacle 
+ 
+Cushioning 
+materials 
+Category A 
+Category B 
+Documentation 
+ 
+Absorbent 
+materials 
+Styrofoam 
+Cooler/ 
+secondary 
+container 
+ 
+Rigid outer 
+packaging 
+Refrigerated 
+or frozen 
+cold packs 
+
+5 
+ Office of the Deputy Director of Infectious Diseases 
+Packing Room-Temperature Specimens: 
+• Ensure that specimens are at 15-25°C prior to shipment.
+• Include room-temperature cold packs to maintain proper temperature within the secondary container and add adequate
+cushioning material.
+• Ensure that secondary packaging is surrounded by an outer, secondary container (i.e., a Styrofoam cooler) with walls that are,
+at minimum, two inches thick. For dried samples (e.g., blood slides, swabs), a secondary container may be omitted.
+Leakproof/ 
+siftproof 
+secondary 
+packaging 
+Styrofoam 
+Cooler/ 
+secondary 
+container 
+Rigid outer 
+packaging 
+Secondary 
+packaging cap 
+Leakproof/ 
+siftproof 
+primary 
+receptacle 
+Documentation 
+ 
+Room- 
+Temperature 
+cold packs 
+Leakproof
+/ siftproof 
+secondary 
+packaging 
+Leakproof
+/ siftproof 
+primary 
+receptacle 
+Absorbent 
+materials Cushioning 
+materials 
+Category A 
+Category B 
+Documentation 
+Absorbent 
+materials 
+Room-
+Temperature 
+cold packs 
+Rigid outer 
+packaging 
+Styrofoam 
+Cooler/ 
+secondary 
+container 
+
+6 
+ Office of the Deputy Director of Infectious Diseases 
+Packing Ambient Specimens: 
+• Submitters should ensure that specimens are at ambient temperature prior to packing.
+• No temperature-maintaining materials (e.g., cold packs) are required.
+ 
+Documentation 
+ 
+Leakproof/ 
+siftproof 
+primary 
+receptacle 
+Leakproof/ 
+siftproof 
+secondary 
+packaging 
+Secondary 
+packaging 
+cap 
+Cushioning 
+materials 
+Absorbent 
+materials 
+Category A 
+Rigid outer 
+packaging 
+Leakproof/ 
+siftproof 
+primary 
+receptacle 
+Leakproof/ 
+siftproof 
+secondary 
+packaging 
+Styrofoam 
+Cooler/ 
+secondary 
+container 
+Category B 
+Documentation 
+ 
+Absorbent 
+materials 
+Rigid outer 
+packaging 
+
+7 
+ Office of the Deputy Director of Infectious Diseases 
+Step 4: Label, Mark, and Document the Package 
+T
+he mode of transport and the classification, as determined in the previous steps, will determine the 
+proper mode of labeling and marking, as well as documentation needed for the outer packaging. 
+Definitions 
+Cold pack: reusable, leakproof, gel or solid refrigerant used to maintain temperature within a shipping container during transit. 
+Cold packs can be frozen, refrigerated, or room temperature. 
+Ambient: descriptor of any specimen or material that maintains a temperature equal to its surrounding environment and which is 
+not otherwise temperature controlled. 
+Frozen: descriptor of any specimen or material that is kept at or below -20°C. 
+Refrigerated: descriptor of any specimen or material that is kept within a range of 2-8°C. 
+Room-temperature: descriptor of any specimen or material that is kept within a range of 15-25°C. 
+P
+rimary receptacle: the glass, metal, or plastic, leakproof/siftproof container housing the submitted specimen. 
+Secondary packaging: the leakproof/siftproof packing material that seals, cushions, and surrounds the primary receptacle(s). 
+Secondary container: a sealable, Styrofoam cooler that makes up the outermost layer of secondary packaging. 
+Outer packaging: the rigid, outermost packaging (typically a cardboard box) that houses the primary receptacle(s), secondary 
+packaging, and secondary container.

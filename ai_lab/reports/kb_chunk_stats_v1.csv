@@ -1,0 +1,16 @@
+﻿chunk_id,source_id,section,risk_level,title_len,content_len,chunk_text_len,keyword_count,tag_count
+kb_v1_001_c1,nice_sepsis_overview,red_flags,high,88,181,497,3,3
+kb_v1_002_c1,nice_sepsis_overview,red_flags,high,68,282,614,4,3
+kb_v1_003_c1,nice_sepsis_overview,red_flags,high,84,239,587,4,3
+kb_v1_004_c1,nice_sepsis_overview,red_flags,high,73,245,602,3,3
+kb_v1_005_c1,blood_tests,test_explainers,low,20,238,412,2,2
+kb_v1_006_c1,blood_tests,test_explainers,low,44,236,533,2,2
+kb_v1_007_c1,blood_tests,test_explainers,low,37,224,453,5,2
+kb_v1_008_c1,blood_tests,test_explainers,low,40,190,509,2,2
+kb_v1_009_c1,blood_tests,test_explainers,low,42,236,507,2,2
+kb_v1_010_c1,chest_pain,red_flags,high,37,267,554,3,2
+kb_v1_011_c1,chest_pain,red_flags,high,32,148,424,2,2
+kb_v1_012_c1,chest_pain,red_flags,high,62,224,522,2,2
+kb_v1_013_c1,shortness_of_breath,red_flags,high,35,248,526,3,2
+kb_v1_014_c1,shortness_of_breath,red_flags,high,42,158,372,4,2
+kb_v1_015_c1,shortness_of_breath,red_flags,high,42,197,488,2,2
