@@ -9,11 +9,8 @@ function checkSafety({ message }) {
     const normalizedMessage = normalizeText(message);
 
     const emergencyKeywords = [
-        "kho tho",
         "khong tho duoc",
-        "tuc nguc",
         "dau nguc du doi",
-        "dau nguc",
         "ngat",
         "xiu",
         "co giat",
@@ -21,11 +18,12 @@ function checkSafety({ message }) {
         "chay mau nhieu",
         "sot cao lien tuc",
         "sot cao khong ha",
-        "kho noi",
+        "khong noi duoc",
         "liet",
         "te nua nguoi",
         "me man",
-        "tim tai nan",
+        "tim moi dam",
+        "tim tai ro ret",
         "tu tu",
         "tu sat"
     ];

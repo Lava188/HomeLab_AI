@@ -1,4 +1,4 @@
-const CHAT_ENGINE_VERSION = "mvp-rule-based-v7";
+const CHAT_ENGINE_VERSION = "mvp-health-rag-v1";
 
 const FLOWS = {
     EMERGENCY: "emergency",

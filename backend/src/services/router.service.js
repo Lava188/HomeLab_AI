@@ -60,7 +60,17 @@ function detectFlow(message) {
         "co y nghia gi",
         "tu van",
         "mau",
-        "nuoc tieu"
+        "nuoc tieu",
+        "dau nguc",
+        "tuc nguc",
+        "kho tho",
+        "tho doc",
+        "tim moi",
+        "tim tai",
+        "nhiem trung",
+        "sepsis",
+        "sot cao",
+        "xau di nhanh"
     ];
 
     if (hasAnyKeyword(normalizedMessage, rescheduleKeywords)) {
