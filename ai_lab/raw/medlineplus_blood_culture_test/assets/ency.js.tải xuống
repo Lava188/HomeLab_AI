@@ -1,0 +1,946 @@
+var NLM = {};
+/*Display Adam URAC pages.*/
+function honc_open() {
+  window.open("https://www.healthonnet.org/HONcode/Conduct.html?HONConduct087353", "plain", "width=915,height=540, location=yes,menubar=yes,scrollbars=yes,toolbars=yes,resizable=yes");
+}
+function urac_open() {
+  window.open("https://accreditnet.urac.org/directory/#/certification/HCP010004/info", "plain", "width=915,height=540, location=yes,menubar=yes,scrollbars=yes,toolbars=yes,resizable=yes");
+}
+function hwsopen() {
+  window.open("https://www.urac.org/accreditations-certifications/accreditation-process/","plain","width=800","height=540");
+}
+function edopen() {
+  window.open("http://www.adam.com/About_ADAM/Editorial/process.html","plain","width=915,height=540, location=yes,menubar=yes,scrollbars=yes,toolbars=yes,resizable=yes");
+}
+function edpolopen() {
+  window.open("https://www.adam.com/editorial-policy","plain","width=915,height=540, location=yes,menubar=yes,scrollbars=yes,toolbars=yes,resizable=yes");
+}
+function ppopen() {
+  window.open("http://www.adam.com/PrivacyStatement.html","plain","width=915,height=540, location=yes,menubar=yes,scrollbars=yes,toolbars=yes,resizable=yes");
+}
+function honopen() {
+  window.open("http://www.hon.ch/HONcode/Patients/Conduct.html", "plain", "width=915,height=540,location=yes,menubar=yes,scrollbars=yes,toolbars=yes,resizable=yes");
+}
+
+(function ($, document, undefined) {
+  NLM.namespace = function(ns_string) {
+    var parts = ns_string.split("."),
+        parent = NLM;
+    if ("NLM"===parts[0]) {
+      parts = parts.slice(1);
+    }
+
+    for (var i=0;i<parts.length;i++) {
+      if ("undefined"===typeof parent[parts[i]]) {
+        parent[parts[i]] = {};
+      }
+      parent = parent[parts[i]];
+    }
+    return parent;
+  };
+  NLM.namespace("NLM.MedlinePlus");
+
+  var video_types={en:["With audio description","No audio description"],es:["Con audio describiendo contenido","Sin audio describiendo contenido"]},
+      video_label = {en:'English','es':'español'},
+      video_caps={en:["For closed captioning, click the CC button in the lower right corner of the player","Video player keyboard shortcuts"],es:["Para subtítulos, haga click en el botón que se encuentra en el margen derecho superior del video","Teclas de acceso para el video"]},
+      play_video = {en:['Play Video','Pause Video'],es:['reproduce el video','pausa el video']},
+      hotkey_list = {en:'/about/using/hotkeys/',es:'/spanish/acercade/uso/atajosdeteclado/'},
+      adam_play_id = 'adam-play';
+  NLM.MedlinePlus.ENV = {
+        isAndroid: function() {
+          return navigator.userAgent.match(/Android/i);
+        },
+        isBlackBerry: function() {
+          return navigator.userAgent.match(/BlackBerry/i);
+        },
+        isOpera: function() {
+          return navigator.userAgent.match(/Opera Mini/i);
+        },
+        isWindows: function() {
+          return navigator.userAgent.match(/IEMobile/i);
+        },
+        isIOS: function() {
+          return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+        },
+        isMobile: function() {
+          return (NLM.MedlinePlus.ENV.isAndroid() || NLM.MedlinePlus.ENV.isBlackBerry() || NLM.MedlinePlus.ENV.isIOS() || NLM.MedlinePlus.ENV.isOpera() || NLM.MedlinePlus.ENV.isWindows());
+        }
+      };
+  NLM.isIE = function() {
+    if(!(window.ActiveXObject || "ActiveXObject" in window)){
+      return false;
+    }
+    return true;
+  },
+  NLM.ie = function() {
+    //works only for IE < 10
+    var undef,
+        v = 3,
+        div = document.createElement('div'),
+        all = div.getElementsByTagName('i');
+
+    while (
+        div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->',
+        all[0]
+    );
+
+    return v > 4 ? v : undef;
+  };
+  NLM.w7 = function() {
+    return (/windows[\s]+nt[\s]+6\.1/i.test(navigator.userAgent));
+  };
+  NLM.edge = function() {
+    return window.navigator.userAgent.indexOf("Edge") > -1;
+  };
+  //Defult load - load non-AD version  
+  $(document).ready(function () {
+    var ency = NLM.MedlinePlus.Ency();
+    NLM.MedlinePlus.lang = $("html").attr("lang");
+    NLM.MedlinePlus.root = $('html').attr('data-root');
+    ency.init();
+    if (("anatomyVideo"==$("html").attr("id"))) {
+      var util = NLM.MedlinePlus.Util(NLM.MedlinePlus.HealthVideo),
+          root = $('html').attr('data-root'),
+          css=[root+'/css/ency/skins/ency_video.css',root+'/css/ency/skins/videojs.css'],
+          js=[root + '/jslib/ency/video.min.js'];          
+      util.load('css',css);
+      util.load('js',js);
+    }
+    if (("quiz"==$("html").attr("id"))) {
+      var quiz = NLM.MedlinePlus.Quiz();
+      NLM.MedlinePlus.lang = $("html").attr("lang");
+      NLM.MedlinePlus.root = $('html').attr('data-root');
+      quiz.showQuiz();
+    }
+  });
+  NLM.MedlinePlus.Util = function(callback) {
+    function _multiload(type,list) {
+      if ("js"==type) {
+        getScriptCached(list.pop(), function() {_loadanother(type,list);});
+      }
+      else {
+        while(0<list.length) {
+          var _item = (list.pop()).split("|");
+          $('head').append( $('<link rel="stylesheet" type="text/css" href="' + _item[0] + '"/>').attr('media', _item[1]) );
+        }
+      }
+    }
+    function getScriptCached(url, callback) {
+      jQuery.ajax({
+        context:document.body,
+        type: "GET",
+        url: url,
+        success: callback,
+        dataType: "script",
+        cache: true
+      });
+    }
+    function _loadanother(type,list) {
+      if (0<list.length) {
+        _multiload(type,list);
+      }
+      else {
+        if (callback) {
+          callback();
+        }
+      }
+    }
+    
+    return {'load':_multiload};
+  }
+  NLM.MedlinePlus.Quiz = function() {
+    var slideIndex=1, quiz_num=1, showCorrectAnswer = 'no';
+    var i;
+    var slides = document.getElementsByClassName("quiz_slides");
+    var answer_choices = document.getElementsByClassName("answer_choice");
+    var quiz_contents = document.getElementsByClassName("quiz_content");
+    var pbs = document.getElementsByClassName("previous_btn");
+    var nbs = document.getElementsByClassName("next_btn");
+    var question_numbers = document.getElementsByClassName("question_num");
+    var correct_answer_btns = document.getElementsByClassName("correct_answer_btn");
+    var answers = document.getElementsByClassName("answer");
+    var url = document.location.href;
+
+    $("#mplus-lang-toggle").on("click", function(evt) {
+      location.href = $(this)[0].href + '?quiz=' + slideIndex;
+      return false;
+    });
+    $('#mplus-lang-toggle').keypress(function(event){
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (keycode == '13'){
+        location.href = $(this)[0].href + '?quiz=' + slideIndex;
+        return false;
+      }
+    });
+    const param = (new URL(location.href).searchParams).get('quiz');
+    if (param > 0) {
+      slideIndex = parseInt(param);
+    } else {
+      slideIndex = parseInt(quiz_num);
+    }
+
+    $("#previous_btn").on("click", function(evt) {
+      showCorrectAnswer = 'no';
+      slideIndex = slideIndex - 1;
+      showQuizSlides(slideIndex)
+      return false;
+    });
+    $('#previous_btn').keypress(function(event){
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (keycode == '13'){
+        if (slideIndex == 1) {
+          event.preventDefault();
+        } else {
+          showCorrectAnswer = 'no';
+          slideIndex = slideIndex - 1;
+          showQuizSlides(slideIndex)
+        }
+        return false;
+      }
+    });
+
+    $("#next_btn").on("click", function(event) {
+      showCorrectAnswer = 'no';
+      slideIndex = slideIndex + 1;
+      showQuizSlides(slideIndex)
+      return false;
+    });
+    $('#next_btn').keypress(function(event){
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if(keycode == '13'){
+        if (slideIndex == slides.length) {
+          event.preventDefault();
+        } else {
+          showCorrectAnswer = 'no';
+          slideIndex = slideIndex + 1;
+          showQuizSlides(slideIndex)
+        }
+        return false;
+      }
+    });
+
+    $("#correct_answer_btn").on("click", function(event) {
+      showCorrectAnswer = 'yes';
+      showQuizSlides(slideIndex)
+      return false;
+    });
+    $('#correct_answer_btn').keypress(function(event){
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if(keycode == '13'){
+        showCorrectAnswer = 'yes';
+        showQuizSlides(slideIndex)
+        return false;
+      }
+    });
+
+
+      $(".question_option").keyup(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '9'){
+          $(this).attr('checked', true);
+          showQuizSlides(slideIndex);
+          return false;
+        }
+      });
+
+
+    $(".question_num").each(function(index) {
+      index +=1;
+      var question_num_var = "#question_num_" + index;
+      $(question_num_var).on("click", function(event) {
+        showCorrectAnswer = 'no';
+        showQuizSlides(slideIndex=index);
+        return false;
+      });
+      $(question_num_var).keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13'){
+          showCorrectAnswer = 'no';
+          showQuizSlides(slideIndex=index);
+          return false;
+        }
+      });
+      $(question_num_var).keyup(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '9'){
+          showCorrectAnswer = 'no';
+          showQuizSlides(slideIndex=index);
+          return false;
+        }
+      });
+    });
+
+    function showQuizSlides(n) {
+      new_url = window.location.origin + window.location.pathname + '?quiz=' + slideIndex;
+      window.history.pushState({}, '', new_url);
+
+      if (slideIndex == 10) {
+        $("#correct_answer_btn").removeClass("jump_num");
+      }
+      if ($("#correct_answer_btn").hasClass("jump_num")) {
+        $("#next_btn").keyup(function(event){
+          if(event.keyCode == '9'){
+            if (event.shiftKey) {
+              var previous_slide_num = slideIndex - 1
+              document.getElementById("question_num_" + previous_slide_num).focus();
+              $("#correct_answer_btn").removeClass("jump_num");
+            } else {
+              document.getElementById("question_num_" + slideIndex).focus();
+              $("#correct_answer_btn").removeClass("jump_num");
+            }
+          }
+        });
+      }
+      var current_question_num_id = question_numbers[slideIndex-1].id;
+      var current_quiz_content_id = quiz_contents[slideIndex-1].id;
+      for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+      }
+      for (i = 0; i < answer_choices.length; i++) {
+        answer_choices[i].className = answer_choices[i].className.replace(" quiz_active", "");
+      }
+      for (i = 0; i < question_numbers.length; i++) {
+        question_numbers[i].className = question_numbers[i].className.replace(" question_number_active", "");
+      }
+
+      for (i = 0; i < answers.length; i++) {
+        answers[i].className = answers[i].className.replace(" show_correct_answer", "");
+        answers[i].setAttribute("aria-hidden", "true");
+        answers[i].removeAttribute("aria-live");
+      }
+      slides[slideIndex-1].style.display = "block";
+      question_numbers[slideIndex-1].className += " question_number_active";
+
+      if (slideIndex == 1) {
+        if (!$('#previous_btn').hasClass("previous_next_inactive")) {
+          pbs[0].className += " previous_next_inactive";
+          nbs[0].className = nbs[0].className.replace(" previous_next_inactive", "");
+        }
+      } else if (slideIndex == slides.length) {
+        if (!$('#next_btn').hasClass("previous_next_inactive")) {
+          nbs[0].className += " previous_next_inactive";
+          pbs[0].className = pbs[0].className.replace(" previous_next_inactive", "");
+        }
+      } else {
+        pbs[0].className = pbs[0].className.replace(" previous_next_inactive", "");
+        nbs[0].className = nbs[0].className.replace(" previous_next_inactive", "");
+      }
+
+      if (showCorrectAnswer == 'yes') {
+        answers[slideIndex-1].className += " show_correct_answer";
+        answers[slideIndex-1].setAttribute("aria-hidden", "false");
+        answers[slideIndex-1].setAttribute("aria-live", "assertive");
+        answers[slideIndex-1].focus();
+      }
+
+      if (document.activeElement.id == ("question_num_" + slideIndex)) {
+        document.getElementById(current_quiz_content_id).focus();
+        $("#correct_answer_btn").addClass("jump_num");
+      }
+
+      console.log(document.location.href);
+      console.log($())
+    }
+    function currentSlide(n) {
+      showCorrectAnswer = 'no';
+      showQuizSlides(slideIndex = n);
+    }
+    function correctAnswer(n) {
+      showCorrectAnswer = "yes";
+      showQuizSlides(slideIndex = n);
+    }
+    return {'showQuiz':showQuizSlides};
+  }
+
+  NLM.MedlinePlus.Ency = function() {
+    var items,elems,obj,i,docFrag = document.createDocumentFragment(), buf=[], assemb=[],_cssenabled = false,
+        _href = $("a[title~='Bookmark']").attr("href"),_ua = navigator.userAgent,
+        cano = $("link[rel='canonical']"),
+        bodyBackground = $('body').css("background-color"),
+        _display = $("#mplus-menu-list").css("display");
+    function init() {
+      if (bodyBackground != "") {
+        _cssenabled = true;
+      }
+      if (NLM.MedlinePlus.ENV.isAndroid() && /Chrome\/[.0-9]* (?!Mobile)/.test(_ua)) {
+        if (0==$(".main-single").length) {
+          $.each($(".main p"), function() {
+            if (!$(this).hasClass("side-nav")) {
+              $(this).css("font-size","130%");
+            }
+          });
+        }
+        else {
+          $.each($(".main-single p"), function() {
+            if (!$(this).hasClass("side-nav")) {
+              $(this).css("font-size","130%");
+            }
+          });
+        }
+      }
+      section_elems = $("div.section");
+      section_elems = section_elems.slice(1);
+      if (("article"==$("html").attr("id"))) {
+        $($(section_elems[0]).find(".section-header")[0]).trigger("click");
+      }
+      $($($("#mplus-footer").find("span[class*='icon-twitter']")[0]).parent()).attr("target","_blank");
+      obj = $(($("ul[class~='secondarynav']").find("a[href*='from=']"))[0]);
+      $(obj).attr("href",($(obj).attr("href")+"https"+($("span[class~='page-url']").html()).split("https")[1]));
+      if (0!=cano.length) {
+        $("a[class~='desktop-version']").attr("href",$(cano).attr("href"));
+      }
+      _href = _href +  encodeURIComponent($("h1").html());
+      $("a[title~='Bookmark']").attr("href",_href);
+      elems = $("#index").find("li");
+
+      for (i=0;i<elems.length;i++) {
+        if (0==((i+1)%5)) {
+          $(elems[i]).addClass("g-5");
+        }
+        if (0==(i%2)) {
+          $(elems[i]).addClass("g-m");
+        }
+      }
+      if (/video-index/i.test($("html").attr("id"))) {
+        var subs1=[], m=Math.ceil($(".g-5").length/2)*5;
+        for (var i=m;i<elems.length;i++) {
+          subs1.push($(elems[i]).detach());
+        }
+        var sublist = $(document.createElement("ul"));
+        $(sublist).addClass("sub-list");
+        for (var m=0;m<subs1.length;m++) {
+          sublist.append(subs1[m]);
+        }
+        $(sublist).insertAfter("#index");
+      }
+      items = $(".img-grid");
+      elems = items.find("li");
+      for(i=0;i<elems.length;i++) {
+        obj = $(elems[i]);
+        if (0==(i%2)) {
+          obj.addClass("thum-1");
+        }
+        else {
+          obj.addClass("thum-2");
+          $("<li style='clear:both;'></li>").insertAfter(obj);
+        }
+      }
+      if ($("div.main") && _cssenabled && ("none"==_display)) {
+        //topics
+        buf=[];
+        obj = document.createElement("div");
+        docFrag.appendChild(obj);
+        items = $("#section-mtp");
+        if (0!=items.length) {
+          buf.push("<section>");
+          buf.push("<div class=\"side-section\">");
+          buf.push("<div class=\"section-header\">");
+          buf.push("<h2>" + $("#section-mtp").attr("name") + "</h2>");
+          buf.push("</div>");
+          buf.push("<div class=\"section-body\">");
+          buf.push(items.html());
+          buf.push("</div></section>");
+        }
+        //images
+        items = $("#section-tnails");
+        if (!/anatomyVideo|presentation/.test($("html").attr("id")) && (0!=items.length)) {
+          buf.push("<section>");
+          buf.push("<div class=\"side-section\">");
+          buf.push("<div class=\"section-header\">");
+          buf.push("<h2>" + $("#section-tnails").attr("name") + "</h2>");
+          buf.push("</div>");
+          buf.push("<div class=\"section-body\">");
+          buf.push(items.html());
+          buf.push("</div></section>");
+        }
+        //images
+        items = $("#side-section-1");
+        if (!/anatomyVideo|presentation/.test($("html").attr("id")) && (0!=items.length)) {
+          buf.push("<section>");
+          buf.push("<div class=\"side-section\">");
+          buf.push("<div class=\"section-header\">");
+          buf.push("<h2>" + $("#side-section-1").attr("name") + "</h2>");
+          buf.push("</div>");
+          buf.push("<div class=\"section-body\">");
+          buf.push(items.html());
+          buf.push("</div></section>");
+        }
+
+        //readmore
+        items = $("#section-rdmore");
+        if (0!=items.length) {
+          buf.push("<section>");
+          buf.push("<div class=\"side-section\">");
+          buf.push("<div class=\"section-header\">");
+          buf.push("<h2>" + $("#section-rdmore").attr("name") + "</h2>");
+          buf.push("</div>");
+          buf.push("<div class=\"section-body\">");
+          buf.push(items.html());
+          buf.push("</div></section>");
+        }
+        //carepoint
+        items = $("#section-carepnt");
+        if (0!=items.length) {
+          buf.push("<section>");
+          buf.push("<div class=\"side-section\">");
+          buf.push("<div class=\"section-header\">");
+          buf.push("<h2>" + $("#section-carepnt").attr("name") + "</h2>");
+          buf.push("</div>");
+          buf.push("<div class=\"section-body\">");
+          buf.push(items.html());
+          buf.push("</div></section>");
+        }
+        //Test Your Knowledge
+        items = $("#section-testyourknowledge");
+        if (0!=items.length) {
+          buf.push("<section>");
+          buf.push("<div class=\"side-section\">");
+          buf.push("<div class=\"section-header\">");
+          buf.push("<h2>" + $("#section-testyourknowledge").attr("name") + "</h2>");
+          buf.push("</div>");
+          buf.push("<div class=\"section-body\">");
+          buf.push(items.html());
+          buf.push("</div></section>");
+        }
+        //anatomy video
+        items = $("#sec-anatomy");
+        if (0!=items.length) {
+          buf.push("<section>");
+          buf.push("<div class=\"side-section\">");
+          buf.push("<div class=\"section-header\">");
+          buf.push("<h2></h2>");
+          buf.push("</div>");
+          buf.push("<div class=\"section-body\">");
+          buf.push(items.html());
+          buf.push("</div></section>");
+        }
+        //assembling
+        assemb.push("<aside>");
+        assemb.push(buf.join(""));
+        assemb.push("</aside>");
+        var sidet = document.createElement("div");
+        sidet.setAttribute("class","side");
+        sidet.innerHTML = assemb.join("");
+        var el = document.getElementById("d-article");
+        //if (("article"!=$("html").attr("id"))) {
+          el.appendChild(sidet);
+        //}
+        if (("anatomyVideo"!=$("html").attr("id"))) {
+          $("#mplus-wrap").show();
+        }
+      }
+      $("article").on("mouseover",".rollover_globals",function() {
+          var src = $(this).attr("src").replace("tnails","rollover");
+          src = src.replace("t.gif","r.gif");
+          $(this).attr("src",src);
+      });
+      $("article").on("mouseout",".rollover_globals",function() {
+          var src = $(this).attr("src").replace("rollover","tnails");
+          src = src.replace("r.gif","t.gif");
+          $(this).attr("src",src);
+      });
+      $(".img-grid,.videobox").on("click","img", function() {
+        window.location = $($(this).next()).attr("href");
+        return true;
+      });
+      elems = $("#vis").find("li");
+      for(i=0;i<elems.length;i++) {
+        obj = $(elems[i]);
+        if (0==(i%2)) {
+          obj.addClass("thum-1");
+        }
+        else {
+          obj.addClass("thum-2");
+        }
+      }
+    }
+    return {'init':init};
+  }
+  //video playback  
+  NLM.MedlinePlus.HealthVideo = function() {
+    var vplayer,
+        element_id = 'adam-video';
+    function __create_video(v_mode) {
+      var wrapper = $('.jwbox'),
+          attr,attr2,
+          v_div = $('#'+v_mode),          
+          src = $($(v_div).find('a[raw]')[0]).attr('href'),
+          poster = src.replace(src.substring(src.lastIndexOf('/') + 1), $(v_div).attr('poster')),
+          vid = $(v_div).attr('data-video'),
+          v = $(document.createElement('video')),
+          config = {
+            controls:true,
+            autoplay:false,
+            poster:poster,
+            responsive: true,
+            aspectRatio:"4:3",
+            preload:"auto",
+            fluid: true,
+            controlBar: {
+              volumePanel: {inline: false},
+              volumeMenuButton: {
+                inline: false,
+                vertical: true
+              },          
+              children: [
+                "playToggle",      
+                "durationDisplay",
+                "timeDivider",
+                "currentTimeDisplay",
+                "progressControl",
+                "remainingTimeDisplay",
+                "VolumeMenuButton"
+              ]
+            }
+          };
+      v.prop('id',adam_play_id);
+      v.prop('controls','controls');
+      v.prop('class','video-js vjs-default-skin vjs-big-play-centered vjs-big-play-button');
+      attr = $(document.createElement('source'));    
+      $(attr).prop('src',src);
+      $(attr).prop('type','video/mp4');
+      $(v).append(attr);
+      $(wrapper).append(v);
+      return config;
+    }
+    
+    function __set_video() {
+      var vid = $('button.video-type[class~="active"]').data('video'),
+          src = $($('div#'+vid).find('a[raw]')[0]).attr('href'),
+          mode,
+          vtt = src.replace('.mp4','.vtt');
+      vplayer.src(src);
+      mode = vplayer.textTracks()[0].mode;
+      vplayer.removeRemoteTextTrack(vplayer.textTracks()[0]);
+      vplayer.addRemoteTextTrack({
+        kind: 'captions',
+        language: $("html").attr("id"),
+        label: video_label[$("html").attr("id")],
+        src: vtt
+      },true);
+      vplayer.textTracks()[0].mode='disabled';
+      $('.vjs-icon-captions').removeClass('caption-on');
+    }
+    
+    function _vj(config) {
+      vplayer = videojs(adam_play_id,config);
+      __init_player();
+    }
+
+    function __init_player() {
+      vplayer.ready(function() {
+        var controlBar = document.getElementsByClassName('vjs-control-bar')[0],
+            ctrl = controlBar.querySelector('.vjs-picture-in-picture-control'),
+            wrapper,cap_toggle,lastctrl,ctrl_cc,wrapper_cc,
+            lang = $('html').attr('lang'),            
+            player = this;
+        $('.vjs-volume-vertical').css('left','-123456px');
+        $('.vjs-big-play-button').on('keypress',function(evt) {
+          //player.focus();
+          evt.stopPropagation();
+        });
+        $('.vjs-current-time').show();
+        wrapper = document.createElement('div');      
+        cap_toggle = document.createElement('button');
+        wrapper.setAttribute('class','vjs-control vjs-captions-control');
+        wrapper.setAttribute('tabindex','-1');
+        cap_toggle.className = 'vjs-captions-control vjs-control vjs-button';
+        cap_toggle.setAttribute('type','button');
+        cap_toggle.setAttribute('title','Toggle Caption');
+        cap_toggle.setAttribute('aria-disabled','false');
+        cap_toggle.innerHTML = '<span class="vjs-icon-captions vjs-icon-placeholder" aria-hidden="true"></span><span class="vjs-control-text" aria-live="polite">Toggle Captions</span>';
+        wrapper.appendChild(cap_toggle);
+        lastctrl = controlBar.querySelector('.vjs-volume-panel');
+        ctrl_cc = document.createElement('button');
+        wrapper_cc = document.createElement('div');
+        wrapper_cc.setAttribute('class','vjs-control');
+        wrapper_cc.setAttribute('tabindex','-1');
+        ctrl_cc.className = 'vjs-fullscreen-control vjs-control vjs-button';
+        ctrl_cc.setAttribute('type','button');
+        ctrl_cc.setAttribute('title','Fullscreen');
+        ctrl_cc.setAttribute('aria-disabled','false');
+        ctrl_cc.innerHTML = '<span class="vjs-icon-placeholder" aria-hidden="true"></span><span class="vjs-control-text" aria-live="polite">Toggle Fullscreen</span>';
+        wrapper_cc.appendChild(ctrl_cc);
+        if (lastctrl) {
+          controlBar.insertBefore(wrapper,lastctrl);
+          controlBar.insertBefore(wrapper_cc,lastctrl.nextSibling);
+        }
+        $('#' + adam_play_id).on('keydown', function(evt) {
+          var o = evt.originalEvent,
+              code = o.which || o.keyCode,
+              vl = player.volume(),vd = document.getElementsByTagName('video')[0],
+              time = player.currentTime();
+          if (0>time) {
+            time = 0;
+          }
+          switch (code) {
+            case 27:
+              if (player.isFullscreen() && !NLM.edge() && vd.msRequestFullscreen) {
+                var e = $.Event('keypress');
+                e.which = 102;
+                e.keyCode = 102;
+                $('#'+adam_play_id).trigger(e);
+                $(this).blur();
+                $('video').focus();
+                evt.stopPropagation();
+                evt.preventDefault();
+              }
+              else {
+                return;
+              }
+              break;
+            case 13:
+              var e = $.Event('keypress');
+              e.which = 32;
+              e.keyCode = 32;
+              $('#'+adam_play_id).trigger(e);
+              $(this).blur();
+              $('video').focus();
+              evt.stopPropagation();
+              break;
+            case 37:
+              //left
+              player.currentTime(time-5);
+              evt.stopPropagation();
+              evt.preventDefault();
+              break;
+            case 38:          
+              //up
+              if (player.muted()) {
+                player.muted(false);
+                player.volume(0.1);
+              }
+              else {
+                player.volume(vl+0.1);
+              }
+              evt.stopPropagation();
+              evt.preventDefault();
+              break;
+            case 39:
+              //right
+              player.currentTime(time+5);
+              evt.stopPropagation();
+              evt.preventDefault();
+              break;
+            case 40:
+              //down
+              player.volume(vl-0.1);
+              evt.stopPropagation();
+              evt.preventDefault();
+              break;
+            default:
+              $('video').focus();
+              return;
+          }
+        });
+        $('.vjs-mute-control, .vjs-volume-vertical').mouseover(function(evt) {
+          $('.vjs-volume-vertical').css('left','0');
+        });
+        $('.vjs-mute-control, .vjs-volume-vertical').mouseout(function(evt) {
+          $('.vjs-volume-vertical').css('left','-123456px');
+        });
+        $('.vjs-fullscreen-control').click(function(evt) {
+          var isEdge = NLM.edge(),
+              vd = document.getElementsByTagName('video')[0];
+          if (!player.isFullscreen()) {
+            player.requestFullscreen();
+          }
+          else {
+            if (!isEdge && vd.msRequestFullscreen) {
+              document.msExitFullscreen();
+            }
+            else {
+              player.exitFullscreen();
+            }
+          }
+          evt.stopPropagation();
+          $('video').focus();
+        });
+        $('.vjs-captions-control').click(function(evt) {
+          var e = $.Event('keypress');
+          e.which = 99;
+          e.keyCode = 99;
+          $('#'+adam_play_id).trigger(e);
+          //$(this).blur();
+          //$('video').focus();
+          evt.stopPropagation();
+          return true;
+        });
+        $('.vjs-play-control, .vjs-mute-control').click(function(evt) {
+          $(this).blur();
+          $('video').focus();
+        });
+        $('.vjs-volume-vertical').mouseover(function(evt) {
+          $(this).show();
+          $('video').focus();
+        });
+        $('#'+adam_play_id).on('keypress', function(evt) {
+          var o = evt.originalEvent || evt,
+              code = o.which || o.keyCode,
+              track,duration,
+              target=o.target;
+          switch(code) {
+            case 48:
+            case 49:
+            case 50:
+            case 51:
+            case 52:
+            case 53:
+            case 54:
+            case 55:
+            case 56:
+            case 57: {
+              duration = vplayer.duration() / 10;
+              player.currentTime(duration*(code-48));
+            }
+              break;
+            case 70:
+            case 102: {
+              __toggleFullscreen();
+              break;
+            }
+            case 77:
+            case 109: {            
+              player.muted(!player.muted());
+              break;
+            }
+            case 67:
+            case 99: {              
+                track = player.textTracks()[0],
+                    mode = track.mode;
+                if ('showing'!=mode) {
+                  mode = 'showing';
+                  $('.vjs-icon-captions').addClass('caption-on');
+                }
+                else {
+                  mode = 'hidden';
+                  $('.vjs-icon-captions').removeClass('caption-on');
+                }
+                track.mode = mode;
+              break;
+            }
+            case 32: {
+              if (!$(target).hasClass('vjs-play-control')) {
+                if (!player.paused()) {
+                  player.pause();
+                }
+                else {
+                  player.play();
+                }
+              }
+            }
+          }
+          evt.stopPropagation();
+          evt.preventDefault();
+          $('video').focus();
+          return true;
+        });
+        $.each($('.vjs-control'), function(idx,obj) {
+          $(obj).prop("tabindex","-1");
+        });
+        $('.vjs-volume-bar').prop('tabindex','-1');
+        $('.vjs-progress-holder').prop('tabindex','-1');
+        $('.vjs-big-play-button').prop('tabindex','-1');
+        $('.vjs-big-play-button').prop('title',play_video[lang][0]);
+        $('video').prop('tabindex','0');
+        var mid = $('button.video-type[class~="active"]').data('video'),
+            v_div = $('#'+mid);
+        player.addRemoteTextTrack({
+          kind: 'captions',
+          language: $("html").attr("id"),
+          label: video_label[$("html").attr("id")],
+          src: $($(v_div).find('a[raw]')[0]).attr('href').replace('.mp4','.vtt')
+        },true);
+        player.volume(0.3);
+        player.on('play', function(evt) {
+          $('#'+adam_play_id).attr('title',play_video[lang][1]);
+          $('button.vjs-big-play-button').prop('title',play_video[lang][1]);
+          $('button.vjs-big-play-button').hide();
+        });
+        player.on('pause', function(evt) {
+          $('#'+adam_play_id).attr('title',play_video[lang][0]);
+          $('button.vjs-big-play-button').prop('title',play_video[lang][0]);
+          $('button.vjs-big-play-button').show();
+        });
+        player.reportUserActivity();
+        player.enableTouchActivity();
+      },true);    
+    }
+    function __toggleFullscreen() {
+      var isEdge = NLM.edge(),
+          vd = document.getElementsByTagName('video')[0];
+      if (!vplayer.isFullscreen()) {
+        if (!isEdge && vd.msRequestFullscreen) {
+          $('.jwbox').addClass('full-screen-ie');
+          $('.jwbox').css('max-width','100%');
+          $('.video-js').addClass('vjs-fullscreen');
+          vplayer.isFullscreen(true);
+        }
+        else {
+          vplayer.requestFullscreen();
+        }
+      }
+      else {
+        if (!isEdge && vd.msRequestFullscreen) {
+          $('.jwbox').removeClass('full-screen-ie');
+          $('.jwbox').css('max-width','400px');
+          $('.video-js').removeClass('vjs-fullscreen');
+          vplayer.isFullscreen(false);
+        }
+        vplayer.exitFullscreen();
+      }
+    }
+    function _setVideoPick(mid) {
+      //only do this when we have 2 videos
+      var _media_auID = $("#adam-video-au").data("video");
+      if (!_media_auID) {
+        return;
+      }
+      if (_media_auID) {
+        //build video type picks
+        var buf = [],v;
+        buf.push("<button class=\"video-type active\" id=\"video2\" data-video=\"adam-video\">");
+        buf.push("<span>" + video_types[$("html").attr("lang")][1] + "</span></button>");
+        buf.push("<button class=\"video-type\" id=\"video1\" data-video=\"adam-video-au\">");
+        buf.push("<span>" + video_types[$("html").attr("lang")][0] + "</span></button>");
+        v = document.createElement("div");
+        v.setAttribute("class","video-pick group");
+        v.innerHTML = buf.join("");
+        $(v).append($(".icon-info"));
+        if (0!=$('div.main').length) {
+          $("div.main").prepend(v);
+        }
+        else {
+          $("div.main-single").prepend(v);
+        }
+      }
+      $(".video-type").on("click", function(evt) {
+        var obj = $(evt.currentTarget);
+        if (obj.hasClass("active")) {
+          return false;
+        }
+        $("button.active").removeClass("active");
+        obj.addClass("active");
+        //load video
+        __set_video();
+        $('button.vjs-big-play-button').show();
+      });
+    }
+    (function() {
+      var buf = [],mid,config,elem;
+      $('#'+element_id).hide();
+      $('#'+element_id+'-au').hide();
+      _setVideoPick(element_id);
+      mid = $('button.video-type[class~="active"]').data('video');
+      config = __create_video(mid);
+      _vj(config);
+      if (!$(".caption").length) {
+        buf.push("<div class=\"caption\">" + video_caps[$("html").attr("lang")][0] + "</div>");
+        buf.push('<div class="shortcuts"><a href="' + NLM.MedlinePlus.root + hotkey_list[NLM.MedlinePlus.lang] + '"/>' + video_caps[$("html").attr("lang")][1] + '</a></div>');
+        elem = document.createElement("div");
+        elem.innerHTML = buf.join("");
+        $(elem).insertBefore("div.ibox-note");
+      }
+    }());
+  }
+}(jQuery,document));

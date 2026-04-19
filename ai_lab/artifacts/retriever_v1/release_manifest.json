@@ -1,0 +1,95 @@
+{
+  "release_version": "v1.1",
+  "release_date": "2026-04-17",
+  "generated_at": "2026-04-17T09:36:07.1897718+07:00",
+  "freeze_type": "documentation_level_inspection_freeze",
+  "repo_commit": "37eadcf798c1f6065b987cf589554356ece02ea4",
+  "kb_version": "medical_kb_v1",
+  "retriever_version": "v1",
+  "chunk_version": "kb_chunks_v1",
+  "embedding_version": null,
+  "policy_version": "response_policy_v1",
+  "eval_versions": [
+    "health_rag_eval_v1",
+    "health_rag_eval_v1_1"
+  ],
+  "chunk_count": 15,
+  "model_name": "intfloat/multilingual-e5-small",
+  "embedding_model_name": "intfloat/multilingual-e5-small",
+  "embedding_dim": 384,
+  "index_type": "IndexFlatIP",
+  "normalized_embeddings": true,
+  "top_k_policy_default": 3,
+  "retrieval_top_k_default": 3,
+  "policy_decision_basis_top_k": 3,
+  "source_groups": [
+    "nice_sepsis_overview",
+    "blood_tests",
+    "chest_pain",
+    "shortness_of_breath"
+  ],
+  "supported_sections": [
+    "red_flags",
+    "test_explainers"
+  ],
+  "supported_topics": [
+    "blood_tests",
+    "chest_pain_red_flags",
+    "shortness_of_breath_red_flags",
+    "severe_infection_or_sepsis_red_flags"
+  ],
+  "patient_facing_only": null,
+  "created_from_artifacts": [
+    "ai_lab/datasets/medical_kb_v1.json",
+    "ai_lab/datasets/eval/health_rag_eval_v1.json",
+    "ai_lab/datasets/eval/health_rag_eval_v1_1.json",
+    "ai_lab/artifacts/retriever_v1/kb_chunks_v1.json",
+    "ai_lab/artifacts/retriever_v1/chunk_metadata.json",
+    "ai_lab/artifacts/retriever_v1/faiss.index",
+    "ai_lab/artifacts/retriever_v1/chunk_embeddings.npy",
+    "ai_lab/artifacts/retriever_v1/embedding_config.json",
+    "ai_lab/artifacts/retriever_v1/retriever_manifest.json",
+    "ai_lab/docs/response_policy_v1.md",
+    "ai_lab/reports/retrieval_eval_v1.csv",
+    "ai_lab/reports/retrieval_eval_v1_1.csv",
+    "ai_lab/reports/final_answer_simulation_v2.csv"
+  ],
+  "source_files_present": [
+    "ai_lab/datasets/medical_kb_v1.json",
+    "ai_lab/datasets/eval/health_rag_eval_v1.json",
+    "ai_lab/datasets/eval/health_rag_eval_v1_1.json",
+    "ai_lab/artifacts/retriever_v1/kb_chunks_v1.json",
+    "ai_lab/artifacts/retriever_v1/chunk_metadata.json",
+    "ai_lab/artifacts/retriever_v1/faiss.index",
+    "ai_lab/artifacts/retriever_v1/chunk_embeddings.npy",
+    "ai_lab/artifacts/retriever_v1/embedding_config.json",
+    "ai_lab/artifacts/retriever_v1/retriever_manifest.json",
+    "ai_lab/docs/response_policy_v1.md",
+    "ai_lab/docs/answer_policy.md",
+    "ai_lab/docs/data_contract.md",
+    "ai_lab/docs/eval_criteria.md",
+    "ai_lab/reports/retrieval_eval_v1.csv",
+    "ai_lab/reports/retrieval_eval_v1_1.csv",
+    "ai_lab/reports/final_answer_simulation_v2.csv"
+  ],
+  "source_files_missing": [],
+  "notes": [
+    "release_version v1.1 is an internal release-freeze label maintained at documentation level",
+    "release_date and generated_at record the current polish pass rather than a retriever rebuild time",
+    "kb_version medical_kb_v1 is grounded by ai_lab/datasets/medical_kb_v1.json",
+    "retriever_version v1 is grounded by ai_lab/artifacts/retriever_v1/retriever_manifest.json",
+    "chunk_version kb_chunks_v1 is grounded by the current chunk file name",
+    "embedding_version is set to null because no explicit embedding artifact version string was found beyond model/config metadata",
+    "policy_version response_policy_v1 is grounded by ai_lab/docs/response_policy_v1.md",
+    "policy_decision_basis_top_k is grounded by the policy document statement that top-3 retrieval is the basis for answer decisions",
+    "supported_topics are conservative high-level labels derived from current chunk source groups and policy scope, not from an explicit topic enum file",
+    "patient_facing_only is null because the repository does not provide a strong explicit flag for that property",
+    "this manifest does not claim that every runtime path currently uses faiss.index directly"
+  ],
+  "compatibility_notes": [
+    "intended as the stable comparison point for later KB expansion and retriever improvement",
+    "compatible with artifact sets under ai_lab/artifacts/retriever_v1",
+    "compatible with top-3 policy assumptions described in response_policy_v1.md",
+    "if backend integration reads only kb_chunks_v1.json and chunk_metadata.json, this should be documented as an implementation-layer simplification rather than a change in frozen baseline assets"
+  ]
+}
