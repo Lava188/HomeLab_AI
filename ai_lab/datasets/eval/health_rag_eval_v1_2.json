@@ -1,0 +1,854 @@
+[
+  {
+    "query": "xét nghiệm máu là gì",
+    "expected_chunk_ids": [
+      "kb_v1_005_c1"
+    ],
+    "expected_source_id": "blood_tests",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "blood_tests"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "blood test là gì",
+    "expected_chunk_ids": [
+      "kb_v1_005_c1"
+    ],
+    "expected_source_id": "blood_tests",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "blood_tests"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "vì sao bác sĩ chỉ định xét nghiệm máu",
+    "expected_chunk_ids": [
+      "kb_v1_006_c1"
+    ],
+    "expected_source_id": "blood_tests",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "blood_tests"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "lý do cần làm xét nghiệm máu",
+    "expected_chunk_ids": [
+      "kb_v1_006_c1"
+    ],
+    "expected_source_id": "blood_tests",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "blood_tests"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "một số loại xét nghiệm máu thường gặp",
+    "expected_chunk_ids": [
+      "kb_v1_007_c1"
+    ],
+    "expected_source_id": "blood_tests",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "blood_tests"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "công thức máu đường huyết mỡ máu là những xét nghiệm nào",
+    "expected_chunk_ids": [
+      "kb_v1_007_c1"
+    ],
+    "expected_source_id": "blood_tests",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "blood_tests"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "cần chuẩn bị gì trước khi xét nghiệm máu",
+    "expected_chunk_ids": [
+      "kb_v1_008_c1"
+    ],
+    "expected_source_id": "blood_tests",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "blood_tests"
+    ],
+    "acceptable_sections": [
+      "test_explainers",
+      "pre_test_guides"
+    ]
+  },
+  {
+    "query": "trước khi xét nghiệm máu có cần nhịn ăn không",
+    "expected_chunk_ids": [
+      "kb_v1_008_c1"
+    ],
+    "expected_source_id": "blood_tests",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "blood_tests"
+    ],
+    "acceptable_sections": [
+      "test_explainers",
+      "pre_test_guides"
+    ]
+  },
+  {
+    "query": "sau khi xét nghiệm máu thì bao lâu có kết quả",
+    "expected_chunk_ids": [
+      "kb_v1_009_c1"
+    ],
+    "expected_source_id": "blood_tests",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "blood_tests"
+    ],
+    "acceptable_sections": [
+      "test_explainers",
+      "test_results"
+    ]
+  },
+  {
+    "query": "kết quả xét nghiệm máu khi nào có",
+    "expected_chunk_ids": [
+      "kb_v1_009_c1"
+    ],
+    "expected_source_id": "blood_tests",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "blood_tests"
+    ],
+    "acceptable_sections": [
+      "test_explainers",
+      "test_results"
+    ]
+  },
+  {
+    "query": "khi nào đau ngực cần gọi cấp cứu",
+    "expected_chunk_ids": [
+      "kb_v1_010_c1"
+    ],
+    "expected_source_id": "chest_pain",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "chest_pain"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau ngực lan ra tay và khó thở có nguy hiểm không",
+    "expected_chunk_ids": [
+      "kb_v1_010_c1",
+      "kb_v1_013_c1"
+    ],
+    "expected_source_id": "chest_pain",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "chest_pain",
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau ngực lúc có lúc không có nên đi khám sớm không",
+    "expected_chunk_ids": [
+      "kb_v1_011_c1"
+    ],
+    "expected_source_id": "chest_pain",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "chest_pain"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau ngực rồi tự hết nhưng vẫn lo thì nên làm gì",
+    "expected_chunk_ids": [
+      "kb_v1_011_c1"
+    ],
+    "expected_source_id": "chest_pain",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "chest_pain"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau ngực có thể do nhiều nguyên nhân và không nên tự chẩn đoán",
+    "expected_chunk_ids": [
+      "kb_v1_012_c1"
+    ],
+    "expected_source_id": "chest_pain",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "chest_pain"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "không nên tự kết luận nguyên nhân đau ngực đúng không",
+    "expected_chunk_ids": [
+      "kb_v1_012_c1"
+    ],
+    "expected_source_id": "chest_pain",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "chest_pain"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "khó thở khi nào cần hỗ trợ khẩn cấp",
+    "expected_chunk_ids": [
+      "kb_v1_013_c1"
+    ],
+    "expected_source_id": "shortness_of_breath",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "khó thở nặng tím môi và lú lẫn có cần cấp cứu không",
+    "expected_chunk_ids": [
+      "kb_v1_013_c1"
+    ],
+    "expected_source_id": "shortness_of_breath",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "shortness_of_breath",
+      "nice_sepsis_overview"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "khó thở kéo dài và nặng dần có cần đi khám sớm không",
+    "expected_chunk_ids": [
+      "kb_v1_014_c1"
+    ],
+    "expected_source_id": "shortness_of_breath",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "khó thở kèm ho ra máu hoặc sưng một chân thì sao",
+    "expected_chunk_ids": [
+      "kb_v1_014_c1"
+    ],
+    "expected_source_id": "shortness_of_breath",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "không nên tự chẩn đoán nguyên nhân khó thở",
+    "expected_chunk_ids": [
+      "kb_v1_015_c1"
+    ],
+    "expected_source_id": "shortness_of_breath",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "khó thở có thể do nhiều nguyên nhân khác nhau đúng không",
+    "expected_chunk_ids": [
+      "kb_v1_015_c1"
+    ],
+    "expected_source_id": "shortness_of_breath",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "dấu hiệu nhiễm trùng nặng cần được đánh giá sớm",
+    "expected_chunk_ids": [
+      "kb_v1_001_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "người có dấu hiệu nhiễm trùng và rất mệt rất yếu thì sao",
+    "expected_chunk_ids": [
+      "kb_v1_001_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "da tái xám tím môi ban không mất màu có phải dấu hiệu đáng lo không",
+    "expected_chunk_ids": [
+      "kb_v1_002_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview",
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "những dấu hiệu bên ngoài nào làm tăng cảnh giác nhiễm trùng nặng",
+    "expected_chunk_ids": [
+      "kb_v1_002_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "tình trạng xấu đi nhanh và không cải thiện có làm tăng mức độ lo ngại không",
+    "expected_chunk_ids": [
+      "kb_v1_003_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "dù trước đó chưa quá xấu nhưng nếu tím môi và không cải thiện thì sao",
+    "expected_chunk_ids": [
+      "kb_v1_003_c1",
+      "kb_v1_002_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview",
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng thì cần chuyển cấp cứu ngay",
+    "expected_chunk_ids": [
+      "kb_v1_004_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "nguy cơ cao của nhiễm trùng nặng có cần đi cấp cứu không",
+    "expected_chunk_ids": [
+      "kb_v1_004_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau ngực kèm khó thở và vã mồ hôi có cần gọi cấp cứu không",
+    "expected_chunk_ids": [
+      "kb_v1_010_c1",
+      "kb_v1_013_c1"
+    ],
+    "expected_source_id": "chest_pain",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "chest_pain",
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau ngực bóp nghẹt lan ra tay trái và toát mồ hôi lạnh",
+    "expected_chunk_ids": [
+      "kb_v1_010_c1"
+    ],
+    "expected_source_id": "chest_pain",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "chest_pain"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "khó thở dữ dội kèm ngực nặng và đau lan ra hàm",
+    "expected_chunk_ids": [
+      "kb_v1_013_c1",
+      "kb_v1_010_c1"
+    ],
+    "expected_source_id": "shortness_of_breath",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "shortness_of_breath",
+      "chest_pain"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "khó thở không nói được thành câu và môi tím có phải đi cấp cứu không",
+    "expected_chunk_ids": [
+      "kb_v1_013_c1"
+    ],
+    "expected_source_id": "shortness_of_breath",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "shortness_of_breath",
+      "nice_sepsis_overview"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "người bệnh nhiễm trùng xấu đi nhanh, tím môi và lú lẫn",
+    "expected_chunk_ids": [
+      "kb_v1_001_c1",
+      "kb_v1_003_c1",
+      "kb_v1_013_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview",
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "da tái xám, ban không mất màu và rất mệt có nguy hiểm không",
+    "expected_chunk_ids": [
+      "kb_v1_001_c1",
+      "kb_v1_002_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau ngực rồi khó thở nặng dần và choáng váng thì nên làm gì",
+    "expected_chunk_ids": [
+      "kb_v1_010_c1",
+      "kb_v1_013_c1"
+    ],
+    "expected_source_id": "chest_pain",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "chest_pain",
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "khó thở kèm đau ngực và tím tái là dấu hiệu khẩn cấp chứ",
+    "expected_chunk_ids": [
+      "kb_v1_013_c1",
+      "kb_v1_010_c1"
+    ],
+    "expected_source_id": "shortness_of_breath",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "shortness_of_breath",
+      "chest_pain"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "tình trạng không cải thiện, tím lưỡi và nhiễm trùng da có đáng lo không",
+    "expected_chunk_ids": [
+      "kb_v1_002_c1",
+      "kb_v1_003_c1"
+    ],
+    "expected_source_id": "nice_sepsis_overview",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nice_sepsis_overview"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau ngực kèm buồn nôn, khó thở và vã mồ hôi có phải dấu hiệu rất nguy hiểm không",
+    "expected_chunk_ids": [
+      "kb_v1_010_c1",
+      "kb_v1_013_c1"
+    ],
+    "expected_source_id": "chest_pain",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "chest_pain",
+      "shortness_of_breath"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "cấy máu giúp tìm vi khuẩn hoặc nấm trong máu",
+    "expected_chunk_ids": [
+      "kb_v1_2_016_c1"
+    ],
+    "expected_source_id": "medlineplus_blood_culture_test",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "medlineplus_blood_culture_test"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "bmp là xét nghiệm đánh giá các chất cơ bản trong máu",
+    "expected_chunk_ids": [
+      "kb_v1_2_017_c1"
+    ],
+    "expected_source_id": "medlineplus_bmp_test",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "medlineplus_bmp_test"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "cbc là công thức máu toàn bộ để kiểm tra tế bào máu",
+    "expected_chunk_ids": [
+      "kb_v1_2_018_c1"
+    ],
+    "expected_source_id": "medlineplus_cbc_test",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "medlineplus_cbc_test"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "crp là xét nghiệm gợi ý mức độ viêm trong cơ thể",
+    "expected_chunk_ids": [
+      "kb_v1_2_019_c1"
+    ],
+    "expected_source_id": "medlineplus_crp_test",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "medlineplus_crp_test"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "d-dimer là xét nghiệm hỗ trợ đánh giá nguy cơ cục máu đông",
+    "expected_chunk_ids": [
+      "kb_v1_2_020_c1"
+    ],
+    "expected_source_id": "medlineplus_ddimer_test",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "medlineplus_ddimer_test"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "đo spo2 giúp ước tính mức oxy trong máu một cách nhanh chóng",
+    "expected_chunk_ids": [
+      "kb_v1_2_021_c1"
+    ],
+    "expected_source_id": "medlineplus_pulse_oximetry_test",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "medlineplus_pulse_oximetry_test"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim",
+    "expected_chunk_ids": [
+      "kb_v1_2_022_c1"
+    ],
+    "expected_source_id": "medlineplus_troponin_test",
+    "expected_section": "test_explainers",
+    "acceptable_source_ids": [
+      "medlineplus_troponin_test"
+    ],
+    "acceptable_sections": [
+      "test_explainers"
+    ]
+  },
+  {
+    "query": "phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+    "expected_chunk_ids": [
+      "kb_v1_2_023_c1"
+    ],
+    "expected_source_id": "nhs_anaphylaxis",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_anaphylaxis"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "nếu đã có bút tiêm adrenaline, cần dùng đúng lúc và vẫn đi cấp cứu",
+    "expected_chunk_ids": [
+      "kb_v1_2_024_c1"
+    ],
+    "expected_source_id": "nhs_anaphylaxis",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_anaphylaxis"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "phản vệ có cần gọi cấp cứu ngay không",
+    "expected_chunk_ids": [
+      "kb_v1_2_023_c1"
+    ],
+    "expected_source_id": "nhs_anaphylaxis",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_anaphylaxis"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+    "expected_chunk_ids": [
+      "kb_v1_2_025_c1"
+    ],
+    "expected_source_id": "nhs_fainting_adults",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_fainting_adults"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+    "expected_chunk_ids": [
+      "kb_v1_2_026_c1"
+    ],
+    "expected_source_id": "nhs_fainting_adults",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_fainting_adults"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+    "expected_chunk_ids": [
+      "kb_v1_2_027_c1"
+    ],
+    "expected_source_id": "nhs_headaches",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_headaches"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+    "expected_chunk_ids": [
+      "kb_v1_2_028_c1"
+    ],
+    "expected_source_id": "nhs_headaches",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_headaches"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",
+    "expected_chunk_ids": [
+      "kb_v1_2_029_c1"
+    ],
+    "expected_source_id": "nhs_stomach_ache",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_stomach_ache"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+    "expected_chunk_ids": [
+      "kb_v1_2_030_c1"
+    ],
+    "expected_source_id": "nhs_stomach_ache",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_stomach_ache"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "dấu hiệu fast của đột quỵ cần gọi cấp cứu ngay",
+    "expected_chunk_ids": [
+      "kb_v1_2_031_c1"
+    ],
+    "expected_source_id": "nhs_stroke_symptoms",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_stroke_symptoms"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "cơn thiếu máu não thoáng qua vẫn cần xử trí khẩn",
+    "expected_chunk_ids": [
+      "kb_v1_2_032_c1"
+    ],
+    "expected_source_id": "nhs_stroke_symptoms",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_stroke_symptoms"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  },
+  {
+    "query": "dấu hiệu fast của đột quỵ là gì",
+    "expected_chunk_ids": [
+      "kb_v1_2_031_c1"
+    ],
+    "expected_source_id": "nhs_stroke_symptoms",
+    "expected_section": "red_flags",
+    "acceptable_source_ids": [
+      "nhs_stroke_symptoms"
+    ],
+    "acceptable_sections": [
+      "red_flags"
+    ]
+  }
+]

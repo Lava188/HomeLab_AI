@@ -1,0 +1,10 @@
+{
+  "model_name": "lexical_tfidf_fallback",
+  "embedding_dimension": 179,
+  "normalized": true,
+  "index_type": "python_dot_product",
+  "text_field": "chunk_text",
+  "passage_prefix": "",
+  "query_prefix": "",
+  "notes": "Dependency-light fallback used because the notebook FAISS / sentence-transformers stack is unavailable in this environment."
+}

@@ -1,0 +1,15 @@
+﻿source_id,extract_status,output_path,char_count,line_count,noise_flags,proceed_to_normalize
+medlineplus_blood_culture_test,ok,ai_lab/extracted/medlineplus_blood_culture_test.txt,4540,161,,yes
+medlineplus_blood_testing_overview,ok,ai_lab/extracted/medlineplus_blood_testing_overview.txt,9215,241,duplicate_holdout,yes
+medlineplus_bmp_test,ok,ai_lab/extracted/medlineplus_bmp_test.txt,7510,239,,yes
+medlineplus_cbc_test,ok,ai_lab/extracted/medlineplus_cbc_test.txt,7800,212,,yes
+medlineplus_crp_test,ok,ai_lab/extracted/medlineplus_crp_test.txt,8759,247,,yes
+medlineplus_ddimer_test,ok,ai_lab/extracted/medlineplus_ddimer_test.txt,10410,265,,yes
+medlineplus_pulse_oximetry_test,ok,ai_lab/extracted/medlineplus_pulse_oximetry_test.txt,8894,223,,yes
+medlineplus_troponin_test,ok,ai_lab/extracted/medlineplus_troponin_test.txt,10770,249,,yes
+nhs_anaphylaxis,ok,ai_lab/extracted/nhs_anaphylaxis.txt,5985,345,,yes
+nhs_blood_tests,ok,ai_lab/extracted/nhs_blood_tests.txt,4626,325,duplicate_holdout,yes
+nhs_fainting_adults,ok,ai_lab/extracted/nhs_fainting_adults.txt,2464,219,,yes
+nhs_headaches,ok,ai_lab/extracted/nhs_headaches.txt,3636,349,,yes
+nhs_stomach_ache,ok,ai_lab/extracted/nhs_stomach_ache.txt,3195,426,,yes
+nhs_stroke_symptoms,ok,ai_lab/extracted/nhs_stroke_symptoms.txt,1591,107,,yes

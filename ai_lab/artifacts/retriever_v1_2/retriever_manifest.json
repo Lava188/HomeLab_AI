@@ -1,0 +1,12 @@
+{
+  "retriever_version": "v1_2",
+  "kb_file": "kb_chunks_v1_2.json",
+  "metadata_file": "chunk_metadata.json",
+  "embeddings_file": "chunk_embeddings.json",
+  "faiss_index_file": "faiss.index",
+  "embedding_config_file": "embedding_config.json",
+  "chunk_count": 32,
+  "model_name": "lexical_tfidf_fallback",
+  "top_k_default": 3,
+  "build_mode": "fallback_no_external_dependencies"
+}

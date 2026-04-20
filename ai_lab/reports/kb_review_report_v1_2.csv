@@ -1,0 +1,21 @@
+﻿source_id,decision,title,reason,topic
+medlineplus_blood_culture_test,approved,Cấy máu giúp tìm vi khuẩn hoặc nấm trong máu,Approved via conservative source-specific curation template.,blood_culture
+medlineplus_blood_testing_overview,holdout,What You Need to Know About Blood Testing: MedlinePlus Medical Test,General blood testing overview overlaps the existing NHS blood tests baseline and is held out to avoid duplicate ingestion.,blood_testing_overview
+medlineplus_bmp_test,approved,BMP là xét nghiệm đánh giá các chất cơ bản trong máu,Approved via conservative source-specific curation template.,basic_metabolic_panel
+medlineplus_cbc_test,approved,CBC là công thức máu toàn bộ để kiểm tra tế bào máu,Approved via conservative source-specific curation template.,complete_blood_count
+medlineplus_crp_test,approved,CRP là xét nghiệm gợi ý mức độ viêm trong cơ thể,Approved via conservative source-specific curation template.,c_reactive_protein
+medlineplus_ddimer_test,approved,D-dimer là xét nghiệm hỗ trợ đánh giá nguy cơ cục máu đông,Approved via conservative source-specific curation template.,d_dimer
+medlineplus_pulse_oximetry_test,approved,Đo SpO2 giúp ước tính mức oxy trong máu một cách nhanh chóng,Approved via conservative source-specific curation template.,pulse_oximetry
+medlineplus_troponin_test,approved,Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim,Approved via conservative source-specific curation template.,troponin
+nhs_anaphylaxis,approved,Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay,Approved via conservative source-specific curation template.,anaphylaxis
+nhs_anaphylaxis,approved,"Nếu đã có bút tiêm adrenaline, cần dùng đúng lúc và vẫn đi cấp cứu",Approved via conservative source-specific curation template.,anaphylaxis
+nhs_blood_tests,holdout,"Blood tests
+ - NHS",Exact NHS blood tests duplicate of the already-registered baseline source.,blood_tests
+nhs_fainting_adults,approved,"Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",Approved via conservative source-specific curation template.,fainting
+nhs_fainting_adults,approved,Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế,Approved via conservative source-specific curation template.,fainting
+nhs_headaches,approved,Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu,Approved via conservative source-specific curation template.,headaches
+nhs_headaches,approved,"Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",Approved via conservative source-specific curation template.,headaches
+nhs_stomach_ache,approved,"Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",Approved via conservative source-specific curation template.,stomach_ache
+nhs_stomach_ache,approved,"Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",Approved via conservative source-specific curation template.,stomach_ache
+nhs_stroke_symptoms,approved,Dấu hiệu FAST của đột quỵ cần gọi cấp cứu ngay,Approved via conservative source-specific curation template.,stroke
+nhs_stroke_symptoms,approved,Cơn thiếu máu não thoáng qua vẫn cần xử trí khẩn,Approved via conservative source-specific curation template.,stroke

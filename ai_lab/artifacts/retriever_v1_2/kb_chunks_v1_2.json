@@ -1,0 +1,969 @@
+[
+  {
+    "chunk_id": "kb_v1_001_c1",
+    "kb_id": "kb_v1_001",
+    "doc_id": "nice_sepsis_overview_doc_001",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "source_url": "https://www.nice.org.uk/guidance/ng253",
+    "section": "red_flags",
+    "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+    "content": "Nếu một người có dấu hiệu nhiễm trùng và đồng thời cảm thấy rất mệt, rất yếu hoặc diễn tiến xấu nhanh, cần nghĩ đến khả năng bệnh nặng hơn bình thường và nên được đánh giá y tế sớm.",
+    "chunk_text": "Tiêu đề: Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: nhiễm trùng nặng, sepsis, dấu hiệu nặng\nNhãn: sepsis, red_flags, infection\nLoại FAQ: red_flag_general\nLưu ý an toàn: Không dùng nội dung này để tự kết luận sepsis.\nNội dung: Nếu một người có dấu hiệu nhiễm trùng và đồng thời cảm thấy rất mệt, rất yếu hoặc diễn tiến xấu nhanh, cần nghĩ đến khả năng bệnh nặng hơn bình thường và nên được đánh giá y tế sớm.",
+    "risk_level": "high",
+    "tags": [
+      "sepsis",
+      "red_flags",
+      "infection"
+    ],
+    "keywords": [
+      "nhiễm trùng nặng",
+      "sepsis",
+      "dấu hiệu nặng"
+    ],
+    "test_types": [],
+    "faq_type": "red_flag_general",
+    "safety_notes": "Không dùng nội dung này để tự kết luận sepsis.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_002_c1",
+    "kb_id": "kb_v1_002",
+    "doc_id": "nice_sepsis_overview_doc_001",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "source_url": "https://www.nice.org.uk/guidance/ng253",
+    "section": "red_flags",
+    "title": "Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng",
+    "content": "Một số dấu hiệu bên ngoài có thể làm tăng mức độ cảnh giác gồm da tái xám hoặc lốm đốm bất thường, tím môi hoặc tím lưỡi, ban không mất màu khi ấn, hoặc có dấu hiệu nhiễm trùng da và vết thương. Khi các dấu hiệu này xuất hiện kèm người bệnh xấu đi nhanh, cần được đánh giá y tế sớm.",
+    "chunk_text": "Tiêu đề: Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: da tái xám, tím môi, ban không mất màu, nhiễm trùng nặng\nNhãn: sepsis, red_flags, skin_signs\nLoại FAQ: red_flag_signs\nLưu ý an toàn: Không dùng để chẩn đoán. Nếu người bệnh xấu nhanh, cần đi cấp cứu.\nNội dung: Một số dấu hiệu bên ngoài có thể làm tăng mức độ cảnh giác gồm da tái xám hoặc lốm đốm bất thường, tím môi hoặc tím lưỡi, ban không mất màu khi ấn, hoặc có dấu hiệu nhiễm trùng da và vết thương. Khi các dấu hiệu này xuất hiện kèm người bệnh xấu đi nhanh, cần được đánh giá y tế sớm.",
+    "risk_level": "high",
+    "tags": [
+      "sepsis",
+      "red_flags",
+      "skin_signs"
+    ],
+    "keywords": [
+      "da tái xám",
+      "tím môi",
+      "ban không mất màu",
+      "nhiễm trùng nặng"
+    ],
+    "test_types": [],
+    "faq_type": "red_flag_signs",
+    "safety_notes": "Không dùng để chẩn đoán. Nếu người bệnh xấu nhanh, cần đi cấp cứu.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_003_c1",
+    "kb_id": "kb_v1_003",
+    "doc_id": "nice_sepsis_overview_doc_001",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "source_url": "https://www.nice.org.uk/guidance/ng253",
+    "section": "red_flags",
+    "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+    "content": "Ngay cả khi đánh giá trước đó chưa cho thấy nguy cơ cao, mức độ lo ngại vẫn tăng lên nếu người bệnh xuất hiện da tái xám hoặc lốm đốm, ban không mất màu khi ấn, tím môi hoặc tím lưỡi, hoặc tình trạng xấu đi và không cải thiện như mong đợi.",
+    "chunk_text": "Tiêu đề: Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: xấu đi nhanh, không cải thiện, tím môi, ban không mất màu\nNhãn: sepsis, red_flags, deterioration\nLoại FAQ: red_flag_signs\nLưu ý an toàn: Nếu có dấu hiệu xấu đi nhanh, cần được đánh giá y tế khẩn cấp.\nNội dung: Ngay cả khi đánh giá trước đó chưa cho thấy nguy cơ cao, mức độ lo ngại vẫn tăng lên nếu người bệnh xuất hiện da tái xám hoặc lốm đốm, ban không mất màu khi ấn, tím môi hoặc tím lưỡi, hoặc tình trạng xấu đi và không cải thiện như mong đợi.",
+    "risk_level": "high",
+    "tags": [
+      "sepsis",
+      "red_flags",
+      "deterioration"
+    ],
+    "keywords": [
+      "xấu đi nhanh",
+      "không cải thiện",
+      "tím môi",
+      "ban không mất màu"
+    ],
+    "test_types": [],
+    "faq_type": "red_flag_signs",
+    "safety_notes": "Nếu có dấu hiệu xấu đi nhanh, cần được đánh giá y tế khẩn cấp.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_004_c1",
+    "kb_id": "kb_v1_004",
+    "doc_id": "nice_sepsis_overview_doc_001",
+    "source_id": "nice_sepsis_overview",
+    "source_name": "NICE",
+    "source_url": "https://www.nice.org.uk/guidance/ng253",
+    "section": "red_flags",
+    "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+    "content": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển đến cơ sở cấp cứu ngay bằng phương thức phù hợp. Với chatbot HomeLab, nội dung này chỉ nên dùng để tăng mức độ cảnh báo và hướng người dùng đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
+    "chunk_text": "Tiêu đề: Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: nguy cơ cao, nhiễm trùng nặng, chuyển cấp cứu\nNhãn: sepsis, red_flags, emergency_transfer\nLoại FAQ: emergency_warning\nLưu ý an toàn: Chatbot chỉ cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp.\nNội dung: Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển đến cơ sở cấp cứu ngay bằng phương thức phù hợp. Với chatbot HomeLab, nội dung này chỉ nên dùng để tăng mức độ cảnh báo và hướng người dùng đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
+    "risk_level": "high",
+    "tags": [
+      "sepsis",
+      "red_flags",
+      "emergency_transfer"
+    ],
+    "keywords": [
+      "nguy cơ cao",
+      "nhiễm trùng nặng",
+      "chuyển cấp cứu"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Chatbot chỉ cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_005_c1",
+    "kb_id": "kb_v1_005",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Xét nghiệm máu là gì",
+    "content": "Xét nghiệm máu là một xét nghiệm y khoa phổ biến, thường được dùng để kiểm tra sức khỏe tổng quát hoặc hỗ trợ tìm nguyên nhân của một số triệu chứng. Khi làm xét nghiệm, nhân viên y tế sẽ lấy một lượng máu nhỏ để gửi đến phòng xét nghiệm.",
+    "chunk_text": "Tiêu đề: Xét nghiệm máu là gì\nMục: test_explainers\nMức độ rủi ro: low\nTừ khóa: xét nghiệm máu, blood test\nNhãn: blood_tests, test_explainers\nLoại FAQ: general_info\nNội dung: Xét nghiệm máu là một xét nghiệm y khoa phổ biến, thường được dùng để kiểm tra sức khỏe tổng quát hoặc hỗ trợ tìm nguyên nhân của một số triệu chứng. Khi làm xét nghiệm, nhân viên y tế sẽ lấy một lượng máu nhỏ để gửi đến phòng xét nghiệm.",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "test_explainers"
+    ],
+    "keywords": [
+      "xét nghiệm máu",
+      "blood test"
+    ],
+    "test_types": [],
+    "faq_type": "general_info",
+    "safety_notes": "",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_006_c1",
+    "kb_id": "kb_v1_006",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Vì sao bác sĩ có thể chỉ định xét nghiệm máu",
+    "content": "Xét nghiệm máu có thể được chỉ định để kiểm tra sức khỏe chung, hỗ trợ tìm nguyên nhân triệu chứng, đánh giá nguy cơ của một số bệnh hoặc theo dõi hiệu quả điều trị. Kết quả xét nghiệm cần được giải thích trong bối cảnh lâm sàng cụ thể.",
+    "chunk_text": "Tiêu đề: Vì sao bác sĩ có thể chỉ định xét nghiệm máu\nMục: test_explainers\nMức độ rủi ro: low\nTừ khóa: vì sao cần xét nghiệm máu, lý do làm blood test\nNhãn: blood_tests, test_explainers\nLoại FAQ: general_info\nLưu ý an toàn: Không tự diễn giải kết quả xét nghiệm mà không có tư vấn y tế.\nNội dung: Xét nghiệm máu có thể được chỉ định để kiểm tra sức khỏe chung, hỗ trợ tìm nguyên nhân triệu chứng, đánh giá nguy cơ của một số bệnh hoặc theo dõi hiệu quả điều trị. Kết quả xét nghiệm cần được giải thích trong bối cảnh lâm sàng cụ thể.",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "test_explainers"
+    ],
+    "keywords": [
+      "vì sao cần xét nghiệm máu",
+      "lý do làm blood test"
+    ],
+    "test_types": [],
+    "faq_type": "general_info",
+    "safety_notes": "Không tự diễn giải kết quả xét nghiệm mà không có tư vấn y tế.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_007_c1",
+    "kb_id": "kb_v1_007",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Một số loại xét nghiệm máu thường gặp",
+    "content": "Một số xét nghiệm máu thường gặp gồm công thức máu, đường huyết, mỡ máu, chức năng thận và hormone tuyến giáp. Mỗi xét nghiệm phục vụ một mục đích khác nhau, vì vậy người dùng nên làm theo chỉ định phù hợp từ nhân viên y tế.",
+    "chunk_text": "Tiêu đề: Một số loại xét nghiệm máu thường gặp\nMục: test_explainers\nMức độ rủi ro: low\nTừ khóa: công thức máu, đường huyết, mỡ máu, lipid profile, blood glucose\nNhãn: blood_tests, test_explainers\nLoại FAQ: test_meaning\nNội dung: Một số xét nghiệm máu thường gặp gồm công thức máu, đường huyết, mỡ máu, chức năng thận và hormone tuyến giáp. Mỗi xét nghiệm phục vụ một mục đích khác nhau, vì vậy người dùng nên làm theo chỉ định phù hợp từ nhân viên y tế.",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "test_explainers"
+    ],
+    "keywords": [
+      "công thức máu",
+      "đường huyết",
+      "mỡ máu",
+      "lipid profile",
+      "blood glucose"
+    ],
+    "test_types": [],
+    "faq_type": "test_meaning",
+    "safety_notes": "",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_008_c1",
+    "kb_id": "kb_v1_008",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Cần chuẩn bị gì trước khi xét nghiệm máu",
+    "content": "Trước một số xét nghiệm máu, người làm xét nghiệm có thể cần nhịn ăn hoặc tạm ngừng một số thuốc theo hướng dẫn của nhân viên y tế. Không nên tự ý ngừng thuốc nếu chưa được hướng dẫn cụ thể.",
+    "chunk_text": "Tiêu đề: Cần chuẩn bị gì trước khi xét nghiệm máu\nMục: test_explainers\nMức độ rủi ro: low\nTừ khóa: nhịn ăn trước xét nghiệm, chuẩn bị trước xét nghiệm máu\nNhãn: blood_tests, pre_test_guides\nLoại FAQ: preparation\nLưu ý an toàn: Chỉ thực hiện nhịn ăn hoặc điều chỉnh thuốc khi đã được hướng dẫn bởi cơ sở y tế.\nNội dung: Trước một số xét nghiệm máu, người làm xét nghiệm có thể cần nhịn ăn hoặc tạm ngừng một số thuốc theo hướng dẫn của nhân viên y tế. Không nên tự ý ngừng thuốc nếu chưa được hướng dẫn cụ thể.",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "pre_test_guides"
+    ],
+    "keywords": [
+      "nhịn ăn trước xét nghiệm",
+      "chuẩn bị trước xét nghiệm máu"
+    ],
+    "test_types": [],
+    "faq_type": "preparation",
+    "safety_notes": "Chỉ thực hiện nhịn ăn hoặc điều chỉnh thuốc khi đã được hướng dẫn bởi cơ sở y tế.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_009_c1",
+    "kb_id": "kb_v1_009",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Sau khi xét nghiệm máu và khi nhận kết quả",
+    "content": "Sau xét nghiệm máu, vùng lấy máu có thể hơi đau, bầm hoặc sưng nhẹ trong vài ngày. Kết quả có thể có sau vài ngày hoặc vài tuần tùy loại xét nghiệm. Nếu không hiểu kết quả, người dùng nên trao đổi với nhân viên y tế thay vì tự kết luận.",
+    "chunk_text": "Tiêu đề: Sau khi xét nghiệm máu và khi nhận kết quả\nMục: test_explainers\nMức độ rủi ro: low\nTừ khóa: kết quả xét nghiệm máu, sau khi lấy máu\nNhãn: blood_tests, test_results\nLoại FAQ: results\nLưu ý an toàn: Không tự chẩn đoán dựa trên kết quả xét nghiệm đơn lẻ.\nNội dung: Sau xét nghiệm máu, vùng lấy máu có thể hơi đau, bầm hoặc sưng nhẹ trong vài ngày. Kết quả có thể có sau vài ngày hoặc vài tuần tùy loại xét nghiệm. Nếu không hiểu kết quả, người dùng nên trao đổi với nhân viên y tế thay vì tự kết luận.",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "test_results"
+    ],
+    "keywords": [
+      "kết quả xét nghiệm máu",
+      "sau khi lấy máu"
+    ],
+    "test_types": [],
+    "faq_type": "results",
+    "safety_notes": "Không tự chẩn đoán dựa trên kết quả xét nghiệm đơn lẻ.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_010_c1",
+    "kb_id": "kb_v1_010",
+    "doc_id": "chest_pain_doc_001",
+    "source_id": "chest_pain",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/chest-pain/",
+    "section": "red_flags",
+    "title": "Khi nào đau ngực cần gọi cấp cứu ngay",
+    "content": "Cần gọi cấp cứu ngay nếu đau hoặc tức ngực xuất hiện đột ngột và không hết, có cảm giác bóp nghẹt, đè nặng hoặc nóng rát, đặc biệt nếu cơn đau lan ra tay, cổ, hàm, bụng hoặc lưng. Nguy cơ cũng cao hơn nếu đau ngực đi kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở.",
+    "chunk_text": "Tiêu đề: Khi nào đau ngực cần gọi cấp cứu ngay\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: đau ngực, cấp cứu, call emergency\nNhãn: chest_pain, red_flags\nLoại FAQ: emergency_warning\nLưu ý an toàn: Nếu có dấu hiệu nghiêm trọng, cần gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay.\nNội dung: Cần gọi cấp cứu ngay nếu đau hoặc tức ngực xuất hiện đột ngột và không hết, có cảm giác bóp nghẹt, đè nặng hoặc nóng rát, đặc biệt nếu cơn đau lan ra tay, cổ, hàm, bụng hoặc lưng. Nguy cơ cũng cao hơn nếu đau ngực đi kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở.",
+    "risk_level": "high",
+    "tags": [
+      "chest_pain",
+      "red_flags"
+    ],
+    "keywords": [
+      "đau ngực",
+      "cấp cứu",
+      "call emergency"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Nếu có dấu hiệu nghiêm trọng, cần gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_011_c1",
+    "kb_id": "kb_v1_011",
+    "doc_id": "chest_pain_doc_001",
+    "source_id": "chest_pain",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/chest-pain/",
+    "section": "red_flags",
+    "title": "Khi nào đau ngực nên đi khám sớm",
+    "content": "Nếu đau ngực xuất hiện rồi tự hết, đau ngực đến rồi đi, hoặc bạn vẫn còn lo lắng dù triệu chứng không kéo dài, bạn nên đi khám sớm để được đánh giá.",
+    "chunk_text": "Tiêu đề: Khi nào đau ngực nên đi khám sớm\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: đau ngực đi khám, đau ngực kéo dài\nNhãn: chest_pain, red_flags\nLoại FAQ: urgent_advice\nLưu ý an toàn: Không nên trì hoãn thăm khám nếu triệu chứng tái diễn hoặc khiến bạn lo ngại.\nNội dung: Nếu đau ngực xuất hiện rồi tự hết, đau ngực đến rồi đi, hoặc bạn vẫn còn lo lắng dù triệu chứng không kéo dài, bạn nên đi khám sớm để được đánh giá.",
+    "risk_level": "high",
+    "tags": [
+      "chest_pain",
+      "red_flags"
+    ],
+    "keywords": [
+      "đau ngực đi khám",
+      "đau ngực kéo dài"
+    ],
+    "test_types": [],
+    "faq_type": "urgent_advice",
+    "safety_notes": "Không nên trì hoãn thăm khám nếu triệu chứng tái diễn hoặc khiến bạn lo ngại.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_012_c1",
+    "kb_id": "kb_v1_012",
+    "doc_id": "chest_pain_doc_001",
+    "source_id": "chest_pain",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/chest-pain/",
+    "section": "red_flags",
+    "title": "Đau ngực có thể do nhiều nguyên nhân và không nên tự chẩn đoán",
+    "content": "Đau ngực có thể liên quan đến nhiều nguyên nhân khác nhau, từ vấn đề cơ xương, khó tiêu, nhiễm trùng đến bệnh tim. Vì triệu chứng có thể chồng lấp, người dùng không nên tự chẩn đoán nguyên nhân chỉ dựa vào cảm giác chủ quan.",
+    "chunk_text": "Tiêu đề: Đau ngực có thể do nhiều nguyên nhân và không nên tự chẩn đoán\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: nguyên nhân đau ngực, không tự chẩn đoán đau ngực\nNhãn: chest_pain, red_flags\nLoại FAQ: safety_boundary\nLưu ý an toàn: Chatbot không dùng để xác định nguyên nhân đau ngực.\nNội dung: Đau ngực có thể liên quan đến nhiều nguyên nhân khác nhau, từ vấn đề cơ xương, khó tiêu, nhiễm trùng đến bệnh tim. Vì triệu chứng có thể chồng lấp, người dùng không nên tự chẩn đoán nguyên nhân chỉ dựa vào cảm giác chủ quan.",
+    "risk_level": "high",
+    "tags": [
+      "chest_pain",
+      "red_flags"
+    ],
+    "keywords": [
+      "nguyên nhân đau ngực",
+      "không tự chẩn đoán đau ngực"
+    ],
+    "test_types": [],
+    "faq_type": "safety_boundary",
+    "safety_notes": "Chatbot không dùng để xác định nguyên nhân đau ngực.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_013_c1",
+    "kb_id": "kb_v1_013",
+    "doc_id": "shortness_of_breath_doc_001",
+    "source_id": "shortness_of_breath",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/shortness-of-breath/",
+    "section": "red_flags",
+    "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+    "content": "Cần hỗ trợ khẩn cấp ngay nếu khó thở nặng, thở hổn hển, nghẹt thở, không nói được thành câu, ngực nặng hoặc đau lan ra tay, lưng, cổ hoặc hàm. Đây cũng là tình huống nguy hiểm nếu môi hoặc da rất nhợt, tím hoặc xám, hoặc người bệnh đột ngột lú lẫn.",
+    "chunk_text": "Tiêu đề: Khi nào khó thở cần hỗ trợ khẩn cấp\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: khó thở, cấp cứu, thở gấp\nNhãn: shortness_of_breath, red_flags\nLoại FAQ: emergency_warning\nLưu ý an toàn: Nếu có dấu hiệu nặng, cần gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay.\nNội dung: Cần hỗ trợ khẩn cấp ngay nếu khó thở nặng, thở hổn hển, nghẹt thở, không nói được thành câu, ngực nặng hoặc đau lan ra tay, lưng, cổ hoặc hàm. Đây cũng là tình huống nguy hiểm nếu môi hoặc da rất nhợt, tím hoặc xám, hoặc người bệnh đột ngột lú lẫn.",
+    "risk_level": "high",
+    "tags": [
+      "shortness_of_breath",
+      "red_flags"
+    ],
+    "keywords": [
+      "khó thở",
+      "cấp cứu",
+      "thở gấp"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Nếu có dấu hiệu nặng, cần gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_014_c1",
+    "kb_id": "kb_v1_014",
+    "doc_id": "shortness_of_breath_doc_001",
+    "source_id": "shortness_of_breath",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/shortness-of-breath/",
+    "section": "red_flags",
+    "title": "Khi nào khó thở cần được đánh giá y tế sớm",
+    "content": "Bạn nên được đánh giá y tế sớm nếu khó thở hơn bình thường, ho ra máu, đau hoặc sưng một chân, hồi hộp trống ngực, hoặc khó thở kéo dài và ngày càng nặng hơn.",
+    "chunk_text": "Tiêu đề: Khi nào khó thở cần được đánh giá y tế sớm\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: khó thở đi khám, ho ra máu, sưng chân, hồi hộp\nNhãn: shortness_of_breath, red_flags\nLoại FAQ: urgent_advice\nNội dung: Bạn nên được đánh giá y tế sớm nếu khó thở hơn bình thường, ho ra máu, đau hoặc sưng một chân, hồi hộp trống ngực, hoặc khó thở kéo dài và ngày càng nặng hơn.",
+    "risk_level": "high",
+    "tags": [
+      "shortness_of_breath",
+      "red_flags"
+    ],
+    "keywords": [
+      "khó thở đi khám",
+      "ho ra máu",
+      "sưng chân",
+      "hồi hộp"
+    ],
+    "test_types": [],
+    "faq_type": "urgent_advice",
+    "safety_notes": "",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_015_c1",
+    "kb_id": "kb_v1_015",
+    "doc_id": "shortness_of_breath_doc_001",
+    "source_id": "shortness_of_breath",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/shortness-of-breath/",
+    "section": "red_flags",
+    "title": "Không nên tự chẩn đoán nguyên nhân khó thở",
+    "content": "Khó thở có thể liên quan đến nhiều nguyên nhân khác nhau như hen, nhiễm trùng ngực, lo âu, bệnh phổi hoặc bệnh tim. Vì vậy, người dùng không nên tự xác định nguyên nhân nếu chưa được đánh giá y tế.",
+    "chunk_text": "Tiêu đề: Không nên tự chẩn đoán nguyên nhân khó thở\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: nguyên nhân khó thở, không tự chẩn đoán khó thở\nNhãn: shortness_of_breath, safety_boundary\nLoại FAQ: safety_boundary\nLưu ý an toàn: Chatbot không dùng để chẩn đoán nguyên nhân khó thở.\nNội dung: Khó thở có thể liên quan đến nhiều nguyên nhân khác nhau như hen, nhiễm trùng ngực, lo âu, bệnh phổi hoặc bệnh tim. Vì vậy, người dùng không nên tự xác định nguyên nhân nếu chưa được đánh giá y tế.",
+    "risk_level": "high",
+    "tags": [
+      "shortness_of_breath",
+      "safety_boundary"
+    ],
+    "keywords": [
+      "nguyên nhân khó thở",
+      "không tự chẩn đoán khó thở"
+    ],
+    "test_types": [],
+    "faq_type": "safety_boundary",
+    "safety_notes": "Chatbot không dùng để chẩn đoán nguyên nhân khó thở.",
+    "review_status": "approved",
+    "use_in_v1": true,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_016_c1",
+    "kb_id": "kb_v1_2_016",
+    "doc_id": "medlineplus_blood_culture_test_doc_001",
+    "source_id": "medlineplus_blood_culture_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/ency/article/003744.htm",
+    "section": "test_explainers",
+    "title": "Cấy máu giúp tìm vi khuẩn hoặc nấm trong máu",
+    "content": "Xét nghiệm cấy máu được dùng để kiểm tra xem trong máu có vi khuẩn hay nấm hay không. Xét nghiệm này thường được chỉ định khi bác sĩ nghi ngờ nhiễm trùng trong máu hoặc nhiễm trùng nặng cần xác định tác nhân.",
+    "chunk_text": "Tiêu đề: Cấy máu giúp tìm vi khuẩn hoặc nấm trong máu\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: cấy máu, vi khuẩn trong máu, nhiễm trùng\nNhãn: blood_culture, test_explainers, infection\nLoại xét nghiệm: blood_culture\nLoại FAQ: test_meaning\nLưu ý an toàn: Kết quả cần được bác sĩ diễn giải cùng triệu chứng và các xét nghiệm khác.\nNội dung: Xét nghiệm cấy máu được dùng để kiểm tra xem trong máu có vi khuẩn hay nấm hay không. Xét nghiệm này thường được chỉ định khi bác sĩ nghi ngờ nhiễm trùng trong máu hoặc nhiễm trùng nặng cần xác định tác nhân.",
+    "risk_level": "medium",
+    "tags": [
+      "blood_culture",
+      "test_explainers",
+      "infection"
+    ],
+    "keywords": [
+      "cấy máu",
+      "vi khuẩn trong máu",
+      "nhiễm trùng"
+    ],
+    "test_types": [
+      "blood_culture"
+    ],
+    "faq_type": "test_meaning",
+    "safety_notes": "Kết quả cần được bác sĩ diễn giải cùng triệu chứng và các xét nghiệm khác.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_017_c1",
+    "kb_id": "kb_v1_2_017",
+    "doc_id": "medlineplus_bmp_test_doc_001",
+    "source_id": "medlineplus_bmp_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/basic-metabolic-panel-bmp/",
+    "section": "test_explainers",
+    "title": "BMP là xét nghiệm đánh giá các chất cơ bản trong máu",
+    "content": "Basic Metabolic Panel (BMP) là nhóm xét nghiệm đo một số chất quan trọng trong máu như điện giải, đường huyết và chỉ số liên quan đến thận. Xét nghiệm này giúp đánh giá sức khỏe tổng quát và theo dõi nhiều tình trạng bệnh lý thường gặp.",
+    "chunk_text": "Tiêu đề: BMP là xét nghiệm đánh giá các chất cơ bản trong máu\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: BMP, điện giải, đường huyết, chức năng thận\nNhãn: bmp, test_explainers\nLoại xét nghiệm: bmp\nLoại FAQ: test_meaning\nLưu ý an toàn: Một số chỉ số trong BMP có thể bị ảnh hưởng bởi thuốc hoặc mất nước.\nNội dung: Basic Metabolic Panel (BMP) là nhóm xét nghiệm đo một số chất quan trọng trong máu như điện giải, đường huyết và chỉ số liên quan đến thận. Xét nghiệm này giúp đánh giá sức khỏe tổng quát và theo dõi nhiều tình trạng bệnh lý thường gặp.",
+    "risk_level": "medium",
+    "tags": [
+      "bmp",
+      "test_explainers"
+    ],
+    "keywords": [
+      "BMP",
+      "điện giải",
+      "đường huyết",
+      "chức năng thận"
+    ],
+    "test_types": [
+      "bmp"
+    ],
+    "faq_type": "test_meaning",
+    "safety_notes": "Một số chỉ số trong BMP có thể bị ảnh hưởng bởi thuốc hoặc mất nước.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_018_c1",
+    "kb_id": "kb_v1_2_018",
+    "doc_id": "medlineplus_cbc_test_doc_001",
+    "source_id": "medlineplus_cbc_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/complete-blood-count-cbc/",
+    "section": "test_explainers",
+    "title": "CBC là công thức máu toàn bộ để kiểm tra tế bào máu",
+    "content": "Complete Blood Count (CBC) là xét nghiệm đo số lượng và đặc điểm của hồng cầu, bạch cầu và tiểu cầu. Xét nghiệm này thường được dùng để sàng lọc sức khỏe, hỗ trợ tìm nguyên nhân thiếu máu, nhiễm trùng hoặc rối loạn tế bào máu.",
+    "chunk_text": "Tiêu đề: CBC là công thức máu toàn bộ để kiểm tra tế bào máu\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: CBC, công thức máu, hồng cầu, bạch cầu, tiểu cầu\nNhãn: cbc, test_explainers\nLoại xét nghiệm: cbc\nLoại FAQ: test_meaning\nLưu ý an toàn: CBC không tự đưa ra chẩn đoán cuối cùng nếu thiếu bối cảnh lâm sàng.\nNội dung: Complete Blood Count (CBC) là xét nghiệm đo số lượng và đặc điểm của hồng cầu, bạch cầu và tiểu cầu. Xét nghiệm này thường được dùng để sàng lọc sức khỏe, hỗ trợ tìm nguyên nhân thiếu máu, nhiễm trùng hoặc rối loạn tế bào máu.",
+    "risk_level": "medium",
+    "tags": [
+      "cbc",
+      "test_explainers"
+    ],
+    "keywords": [
+      "CBC",
+      "công thức máu",
+      "hồng cầu",
+      "bạch cầu",
+      "tiểu cầu"
+    ],
+    "test_types": [
+      "cbc"
+    ],
+    "faq_type": "test_meaning",
+    "safety_notes": "CBC không tự đưa ra chẩn đoán cuối cùng nếu thiếu bối cảnh lâm sàng.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_019_c1",
+    "kb_id": "kb_v1_2_019",
+    "doc_id": "medlineplus_crp_test_doc_001",
+    "source_id": "medlineplus_crp_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/c-reactive-protein-crp-test/",
+    "section": "test_explainers",
+    "title": "CRP là xét nghiệm gợi ý mức độ viêm trong cơ thể",
+    "content": "Xét nghiệm CRP đo nồng độ protein phản ứng C trong máu để hỗ trợ đánh giá tình trạng viêm. CRP có thể tăng do nhiễm trùng, chấn thương hoặc một số bệnh mạn tính nên kết quả cần được diễn giải cùng các dấu hiệu khác.",
+    "chunk_text": "Tiêu đề: CRP là xét nghiệm gợi ý mức độ viêm trong cơ thể\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: CRP, viêm, protein phản ứng C\nNhãn: crp, test_explainers, inflammation\nLoại xét nghiệm: crp\nLoại FAQ: test_meaning\nLưu ý an toàn: CRP tăng không tự xác định được nguyên nhân cụ thể của viêm.\nNội dung: Xét nghiệm CRP đo nồng độ protein phản ứng C trong máu để hỗ trợ đánh giá tình trạng viêm. CRP có thể tăng do nhiễm trùng, chấn thương hoặc một số bệnh mạn tính nên kết quả cần được diễn giải cùng các dấu hiệu khác.",
+    "risk_level": "medium",
+    "tags": [
+      "crp",
+      "test_explainers",
+      "inflammation"
+    ],
+    "keywords": [
+      "CRP",
+      "viêm",
+      "protein phản ứng C"
+    ],
+    "test_types": [
+      "crp"
+    ],
+    "faq_type": "test_meaning",
+    "safety_notes": "CRP tăng không tự xác định được nguyên nhân cụ thể của viêm.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_020_c1",
+    "kb_id": "kb_v1_2_020",
+    "doc_id": "medlineplus_ddimer_test_doc_001",
+    "source_id": "medlineplus_ddimer_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/d-dimer-test/",
+    "section": "test_explainers",
+    "title": "D-dimer là xét nghiệm hỗ trợ đánh giá nguy cơ cục máu đông",
+    "content": "Xét nghiệm D-dimer đo một mảnh protein được tạo ra khi cục máu đông tan ra. Xét nghiệm này thường được dùng để hỗ trợ loại trừ hoặc đánh giá thêm khả năng có rối loạn đông máu như huyết khối tĩnh mạch sâu hoặc thuyên tắc phổi.",
+    "chunk_text": "Tiêu đề: D-dimer là xét nghiệm hỗ trợ đánh giá nguy cơ cục máu đông\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: D-dimer, cục máu đông, huyết khối, thuyên tắc phổi\nNhãn: d_dimer, test_explainers, blood_clot\nLoại xét nghiệm: d_dimer\nLoại FAQ: test_meaning\nLưu ý an toàn: D-dimer tăng không có nghĩa chắc chắn đang có cục máu đông và vẫn cần bác sĩ đánh giá tiếp.\nNội dung: Xét nghiệm D-dimer đo một mảnh protein được tạo ra khi cục máu đông tan ra. Xét nghiệm này thường được dùng để hỗ trợ loại trừ hoặc đánh giá thêm khả năng có rối loạn đông máu như huyết khối tĩnh mạch sâu hoặc thuyên tắc phổi.",
+    "risk_level": "medium",
+    "tags": [
+      "d_dimer",
+      "test_explainers",
+      "blood_clot"
+    ],
+    "keywords": [
+      "D-dimer",
+      "cục máu đông",
+      "huyết khối",
+      "thuyên tắc phổi"
+    ],
+    "test_types": [
+      "d_dimer"
+    ],
+    "faq_type": "test_meaning",
+    "safety_notes": "D-dimer tăng không có nghĩa chắc chắn đang có cục máu đông và vẫn cần bác sĩ đánh giá tiếp.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_021_c1",
+    "kb_id": "kb_v1_2_021",
+    "doc_id": "medlineplus_pulse_oximetry_test_doc_001",
+    "source_id": "medlineplus_pulse_oximetry_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/pulse-oximetry/",
+    "section": "test_explainers",
+    "title": "Đo SpO2 giúp ước tính mức oxy trong máu một cách nhanh chóng",
+    "content": "Pulse oximetry là cách đo nhanh độ bão hòa oxy trong máu bằng cảm biến kẹp ở ngón tay hoặc vị trí phù hợp. Đây là xét nghiệm không đau, thường dùng để phát hiện sớm tình trạng thiếu oxy và theo dõi đáp ứng điều trị hô hấp.",
+    "chunk_text": "Tiêu đề: Đo SpO2 giúp ước tính mức oxy trong máu một cách nhanh chóng\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: SpO2, pulse oximetry, oxy máu\nNhãn: pulse_oximetry, test_explainers, oxygen\nLoại xét nghiệm: pulse_oximetry\nLoại FAQ: test_meaning\nLưu ý an toàn: Kết quả có thể bị ảnh hưởng bởi tuần hoàn kém, sơn móng tay hoặc chuyển động.\nNội dung: Pulse oximetry là cách đo nhanh độ bão hòa oxy trong máu bằng cảm biến kẹp ở ngón tay hoặc vị trí phù hợp. Đây là xét nghiệm không đau, thường dùng để phát hiện sớm tình trạng thiếu oxy và theo dõi đáp ứng điều trị hô hấp.",
+    "risk_level": "medium",
+    "tags": [
+      "pulse_oximetry",
+      "test_explainers",
+      "oxygen"
+    ],
+    "keywords": [
+      "SpO2",
+      "pulse oximetry",
+      "oxy máu"
+    ],
+    "test_types": [
+      "pulse_oximetry"
+    ],
+    "faq_type": "test_meaning",
+    "safety_notes": "Kết quả có thể bị ảnh hưởng bởi tuần hoàn kém, sơn móng tay hoặc chuyển động.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_022_c1",
+    "kb_id": "kb_v1_2_022",
+    "doc_id": "medlineplus_troponin_test_doc_001",
+    "source_id": "medlineplus_troponin_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/troponin-test/",
+    "section": "test_explainers",
+    "title": "Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim",
+    "content": "Xét nghiệm troponin đo nồng độ troponin trong máu để hỗ trợ phát hiện tổn thương cơ tim. Chỉ số này thường được dùng trong đánh giá đau ngực và nghi ngờ nhồi máu cơ tim, nhưng vẫn cần kết hợp với triệu chứng và điện tim.",
+    "chunk_text": "Tiêu đề: Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: troponin, đau ngực, tổn thương cơ tim, nhồi máu cơ tim\nNhãn: troponin, test_explainers, cardiac\nLoại xét nghiệm: troponin\nLoại FAQ: test_meaning\nLưu ý an toàn: Không nên tự giải thích kết quả troponin khi có đau ngực hoặc khó thở đang diễn ra.\nNội dung: Xét nghiệm troponin đo nồng độ troponin trong máu để hỗ trợ phát hiện tổn thương cơ tim. Chỉ số này thường được dùng trong đánh giá đau ngực và nghi ngờ nhồi máu cơ tim, nhưng vẫn cần kết hợp với triệu chứng và điện tim.",
+    "risk_level": "medium",
+    "tags": [
+      "troponin",
+      "test_explainers",
+      "cardiac"
+    ],
+    "keywords": [
+      "troponin",
+      "đau ngực",
+      "tổn thương cơ tim",
+      "nhồi máu cơ tim"
+    ],
+    "test_types": [
+      "troponin"
+    ],
+    "faq_type": "test_meaning",
+    "safety_notes": "Không nên tự giải thích kết quả troponin khi có đau ngực hoặc khó thở đang diễn ra.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_023_c1",
+    "kb_id": "kb_v1_2_023",
+    "doc_id": "nhs_anaphylaxis_doc_001",
+    "source_id": "nhs_anaphylaxis",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/conditions/anaphylaxis/",
+    "section": "red_flags",
+    "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+    "content": "Nếu có dấu hiệu phản vệ như khó thở, sưng môi hoặc lưỡi, thở rít, chóng mặt nặng hoặc ngất sau dị ứng, cần gọi cấp cứu ngay. Đây là tình huống có thể diễn tiến rất nhanh và không nên tự theo dõi tại nhà.",
+    "chunk_text": "Tiêu đề: Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: phản vệ, khó thở, sưng môi, dị ứng nặng\nNhãn: anaphylaxis, red_flags, allergy\nLoại FAQ: emergency_warning\nLưu ý an toàn: Nếu đã được kê bút tiêm adrenaline, hãy dùng theo hướng dẫn khẩn cấp và vẫn gọi cấp cứu.\nNội dung: Nếu có dấu hiệu phản vệ như khó thở, sưng môi hoặc lưỡi, thở rít, chóng mặt nặng hoặc ngất sau dị ứng, cần gọi cấp cứu ngay. Đây là tình huống có thể diễn tiến rất nhanh và không nên tự theo dõi tại nhà.",
+    "risk_level": "high",
+    "tags": [
+      "anaphylaxis",
+      "red_flags",
+      "allergy"
+    ],
+    "keywords": [
+      "phản vệ",
+      "khó thở",
+      "sưng môi",
+      "dị ứng nặng"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Nếu đã được kê bút tiêm adrenaline, hãy dùng theo hướng dẫn khẩn cấp và vẫn gọi cấp cứu.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_024_c1",
+    "kb_id": "kb_v1_2_024",
+    "doc_id": "nhs_anaphylaxis_doc_001",
+    "source_id": "nhs_anaphylaxis",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/conditions/anaphylaxis/",
+    "section": "red_flags",
+    "title": "Nếu đã có bút tiêm adrenaline, cần dùng đúng lúc và vẫn đi cấp cứu",
+    "content": "Người từng được kê bút tiêm adrenaline cần biết cách sử dụng khi có dấu hiệu phản vệ. Sau khi dùng thuốc khẩn cấp, vẫn phải gọi cấp cứu hoặc đến cơ sở y tế ngay để được theo dõi tiếp.",
+    "chunk_text": "Tiêu đề: Nếu đã có bút tiêm adrenaline, cần dùng đúng lúc và vẫn đi cấp cứu\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: adrenaline auto-injector, bút tiêm adrenaline, phản vệ\nNhãn: anaphylaxis, adrenaline, red_flags\nLoại FAQ: red_flag_general\nLưu ý an toàn: Không xem việc triệu chứng giảm tạm thời là đã an toàn hoàn toàn.\nNội dung: Người từng được kê bút tiêm adrenaline cần biết cách sử dụng khi có dấu hiệu phản vệ. Sau khi dùng thuốc khẩn cấp, vẫn phải gọi cấp cứu hoặc đến cơ sở y tế ngay để được theo dõi tiếp.",
+    "risk_level": "high",
+    "tags": [
+      "anaphylaxis",
+      "adrenaline",
+      "red_flags"
+    ],
+    "keywords": [
+      "adrenaline auto-injector",
+      "bút tiêm adrenaline",
+      "phản vệ"
+    ],
+    "test_types": [],
+    "faq_type": "red_flag_general",
+    "safety_notes": "Không xem việc triệu chứng giảm tạm thời là đã an toàn hoàn toàn.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_025_c1",
+    "kb_id": "kb_v1_2_025",
+    "doc_id": "nhs_fainting_adults_doc_001",
+    "source_id": "nhs_fainting_adults",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/fainting/",
+    "section": "red_flags",
+    "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+    "content": "Ngất có thể là dấu hiệu nguy hiểm nếu xảy ra cùng đau ngực, khó thở, tim đập bất thường, chấn thương đầu hoặc khó hồi tỉnh. Khi có các dấu hiệu này, cần gọi cấp cứu hoặc đi cấp cứu ngay.",
+    "chunk_text": "Tiêu đề: Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: ngất, đau ngực, khó thở, chấn thương đầu\nNhãn: fainting, syncope, red_flags\nLoại FAQ: emergency_warning\nLưu ý an toàn: Không tự lái xe nếu vừa ngất hoặc còn chóng mặt.\nNội dung: Ngất có thể là dấu hiệu nguy hiểm nếu xảy ra cùng đau ngực, khó thở, tim đập bất thường, chấn thương đầu hoặc khó hồi tỉnh. Khi có các dấu hiệu này, cần gọi cấp cứu hoặc đi cấp cứu ngay.",
+    "risk_level": "high",
+    "tags": [
+      "fainting",
+      "syncope",
+      "red_flags"
+    ],
+    "keywords": [
+      "ngất",
+      "đau ngực",
+      "khó thở",
+      "chấn thương đầu"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Không tự lái xe nếu vừa ngất hoặc còn chóng mặt.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_026_c1",
+    "kb_id": "kb_v1_2_026",
+    "doc_id": "nhs_fainting_adults_doc_001",
+    "source_id": "nhs_fainting_adults",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/fainting/",
+    "section": "red_flags",
+    "title": "Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+    "content": "Nếu bị ngất lặp lại, ngất khi gắng sức hoặc vẫn còn lo lắng sau cơn ngất, nên đi khám để tìm nguyên nhân. Ngay cả khi đã tỉnh lại, vẫn cần đánh giá nếu cơn ngất không giống các lần trước hoặc kèm triệu chứng mới.",
+    "chunk_text": "Tiêu đề: Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: ngất tái diễn, đi khám, đánh giá nguyên nhân\nNhãn: fainting, evaluation\nLoại FAQ: urgent_advice\nLưu ý an toàn: Không nên tự kết luận chỉ là tụt huyết áp thông thường khi còn triệu chứng kéo dài.\nNội dung: Nếu bị ngất lặp lại, ngất khi gắng sức hoặc vẫn còn lo lắng sau cơn ngất, nên đi khám để tìm nguyên nhân. Ngay cả khi đã tỉnh lại, vẫn cần đánh giá nếu cơn ngất không giống các lần trước hoặc kèm triệu chứng mới.",
+    "risk_level": "high",
+    "tags": [
+      "fainting",
+      "evaluation"
+    ],
+    "keywords": [
+      "ngất tái diễn",
+      "đi khám",
+      "đánh giá nguyên nhân"
+    ],
+    "test_types": [],
+    "faq_type": "urgent_advice",
+    "safety_notes": "Không nên tự kết luận chỉ là tụt huyết áp thông thường khi còn triệu chứng kéo dài.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_027_c1",
+    "kb_id": "kb_v1_2_027",
+    "doc_id": "nhs_headaches_doc_001",
+    "source_id": "nhs_headaches",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/headaches/",
+    "section": "red_flags",
+    "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+    "content": "Cần đi cấp cứu ngay nếu đau đầu xuất hiện đột ngột và dữ dội, hoặc đi kèm yếu liệt, nói khó, lú lẫn, co giật, sốt cao kèm cổ cứng, hay sau chấn thương đầu. Đây là các dấu hiệu không nên tự điều trị tại nhà.",
+    "chunk_text": "Tiêu đề: Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: đau đầu dữ dội, nói khó, yếu liệt, cổ cứng\nNhãn: headache, red_flags, neurology\nLoại FAQ: emergency_warning\nLưu ý an toàn: Không chậm trễ thăm khám nếu đau đầu khác thường rõ rệt so với trước đây.\nNội dung: Cần đi cấp cứu ngay nếu đau đầu xuất hiện đột ngột và dữ dội, hoặc đi kèm yếu liệt, nói khó, lú lẫn, co giật, sốt cao kèm cổ cứng, hay sau chấn thương đầu. Đây là các dấu hiệu không nên tự điều trị tại nhà.",
+    "risk_level": "high",
+    "tags": [
+      "headache",
+      "red_flags",
+      "neurology"
+    ],
+    "keywords": [
+      "đau đầu dữ dội",
+      "nói khó",
+      "yếu liệt",
+      "cổ cứng"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Không chậm trễ thăm khám nếu đau đầu khác thường rõ rệt so với trước đây.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_028_c1",
+    "kb_id": "kb_v1_2_028",
+    "doc_id": "nhs_headaches_doc_001",
+    "source_id": "nhs_headaches",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/headaches/",
+    "section": "red_flags",
+    "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+    "content": "Nên được đánh giá sớm nếu đau đầu kéo dài, ngày càng nặng, tái diễn thường xuyên, hoặc kèm nôn ói, thay đổi thị lực hay triệu chứng toàn thân. Việc này giúp loại trừ nguyên nhân nghiêm trọng và điều chỉnh chăm sóc phù hợp.",
+    "chunk_text": "Tiêu đề: Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: đau đầu kéo dài, đau đầu tái diễn, thị lực\nNhãn: headache, urgent_advice\nLoại FAQ: urgent_advice\nLưu ý an toàn: Không lạm dụng thuốc giảm đau kéo dài mà không trao đổi với nhân viên y tế.\nNội dung: Nên được đánh giá sớm nếu đau đầu kéo dài, ngày càng nặng, tái diễn thường xuyên, hoặc kèm nôn ói, thay đổi thị lực hay triệu chứng toàn thân. Việc này giúp loại trừ nguyên nhân nghiêm trọng và điều chỉnh chăm sóc phù hợp.",
+    "risk_level": "high",
+    "tags": [
+      "headache",
+      "urgent_advice"
+    ],
+    "keywords": [
+      "đau đầu kéo dài",
+      "đau đầu tái diễn",
+      "thị lực"
+    ],
+    "test_types": [],
+    "faq_type": "urgent_advice",
+    "safety_notes": "Không lạm dụng thuốc giảm đau kéo dài mà không trao đổi với nhân viên y tế.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_029_c1",
+    "kb_id": "kb_v1_2_029",
+    "doc_id": "nhs_stomach_ache_doc_001",
+    "source_id": "nhs_stomach_ache",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/stomach-ache/",
+    "section": "red_flags",
+    "title": "Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",
+    "content": "Đau bụng dữ dội, bụng cứng, đau tăng nhanh, ngất, nôn ra máu, đi ngoài phân đen hoặc kèm đau ngực cần được cấp cứu ngay. Những dấu hiệu này có thể gợi ý tình trạng nặng và không nên tự theo dõi tại nhà.",
+    "chunk_text": "Tiêu đề: Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: đau bụng dữ dội, nôn ra máu, phân đen, cấp cứu\nNhãn: stomach_ache, abdominal_pain, red_flags\nLoại FAQ: emergency_warning\nLưu ý an toàn: Không tự dùng thuốc giảm đau mạnh để trì hoãn đi cấp cứu khi có dấu hiệu cảnh báo.\nNội dung: Đau bụng dữ dội, bụng cứng, đau tăng nhanh, ngất, nôn ra máu, đi ngoài phân đen hoặc kèm đau ngực cần được cấp cứu ngay. Những dấu hiệu này có thể gợi ý tình trạng nặng và không nên tự theo dõi tại nhà.",
+    "risk_level": "high",
+    "tags": [
+      "stomach_ache",
+      "abdominal_pain",
+      "red_flags"
+    ],
+    "keywords": [
+      "đau bụng dữ dội",
+      "nôn ra máu",
+      "phân đen",
+      "cấp cứu"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Không tự dùng thuốc giảm đau mạnh để trì hoãn đi cấp cứu khi có dấu hiệu cảnh báo.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_030_c1",
+    "kb_id": "kb_v1_2_030",
+    "doc_id": "nhs_stomach_ache_doc_001",
+    "source_id": "nhs_stomach_ache",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/stomach-ache/",
+    "section": "red_flags",
+    "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+    "content": "Nếu đau bụng kéo dài nhiều giờ, tái diễn, ngày càng nặng hoặc đi kèm sốt, nôn ói, tiêu chảy kéo dài hay sụt cân, nên được khám sớm. Đây là cách an toàn hơn là tự chẩn đoán nguyên nhân tại nhà.",
+    "chunk_text": "Tiêu đề: Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: đau bụng kéo dài, sốt, nôn ói, đi khám\nNhãn: stomach_ache, urgent_advice\nLoại FAQ: urgent_advice\nLưu ý an toàn: Nếu đau chuyển nhanh sang dữ dội hoặc có dấu hiệu mất nước, cần đi cấp cứu.\nNội dung: Nếu đau bụng kéo dài nhiều giờ, tái diễn, ngày càng nặng hoặc đi kèm sốt, nôn ói, tiêu chảy kéo dài hay sụt cân, nên được khám sớm. Đây là cách an toàn hơn là tự chẩn đoán nguyên nhân tại nhà.",
+    "risk_level": "high",
+    "tags": [
+      "stomach_ache",
+      "urgent_advice"
+    ],
+    "keywords": [
+      "đau bụng kéo dài",
+      "sốt",
+      "nôn ói",
+      "đi khám"
+    ],
+    "test_types": [],
+    "faq_type": "urgent_advice",
+    "safety_notes": "Nếu đau chuyển nhanh sang dữ dội hoặc có dấu hiệu mất nước, cần đi cấp cứu.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_031_c1",
+    "kb_id": "kb_v1_2_031",
+    "doc_id": "nhs_stroke_symptoms_doc_001",
+    "source_id": "nhs_stroke_symptoms",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/conditions/stroke/symptoms/",
+    "section": "red_flags",
+    "title": "Dấu hiệu FAST của đột quỵ cần gọi cấp cứu ngay",
+    "content": "Khi có méo miệng, yếu tay chân hoặc nói khó, cần nghĩ đến đột quỵ và gọi cấp cứu ngay. Thời gian can thiệp rất quan trọng, nên không chờ xem triệu chứng có tự hết hay không.",
+    "chunk_text": "Tiêu đề: Dấu hiệu FAST của đột quỵ cần gọi cấp cứu ngay\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: đột quỵ, FAST, méo miệng, nói khó\nNhãn: stroke, fast, red_flags\nLoại FAQ: emergency_warning\nLưu ý an toàn: Không tự đưa người bệnh đi xa nếu cấp cứu có thể tới nhanh hơn.\nNội dung: Khi có méo miệng, yếu tay chân hoặc nói khó, cần nghĩ đến đột quỵ và gọi cấp cứu ngay. Thời gian can thiệp rất quan trọng, nên không chờ xem triệu chứng có tự hết hay không.",
+    "risk_level": "high",
+    "tags": [
+      "stroke",
+      "fast",
+      "red_flags"
+    ],
+    "keywords": [
+      "đột quỵ",
+      "FAST",
+      "méo miệng",
+      "nói khó"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Không tự đưa người bệnh đi xa nếu cấp cứu có thể tới nhanh hơn.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_032_c1",
+    "kb_id": "kb_v1_2_032",
+    "doc_id": "nhs_stroke_symptoms_doc_001",
+    "source_id": "nhs_stroke_symptoms",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/conditions/stroke/symptoms/",
+    "section": "red_flags",
+    "title": "Cơn thiếu máu não thoáng qua vẫn cần xử trí khẩn",
+    "content": "Nếu các dấu hiệu giống đột quỵ xuất hiện rồi tự hết nhanh, tình huống đó vẫn cần được đánh giá khẩn cấp vì có thể là cơn thiếu máu não thoáng qua. Đây là dấu hiệu cảnh báo nguy cơ đột quỵ thực sự trong thời gian gần.",
+    "chunk_text": "Tiêu đề: Cơn thiếu máu não thoáng qua vẫn cần xử trí khẩn\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: TIA, mini-stroke, triệu chứng tự hết\nNhãn: stroke, tia, red_flags\nLoại FAQ: red_flag_general\nLưu ý an toàn: Không xem việc triệu chứng biến mất là an toàn hoàn toàn.\nNội dung: Nếu các dấu hiệu giống đột quỵ xuất hiện rồi tự hết nhanh, tình huống đó vẫn cần được đánh giá khẩn cấp vì có thể là cơn thiếu máu não thoáng qua. Đây là dấu hiệu cảnh báo nguy cơ đột quỵ thực sự trong thời gian gần.",
+    "risk_level": "high",
+    "tags": [
+      "stroke",
+      "tia",
+      "red_flags"
+    ],
+    "keywords": [
+      "TIA",
+      "mini-stroke",
+      "triệu chứng tự hết"
+    ],
+    "test_types": [],
+    "faq_type": "red_flag_general",
+    "safety_notes": "Không xem việc triệu chứng biến mất là an toàn hoàn toàn.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  }
+]
