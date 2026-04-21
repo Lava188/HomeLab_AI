@@ -26,7 +26,11 @@
     "faq_type": "red_flag_general",
     "safety_notes": "Không dùng nội dung này để tự kết luận sepsis.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_002",
@@ -56,7 +60,11 @@
     "faq_type": "red_flag_signs",
     "safety_notes": "Không dùng để chẩn đoán. Nếu người bệnh xấu nhanh, cần đi cấp cứu.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_003",
@@ -86,7 +94,11 @@
     "faq_type": "red_flag_signs",
     "safety_notes": "Nếu có dấu hiệu xấu đi nhanh, cần được đánh giá y tế khẩn cấp.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_004",
@@ -96,7 +108,7 @@
     "source_url": "https://www.nice.org.uk/guidance/ng253",
     "section": "red_flags",
     "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
-    "content": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển đến cơ sở cấp cứu ngay bằng phương thức phù hợp. Với chatbot HomeLab, nội dung này chỉ nên dùng để tăng mức độ cảnh báo và hướng người dùng đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
+    "content": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển đến cơ sở cấp cứu ngay bằng phương thức phù hợp. Nội dung này nên được dùng để tăng mức độ cảnh báo và hướng người bệnh đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
     "source_excerpt": "When to transfer immediately to an acute hospital setting \nIn community and custodial settings \n1.7.1 If they meet any high-risk criteria, refer people aged 16 or over with suspected \nsepsis in the community and in custodial settings for emergency medical care \n(see table 1). \nUse the most appropriate means of transport (usually 999 ambulance). \nEmergency care requires facilities for resuscitation to be available and, depending \non local services, may be an emergency department or medical admissions unit. \n[2016, amended 2024] \n1.7.2 Pre-alert secondary care (through GP or ambulance service) when any high-risk \ncriteria are met in a person aged 16 or over with suspected sepsis in the \ncommunity or in a custodial setting and transfer them immediately. [2016, \namended 2024] \nIn acute mental health settings \n1.7.3 For people in an acute mental health setting who are aged 16 or over and are at \nhigh risk of severe illness or death from sepsis, refer for emergency medical care. \n[2024, amended 2025] \nFor a short explanation of why the committee made this recommendation and how it \nmight affect practice, see the rationale and impact section on when to transfer \nimmediately: people in men",
     "language": "vi",
     "locale": "vi-VN",
@@ -113,9 +125,13 @@
     ],
     "test_types": [],
     "faq_type": "emergency_warning",
-    "safety_notes": "Chatbot chỉ cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp.",
+    "safety_notes": "Nội dung này chỉ nhằm cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_005",
@@ -142,7 +158,11 @@
     "faq_type": "general_info",
     "safety_notes": "",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_006",
@@ -169,7 +189,11 @@
     "faq_type": "general_info",
     "safety_notes": "Không tự diễn giải kết quả xét nghiệm mà không có tư vấn y tế.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_007",
@@ -199,7 +223,11 @@
     "faq_type": "test_meaning",
     "safety_notes": "",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_008",
@@ -226,7 +254,11 @@
     "faq_type": "preparation",
     "safety_notes": "Chỉ thực hiện nhịn ăn hoặc điều chỉnh thuốc khi đã được hướng dẫn bởi cơ sở y tế.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_009",
@@ -253,7 +285,11 @@
     "faq_type": "results",
     "safety_notes": "Không tự chẩn đoán dựa trên kết quả xét nghiệm đơn lẻ.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_010",
@@ -281,7 +317,11 @@
     "faq_type": "emergency_warning",
     "safety_notes": "Nếu có dấu hiệu nghiêm trọng, cần gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_011",
@@ -308,7 +348,11 @@
     "faq_type": "urgent_advice",
     "safety_notes": "Không nên trì hoãn thăm khám nếu triệu chứng tái diễn hoặc khiến bạn lo ngại.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_012",
@@ -333,9 +377,13 @@
     ],
     "test_types": [],
     "faq_type": "safety_boundary",
-    "safety_notes": "Chatbot không dùng để xác định nguyên nhân đau ngực.",
+    "safety_notes": "Không nên tự xác định nguyên nhân đau ngực nếu chưa được đánh giá y tế.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_013",
@@ -363,7 +411,11 @@
     "faq_type": "emergency_warning",
     "safety_notes": "Nếu có dấu hiệu nặng, cần gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_014",
@@ -392,7 +444,11 @@
     "faq_type": "urgent_advice",
     "safety_notes": "",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_015",
@@ -417,9 +473,13 @@
     ],
     "test_types": [],
     "faq_type": "safety_boundary",
-    "safety_notes": "Chatbot không dùng để chẩn đoán nguyên nhân khó thở.",
+    "safety_notes": "Không nên tự chẩn đoán nguyên nhân khó thở nếu chưa được đánh giá y tế.",
     "review_status": "approved",
-    "use_in_v1": true
+    "use_in_v1": true,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_2_016",
@@ -450,7 +510,11 @@
     "faq_type": "test_meaning",
     "safety_notes": "Kết quả cần được bác sĩ diễn giải cùng triệu chứng và các xét nghiệm khác.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_2_017",
@@ -481,10 +545,50 @@
     "faq_type": "test_meaning",
     "safety_notes": "Một số chỉ số trong BMP có thể bị ảnh hưởng bởi thuốc hoặc mất nước.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
     "id": "kb_v1_2_018",
+    "doc_id": "medlineplus_bmp_test_doc_001",
+    "source_id": "medlineplus_bmp_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/basic-metabolic-panel-bmp/",
+    "section": "test_explainers",
+    "title": "BMP thường được dùng để kiểm tra sức khỏe chung và theo dõi chức năng thận",
+    "content": "BMP thường được chỉ định trong khám sức khỏe, khi cần đánh giá cân bằng dịch và điện giải, hoặc để theo dõi chức năng thận và chuyển hóa. Trong một số trường hợp, người bệnh có thể được yêu cầu nhịn ăn trước khi lấy máu theo hướng dẫn của cơ sở y tế.",
+    "source_excerpt": "Basic Metabolic Panel (BMP)",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "medium",
+    "tags": [
+      "bmp",
+      "test_explainers",
+      "care_pathway"
+    ],
+    "keywords": [
+      "khám sức khỏe",
+      "theo dõi thận",
+      "cân bằng điện giải",
+      "nhịn ăn trước xét nghiệm"
+    ],
+    "test_types": [
+      "bmp"
+    ],
+    "faq_type": "test_use",
+    "safety_notes": "Cần làm theo hướng dẫn chuẩn bị xét nghiệm của cơ sở y tế vì không phải ai cũng cần chuẩn bị giống nhau.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
+  },
+  {
+    "id": "kb_v1_2_019",
     "doc_id": "medlineplus_cbc_test_doc_001",
     "source_id": "medlineplus_cbc_test",
     "source_name": "MedlinePlus",
@@ -513,10 +617,50 @@
     "faq_type": "test_meaning",
     "safety_notes": "CBC không tự đưa ra chẩn đoán cuối cùng nếu thiếu bối cảnh lâm sàng.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_019",
+    "id": "kb_v1_2_020",
+    "doc_id": "medlineplus_cbc_test_doc_001",
+    "source_id": "medlineplus_cbc_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/complete-blood-count-cbc/",
+    "section": "test_explainers",
+    "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+    "content": "CBC thường được làm trong khám định kỳ hoặc khi bác sĩ cần tìm thêm nguyên nhân của thiếu máu, nhiễm trùng hay một số rối loạn tế bào máu. Kết quả bất thường không tự khẳng định chẩn đoán mà cần được đọc cùng triệu chứng, bệnh sử và các xét nghiệm khác.",
+    "source_excerpt": "Complete Blood Count (CBC)",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "medium",
+    "tags": [
+      "cbc",
+      "test_explainers",
+      "care_pathway"
+    ],
+    "keywords": [
+      "thiếu máu",
+      "nhiễm trùng",
+      "rối loạn máu",
+      "kết quả bất thường"
+    ],
+    "test_types": [
+      "cbc"
+    ],
+    "faq_type": "result_interpretation",
+    "safety_notes": "Không nên tự kết luận bệnh chỉ dựa vào một chỉ số CBC nằm ngoài khoảng tham chiếu.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
+  },
+  {
+    "id": "kb_v1_2_021",
     "doc_id": "medlineplus_crp_test_doc_001",
     "source_id": "medlineplus_crp_test",
     "source_name": "MedlinePlus",
@@ -544,10 +688,50 @@
     "faq_type": "test_meaning",
     "safety_notes": "CRP tăng không tự xác định được nguyên nhân cụ thể của viêm.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_020",
+    "id": "kb_v1_2_022",
+    "doc_id": "medlineplus_crp_test_doc_001",
+    "source_id": "medlineplus_crp_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/c-reactive-protein-crp-test/",
+    "section": "test_explainers",
+    "title": "CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm",
+    "content": "Bác sĩ có thể dùng CRP để theo dõi tình trạng viêm hoặc đáp ứng điều trị theo thời gian, vì chỉ số này có thể tăng rồi giảm theo mức độ viêm trong cơ thể. Tuy vậy, CRP không cho biết chính xác viêm nằm ở đâu hay do nguyên nhân nào nếu không có thêm thông tin lâm sàng.",
+    "source_excerpt": "C-Reactive Protein (CRP) Test",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "medium",
+    "tags": [
+      "crp",
+      "test_explainers",
+      "result_boundary"
+    ],
+    "keywords": [
+      "theo dõi điều trị",
+      "đáp ứng điều trị",
+      "không chỉ ra vị trí viêm",
+      "diễn giải CRP"
+    ],
+    "test_types": [
+      "crp"
+    ],
+    "faq_type": "result_interpretation",
+    "safety_notes": "Kết quả CRP nên được đọc cùng triệu chứng và các xét nghiệm khác, nhất là khi đang nghi nhiễm trùng nặng.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
+  },
+  {
+    "id": "kb_v1_2_023",
     "doc_id": "medlineplus_ddimer_test_doc_001",
     "source_id": "medlineplus_ddimer_test",
     "source_name": "MedlinePlus",
@@ -576,10 +760,50 @@
     "faq_type": "test_meaning",
     "safety_notes": "D-dimer tăng không có nghĩa chắc chắn đang có cục máu đông và vẫn cần bác sĩ đánh giá tiếp.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_021",
+    "id": "kb_v1_2_024",
+    "doc_id": "medlineplus_ddimer_test_doc_001",
+    "source_id": "medlineplus_ddimer_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/d-dimer-test/",
+    "section": "test_explainers",
+    "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+    "content": "Nếu D-dimer tăng, bác sĩ thường cần kết hợp thêm triệu chứng và các xét nghiệm hình ảnh để xác định có cục máu đông hay không. Ngược lại, kết quả bình thường cũng phải được đọc trong đúng bối cảnh lâm sàng thay vì dùng để tự trấn an khi vẫn còn triệu chứng đáng lo.",
+    "source_excerpt": "D-Dimer Test",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "medium",
+    "tags": [
+      "d_dimer",
+      "test_explainers",
+      "result_boundary"
+    ],
+    "keywords": [
+      "kết quả D-dimer",
+      "cần xét nghiệm tiếp",
+      "không tự kết luận",
+      "huyết khối"
+    ],
+    "test_types": [
+      "d_dimer"
+    ],
+    "faq_type": "result_interpretation",
+    "safety_notes": "Nếu đang có khó thở, đau ngực hoặc sưng đau chân, cần ưu tiên đánh giá y tế thay vì tự diễn giải D-dimer tại nhà.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
+  },
+  {
+    "id": "kb_v1_2_025",
     "doc_id": "medlineplus_pulse_oximetry_test_doc_001",
     "source_id": "medlineplus_pulse_oximetry_test",
     "source_name": "MedlinePlus",
@@ -607,17 +831,57 @@
     "faq_type": "test_meaning",
     "safety_notes": "Kết quả có thể bị ảnh hưởng bởi tuần hoàn kém, sơn móng tay hoặc chuyển động.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_022",
+    "id": "kb_v1_2_026",
+    "doc_id": "medlineplus_pulse_oximetry_test_doc_001",
+    "source_id": "medlineplus_pulse_oximetry_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/pulse-oximetry/",
+    "section": "test_explainers",
+    "title": "Khi dùng máy đo SpO2 tại nhà, kết quả thấp hoặc có triệu chứng vẫn cần được đánh giá",
+    "content": "Máy đo SpO2 tại nhà có thể hữu ích khi theo dõi bệnh phổi hoặc khó thở, nhưng kết quả cần được hiểu cùng tình trạng thực tế của người bệnh. Nếu SpO2 xuống thấp hoặc đi kèm tím tái, đau ngực hay khó thở tăng dần, nên liên hệ cơ sở y tế sớm thay vì chỉ lặp lại phép đo nhiều lần.",
+    "source_excerpt": "Pulse Oximetry",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "medium",
+    "tags": [
+      "pulse_oximetry",
+      "test_explainers",
+      "home_monitoring"
+    ],
+    "keywords": [
+      "máy đo SpO2 tại nhà",
+      "khó thở",
+      "tím tái",
+      "kết quả thấp"
+    ],
+    "test_types": [
+      "pulse_oximetry"
+    ],
+    "faq_type": "urgent_advice",
+    "safety_notes": "Sơn móng tay, tuần hoàn kém hoặc cử động nhiều có thể làm kết quả sai lệch.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
+  },
+  {
+    "id": "kb_v1_2_027",
     "doc_id": "medlineplus_troponin_test_doc_001",
     "source_id": "medlineplus_troponin_test",
     "source_name": "MedlinePlus",
     "source_url": "https://medlineplus.gov/lab-tests/troponin-test/",
     "section": "test_explainers",
     "title": "Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim",
-    "content": "Xét nghiệm troponin đo nồng độ troponin trong máu để hỗ trợ phát hiện tổn thương cơ tim. Chỉ số này thường được dùng trong đánh giá đau ngực và nghi ngờ nhồi máu cơ tim, nhưng vẫn cần kết hợp với triệu chứng và điện tim.",
+    "content": "Xét nghiệm troponin đo nồng độ troponin trong máu để hỗ trợ phát hiện tổn thương cơ tim. Xét nghiệm này thường được dùng cùng điện tim và đánh giá lâm sàng khi bác sĩ nghi có tổn thương tim, thay vì tự đứng một mình để kết luận nguyên nhân triệu chứng.",
     "source_excerpt": "Troponin Test",
     "language": "vi",
     "locale": "vi-VN",
@@ -629,9 +893,9 @@
     ],
     "keywords": [
       "troponin",
-      "đau ngực",
       "tổn thương cơ tim",
-      "nhồi máu cơ tim"
+      "xét nghiệm tim",
+      "điện tim"
     ],
     "test_types": [
       "troponin"
@@ -639,10 +903,50 @@
     "faq_type": "test_meaning",
     "safety_notes": "Không nên tự giải thích kết quả troponin khi có đau ngực hoặc khó thở đang diễn ra.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_023",
+    "id": "kb_v1_2_028",
+    "doc_id": "medlineplus_troponin_test_doc_001",
+    "source_id": "medlineplus_troponin_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/troponin-test/",
+    "section": "test_explainers",
+    "title": "Troponin tăng không phải lúc nào cũng đồng nghĩa nhồi máu cơ tim",
+    "content": "Troponin tăng cho thấy có tổn thương cơ tim nhưng không phải lúc nào cũng đồng nghĩa với nhồi máu cơ tim, vì một số tình trạng khác cũng có thể làm chỉ số này tăng. Kết quả ban đầu bình thường cũng chưa đủ để loại trừ sớm trong mọi trường hợp, nên bác sĩ có thể cần lặp lại xét nghiệm và kết hợp thêm dữ liệu khác.",
+    "source_excerpt": "Troponin Test",
+    "language": "vi",
+    "locale": "vi-VN",
+    "risk_level": "medium",
+    "tags": [
+      "troponin",
+      "test_explainers",
+      "result_boundary"
+    ],
+    "keywords": [
+      "troponin tăng",
+      "không luôn là nhồi máu cơ tim",
+      "lặp lại xét nghiệm",
+      "diễn giải kết quả"
+    ],
+    "test_types": [
+      "troponin"
+    ],
+    "faq_type": "result_interpretation",
+    "safety_notes": "Nếu đang đau ngực, khó thở hoặc chóng mặt, cần ưu tiên đi cấp cứu thay vì chờ tự đọc kết quả xét nghiệm.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
+  },
+  {
+    "id": "kb_v1_2_029",
     "doc_id": "nhs_anaphylaxis_doc_001",
     "source_id": "nhs_anaphylaxis",
     "source_name": "NHS",
@@ -669,10 +973,14 @@
     "faq_type": "emergency_warning",
     "safety_notes": "Nếu đã được kê bút tiêm adrenaline, hãy dùng theo hướng dẫn khẩn cấp và vẫn gọi cấp cứu.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_024",
+    "id": "kb_v1_2_030",
     "doc_id": "nhs_anaphylaxis_doc_001",
     "source_id": "nhs_anaphylaxis",
     "source_name": "NHS",
@@ -698,10 +1006,14 @@
     "faq_type": "red_flag_general",
     "safety_notes": "Không xem việc triệu chứng giảm tạm thời là đã an toàn hoàn toàn.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_025",
+    "id": "kb_v1_2_031",
     "doc_id": "nhs_fainting_adults_doc_001",
     "source_id": "nhs_fainting_adults",
     "source_name": "NHS",
@@ -728,10 +1040,14 @@
     "faq_type": "emergency_warning",
     "safety_notes": "Không tự lái xe nếu vừa ngất hoặc còn chóng mặt.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_026",
+    "id": "kb_v1_2_032",
     "doc_id": "nhs_fainting_adults_doc_001",
     "source_id": "nhs_fainting_adults",
     "source_name": "NHS",
@@ -756,10 +1072,14 @@
     "faq_type": "urgent_advice",
     "safety_notes": "Không nên tự kết luận chỉ là tụt huyết áp thông thường khi còn triệu chứng kéo dài.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_027",
+    "id": "kb_v1_2_033",
     "doc_id": "nhs_headaches_doc_001",
     "source_id": "nhs_headaches",
     "source_name": "NHS",
@@ -786,10 +1106,14 @@
     "faq_type": "emergency_warning",
     "safety_notes": "Không chậm trễ thăm khám nếu đau đầu khác thường rõ rệt so với trước đây.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_028",
+    "id": "kb_v1_2_034",
     "doc_id": "nhs_headaches_doc_001",
     "source_id": "nhs_headaches",
     "source_name": "NHS",
@@ -814,10 +1138,14 @@
     "faq_type": "urgent_advice",
     "safety_notes": "Không lạm dụng thuốc giảm đau kéo dài mà không trao đổi với nhân viên y tế.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_029",
+    "id": "kb_v1_2_035",
     "doc_id": "nhs_stomach_ache_doc_001",
     "source_id": "nhs_stomach_ache",
     "source_name": "NHS",
@@ -844,10 +1172,14 @@
     "faq_type": "emergency_warning",
     "safety_notes": "Không tự dùng thuốc giảm đau mạnh để trì hoãn đi cấp cứu khi có dấu hiệu cảnh báo.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_030",
+    "id": "kb_v1_2_036",
     "doc_id": "nhs_stomach_ache_doc_001",
     "source_id": "nhs_stomach_ache",
     "source_name": "NHS",
@@ -873,10 +1205,14 @@
     "faq_type": "urgent_advice",
     "safety_notes": "Nếu đau chuyển nhanh sang dữ dội hoặc có dấu hiệu mất nước, cần đi cấp cứu.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_031",
+    "id": "kb_v1_2_037",
     "doc_id": "nhs_stroke_symptoms_doc_001",
     "source_id": "nhs_stroke_symptoms",
     "source_name": "NHS",
@@ -903,10 +1239,14 @@
     "faq_type": "emergency_warning",
     "safety_notes": "Không tự đưa người bệnh đi xa nếu cấp cứu có thể tới nhanh hơn.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   },
   {
-    "id": "kb_v1_2_032",
+    "id": "kb_v1_2_038",
     "doc_id": "nhs_stroke_symptoms_doc_001",
     "source_id": "nhs_stroke_symptoms",
     "source_name": "NHS",
@@ -932,6 +1272,10 @@
     "faq_type": "red_flag_general",
     "safety_notes": "Không xem việc triệu chứng biến mất là an toàn hoàn toàn.",
     "review_status": "approved",
-    "use_in_v1": false
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_2",
+    "release_version": "v1_2",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
   }
 ]

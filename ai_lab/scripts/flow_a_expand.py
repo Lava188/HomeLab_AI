@@ -210,6 +210,7 @@ class Paths:
     grounded_sim_path: Path
     grounded_sim_summary_path: Path
     final_report_path: Path
+    patch_report_path: Path
     retriever_version_dir: Path
 
 
@@ -272,13 +273,14 @@ def build_paths() -> Paths:
         kb_diff_report_path=reports_dir / f"kb_diff_{VERSION}.md",
         chunk_stats_path=reports_dir / f"kb_chunk_stats_{VERSION}.csv",
         eval_set_baseline_path=eval_dir / "health_rag_eval_v1_1.json",
-        eval_set_versioned_path=eval_dir / f"health_rag_eval_{VERSION}.json",
-        retrieval_eval_path=reports_dir / f"retrieval_eval_{VERSION}.csv",
-        retrieval_eval_summary_path=reports_dir / f"retrieval_eval_summary_{VERSION}.md",
-        grounded_sim_path=reports_dir / f"final_answer_simulation_{VERSION}.csv",
-        grounded_sim_summary_path=reports_dir / f"final_answer_simulation_{VERSION}.md",
+        eval_set_versioned_path=eval_dir / f"health_rag_eval_{VERSION}_release_candidate.json",
+        retrieval_eval_path=reports_dir / f"retrieval_eval_{VERSION}_fallback.csv",
+        retrieval_eval_summary_path=reports_dir / f"retrieval_eval_summary_{VERSION}_fallback.md",
+        grounded_sim_path=reports_dir / f"final_answer_simulation_{VERSION}_fallback.csv",
+        grounded_sim_summary_path=reports_dir / f"final_answer_simulation_{VERSION}_fallback.md",
         final_report_path=reports_dir / f"flow_a_final_report_{VERSION}.md",
-        retriever_version_dir=retriever_version_dir,
+        patch_report_path=reports_dir / f"flow_a_patch_report_{VERSION}.md",
+        retriever_version_dir=artifacts_dir / f"{RETRIEVER_VERSION}_fallback",
     )
 
 
@@ -710,6 +712,16 @@ def curate_source(source_id: str, normalized_doc: dict[str, Any], next_id: int) 
             safety_notes="Một số chỉ số trong BMP có thể bị ảnh hưởng bởi thuốc hoặc mất nước.",
             test_types=["bmp"],
         )
+        approve(
+            title="BMP thường được dùng để kiểm tra sức khỏe chung và theo dõi chức năng thận",
+            body="BMP thường được chỉ định trong khám sức khỏe, khi cần đánh giá cân bằng dịch và điện giải, hoặc để theo dõi chức năng thận và chuyển hóa. Trong một số trường hợp, người bệnh có thể được yêu cầu nhịn ăn trước khi lấy máu theo hướng dẫn của cơ sở y tế.",
+            excerpt=excerpt_default,
+            tags=["bmp", "test_explainers", "care_pathway"],
+            keywords=["khám sức khỏe", "theo dõi thận", "cân bằng điện giải", "nhịn ăn trước xét nghiệm"],
+            faq_type="test_use",
+            safety_notes="Cần làm theo hướng dẫn chuẩn bị xét nghiệm của cơ sở y tế vì không phải ai cũng cần chuẩn bị giống nhau.",
+            test_types=["bmp"],
+        )
     elif source_id == "medlineplus_cbc_test":
         approve(
             title="CBC là công thức máu toàn bộ để kiểm tra tế bào máu",
@@ -719,6 +731,16 @@ def curate_source(source_id: str, normalized_doc: dict[str, Any], next_id: int) 
             keywords=["CBC", "công thức máu", "hồng cầu", "bạch cầu", "tiểu cầu"],
             faq_type="test_meaning",
             safety_notes="CBC không tự đưa ra chẩn đoán cuối cùng nếu thiếu bối cảnh lâm sàng.",
+            test_types=["cbc"],
+        )
+        approve(
+            title="CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+            body="CBC thường được làm trong khám định kỳ hoặc khi bác sĩ cần tìm thêm nguyên nhân của thiếu máu, nhiễm trùng hay một số rối loạn tế bào máu. Kết quả bất thường không tự khẳng định chẩn đoán mà cần được đọc cùng triệu chứng, bệnh sử và các xét nghiệm khác.",
+            excerpt=excerpt_default,
+            tags=["cbc", "test_explainers", "care_pathway"],
+            keywords=["thiếu máu", "nhiễm trùng", "rối loạn máu", "kết quả bất thường"],
+            faq_type="result_interpretation",
+            safety_notes="Không nên tự kết luận bệnh chỉ dựa vào một chỉ số CBC nằm ngoài khoảng tham chiếu.",
             test_types=["cbc"],
         )
     elif source_id == "medlineplus_crp_test":
@@ -732,6 +754,16 @@ def curate_source(source_id: str, normalized_doc: dict[str, Any], next_id: int) 
             safety_notes="CRP tăng không tự xác định được nguyên nhân cụ thể của viêm.",
             test_types=["crp"],
         )
+        approve(
+            title="CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm",
+            body="Bác sĩ có thể dùng CRP để theo dõi tình trạng viêm hoặc đáp ứng điều trị theo thời gian, vì chỉ số này có thể tăng rồi giảm theo mức độ viêm trong cơ thể. Tuy vậy, CRP không cho biết chính xác viêm nằm ở đâu hay do nguyên nhân nào nếu không có thêm thông tin lâm sàng.",
+            excerpt=excerpt_default,
+            tags=["crp", "test_explainers", "result_boundary"],
+            keywords=["theo dõi điều trị", "đáp ứng điều trị", "không chỉ ra vị trí viêm", "diễn giải CRP"],
+            faq_type="result_interpretation",
+            safety_notes="Kết quả CRP nên được đọc cùng triệu chứng và các xét nghiệm khác, nhất là khi đang nghi nhiễm trùng nặng.",
+            test_types=["crp"],
+        )
     elif source_id == "medlineplus_ddimer_test":
         approve(
             title="D-dimer là xét nghiệm hỗ trợ đánh giá nguy cơ cục máu đông",
@@ -741,6 +773,16 @@ def curate_source(source_id: str, normalized_doc: dict[str, Any], next_id: int) 
             keywords=["D-dimer", "cục máu đông", "huyết khối", "thuyên tắc phổi"],
             faq_type="test_meaning",
             safety_notes="D-dimer tăng không có nghĩa chắc chắn đang có cục máu đông và vẫn cần bác sĩ đánh giá tiếp.",
+            test_types=["d_dimer"],
+        )
+        approve(
+            title="D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+            body="Nếu D-dimer tăng, bác sĩ thường cần kết hợp thêm triệu chứng và các xét nghiệm hình ảnh để xác định có cục máu đông hay không. Ngược lại, kết quả bình thường cũng phải được đọc trong đúng bối cảnh lâm sàng thay vì dùng để tự trấn an khi vẫn còn triệu chứng đáng lo.",
+            excerpt=excerpt_default,
+            tags=["d_dimer", "test_explainers", "result_boundary"],
+            keywords=["kết quả D-dimer", "cần xét nghiệm tiếp", "không tự kết luận", "huyết khối"],
+            faq_type="result_interpretation",
+            safety_notes="Nếu đang có khó thở, đau ngực hoặc sưng đau chân, cần ưu tiên đánh giá y tế thay vì tự diễn giải D-dimer tại nhà.",
             test_types=["d_dimer"],
         )
     elif source_id == "medlineplus_pulse_oximetry_test":
@@ -754,15 +796,35 @@ def curate_source(source_id: str, normalized_doc: dict[str, Any], next_id: int) 
             safety_notes="Kết quả có thể bị ảnh hưởng bởi tuần hoàn kém, sơn móng tay hoặc chuyển động.",
             test_types=["pulse_oximetry"],
         )
+        approve(
+            title="Khi dùng máy đo SpO2 tại nhà, kết quả thấp hoặc có triệu chứng vẫn cần được đánh giá",
+            body="Máy đo SpO2 tại nhà có thể hữu ích khi theo dõi bệnh phổi hoặc khó thở, nhưng kết quả cần được hiểu cùng tình trạng thực tế của người bệnh. Nếu SpO2 xuống thấp hoặc đi kèm tím tái, đau ngực hay khó thở tăng dần, nên liên hệ cơ sở y tế sớm thay vì chỉ lặp lại phép đo nhiều lần.",
+            excerpt=excerpt_default,
+            tags=["pulse_oximetry", "test_explainers", "home_monitoring"],
+            keywords=["máy đo SpO2 tại nhà", "khó thở", "tím tái", "kết quả thấp"],
+            faq_type="urgent_advice",
+            safety_notes="Sơn móng tay, tuần hoàn kém hoặc cử động nhiều có thể làm kết quả sai lệch.",
+            test_types=["pulse_oximetry"],
+        )
     elif source_id == "medlineplus_troponin_test":
         approve(
             title="Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim",
-            body="Xét nghiệm troponin đo nồng độ troponin trong máu để hỗ trợ phát hiện tổn thương cơ tim. Chỉ số này thường được dùng trong đánh giá đau ngực và nghi ngờ nhồi máu cơ tim, nhưng vẫn cần kết hợp với triệu chứng và điện tim.",
+            body="Xét nghiệm troponin đo nồng độ troponin trong máu để hỗ trợ phát hiện tổn thương cơ tim. Xét nghiệm này thường được dùng cùng điện tim và đánh giá lâm sàng khi bác sĩ nghi có tổn thương tim, thay vì tự đứng một mình để kết luận nguyên nhân triệu chứng.",
             excerpt=excerpt_default,
             tags=["troponin", "test_explainers", "cardiac"],
-            keywords=["troponin", "đau ngực", "tổn thương cơ tim", "nhồi máu cơ tim"],
+            keywords=["troponin", "tổn thương cơ tim", "xét nghiệm tim", "điện tim"],
             faq_type="test_meaning",
             safety_notes="Không nên tự giải thích kết quả troponin khi có đau ngực hoặc khó thở đang diễn ra.",
+            test_types=["troponin"],
+        )
+        approve(
+            title="Troponin tăng không phải lúc nào cũng đồng nghĩa nhồi máu cơ tim",
+            body="Troponin tăng cho thấy có tổn thương cơ tim nhưng không phải lúc nào cũng đồng nghĩa với nhồi máu cơ tim, vì một số tình trạng khác cũng có thể làm chỉ số này tăng. Kết quả ban đầu bình thường cũng chưa đủ để loại trừ sớm trong mọi trường hợp, nên bác sĩ có thể cần lặp lại xét nghiệm và kết hợp thêm dữ liệu khác.",
+            excerpt=excerpt_default,
+            tags=["troponin", "test_explainers", "result_boundary"],
+            keywords=["troponin tăng", "không luôn là nhồi máu cơ tim", "lặp lại xét nghiệm", "diễn giải kết quả"],
+            faq_type="result_interpretation",
+            safety_notes="Nếu đang đau ngực, khó thở hoặc chóng mặt, cần ưu tiên đi cấp cứu thay vì chờ tự đọc kết quả xét nghiệm.",
             test_types=["troponin"],
         )
 
@@ -906,6 +968,42 @@ def ensure_relative(path: Path, root: Path) -> str:
     return str(path.relative_to(root)).replace(os.sep, "/")
 
 
+def normalize_repo_relative_path(path_value: str | None, root: Path) -> str | None:
+    if not path_value:
+        return path_value
+    normalized = str(path_value).replace("\\", "/")
+    repo_root = str(root).replace("\\", "/").rstrip("/")
+    if normalized.startswith(repo_root + "/"):
+        return normalized[len(repo_root) + 1 :]
+    marker = "ai_lab/"
+    idx = normalized.lower().find(marker)
+    if idx >= 0:
+        return normalized[idx:]
+    return normalized
+
+
+def decorate_versioned_kb_item(item: dict[str, Any], runtime_enabled: bool) -> dict[str, Any]:
+    cloned = dict(item)
+    content = cloned.get("content")
+    if isinstance(content, str):
+        cloned["content"] = content.replace(
+            "Với chatbot HomeLab, nội dung này chỉ nên dùng để tăng mức độ cảnh báo và hướng người dùng đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
+            "Nội dung này nên được dùng để tăng mức độ cảnh báo và hướng người bệnh đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
+        )
+    safety_notes = cloned.get("safety_notes")
+    if safety_notes == "Chatbot chỉ cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp.":
+        cloned["safety_notes"] = "Nội dung này chỉ nhằm cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp."
+    elif safety_notes == "Chatbot không dùng để xác định nguyên nhân đau ngực.":
+        cloned["safety_notes"] = "Không nên tự xác định nguyên nhân đau ngực nếu chưa được đánh giá y tế."
+    elif safety_notes == "Chatbot không dùng để chẩn đoán nguyên nhân khó thở.":
+        cloned["safety_notes"] = "Không nên tự chẩn đoán nguyên nhân khó thở nếu chưa được đánh giá y tế."
+    cloned["kb_version"] = f"medical_kb_{VERSION}"
+    cloned["release_version"] = VERSION
+    cloned["runtime_enabled"] = runtime_enabled
+    cloned["promotion_status"] = "draft_kb_only"
+    return cloned
+
+
 def run_flow() -> dict[str, Any]:
     paths = build_paths()
     raw_folders = sorted([path for path in paths.raw_dir.iterdir() if path.is_dir()])
@@ -951,14 +1049,26 @@ def run_flow() -> dict[str, Any]:
 
     updated_raw_manifest = raw_manifest + missing_from_manifest
     write_jsonl(paths.raw_manifest_path, updated_raw_manifest)
+    expansion_records = [row for row in updated_raw_manifest if row["source_id"] in NEW_SOURCE_DEFAULTS]
 
     baseline_extract_manifest = read_jsonl(paths.extract_manifest_path)
-    baseline_extract_by_source = {row["source_id"]: row for row in baseline_extract_manifest}
-    extraction_rows: list[dict[str, Any]] = list(baseline_extract_manifest)
+    extract_by_source: dict[str, dict[str, Any]] = {}
+    extract_order: list[str] = []
+    for row in baseline_extract_manifest:
+        normalized_row = {
+            "source_id": row["source_id"],
+            "input_file": normalize_repo_relative_path(row.get("input_file"), paths.repo_root),
+            "output_file": normalize_repo_relative_path(row.get("output_file"), paths.repo_root),
+            "status": row.get("status", "unknown"),
+            "char_count": row.get("char_count", 0),
+        }
+        extract_by_source[row["source_id"]] = normalized_row
+        if row["source_id"] not in extract_order:
+            extract_order.append(row["source_id"])
     extraction_qc_rows: list[dict[str, Any]] = []
     normalized_rows: list[dict[str, Any]] = []
 
-    for row in missing_from_manifest:
+    for row in expansion_records:
         source_id = row["source_id"]
         input_path = paths.repo_root / row["local_path"]
         status = "ok"
@@ -985,13 +1095,14 @@ def run_flow() -> dict[str, Any]:
 
         extraction_entry = {
             "source_id": source_id,
-            "input_file": str(input_path),
-            "output_file": str(output_path) if output_path.exists() else None,
+            "input_file": row["local_path"],
+            "output_file": ensure_relative(output_path, paths.repo_root) if output_path.exists() else None,
             "status": status,
             "char_count": len(content),
         }
-        extraction_rows.append(extraction_entry)
-        baseline_extract_by_source[source_id] = extraction_entry
+        extract_by_source[source_id] = extraction_entry
+        if source_id not in extract_order:
+            extract_order.append(source_id)
         extraction_qc_rows.append(
             {
                 "source_id": source_id,
@@ -1031,6 +1142,7 @@ def run_flow() -> dict[str, Any]:
                 }
             )
 
+    extraction_rows = [extract_by_source[source_id] for source_id in extract_order]
     write_jsonl(paths.extract_manifest_path, extraction_rows)
     write_jsonl(paths.versioned_docs_path, normalized_rows)
     write_csv(
@@ -1103,7 +1215,8 @@ def run_flow() -> dict[str, Any]:
         encoding="utf-8",
     )
 
-    versioned_kb = baseline_kb + new_kb_items
+    versioned_kb = [decorate_versioned_kb_item(item, runtime_enabled=False) for item in baseline_kb]
+    versioned_kb.extend(decorate_versioned_kb_item(item, runtime_enabled=False) for item in new_kb_items)
     write_json(paths.medical_kb_versioned_path, versioned_kb)
 
     baseline_counts = Counter(item["source_id"] for item in baseline_kb)
@@ -1128,304 +1241,10 @@ def run_flow() -> dict[str, Any]:
         encoding="utf-8",
     )
 
-    kb_chunks: list[dict[str, Any]] = []
-    chunk_metadata: list[dict[str, Any]] = []
-    chunk_stats: list[dict[str, Any]] = []
-    for item in versioned_kb:
-        chunk = {
-            "chunk_id": f"{item['id']}_c1",
-            "kb_id": item["id"],
-            "doc_id": item["doc_id"],
-            "source_id": item["source_id"],
-            "source_name": item["source_name"],
-            "source_url": item["source_url"],
-            "section": item["section"],
-            "title": item["title"],
-            "content": item["content"],
-            "chunk_text": build_chunk_text(item),
-            "risk_level": item["risk_level"],
-            "tags": item.get("tags", []),
-            "keywords": item.get("keywords", []),
-            "test_types": item.get("test_types", []),
-            "faq_type": item.get("faq_type", ""),
-            "safety_notes": item.get("safety_notes", ""),
-            "review_status": item.get("review_status", "pending"),
-            "use_in_v1": bool(item.get("use_in_v1", False)),
-            "language": item.get("language", "vi"),
-            "locale": item.get("locale", "vi-VN"),
-        }
-        kb_chunks.append(chunk)
-        chunk_metadata.append(
-            {
-                "chunk_id": chunk["chunk_id"],
-                "kb_id": chunk["kb_id"],
-                "source_id": chunk["source_id"],
-                "source_name": chunk["source_name"],
-                "section": chunk["section"],
-                "title": chunk["title"],
-                "risk_level": chunk["risk_level"],
-                "faq_type": chunk["faq_type"],
-                "use_in_v1": chunk["use_in_v1"],
-            }
-        )
-        chunk_stats.append(
-            {
-                "chunk_id": chunk["chunk_id"],
-                "source_id": chunk["source_id"],
-                "section": chunk["section"],
-                "risk_level": chunk["risk_level"],
-                "title_len": len(chunk["title"]),
-                "content_len": len(chunk["content"]),
-                "chunk_text_len": len(chunk["chunk_text"]),
-                "keyword_count": len(chunk["keywords"]),
-                "tag_count": len(chunk["tags"]),
-            }
-        )
-
-    write_json(paths.retriever_version_dir / f"kb_chunks_{VERSION}.json", kb_chunks)
-    write_json(paths.retriever_version_dir / "chunk_metadata.json", chunk_metadata)
-    write_csv(
-        paths.chunk_stats_path,
-        chunk_stats,
-        [
-            "chunk_id",
-            "source_id",
-            "section",
-            "risk_level",
-            "title_len",
-            "content_len",
-            "chunk_text_len",
-            "keyword_count",
-            "tag_count",
-        ],
-    )
-
-    vocab = build_vocab([chunk["chunk_text"] for chunk in kb_chunks])
-    vocab_index = {token: idx for idx, token in enumerate(vocab)}
-    chunk_vectors = [vectorize(chunk["chunk_text"], vocab_index) for chunk in kb_chunks]
-    embeddings_payload = [
-        {"chunk_id": chunk["chunk_id"], "vector": vector}
-        for chunk, vector in zip(kb_chunks, chunk_vectors)
-    ]
-    write_json(paths.retriever_version_dir / "chunk_embeddings.json", embeddings_payload)
-    write_json(
-        paths.retriever_version_dir / "embedding_config.json",
-        {
-            "model_name": "lexical_tfidf_fallback",
-            "embedding_dimension": len(vocab),
-            "normalized": True,
-            "index_type": "python_dot_product",
-            "text_field": "chunk_text",
-            "passage_prefix": "",
-            "query_prefix": "",
-            "notes": "Dependency-light fallback used because the notebook FAISS / sentence-transformers stack is unavailable in this environment.",
-        },
-    )
-    write_json(
-        paths.retriever_version_dir / "faiss.index",
-        {
-            "index_type": "python_dot_product",
-            "chunk_count": len(kb_chunks),
-            "version": VERSION,
-        },
-    )
-    write_json(
-        paths.retriever_version_dir / "retriever_manifest.json",
-        {
-            "retriever_version": VERSION,
-            "kb_file": f"kb_chunks_{VERSION}.json",
-            "metadata_file": "chunk_metadata.json",
-            "embeddings_file": "chunk_embeddings.json",
-            "faiss_index_file": "faiss.index",
-            "embedding_config_file": "embedding_config.json",
-            "chunk_count": len(kb_chunks),
-            "model_name": "lexical_tfidf_fallback",
-            "top_k_default": 3,
-            "build_mode": "fallback_no_external_dependencies",
-        },
-    )
-
     baseline_eval = load_baseline_eval(paths)
     new_eval_items = collect_new_eval_items(new_kb_items)
     combined_eval = baseline_eval + new_eval_items
     write_json(paths.eval_set_versioned_path, combined_eval)
-
-    def search(query: str, top_k: int = 3) -> list[dict[str, Any]]:
-        q_vector = vectorize(query, vocab_index)
-        scored = []
-        for chunk, vector in zip(kb_chunks, chunk_vectors):
-            scored.append((dot(q_vector, vector), chunk))
-        scored.sort(key=lambda item: item[0], reverse=True)
-        rows = []
-        for rank, (score, chunk) in enumerate(scored[:top_k], start=1):
-            rows.append(
-                {
-                    "rank": rank,
-                    "score": round(float(score), 6),
-                    "chunk_id": chunk["chunk_id"],
-                    "source_id": chunk["source_id"],
-                    "section": chunk["section"],
-                    "title": chunk["title"],
-                    "faq_type": chunk.get("faq_type", ""),
-                    "content": chunk["content"],
-                }
-            )
-        return rows
-
-    eval_rows: list[dict[str, Any]] = []
-    new_eval_row_count = 0
-    for sample in combined_eval:
-        results = search(sample["query"], top_k=3)
-        top1 = results[0] if results else None
-        top3_chunk_ids = [row["chunk_id"] for row in results]
-        expected_chunk_ids = set(sample["expected_chunk_ids"])
-        acceptable_sources = set(sample.get("acceptable_source_ids", [sample["expected_source_id"]]))
-        acceptable_sections = set(sample.get("acceptable_sections", [sample["expected_section"]]))
-        hit_at_1 = int(bool(top1 and top1["chunk_id"] in expected_chunk_ids))
-        hit_at_3 = int(any(chunk_id in expected_chunk_ids for chunk_id in top3_chunk_ids))
-        source_at_1 = int(bool(top1 and top1["source_id"] in acceptable_sources))
-        section_at_1 = int(bool(top1 and top1["section"] in acceptable_sections))
-        is_new_topic = any(chunk_id.startswith(f"kb_{VERSION}_") for chunk_id in expected_chunk_ids)
-        if is_new_topic:
-            new_eval_row_count += 1
-        eval_rows.append(
-            {
-                "query": sample["query"],
-                "expected_chunk_ids": ",".join(sample["expected_chunk_ids"]),
-                "expected_source_id": sample["expected_source_id"],
-                "expected_section": sample["expected_section"],
-                "top1_chunk_id": top1["chunk_id"] if top1 else "",
-                "top1_source_id": top1["source_id"] if top1 else "",
-                "top1_section": top1["section"] if top1 else "",
-                "top1_score": top1["score"] if top1 else "",
-                "top3_chunk_ids": ",".join(top3_chunk_ids),
-                "hit_at_1": hit_at_1,
-                "hit_at_3": hit_at_3,
-                "source_at_1": source_at_1,
-                "section_at_1": section_at_1,
-                "topic_group": "new" if is_new_topic else "baseline",
-            }
-        )
-
-    write_csv(
-        paths.retrieval_eval_path,
-        eval_rows,
-        [
-            "query",
-            "expected_chunk_ids",
-            "expected_source_id",
-            "expected_section",
-            "top1_chunk_id",
-            "top1_source_id",
-            "top1_section",
-            "top1_score",
-            "top3_chunk_ids",
-            "hit_at_1",
-            "hit_at_3",
-            "source_at_1",
-            "section_at_1",
-            "topic_group",
-        ],
-    )
-    baseline_eval_rows = [row for row in eval_rows if row["topic_group"] == "baseline"]
-    new_eval_rows = [row for row in eval_rows if row["topic_group"] == "new"]
-
-    def mean(rows: list[dict[str, Any]], key: str) -> float:
-        return round(sum(float(row[key]) for row in rows) / len(rows), 4) if rows else 0.0
-
-    retrieval_summary_lines = [
-        f"# Retrieval Eval Summary {VERSION}",
-        "",
-        f"- Total eval rows: {len(eval_rows)}",
-        f"- Baseline carry-over rows: {len(baseline_eval_rows)}",
-        f"- New topic rows: {len(new_eval_rows)}",
-        f"- Recall@1 overall: {mean(eval_rows, 'hit_at_1')}",
-        f"- Recall@3 overall: {mean(eval_rows, 'hit_at_3')}",
-        f"- Recall@1 baseline subset: {mean(baseline_eval_rows, 'hit_at_1')}",
-        f"- Recall@3 baseline subset: {mean(baseline_eval_rows, 'hit_at_3')}",
-        f"- Recall@1 new subset: {mean(new_eval_rows, 'hit_at_1')}",
-        f"- Recall@3 new subset: {mean(new_eval_rows, 'hit_at_3')}",
-        "",
-        "## Notes",
-        "- This run uses a lexical fallback retriever because the notebook embedding stack is unavailable in the current environment.",
-        "- Metrics are comparable inside this fallback run, but not equivalent to the frozen sentence-transformers + FAISS baseline.",
-        "",
-    ]
-    paths.retrieval_eval_summary_path.write_text("\n".join(retrieval_summary_lines), encoding="utf-8")
-
-    sim_queries = [
-        {"query": "xét nghiệm troponin dùng để làm gì", "expected_mode": "informational_test"},
-        {"query": "cbc là xét nghiệm gì", "expected_mode": "informational_test"},
-        {"query": "crp có ý nghĩa gì", "expected_mode": "informational_test"},
-        {"query": "phản vệ có cần gọi cấp cứu ngay không", "expected_mode": "mixed_emergency"},
-        {"query": "dấu hiệu fast của đột quỵ là gì", "expected_mode": "mixed_emergency"},
-        {"query": "đau đầu dữ dội đột ngột có nguy hiểm không", "expected_mode": "emergency_or_urgent"},
-        {"query": "đau bụng dữ dội kèm phân đen thì sao", "expected_mode": "mixed_emergency"},
-        {"query": "ngất kèm đau ngực có cần cấp cứu không", "expected_mode": "mixed_emergency"},
-    ]
-    grounded_rows: list[dict[str, Any]] = []
-    for sample in sim_queries:
-        results = search(sample["query"], top_k=3)
-        top1 = results[0] if results else None
-        primary_mode, urgency_level = classify_primary_mode(top1, results)
-        overlap_flag = "mixed" if len({item["source_id"] for item in results[:3] if item["section"] == "red_flags"}) >= 2 else "single"
-        if primary_mode == "informational_test" and top1:
-            answer = top1["content"]
-            predicted_mode = "informational_test"
-        elif primary_mode == "safety_response" and urgency_level == "emergency":
-            answer = "Các dấu hiệu phù hợp với tình huống khẩn cấp. Bạn nên gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay thay vì tự theo dõi tại nhà."
-            predicted_mode = "mixed_emergency" if overlap_flag == "mixed" else "emergency_or_urgent"
-        elif primary_mode == "safety_response":
-            answer = "Bạn nên được đánh giá y tế sớm và không nên tự chẩn đoán tại nhà."
-            predicted_mode = "emergency_or_urgent"
-        else:
-            answer = "Mình chưa đủ chắc chắn để trả lời trong giới hạn dữ liệu hiện có."
-            predicted_mode = "fallback"
-        grounded_rows.append(
-            {
-                "query": sample["query"],
-                "expected_mode": sample["expected_mode"],
-                "predicted_mode_legacy": predicted_mode,
-                "mode_match": int(predicted_mode == sample["expected_mode"]),
-                "primary_mode": primary_mode,
-                "urgency_level": urgency_level,
-                "overlap_flag": overlap_flag,
-                "top1_source": top1["source_id"] if top1 else "",
-                "top1_title": top1["title"] if top1 else "",
-                "top3_sources": " | ".join(row["source_id"] for row in results),
-                "answer": answer,
-            }
-        )
-    write_csv(
-        paths.grounded_sim_path,
-        grounded_rows,
-        [
-            "query",
-            "expected_mode",
-            "predicted_mode_legacy",
-            "mode_match",
-            "primary_mode",
-            "urgency_level",
-            "overlap_flag",
-            "top1_source",
-            "top1_title",
-            "top3_sources",
-            "answer",
-        ],
-    )
-    paths.grounded_sim_summary_path.write_text(
-        "\n".join(
-            [
-                f"# Grounded Simulation Summary {VERSION}",
-                "",
-                f"- Total queries: {len(grounded_rows)}",
-                f"- Mode accuracy: {mean(grounded_rows, 'mode_match')}",
-                "- Uses the same section-driven answer shape as the baseline notebooks, with conservative emergency wording for red-flag retrievals.",
-                "",
-            ]
-        ),
-        encoding="utf-8",
-    )
 
     audit_lines = [
         f"# Flow A Audit {VERSION}",
@@ -1456,6 +1275,11 @@ def run_flow() -> dict[str, Any]:
         "## Duplicate Candidates",
         *([f"- {note}" for note in duplicate_notes] if duplicate_notes else ["- none"]),
         "",
+        "## Hybrid Strategy State",
+        "- Data and KB draft artifacts are ready under the versioned v1_2 outputs.",
+        "- Official chunking / embeddings / FAISS / retrieval-eval / grounded-simulation are still pending the notebook route.",
+        "- Any fallback-only review artifacts must stay quarantined and non-comparable to the frozen baseline.",
+        "",
     ]
     paths.audit_note_path.write_text("\n".join(audit_lines), encoding="utf-8")
 
@@ -1476,18 +1300,8 @@ def run_flow() -> dict[str, Any]:
         f"- {ensure_relative(paths.curated_blocks_path, paths.repo_root)}",
         f"- {ensure_relative(paths.medical_kb_versioned_path, paths.repo_root)}",
         f"- {ensure_relative(paths.kb_diff_report_path, paths.repo_root)}",
-        f"- {ensure_relative(paths.chunk_stats_path, paths.repo_root)}",
         f"- {ensure_relative(paths.eval_set_versioned_path, paths.repo_root)}",
-        f"- {ensure_relative(paths.retrieval_eval_path, paths.repo_root)}",
-        f"- {ensure_relative(paths.retrieval_eval_summary_path, paths.repo_root)}",
-        f"- {ensure_relative(paths.grounded_sim_path, paths.repo_root)}",
-        f"- {ensure_relative(paths.grounded_sim_summary_path, paths.repo_root)}",
-        f"- {ensure_relative(paths.retriever_version_dir / f'kb_chunks_{VERSION}.json', paths.repo_root)}",
-        f"- {ensure_relative(paths.retriever_version_dir / 'chunk_metadata.json', paths.repo_root)}",
-        f"- {ensure_relative(paths.retriever_version_dir / 'chunk_embeddings.json', paths.repo_root)}",
-        f"- {ensure_relative(paths.retriever_version_dir / 'embedding_config.json', paths.repo_root)}",
-        f"- {ensure_relative(paths.retriever_version_dir / 'faiss.index', paths.repo_root)}",
-        f"- {ensure_relative(paths.retriever_version_dir / 'retriever_manifest.json', paths.repo_root)}",
+        f"- {ensure_relative(paths.patch_report_path, paths.repo_root)}",
         "",
         "## Ingested Sources",
         *[f"- {source_id}: {count} approved KB item(s)" for source_id, count in sorted(new_counts.items())],
@@ -1499,20 +1313,52 @@ def run_flow() -> dict[str, Any]:
             if row["decision"] in {"holdout", "reject"}
         ],
         "",
-        "## Sanity Check",
+        "## KB-Ready State",
         f"- Expanded KB items: {len(versioned_kb)}",
         f"- New approved KB items: {len(new_kb_items)}",
-        f"- Retriever chunk count: {len(kb_chunks)}",
-        f"- Retrieval eval rows: {len(eval_rows)}",
-        f"- Grounded simulation rows: {len(grounded_rows)}",
+        f"- Release-candidate eval rows prepared: {len(combined_eval)}",
+        "- Baseline v1 KB and retriever remain untouched.",
+        "",
+        "## Official Notebook Run Still Pending",
+        "- Notebook 04 should build `kb_chunks_v1_2.json` into a real `artifacts/retriever_v1_2/` folder.",
+        "- Notebook 05 should build embeddings and a real FAISS index only after the dependency stack is available.",
+        "- Notebook 06 should generate the official comparable retrieval eval for v1_2.",
+        "- Notebook 08 should generate the official grounded response simulation for v1_2.",
         "",
         "## Manual Review Needed",
-        "- Promote the versioned retriever only after rebuilding with the true sentence-transformers + FAISS stack in an environment that has the notebook dependencies installed.",
         "- Re-check source wording for high-risk emergency content before runtime promotion.",
         "- Decide whether MedlinePlus blood testing overview should stay held out or be merged later as a secondary anchor source.",
+        "- Keep script-generated fallback review outputs quarantined from official release artifacts.",
         "",
     ]
     paths.final_report_path.write_text("\n".join(final_lines), encoding="utf-8")
+    paths.patch_report_path.write_text(
+        "\n".join(
+            [
+                f"# Flow A Patch Report {VERSION}",
+                "",
+                "## Clean Hybrid State",
+                "- `flow_a_expand.py` now stops at data / KB expansion outputs.",
+                "- `medical_kb_v1_2.json` is explicitly marked as a draft KB version and not runtime-enabled.",
+                "- `health_rag_eval_v1_2_release_candidate.json` is prepared for the future official notebook eval run.",
+                "- Official retriever / eval / grounded simulation remain pending notebook execution.",
+                "",
+                "## Current Safe Outputs",
+                f"- {ensure_relative(paths.medical_kb_versioned_path, paths.repo_root)}",
+                f"- {ensure_relative(paths.versioned_docs_path, paths.repo_root)}",
+                f"- {ensure_relative(paths.eval_set_versioned_path, paths.repo_root)}",
+                f"- {ensure_relative(paths.curated_blocks_path, paths.repo_root)}",
+                "",
+                "## Pending Official Notebook Route",
+                "- Notebook 04: build versioned chunks into `ai_lab/artifacts/retriever_v1_2/`.",
+                "- Notebook 05: build embeddings and FAISS with the real dependency stack.",
+                "- Notebook 06: run official retrieval evaluation against the versioned retriever.",
+                "- Notebook 08: run official grounded response simulation against the versioned retriever.",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
 
     return {
         "paths": paths,
@@ -1520,8 +1366,7 @@ def run_flow() -> dict[str, Any]:
         "new_kb_items": new_kb_items,
         "review_rows": review_rows,
         "versioned_kb_count": len(versioned_kb),
-        "eval_rows": eval_rows,
-        "grounded_rows": grounded_rows,
+        "release_candidate_eval_count": len(combined_eval),
     }
 
 
@@ -1535,8 +1380,7 @@ def main() -> int:
             "new_manifest_entries": len(result["missing_from_manifest"]),
             "new_kb_items": len(result["new_kb_items"]),
             "versioned_kb_count": result["versioned_kb_count"],
-            "eval_rows": len(result["eval_rows"]),
-            "grounded_rows": len(result["grounded_rows"]),
+            "release_candidate_eval_rows": result["release_candidate_eval_count"],
         },
         ensure_ascii=False,
         indent=2,

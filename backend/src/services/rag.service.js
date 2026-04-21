@@ -30,7 +30,7 @@ async function answerHealthQuery({ message, sessionId }) {
                 booking: null,
                 meta: {
                     answeredBy: "rag.service",
-                    retrievalMode: "artifact_json_top3_v1",
+                    retrievalMode: "artifact_json_top3_versioned",
                     found: false,
                     grounded: false,
                     primaryMode: policyDecision.primaryMode,
@@ -63,7 +63,7 @@ async function answerHealthQuery({ message, sessionId }) {
             booking: null,
             meta: {
                 answeredBy: "rag.service",
-                retrievalMode: "artifact_json_top3_v1",
+                retrievalMode: "artifact_json_top3_versioned",
                 found: true,
                 grounded: true,
                 primaryMode: policyDecision.primaryMode,
@@ -108,11 +108,11 @@ async function answerHealthQuery({ message, sessionId }) {
             flow: FLOWS.HEALTH_RAG,
             action: ACTIONS.ANSWER_HEALTH_QUERY,
             reply:
-                "He thong chua doc duoc health_rag baseline de tra loi cau hoi nay. Ban thu lai sau khi kiem tra artifact trong ai_lab.",
+                "He thong chua doc duoc health_rag artifact hien tai de tra loi cau hoi nay. Ban thu lai sau khi kiem tra artifact trong ai_lab.",
             booking: null,
             meta: {
                 answeredBy: "rag.service",
-                retrievalMode: "artifact_json_top3_v1",
+                retrievalMode: "artifact_json_top3_versioned",
                 found: false,
                 grounded: false,
                 error: error.message

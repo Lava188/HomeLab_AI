@@ -48,7 +48,67 @@ const SOURCE_HINTS = [
             "lu lan",
             "ban khong mat mau"
         ]
+    },
+    {
+        sourceId: "medlineplus_blood_culture_test",
+        keywords: ["cay mau", "vi khuan trong mau", "nam trong mau", "nhiem trung"]
+    },
+    {
+        sourceId: "medlineplus_bmp_test",
+        keywords: ["bmp", "dien giai", "duong huyet", "chuc nang than"]
+    },
+    {
+        sourceId: "medlineplus_cbc_test",
+        keywords: ["cbc", "cong thuc mau", "hong cau", "bach cau", "tieu cau"]
+    },
+    {
+        sourceId: "medlineplus_crp_test",
+        keywords: ["crp", "viem", "protein phan ung c", "dap ung dieu tri"]
+    },
+    {
+        sourceId: "medlineplus_ddimer_test",
+        keywords: ["d-dimer", "huyet khoi", "thuyen tac phoi", "cuc mau dong"]
+    },
+    {
+        sourceId: "medlineplus_pulse_oximetry_test",
+        keywords: ["spo2", "pulse ox", "pulse oximetry", "oxy mau", "tim tai"]
+    },
+    {
+        sourceId: "medlineplus_troponin_test",
+        keywords: ["troponin", "ton thuong co tim", "xet nghiem tim", "dien tim"]
+    },
+    {
+        sourceId: "nhs_headaches",
+        keywords: ["dau dau", "co cung", "noi kho", "yeu liet", "co giat"]
+    },
+    {
+        sourceId: "nhs_stomach_ache",
+        keywords: ["dau bung", "phan den", "non ra mau", "dau bung du doi"]
+    },
+    {
+        sourceId: "nhs_fainting_adults",
+        keywords: ["ngat", "choang vang", "tim dap bat thuong", "chan thuong dau"]
+    },
+    {
+        sourceId: "nhs_anaphylaxis",
+        keywords: ["phan ve", "di ung nang", "sung moi", "sung luoi", "adrenaline"]
+    },
+    {
+        sourceId: "nhs_stroke_symptoms",
+        keywords: ["dot quy", "fast", "meo mieng", "noi kho", "yeu tay chan"]
     }
+];
+
+const TEST_QUERY_HINTS = [
+    "xet nghiem",
+    "troponin",
+    "d-dimer",
+    "spo2",
+    "pulse ox",
+    "bmp",
+    "cbc",
+    "crp",
+    "cay mau"
 ];
 
 function toArray(value) {
@@ -135,6 +195,13 @@ function scoreChunk(chunk, normalizedMessage, queryTokens) {
         ["xet nghiem", "nhin an", "duong huyet", "mo mau", "ket qua"].some((keyword) =>
             normalizedMessage.includes(keyword)
         )
+    ) {
+        score += 4;
+    }
+
+    if (
+        chunk.section === "test_explainers" &&
+        TEST_QUERY_HINTS.some((keyword) => normalizedMessage.includes(keyword))
     ) {
         score += 4;
     }

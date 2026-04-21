@@ -70,7 +70,29 @@ function detectFlow(message) {
         "nhiem trung",
         "sepsis",
         "sot cao",
-        "xau di nhanh"
+        "xau di nhanh",
+        "dau dau",
+        "co cung",
+        "dau bung",
+        "phan den",
+        "non ra mau",
+        "ngat",
+        "choang vang",
+        "phan ve",
+        "di ung nang",
+        "dot quy",
+        "fast",
+        "meo mieng",
+        "noi kho",
+        "yeu liet",
+        "troponin",
+        "d-dimer",
+        "spo2",
+        "pulse ox",
+        "cbc",
+        "crp",
+        "bmp",
+        "cay mau"
     ];
 
     if (hasAnyKeyword(normalizedMessage, rescheduleKeywords)) {

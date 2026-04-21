@@ -1,33 +1,70 @@
 const fs = require("fs");
 const path = require("path");
 
-const ARTIFACT_BASE_PATH = path.join(
+const AI_LAB_ARTIFACTS_ROOT = path.join(
     __dirname,
-    "../../../../ai_lab/artifacts/retriever_v1"
+    "../../../../ai_lab/artifacts"
 );
+const DEFAULT_HEALTH_RAG_VERSION = process.env.HOMELAB_HEALTH_RAG_VERSION || "v1_2";
 
-let artifactCache = null;
+const artifactCache = new Map();
 
 function readJsonFile(filePath) {
     return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }
 
-function loadArtifacts() {
-    if (artifactCache) {
-        return artifactCache;
-    }
+function resolveArtifactLayout(version) {
+    const artifactBasePath = path.join(
+        AI_LAB_ARTIFACTS_ROOT,
+        `retriever_${version}`
+    );
+    const manifestPath = path.join(artifactBasePath, "retriever_manifest.json");
 
-    const manifestPath = path.join(ARTIFACT_BASE_PATH, "retriever_manifest.json");
-    const chunksPath = path.join(ARTIFACT_BASE_PATH, "kb_chunks_v1.json");
-    const metadataPath = path.join(ARTIFACT_BASE_PATH, "chunk_metadata.json");
-
-    if (!fs.existsSync(manifestPath) || !fs.existsSync(chunksPath)) {
+    if (!fs.existsSync(manifestPath)) {
         throw new Error(
-            `health_rag artifacts not found under: ${ARTIFACT_BASE_PATH}`
+            `health_rag manifest not found for version '${version}' under: ${artifactBasePath}`
         );
     }
 
     const manifest = readJsonFile(manifestPath);
+    const chunksPath = path.join(
+        artifactBasePath,
+        manifest.kb_file || `kb_chunks_${version}.json`
+    );
+    const metadataPath = path.join(
+        artifactBasePath,
+        manifest.metadata_file || "chunk_metadata.json"
+    );
+
+    if (!fs.existsSync(chunksPath)) {
+        throw new Error(
+            `health_rag chunk file not found for version '${version}' under: ${chunksPath}`
+        );
+    }
+
+    return {
+        version,
+        artifactBasePath,
+        manifest,
+        chunksPath,
+        metadataPath
+    };
+}
+
+function loadArtifacts(options = {}) {
+    const version = options.version || DEFAULT_HEALTH_RAG_VERSION;
+
+    if (artifactCache.has(version)) {
+        return artifactCache.get(version);
+    }
+
+    const {
+        artifactBasePath,
+        manifest,
+        chunksPath,
+        metadataPath
+    } = resolveArtifactLayout(version);
+
     const chunks = readJsonFile(chunksPath);
     const metadata = fs.existsSync(metadataPath) ? readJsonFile(metadataPath) : [];
 
@@ -36,14 +73,16 @@ function loadArtifacts() {
         return accumulator;
     }, {});
 
-    artifactCache = {
-        basePath: ARTIFACT_BASE_PATH,
+    const loadedArtifacts = {
+        basePath: artifactBasePath,
+        requestedVersion: version,
         manifest,
         chunks,
         metadataByChunkId
     };
 
-    return artifactCache;
+    artifactCache.set(version, loadedArtifacts);
+    return loadedArtifacts;
 }
 
 module.exports = {
