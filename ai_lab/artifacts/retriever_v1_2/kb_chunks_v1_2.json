@@ -100,8 +100,8 @@
     "source_url": "https://www.nice.org.uk/guidance/ng253",
     "section": "red_flags",
     "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
-    "content": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển đến cơ sở cấp cứu ngay bằng phương thức phù hợp. Với chatbot HomeLab, nội dung này chỉ nên dùng để tăng mức độ cảnh báo và hướng người dùng đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
-    "chunk_text": "Tiêu đề: Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: nguy cơ cao, nhiễm trùng nặng, chuyển cấp cứu\nNhãn: sepsis, red_flags, emergency_transfer\nLoại FAQ: emergency_warning\nLưu ý an toàn: Chatbot chỉ cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp.\nNội dung: Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển đến cơ sở cấp cứu ngay bằng phương thức phù hợp. Với chatbot HomeLab, nội dung này chỉ nên dùng để tăng mức độ cảnh báo và hướng người dùng đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
+    "content": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển đến cơ sở cấp cứu ngay bằng phương thức phù hợp. Nội dung này nên được dùng để tăng mức độ cảnh báo và hướng người bệnh đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
+    "chunk_text": "Tiêu đề: Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: nguy cơ cao, nhiễm trùng nặng, chuyển cấp cứu\nNhãn: sepsis, red_flags, emergency_transfer\nLoại FAQ: emergency_warning\nLưu ý an toàn: Nội dung này chỉ nhằm cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp.\nNội dung: Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển đến cơ sở cấp cứu ngay bằng phương thức phù hợp. Nội dung này nên được dùng để tăng mức độ cảnh báo và hướng người bệnh đi cấp cứu sớm khi có dấu hiệu nghiêm trọng.",
     "risk_level": "high",
     "tags": [
       "sepsis",
@@ -115,7 +115,7 @@
     ],
     "test_types": [],
     "faq_type": "emergency_warning",
-    "safety_notes": "Chatbot chỉ cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp.",
+    "safety_notes": "Nội dung này chỉ nhằm cảnh báo và định hướng đi cấp cứu, không thay thế đánh giá y tế trực tiếp.",
     "review_status": "approved",
     "use_in_v1": true,
     "language": "vi",
@@ -331,7 +331,7 @@
     "section": "red_flags",
     "title": "Đau ngực có thể do nhiều nguyên nhân và không nên tự chẩn đoán",
     "content": "Đau ngực có thể liên quan đến nhiều nguyên nhân khác nhau, từ vấn đề cơ xương, khó tiêu, nhiễm trùng đến bệnh tim. Vì triệu chứng có thể chồng lấp, người dùng không nên tự chẩn đoán nguyên nhân chỉ dựa vào cảm giác chủ quan.",
-    "chunk_text": "Tiêu đề: Đau ngực có thể do nhiều nguyên nhân và không nên tự chẩn đoán\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: nguyên nhân đau ngực, không tự chẩn đoán đau ngực\nNhãn: chest_pain, red_flags\nLoại FAQ: safety_boundary\nLưu ý an toàn: Chatbot không dùng để xác định nguyên nhân đau ngực.\nNội dung: Đau ngực có thể liên quan đến nhiều nguyên nhân khác nhau, từ vấn đề cơ xương, khó tiêu, nhiễm trùng đến bệnh tim. Vì triệu chứng có thể chồng lấp, người dùng không nên tự chẩn đoán nguyên nhân chỉ dựa vào cảm giác chủ quan.",
+    "chunk_text": "Tiêu đề: Đau ngực có thể do nhiều nguyên nhân và không nên tự chẩn đoán\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: nguyên nhân đau ngực, không tự chẩn đoán đau ngực\nNhãn: chest_pain, red_flags\nLoại FAQ: safety_boundary\nLưu ý an toàn: Không nên tự xác định nguyên nhân đau ngực nếu chưa được đánh giá y tế.\nNội dung: Đau ngực có thể liên quan đến nhiều nguyên nhân khác nhau, từ vấn đề cơ xương, khó tiêu, nhiễm trùng đến bệnh tim. Vì triệu chứng có thể chồng lấp, người dùng không nên tự chẩn đoán nguyên nhân chỉ dựa vào cảm giác chủ quan.",
     "risk_level": "high",
     "tags": [
       "chest_pain",
@@ -343,7 +343,7 @@
     ],
     "test_types": [],
     "faq_type": "safety_boundary",
-    "safety_notes": "Chatbot không dùng để xác định nguyên nhân đau ngực.",
+    "safety_notes": "Không nên tự xác định nguyên nhân đau ngực nếu chưa được đánh giá y tế.",
     "review_status": "approved",
     "use_in_v1": true,
     "language": "vi",
@@ -418,7 +418,7 @@
     "section": "red_flags",
     "title": "Không nên tự chẩn đoán nguyên nhân khó thở",
     "content": "Khó thở có thể liên quan đến nhiều nguyên nhân khác nhau như hen, nhiễm trùng ngực, lo âu, bệnh phổi hoặc bệnh tim. Vì vậy, người dùng không nên tự xác định nguyên nhân nếu chưa được đánh giá y tế.",
-    "chunk_text": "Tiêu đề: Không nên tự chẩn đoán nguyên nhân khó thở\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: nguyên nhân khó thở, không tự chẩn đoán khó thở\nNhãn: shortness_of_breath, safety_boundary\nLoại FAQ: safety_boundary\nLưu ý an toàn: Chatbot không dùng để chẩn đoán nguyên nhân khó thở.\nNội dung: Khó thở có thể liên quan đến nhiều nguyên nhân khác nhau như hen, nhiễm trùng ngực, lo âu, bệnh phổi hoặc bệnh tim. Vì vậy, người dùng không nên tự xác định nguyên nhân nếu chưa được đánh giá y tế.",
+    "chunk_text": "Tiêu đề: Không nên tự chẩn đoán nguyên nhân khó thở\nMục: red_flags\nMức độ rủi ro: high\nTừ khóa: nguyên nhân khó thở, không tự chẩn đoán khó thở\nNhãn: shortness_of_breath, safety_boundary\nLoại FAQ: safety_boundary\nLưu ý an toàn: Không nên tự chẩn đoán nguyên nhân khó thở nếu chưa được đánh giá y tế.\nNội dung: Khó thở có thể liên quan đến nhiều nguyên nhân khác nhau như hen, nhiễm trùng ngực, lo âu, bệnh phổi hoặc bệnh tim. Vì vậy, người dùng không nên tự xác định nguyên nhân nếu chưa được đánh giá y tế.",
     "risk_level": "high",
     "tags": [
       "shortness_of_breath",
@@ -430,7 +430,7 @@
     ],
     "test_types": [],
     "faq_type": "safety_boundary",
-    "safety_notes": "Chatbot không dùng để chẩn đoán nguyên nhân khó thở.",
+    "safety_notes": "Không nên tự chẩn đoán nguyên nhân khó thở nếu chưa được đánh giá y tế.",
     "review_status": "approved",
     "use_in_v1": true,
     "language": "vi",
@@ -503,6 +503,39 @@
   {
     "chunk_id": "kb_v1_2_018_c1",
     "kb_id": "kb_v1_2_018",
+    "doc_id": "medlineplus_bmp_test_doc_001",
+    "source_id": "medlineplus_bmp_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/basic-metabolic-panel-bmp/",
+    "section": "test_explainers",
+    "title": "BMP thường được dùng để kiểm tra sức khỏe chung và theo dõi chức năng thận",
+    "content": "BMP thường được chỉ định trong khám sức khỏe, khi cần đánh giá cân bằng dịch và điện giải, hoặc để theo dõi chức năng thận và chuyển hóa. Trong một số trường hợp, người bệnh có thể được yêu cầu nhịn ăn trước khi lấy máu theo hướng dẫn của cơ sở y tế.",
+    "chunk_text": "Tiêu đề: BMP thường được dùng để kiểm tra sức khỏe chung và theo dõi chức năng thận\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: khám sức khỏe, theo dõi thận, cân bằng điện giải, nhịn ăn trước xét nghiệm\nNhãn: bmp, test_explainers, care_pathway\nLoại xét nghiệm: bmp\nLoại FAQ: test_use\nLưu ý an toàn: Cần làm theo hướng dẫn chuẩn bị xét nghiệm của cơ sở y tế vì không phải ai cũng cần chuẩn bị giống nhau.\nNội dung: BMP thường được chỉ định trong khám sức khỏe, khi cần đánh giá cân bằng dịch và điện giải, hoặc để theo dõi chức năng thận và chuyển hóa. Trong một số trường hợp, người bệnh có thể được yêu cầu nhịn ăn trước khi lấy máu theo hướng dẫn của cơ sở y tế.",
+    "risk_level": "medium",
+    "tags": [
+      "bmp",
+      "test_explainers",
+      "care_pathway"
+    ],
+    "keywords": [
+      "khám sức khỏe",
+      "theo dõi thận",
+      "cân bằng điện giải",
+      "nhịn ăn trước xét nghiệm"
+    ],
+    "test_types": [
+      "bmp"
+    ],
+    "faq_type": "test_use",
+    "safety_notes": "Cần làm theo hướng dẫn chuẩn bị xét nghiệm của cơ sở y tế vì không phải ai cũng cần chuẩn bị giống nhau.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_019_c1",
+    "kb_id": "kb_v1_2_019",
     "doc_id": "medlineplus_cbc_test_doc_001",
     "source_id": "medlineplus_cbc_test",
     "source_name": "MedlinePlus",
@@ -534,8 +567,41 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_019_c1",
-    "kb_id": "kb_v1_2_019",
+    "chunk_id": "kb_v1_2_020_c1",
+    "kb_id": "kb_v1_2_020",
+    "doc_id": "medlineplus_cbc_test_doc_001",
+    "source_id": "medlineplus_cbc_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/complete-blood-count-cbc/",
+    "section": "test_explainers",
+    "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+    "content": "CBC thường được làm trong khám định kỳ hoặc khi bác sĩ cần tìm thêm nguyên nhân của thiếu máu, nhiễm trùng hay một số rối loạn tế bào máu. Kết quả bất thường không tự khẳng định chẩn đoán mà cần được đọc cùng triệu chứng, bệnh sử và các xét nghiệm khác.",
+    "chunk_text": "Tiêu đề: CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: thiếu máu, nhiễm trùng, rối loạn máu, kết quả bất thường\nNhãn: cbc, test_explainers, care_pathway\nLoại xét nghiệm: cbc\nLoại FAQ: result_interpretation\nLưu ý an toàn: Không nên tự kết luận bệnh chỉ dựa vào một chỉ số CBC nằm ngoài khoảng tham chiếu.\nNội dung: CBC thường được làm trong khám định kỳ hoặc khi bác sĩ cần tìm thêm nguyên nhân của thiếu máu, nhiễm trùng hay một số rối loạn tế bào máu. Kết quả bất thường không tự khẳng định chẩn đoán mà cần được đọc cùng triệu chứng, bệnh sử và các xét nghiệm khác.",
+    "risk_level": "medium",
+    "tags": [
+      "cbc",
+      "test_explainers",
+      "care_pathway"
+    ],
+    "keywords": [
+      "thiếu máu",
+      "nhiễm trùng",
+      "rối loạn máu",
+      "kết quả bất thường"
+    ],
+    "test_types": [
+      "cbc"
+    ],
+    "faq_type": "result_interpretation",
+    "safety_notes": "Không nên tự kết luận bệnh chỉ dựa vào một chỉ số CBC nằm ngoài khoảng tham chiếu.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_021_c1",
+    "kb_id": "kb_v1_2_021",
     "doc_id": "medlineplus_crp_test_doc_001",
     "source_id": "medlineplus_crp_test",
     "source_name": "MedlinePlus",
@@ -566,8 +632,41 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_020_c1",
-    "kb_id": "kb_v1_2_020",
+    "chunk_id": "kb_v1_2_022_c1",
+    "kb_id": "kb_v1_2_022",
+    "doc_id": "medlineplus_crp_test_doc_001",
+    "source_id": "medlineplus_crp_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/c-reactive-protein-crp-test/",
+    "section": "test_explainers",
+    "title": "CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm",
+    "content": "Bác sĩ có thể dùng CRP để theo dõi tình trạng viêm hoặc đáp ứng điều trị theo thời gian, vì chỉ số này có thể tăng rồi giảm theo mức độ viêm trong cơ thể. Tuy vậy, CRP không cho biết chính xác viêm nằm ở đâu hay do nguyên nhân nào nếu không có thêm thông tin lâm sàng.",
+    "chunk_text": "Tiêu đề: CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: theo dõi điều trị, đáp ứng điều trị, không chỉ ra vị trí viêm, diễn giải CRP\nNhãn: crp, test_explainers, result_boundary\nLoại xét nghiệm: crp\nLoại FAQ: result_interpretation\nLưu ý an toàn: Kết quả CRP nên được đọc cùng triệu chứng và các xét nghiệm khác, nhất là khi đang nghi nhiễm trùng nặng.\nNội dung: Bác sĩ có thể dùng CRP để theo dõi tình trạng viêm hoặc đáp ứng điều trị theo thời gian, vì chỉ số này có thể tăng rồi giảm theo mức độ viêm trong cơ thể. Tuy vậy, CRP không cho biết chính xác viêm nằm ở đâu hay do nguyên nhân nào nếu không có thêm thông tin lâm sàng.",
+    "risk_level": "medium",
+    "tags": [
+      "crp",
+      "test_explainers",
+      "result_boundary"
+    ],
+    "keywords": [
+      "theo dõi điều trị",
+      "đáp ứng điều trị",
+      "không chỉ ra vị trí viêm",
+      "diễn giải CRP"
+    ],
+    "test_types": [
+      "crp"
+    ],
+    "faq_type": "result_interpretation",
+    "safety_notes": "Kết quả CRP nên được đọc cùng triệu chứng và các xét nghiệm khác, nhất là khi đang nghi nhiễm trùng nặng.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_023_c1",
+    "kb_id": "kb_v1_2_023",
     "doc_id": "medlineplus_ddimer_test_doc_001",
     "source_id": "medlineplus_ddimer_test",
     "source_name": "MedlinePlus",
@@ -599,8 +698,41 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_021_c1",
-    "kb_id": "kb_v1_2_021",
+    "chunk_id": "kb_v1_2_024_c1",
+    "kb_id": "kb_v1_2_024",
+    "doc_id": "medlineplus_ddimer_test_doc_001",
+    "source_id": "medlineplus_ddimer_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/d-dimer-test/",
+    "section": "test_explainers",
+    "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+    "content": "Nếu D-dimer tăng, bác sĩ thường cần kết hợp thêm triệu chứng và các xét nghiệm hình ảnh để xác định có cục máu đông hay không. Ngược lại, kết quả bình thường cũng phải được đọc trong đúng bối cảnh lâm sàng thay vì dùng để tự trấn an khi vẫn còn triệu chứng đáng lo.",
+    "chunk_text": "Tiêu đề: D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: kết quả D-dimer, cần xét nghiệm tiếp, không tự kết luận, huyết khối\nNhãn: d_dimer, test_explainers, result_boundary\nLoại xét nghiệm: d_dimer\nLoại FAQ: result_interpretation\nLưu ý an toàn: Nếu đang có khó thở, đau ngực hoặc sưng đau chân, cần ưu tiên đánh giá y tế thay vì tự diễn giải D-dimer tại nhà.\nNội dung: Nếu D-dimer tăng, bác sĩ thường cần kết hợp thêm triệu chứng và các xét nghiệm hình ảnh để xác định có cục máu đông hay không. Ngược lại, kết quả bình thường cũng phải được đọc trong đúng bối cảnh lâm sàng thay vì dùng để tự trấn an khi vẫn còn triệu chứng đáng lo.",
+    "risk_level": "medium",
+    "tags": [
+      "d_dimer",
+      "test_explainers",
+      "result_boundary"
+    ],
+    "keywords": [
+      "kết quả D-dimer",
+      "cần xét nghiệm tiếp",
+      "không tự kết luận",
+      "huyết khối"
+    ],
+    "test_types": [
+      "d_dimer"
+    ],
+    "faq_type": "result_interpretation",
+    "safety_notes": "Nếu đang có khó thở, đau ngực hoặc sưng đau chân, cần ưu tiên đánh giá y tế thay vì tự diễn giải D-dimer tại nhà.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_025_c1",
+    "kb_id": "kb_v1_2_025",
     "doc_id": "medlineplus_pulse_oximetry_test_doc_001",
     "source_id": "medlineplus_pulse_oximetry_test",
     "source_name": "MedlinePlus",
@@ -631,16 +763,49 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_022_c1",
-    "kb_id": "kb_v1_2_022",
+    "chunk_id": "kb_v1_2_026_c1",
+    "kb_id": "kb_v1_2_026",
+    "doc_id": "medlineplus_pulse_oximetry_test_doc_001",
+    "source_id": "medlineplus_pulse_oximetry_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/pulse-oximetry/",
+    "section": "test_explainers",
+    "title": "Khi dùng máy đo SpO2 tại nhà, kết quả thấp hoặc có triệu chứng vẫn cần được đánh giá",
+    "content": "Máy đo SpO2 tại nhà có thể hữu ích khi theo dõi bệnh phổi hoặc khó thở, nhưng kết quả cần được hiểu cùng tình trạng thực tế của người bệnh. Nếu SpO2 xuống thấp hoặc đi kèm tím tái, đau ngực hay khó thở tăng dần, nên liên hệ cơ sở y tế sớm thay vì chỉ lặp lại phép đo nhiều lần.",
+    "chunk_text": "Tiêu đề: Khi dùng máy đo SpO2 tại nhà, kết quả thấp hoặc có triệu chứng vẫn cần được đánh giá\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: máy đo SpO2 tại nhà, khó thở, tím tái, kết quả thấp\nNhãn: pulse_oximetry, test_explainers, home_monitoring\nLoại xét nghiệm: pulse_oximetry\nLoại FAQ: urgent_advice\nLưu ý an toàn: Sơn móng tay, tuần hoàn kém hoặc cử động nhiều có thể làm kết quả sai lệch.\nNội dung: Máy đo SpO2 tại nhà có thể hữu ích khi theo dõi bệnh phổi hoặc khó thở, nhưng kết quả cần được hiểu cùng tình trạng thực tế của người bệnh. Nếu SpO2 xuống thấp hoặc đi kèm tím tái, đau ngực hay khó thở tăng dần, nên liên hệ cơ sở y tế sớm thay vì chỉ lặp lại phép đo nhiều lần.",
+    "risk_level": "medium",
+    "tags": [
+      "pulse_oximetry",
+      "test_explainers",
+      "home_monitoring"
+    ],
+    "keywords": [
+      "máy đo SpO2 tại nhà",
+      "khó thở",
+      "tím tái",
+      "kết quả thấp"
+    ],
+    "test_types": [
+      "pulse_oximetry"
+    ],
+    "faq_type": "urgent_advice",
+    "safety_notes": "Sơn móng tay, tuần hoàn kém hoặc cử động nhiều có thể làm kết quả sai lệch.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_027_c1",
+    "kb_id": "kb_v1_2_027",
     "doc_id": "medlineplus_troponin_test_doc_001",
     "source_id": "medlineplus_troponin_test",
     "source_name": "MedlinePlus",
     "source_url": "https://medlineplus.gov/lab-tests/troponin-test/",
     "section": "test_explainers",
     "title": "Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim",
-    "content": "Xét nghiệm troponin đo nồng độ troponin trong máu để hỗ trợ phát hiện tổn thương cơ tim. Chỉ số này thường được dùng trong đánh giá đau ngực và nghi ngờ nhồi máu cơ tim, nhưng vẫn cần kết hợp với triệu chứng và điện tim.",
-    "chunk_text": "Tiêu đề: Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: troponin, đau ngực, tổn thương cơ tim, nhồi máu cơ tim\nNhãn: troponin, test_explainers, cardiac\nLoại xét nghiệm: troponin\nLoại FAQ: test_meaning\nLưu ý an toàn: Không nên tự giải thích kết quả troponin khi có đau ngực hoặc khó thở đang diễn ra.\nNội dung: Xét nghiệm troponin đo nồng độ troponin trong máu để hỗ trợ phát hiện tổn thương cơ tim. Chỉ số này thường được dùng trong đánh giá đau ngực và nghi ngờ nhồi máu cơ tim, nhưng vẫn cần kết hợp với triệu chứng và điện tim.",
+    "content": "Xét nghiệm troponin đo nồng độ troponin trong máu để hỗ trợ phát hiện tổn thương cơ tim. Xét nghiệm này thường được dùng cùng điện tim và đánh giá lâm sàng khi bác sĩ nghi có tổn thương tim, thay vì tự đứng một mình để kết luận nguyên nhân triệu chứng.",
+    "chunk_text": "Tiêu đề: Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: troponin, tổn thương cơ tim, xét nghiệm tim, điện tim\nNhãn: troponin, test_explainers, cardiac\nLoại xét nghiệm: troponin\nLoại FAQ: test_meaning\nLưu ý an toàn: Không nên tự giải thích kết quả troponin khi có đau ngực hoặc khó thở đang diễn ra.\nNội dung: Xét nghiệm troponin đo nồng độ troponin trong máu để hỗ trợ phát hiện tổn thương cơ tim. Xét nghiệm này thường được dùng cùng điện tim và đánh giá lâm sàng khi bác sĩ nghi có tổn thương tim, thay vì tự đứng một mình để kết luận nguyên nhân triệu chứng.",
     "risk_level": "medium",
     "tags": [
       "troponin",
@@ -649,9 +814,9 @@
     ],
     "keywords": [
       "troponin",
-      "đau ngực",
       "tổn thương cơ tim",
-      "nhồi máu cơ tim"
+      "xét nghiệm tim",
+      "điện tim"
     ],
     "test_types": [
       "troponin"
@@ -664,8 +829,41 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_023_c1",
-    "kb_id": "kb_v1_2_023",
+    "chunk_id": "kb_v1_2_028_c1",
+    "kb_id": "kb_v1_2_028",
+    "doc_id": "medlineplus_troponin_test_doc_001",
+    "source_id": "medlineplus_troponin_test",
+    "source_name": "MedlinePlus",
+    "source_url": "https://medlineplus.gov/lab-tests/troponin-test/",
+    "section": "test_explainers",
+    "title": "Troponin tăng không phải lúc nào cũng đồng nghĩa nhồi máu cơ tim",
+    "content": "Troponin tăng cho thấy có tổn thương cơ tim nhưng không phải lúc nào cũng đồng nghĩa với nhồi máu cơ tim, vì một số tình trạng khác cũng có thể làm chỉ số này tăng. Kết quả ban đầu bình thường cũng chưa đủ để loại trừ sớm trong mọi trường hợp, nên bác sĩ có thể cần lặp lại xét nghiệm và kết hợp thêm dữ liệu khác.",
+    "chunk_text": "Tiêu đề: Troponin tăng không phải lúc nào cũng đồng nghĩa nhồi máu cơ tim\nMục: test_explainers\nMức độ rủi ro: medium\nTừ khóa: troponin tăng, không luôn là nhồi máu cơ tim, lặp lại xét nghiệm, diễn giải kết quả\nNhãn: troponin, test_explainers, result_boundary\nLoại xét nghiệm: troponin\nLoại FAQ: result_interpretation\nLưu ý an toàn: Nếu đang đau ngực, khó thở hoặc chóng mặt, cần ưu tiên đi cấp cứu thay vì chờ tự đọc kết quả xét nghiệm.\nNội dung: Troponin tăng cho thấy có tổn thương cơ tim nhưng không phải lúc nào cũng đồng nghĩa với nhồi máu cơ tim, vì một số tình trạng khác cũng có thể làm chỉ số này tăng. Kết quả ban đầu bình thường cũng chưa đủ để loại trừ sớm trong mọi trường hợp, nên bác sĩ có thể cần lặp lại xét nghiệm và kết hợp thêm dữ liệu khác.",
+    "risk_level": "medium",
+    "tags": [
+      "troponin",
+      "test_explainers",
+      "result_boundary"
+    ],
+    "keywords": [
+      "troponin tăng",
+      "không luôn là nhồi máu cơ tim",
+      "lặp lại xét nghiệm",
+      "diễn giải kết quả"
+    ],
+    "test_types": [
+      "troponin"
+    ],
+    "faq_type": "result_interpretation",
+    "safety_notes": "Nếu đang đau ngực, khó thở hoặc chóng mặt, cần ưu tiên đi cấp cứu thay vì chờ tự đọc kết quả xét nghiệm.",
+    "review_status": "approved",
+    "use_in_v1": false,
+    "language": "vi",
+    "locale": "vi-VN"
+  },
+  {
+    "chunk_id": "kb_v1_2_029_c1",
+    "kb_id": "kb_v1_2_029",
     "doc_id": "nhs_anaphylaxis_doc_001",
     "source_id": "nhs_anaphylaxis",
     "source_name": "NHS",
@@ -695,8 +893,8 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_024_c1",
-    "kb_id": "kb_v1_2_024",
+    "chunk_id": "kb_v1_2_030_c1",
+    "kb_id": "kb_v1_2_030",
     "doc_id": "nhs_anaphylaxis_doc_001",
     "source_id": "nhs_anaphylaxis",
     "source_name": "NHS",
@@ -725,8 +923,8 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_025_c1",
-    "kb_id": "kb_v1_2_025",
+    "chunk_id": "kb_v1_2_031_c1",
+    "kb_id": "kb_v1_2_031",
     "doc_id": "nhs_fainting_adults_doc_001",
     "source_id": "nhs_fainting_adults",
     "source_name": "NHS",
@@ -756,8 +954,8 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_026_c1",
-    "kb_id": "kb_v1_2_026",
+    "chunk_id": "kb_v1_2_032_c1",
+    "kb_id": "kb_v1_2_032",
     "doc_id": "nhs_fainting_adults_doc_001",
     "source_id": "nhs_fainting_adults",
     "source_name": "NHS",
@@ -785,8 +983,8 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_027_c1",
-    "kb_id": "kb_v1_2_027",
+    "chunk_id": "kb_v1_2_033_c1",
+    "kb_id": "kb_v1_2_033",
     "doc_id": "nhs_headaches_doc_001",
     "source_id": "nhs_headaches",
     "source_name": "NHS",
@@ -816,8 +1014,8 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_028_c1",
-    "kb_id": "kb_v1_2_028",
+    "chunk_id": "kb_v1_2_034_c1",
+    "kb_id": "kb_v1_2_034",
     "doc_id": "nhs_headaches_doc_001",
     "source_id": "nhs_headaches",
     "source_name": "NHS",
@@ -845,8 +1043,8 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_029_c1",
-    "kb_id": "kb_v1_2_029",
+    "chunk_id": "kb_v1_2_035_c1",
+    "kb_id": "kb_v1_2_035",
     "doc_id": "nhs_stomach_ache_doc_001",
     "source_id": "nhs_stomach_ache",
     "source_name": "NHS",
@@ -876,8 +1074,8 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_030_c1",
-    "kb_id": "kb_v1_2_030",
+    "chunk_id": "kb_v1_2_036_c1",
+    "kb_id": "kb_v1_2_036",
     "doc_id": "nhs_stomach_ache_doc_001",
     "source_id": "nhs_stomach_ache",
     "source_name": "NHS",
@@ -906,8 +1104,8 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_031_c1",
-    "kb_id": "kb_v1_2_031",
+    "chunk_id": "kb_v1_2_037_c1",
+    "kb_id": "kb_v1_2_037",
     "doc_id": "nhs_stroke_symptoms_doc_001",
     "source_id": "nhs_stroke_symptoms",
     "source_name": "NHS",
@@ -937,8 +1135,8 @@
     "locale": "vi-VN"
   },
   {
-    "chunk_id": "kb_v1_2_032_c1",
-    "kb_id": "kb_v1_2_032",
+    "chunk_id": "kb_v1_2_038_c1",
+    "kb_id": "kb_v1_2_038",
     "doc_id": "nhs_stroke_symptoms_doc_001",
     "source_id": "nhs_stroke_symptoms",
     "source_name": "NHS",

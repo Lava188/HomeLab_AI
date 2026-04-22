@@ -2,11 +2,17 @@
 medlineplus_blood_culture_test,approved,Cấy máu giúp tìm vi khuẩn hoặc nấm trong máu,Approved via conservative source-specific curation template.,blood_culture
 medlineplus_blood_testing_overview,holdout,What You Need to Know About Blood Testing: MedlinePlus Medical Test,General blood testing overview overlaps the existing NHS blood tests baseline and is held out to avoid duplicate ingestion.,blood_testing_overview
 medlineplus_bmp_test,approved,BMP là xét nghiệm đánh giá các chất cơ bản trong máu,Approved via conservative source-specific curation template.,basic_metabolic_panel
+medlineplus_bmp_test,approved,BMP thường được dùng để kiểm tra sức khỏe chung và theo dõi chức năng thận,Approved via conservative source-specific curation template.,basic_metabolic_panel
 medlineplus_cbc_test,approved,CBC là công thức máu toàn bộ để kiểm tra tế bào máu,Approved via conservative source-specific curation template.,complete_blood_count
+medlineplus_cbc_test,approved,"CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",Approved via conservative source-specific curation template.,complete_blood_count
 medlineplus_crp_test,approved,CRP là xét nghiệm gợi ý mức độ viêm trong cơ thể,Approved via conservative source-specific curation template.,c_reactive_protein
+medlineplus_crp_test,approved,CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm,Approved via conservative source-specific curation template.,c_reactive_protein
 medlineplus_ddimer_test,approved,D-dimer là xét nghiệm hỗ trợ đánh giá nguy cơ cục máu đông,Approved via conservative source-specific curation template.,d_dimer
+medlineplus_ddimer_test,approved,D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận,Approved via conservative source-specific curation template.,d_dimer
 medlineplus_pulse_oximetry_test,approved,Đo SpO2 giúp ước tính mức oxy trong máu một cách nhanh chóng,Approved via conservative source-specific curation template.,pulse_oximetry
+medlineplus_pulse_oximetry_test,approved,"Khi dùng máy đo SpO2 tại nhà, kết quả thấp hoặc có triệu chứng vẫn cần được đánh giá",Approved via conservative source-specific curation template.,pulse_oximetry
 medlineplus_troponin_test,approved,Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim,Approved via conservative source-specific curation template.,troponin
+medlineplus_troponin_test,approved,Troponin tăng không phải lúc nào cũng đồng nghĩa nhồi máu cơ tim,Approved via conservative source-specific curation template.,troponin
 nhs_anaphylaxis,approved,Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay,Approved via conservative source-specific curation template.,anaphylaxis
 nhs_anaphylaxis,approved,"Nếu đã có bút tiêm adrenaline, cần dùng đúng lúc và vẫn đi cấp cứu",Approved via conservative source-specific curation template.,anaphylaxis
 nhs_blood_tests,holdout,"Blood tests

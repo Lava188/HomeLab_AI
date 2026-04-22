@@ -10,8 +10,94 @@ const {
     FLOWS
 } = require("../constants/chat.constants");
 const { createChatResult } = require("../utils/chat-response.util");
+const { normalizeText } = require("../utils/text.util");
 
-function mergeRouterMeta(result, safetyMeta, routeResult) {
+function hasAnyKeyword(text, keywords) {
+    return keywords.some((keyword) => text.includes(keyword));
+}
+
+function detectFlow(message) {
+    const normalizedMessage = normalizeText(message);
+
+    const bookingKeywords = [
+        "dat lich",
+        "book lich",
+        "dang ky lich",
+        "lay mau tai nha",
+        "xet nghiem tai nha",
+        "toi muon xet nghiem",
+        "toi muon dat lich"
+    ];
+
+    const rescheduleKeywords = [
+        "doi lich",
+        "doi hen",
+        "doi ngay",
+        "doi gio",
+        "reschedule",
+        "chuyen lich",
+        "doi lich hen"
+    ];
+
+    const cancelKeywords = [
+        "huy lich",
+        "huy hen",
+        "cancel lich",
+        "khong dat nua",
+        "toi muon huy",
+        "xac nhan huy"
+    ];
+
+    const healthRagKeywords = [
+        "xet nghiem",
+        "nhin an",
+        "duong huyet",
+        "mo mau",
+        "chi so",
+        "suc khoe",
+        "trieu chung",
+        "can chuan bi gi",
+        "co y nghia gi",
+        "tu van",
+        "mau",
+        "nuoc tieu",
+        "dau nguc",
+        "tuc nguc",
+        "kho tho",
+        "tho doc",
+        "tim moi",
+        "tim tai",
+        "nhiem trung",
+        "sepsis",
+        "sot cao",
+        "xau di nhanh"
+    ];
+
+    if (hasAnyKeyword(normalizedMessage, rescheduleKeywords)) {
+        return { flow: FLOWS.RESCHEDULE };
+    }
+
+    if (hasAnyKeyword(normalizedMessage, cancelKeywords)) {
+        return { flow: FLOWS.CANCEL };
+    }
+
+    if (hasAnyKeyword(normalizedMessage, bookingKeywords)) {
+        return { flow: FLOWS.BOOKING };
+    }
+
+    if (hasAnyKeyword(normalizedMessage, healthRagKeywords)) {
+        return { flow: FLOWS.HEALTH_RAG };
+    }
+
+    return {
+        flow: FLOWS.FALLBACK,
+        action: ACTIONS.FALLBACK_RESPONSE,
+        reply:
+            "Xin lỗi, hiện tại mình chưa hiểu rõ yêu cầu của bạn. Bạn có thể hỏi về tư vấn sức khỏe cơ bản, đặt lịch xét nghiệm tại nhà, đổi lịch hoặc hủy lịch."
+    };
+}
+
+function mergeRouterMeta(result, safetyMeta) {
     return {
         ...result.meta,
         routedBy: "router.service",

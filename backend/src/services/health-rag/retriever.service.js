@@ -80,48 +80,65 @@ const SOURCE_HINTS = [
         ]
     },
     {
-        sourceId: "nhs_stomach_ache",
-        keywords: [
-            "dau bung",
-            "bung dau",
-            "dau bung keo dai",
-            "dau bung du doi",
-            "non ra mau",
-            "phan den"
-        ]
+        sourceId: "medlineplus_blood_culture_test",
+        keywords: ["cay mau", "vi khuan trong mau", "nam trong mau", "nhiem trung"]
+    },
+    {
+        sourceId: "medlineplus_bmp_test",
+        keywords: ["bmp", "dien giai", "duong huyet", "chuc nang than"]
+    },
+    {
+        sourceId: "medlineplus_cbc_test",
+        keywords: ["cbc", "cong thuc mau", "hong cau", "bach cau", "tieu cau"]
+    },
+    {
+        sourceId: "medlineplus_crp_test",
+        keywords: ["crp", "viem", "protein phan ung c", "dap ung dieu tri"]
+    },
+    {
+        sourceId: "medlineplus_ddimer_test",
+        keywords: ["d-dimer", "huyet khoi", "thuyen tac phoi", "cuc mau dong"]
+    },
+    {
+        sourceId: "medlineplus_pulse_oximetry_test",
+        keywords: ["spo2", "pulse ox", "pulse oximetry", "oxy mau", "tim tai"]
+    },
+    {
+        sourceId: "medlineplus_troponin_test",
+        keywords: ["troponin", "ton thuong co tim", "xet nghiem tim", "dien tim"]
     },
     {
         sourceId: "nhs_headaches",
-        keywords: [
-            "dau dau",
-            "nhuc dau",
-            "dau dau keo dai",
-            "dau dau du doi",
-            "co cung",
-            "noi kho",
-            "yeu liet"
-        ]
+        keywords: ["dau dau", "co cung", "noi kho", "yeu liet", "co giat"]
+    },
+    {
+        sourceId: "nhs_stomach_ache",
+        keywords: ["dau bung", "phan den", "non ra mau", "dau bung du doi"]
     },
     {
         sourceId: "nhs_fainting_adults",
-        keywords: [
-            "ngat",
-            "xiu",
-            "ngat xiu",
-            "choang roi ngat",
-            "ngat tai dien"
-        ]
+        keywords: ["ngat", "choang vang", "tim dap bat thuong", "chan thuong dau"]
     },
     {
         sourceId: "nhs_anaphylaxis",
-        keywords: [
-            "phan ve",
-            "di ung nang",
-            "sung moi",
-            "sung luoi",
-            "but tiem adrenaline"
-        ]
+        keywords: ["phan ve", "di ung nang", "sung moi", "sung luoi", "adrenaline"]
+    },
+    {
+        sourceId: "nhs_stroke_symptoms",
+        keywords: ["dot quy", "fast", "meo mieng", "noi kho", "yeu tay chan"]
     }
+];
+
+const TEST_QUERY_HINTS = [
+    "xet nghiem",
+    "troponin",
+    "d-dimer",
+    "spo2",
+    "pulse ox",
+    "bmp",
+    "cbc",
+    "crp",
+    "cay mau"
 ];
 
 const TOPIC_SOURCE_GROUPS = {
@@ -463,61 +480,10 @@ function scoreChunk(chunk, normalizedMessage, queryTokens, topicIntent) {
     }
 
     if (
-        chunk.source_id === "nhs_stomach_ache" &&
-        ["dau bung", "bung dau", "phan den", "non ra mau"].some((keyword) =>
-            normalizedMessage.includes(keyword)
-        )
+        chunk.section === "test_explainers" &&
+        TEST_QUERY_HINTS.some((keyword) => normalizedMessage.includes(keyword))
     ) {
-        score += 8;
-    }
-
-    if (
-        chunk.source_id === "nhs_headaches" &&
-        ["dau dau", "nhuc dau", "co cung", "noi kho", "yeu liet"].some((keyword) =>
-            normalizedMessage.includes(keyword)
-        )
-    ) {
-        score += 8;
-    }
-
-    if (
-        chunk.source_id === "nhs_fainting_adults" &&
-        ["ngat", "xiu", "choang"].some((keyword) =>
-            normalizedMessage.includes(keyword)
-        )
-    ) {
-        score += 8;
-    }
-
-    if (
-        chunk.source_id === "nhs_anaphylaxis" &&
-        ["phan ve", "di ung nang", "sung moi", "sung luoi"].some((keyword) =>
-            normalizedMessage.includes(keyword)
-        )
-    ) {
-        score += 10;
-    }
-
-    if (topicIntent.topic && topicIntent.score > 0) {
-        const preferredSources = TOPIC_SOURCE_GROUPS[topicIntent.topic] || [];
-
-        if (preferredSources.includes(chunk.source_id)) {
-            score += 18;
-        } else if (
-            topicIntent.topic !== "blood_tests" &&
-            chunk.source_id === "blood_tests"
-        ) {
-            score -= 18;
-        } else if (
-            ["stomach_ache", "headache", "fainting", "anaphylaxis"].includes(
-                topicIntent.topic
-            ) &&
-            ["chest_pain", "shortness_of_breath", "nice_sepsis_overview"].includes(
-                chunk.source_id
-            )
-        ) {
-            score -= 10;
-        }
+        score += 4;
     }
 
     return {

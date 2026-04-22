@@ -1,17 +1,17 @@
 # KB Diff v1_2
 
 - Baseline items: 15
-- New approved items: 17
-- Expanded KB items: 32
+- New approved items: 23
+- Expanded KB items: 38
 
 ## Added By Source
 - medlineplus_blood_culture_test: +1
-- medlineplus_bmp_test: +1
-- medlineplus_cbc_test: +1
-- medlineplus_crp_test: +1
-- medlineplus_ddimer_test: +1
-- medlineplus_pulse_oximetry_test: +1
-- medlineplus_troponin_test: +1
+- medlineplus_bmp_test: +2
+- medlineplus_cbc_test: +2
+- medlineplus_crp_test: +2
+- medlineplus_ddimer_test: +2
+- medlineplus_pulse_oximetry_test: +2
+- medlineplus_troponin_test: +2
 - nhs_anaphylaxis: +2
 - nhs_fainting_adults: +2
 - nhs_headaches: +2

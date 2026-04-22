@@ -1,6 +1,30 @@
 const { normalizeText } = require("../../utils/text.util");
 
-const POLICY_VERSION = "response_policy_v1";
+const POLICY_VERSION = "response_policy_v1_2_backend";
+const TEST_INFO_SECTIONS = new Set([
+    "test_explainers",
+    "pre_test_guides",
+    "test_results"
+]);
+const OVERLAP_ELIGIBLE_SOURCES = new Set([
+    "chest_pain",
+    "shortness_of_breath",
+    "nice_sepsis_overview",
+    "nhs_anaphylaxis",
+    "nhs_stroke_symptoms",
+    "nhs_fainting_adults"
+]);
+const TEST_QUERY_HINTS = [
+    "xet nghiem",
+    "troponin",
+    "d-dimer",
+    "spo2",
+    "pulse ox",
+    "bmp",
+    "cbc",
+    "crp",
+    "cay mau"
+];
 
 const EMERGENCY_PATTERNS = [
     "lan ra tay",
@@ -12,26 +36,17 @@ const EMERGENCY_PATTERNS = [
     "lu lan",
     "khong noi duoc",
     "ho ra mau",
-    "xau di nhanh",
-    "dau bung du doi",
-    "non ra mau",
-    "phan den",
-    "dau dau du doi",
-    "co cung",
-    "yeu liet",
-    "phan ve",
-    "sung moi",
-    "sung luoi"
+    "xau di nhanh"
 ];
 
-function hasEmergencyPattern(normalizedMessage) {
-    return EMERGENCY_PATTERNS.some((pattern) => normalizedMessage.includes(pattern));
+function hasAnyPattern(text, patterns) {
+    return patterns.some((pattern) => text.includes(pattern));
 }
 
 function detectUrgencyLevel(message, topChunks) {
     const normalizedMessage = normalizeText(message);
 
-    if (hasEmergencyPattern(normalizedMessage)) {
+    if (hasAnyPattern(normalizedMessage, EMERGENCY_PATTERNS)) {
         return "emergency";
     }
 
@@ -46,18 +61,20 @@ function choosePolicyMode({ message, retrievedChunks }) {
     const topChunks = retrievedChunks.slice(0, 3);
     const topTwoChunks = topChunks.slice(0, 2);
     const top1 = topChunks[0] || null;
-    const top2 = topChunks[1] || null;
     const normalizedMessage = normalizeText(message);
     const redFlagChunks = topChunks.filter((chunk) => chunk.section === "red_flags");
-    const uniqueRedFlagSources = [...new Set(redFlagChunks.map((chunk) => chunk.source_id))];
     const uniqueSources = [...new Set(topChunks.map((chunk) => chunk.source_id))];
-    const topTwoRedFlagSources = [
+    const eligibleRedFlagSources = [
         ...new Set(
-            topTwoChunks
-                .filter((chunk) => chunk.section === "red_flags")
+            redFlagChunks
                 .map((chunk) => chunk.source_id)
+                .filter((sourceId) => OVERLAP_ELIGIBLE_SOURCES.has(sourceId))
         )
     ];
+    const hasHardEmergencyPattern = hasAnyPattern(
+        normalizedMessage,
+        EMERGENCY_PATTERNS
+    );
 
     if (!top1 || top1.score < 0.12) {
         return {
@@ -69,11 +86,34 @@ function choosePolicyMode({ message, retrievedChunks }) {
         };
     }
 
-    if (
-        redFlagChunks.length >= 2 &&
-        uniqueRedFlagSources.length >= 2 &&
-        topTwoRedFlagSources.length >= 2
-    ) {
+    if (top1.section && TEST_INFO_SECTIONS.has(top1.section)) {
+        const top1TestTypes = new Set(top1.test_types || []);
+        const hasSupportingTestChunk = topChunks.slice(1).some((chunk) => {
+            const chunkTestTypes = new Set(chunk.test_types || []);
+            return (
+                chunk.section &&
+                TEST_INFO_SECTIONS.has(chunk.section) &&
+                (chunk.source_id === top1.source_id ||
+                    [...chunkTestTypes].some((type) => top1TestTypes.has(type)))
+            );
+        });
+
+        if (
+            redFlagChunks.length === 0 ||
+            hasSupportingTestChunk ||
+            hasAnyPattern(normalizedMessage, TEST_QUERY_HINTS)
+        ) {
+            return {
+                policyVersion: POLICY_VERSION,
+                primaryMode: "informational_test",
+                urgencyLevel: "none",
+                overlapFlag: uniqueSources.length > 1 ? "mixed" : "single",
+                reason: "test_information_top1"
+            };
+        }
+    }
+
+    if (hasHardEmergencyPattern && eligibleRedFlagSources.length >= 2) {
         return {
             policyVersion: POLICY_VERSION,
             primaryMode: "mixed_emergency",
@@ -120,16 +160,6 @@ function choosePolicyMode({ message, retrievedChunks }) {
             urgencyLevel: detectUrgencyLevel(message, topChunks),
             overlapFlag: uniqueSources.length > 1 ? "mixed" : "single",
             reason: "top1_is_red_flag"
-        };
-    }
-
-    if (top1.source_id === "blood_tests" && redFlagChunks.length === 0) {
-        return {
-            policyVersion: POLICY_VERSION,
-            primaryMode: "informational_test",
-            urgencyLevel: "none",
-            overlapFlag: uniqueSources.length > 1 ? "mixed" : "single",
-            reason: "blood_tests_without_red_flags"
         };
     }
 
