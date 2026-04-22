@@ -40,6 +40,13 @@ async function answerHealthQuery({ message, sessionId }) {
                     policyVersion: policyDecision.policyVersion,
                     retrieverVersion: retrievalResult.retrieverVersion,
                     modelName: retrievalResult.modelName,
+                    debug: {
+                        runtimeMode: retrievalResult.runtimeMode || null,
+                        queryExpansions: retrievalResult.queryExpansions || [],
+                        queryRewriteRules: retrievalResult.queryRewriteRules || [],
+                        topicIntent: retrievalResult.topicIntent || null,
+                        rewrittenQuery: retrievalResult.rewrittenQuery || retrievalResult.normalizedQuery
+                    },
                     topChunks: []
                 }
             });
@@ -73,6 +80,13 @@ async function answerHealthQuery({ message, sessionId }) {
                 policyVersion: policyDecision.policyVersion,
                 retrieverVersion: retrievalResult.retrieverVersion,
                 modelName: retrievalResult.modelName,
+                debug: {
+                    runtimeMode: retrievalResult.runtimeMode || null,
+                    queryExpansions: retrievalResult.queryExpansions || [],
+                    queryRewriteRules: retrievalResult.queryRewriteRules || [],
+                    topicIntent: retrievalResult.topicIntent || null,
+                    rewrittenQuery: retrievalResult.rewrittenQuery || retrievalResult.normalizedQuery
+                },
                 topChunks: topChunks.map((chunk) => ({
                     chunkId: chunk.chunk_id,
                     title: chunk.title,
@@ -115,7 +129,14 @@ async function answerHealthQuery({ message, sessionId }) {
                 retrievalMode: "artifact_json_top3_v1",
                 found: false,
                 grounded: false,
-                error: error.message
+                error: error.message,
+                debug: {
+                    runtimeMode: null,
+                    queryExpansions: [],
+                    queryRewriteRules: [],
+                    topicIntent: null,
+                    rewrittenQuery: null
+                }
             }
         });
     }

@@ -344,6 +344,7 @@ export default function ChatPage() {
                 ) : (
                   messages.map((msg, index) => {
                     const isUser = msg.role === 'user';
+                    const isClarify = msg.variant === 'clarify';
                     const prevMsg = messages[index - 1];
                     const isFirstInGroup = !prevMsg || prevMsg.role !== msg.role;
                     const nextMsg = messages[index + 1];
@@ -373,13 +374,27 @@ export default function ChatPage() {
                             <div
                               className={`px-4 py-3 text-[15px] leading-relaxed ${isUser
                                 ? 'bg-slate-800 text-white'
-                                : 'bg-white text-slate-800 shadow-sm border border-slate-100'
+                                : isClarify
+                                  ? 'bg-amber-50 text-amber-950 shadow-sm border border-amber-200'
+                                  : 'bg-white text-slate-800 shadow-sm border border-slate-100'
                                 } ${isUser
                                   ? `rounded-2xl ${!isFirstInGroup ? 'rounded-tr-sm' : ''} ${!isLastInGroup ? 'rounded-br-sm' : ''}`
                                   : `rounded-2xl ${!isFirstInGroup ? 'rounded-tl-sm' : ''} ${!isLastInGroup ? 'rounded-bl-sm' : ''}`
                                 }`}
                             >
+                              {!isUser && isClarify && (
+                                <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700">
+                                  <AlertCircle className="w-3.5 h-3.5" />
+                                  Cần làm rõ
+                                </div>
+                              )}
                               {msg.text}
+
+                              {!isUser && isClarify && (
+                                <div className="mt-3 rounded-xl border border-amber-200/80 bg-white/60 px-3 py-2 text-[12px] text-amber-800">
+                                  Trả lời này xuất hiện khi câu hỏi còn ngắn hoặc chưa đủ rõ để HomeLab truy xuất tri thức an toàn.
+                                </div>
+                              )}
 
                               {/* Citations */}
                               {!isUser && msg.citations && msg.citations.length > 0 && (

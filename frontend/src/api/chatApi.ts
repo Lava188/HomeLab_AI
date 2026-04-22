@@ -4,6 +4,17 @@ export interface Message {
   text: string;
   timestamp: string;
   citations?: string[];
+  variant?: 'default' | 'clarify';
+  meta?: {
+    flow?: string;
+    action?: string;
+    routing?: {
+      lowConfidenceGuard?: {
+        triggered?: boolean;
+        reason?: string | null;
+      } | null;
+    } | null;
+  };
 }
 
 const API_BASE_URL =
@@ -15,7 +26,25 @@ type BackendChatData = {
   sessionId?: string;
   reply?: string;
   timestamp?: string;
+  flow?: string;
+  action?: string;
   meta?: {
+    debug?: {
+      runtimeMode?: string | null;
+      queryExpansions?: string[];
+      queryRewriteRules?: string[];
+      topicIntent?: {
+        topic?: string | null;
+        score?: number;
+      } | null;
+      rewrittenQuery?: string | null;
+    };
+    routing?: {
+      lowConfidenceGuard?: {
+        triggered?: boolean;
+        reason?: string | null;
+      } | null;
+    } | null;
     knowledgeItem?: {
       source?: string | null;
     };
@@ -99,6 +128,9 @@ export const mockSendMessage = async (text: string): Promise<Message> => {
     const citations = result.data.meta?.knowledgeItem?.source
       ? [result.data.meta.knowledgeItem.source]
       : undefined;
+    const isClarifyingResponse =
+      result.data.action === 'FALLBACK_RESPONSE' &&
+      result.data.meta?.routing?.lowConfidenceGuard?.triggered === true;
 
     return {
       id: Date.now().toString(),
@@ -107,7 +139,13 @@ export const mockSendMessage = async (text: string): Promise<Message> => {
         result.data.reply ||
         'HomeLab hiện chưa có phản hồi phù hợp cho yêu cầu này.',
       timestamp: buildTimestamp(result.data.timestamp),
-      citations,
+      citations: isClarifyingResponse ? undefined : citations,
+      variant: isClarifyingResponse ? 'clarify' : 'default',
+      meta: {
+        flow: result.data.flow,
+        action: result.data.action,
+        routing: result.data.meta?.routing ?? null,
+      },
     };
   } catch (error) {
     console.error('mockSendMessage error:', error);

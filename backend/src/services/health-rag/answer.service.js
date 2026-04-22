@@ -61,6 +61,22 @@ function buildEmergencyReply(topChunks, urgencyLevel) {
     ]).join(" ");
 }
 
+function buildUrgentReply(topChunks) {
+    const primary = topChunks[0];
+    const support = topChunks.find(
+        (chunk, index) =>
+            index > 0 &&
+            chunk.source_id === primary.source_id &&
+            chunk.chunk_id !== primary.chunk_id
+    );
+
+    return dedupeTexts([
+        getLeadSentence(primary.content),
+        support ? getLeadSentence(support.content) : "",
+        "Ban nen di kham som de duoc danh gia phu hop, thay vi tu theo doi qua lau tai nha."
+    ]).join(" ");
+}
+
 function buildMixedEmergencyReply(topChunks) {
     const sourceLabels = [...new Set(topChunks.map((chunk) => chunk.source_name || chunk.source_id))]
         .slice(0, 3)
@@ -96,6 +112,10 @@ function composeGroundedAnswer({ policyDecision, topChunks }) {
 
     if (policyDecision.primaryMode === "emergency_or_urgent") {
         return buildEmergencyReply(topChunks, policyDecision.urgencyLevel);
+    }
+
+    if (policyDecision.primaryMode === "urgent_advice") {
+        return buildUrgentReply(topChunks);
     }
 
     if (policyDecision.primaryMode === "mixed_emergency") {

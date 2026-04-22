@@ -11,8 +11,6 @@ function checkSafety({ message }) {
     const emergencyKeywords = [
         "khong tho duoc",
         "dau nguc du doi",
-        "ngat",
-        "xiu",
         "co giat",
         "bat tinh",
         "chay mau nhieu",

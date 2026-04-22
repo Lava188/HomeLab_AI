@@ -2,102 +2,63 @@ const mockSessions = require("../data/mockSessions");
 const mockBookings = require("../data/mockBookings");
 const { FLOWS, ACTIONS } = require("../constants/chat.constants");
 const { createChatResult } = require("../utils/chat-response.util");
-const {
-    normalizeText,
-    formatDisplayDate,
-    detectDateFromMessage,
-    detectTimeFromMessage,
-    extractBookingId
-} = require("../utils/text.util");
+const { normalizeText, extractBookingId } = require("../utils/text.util");
 
-function getEmptyRescheduleDraft(defaultBookingId = null) {
+function getEmptyCancelDraft(defaultBookingId = null) {
     return {
         bookingId: defaultBookingId,
-        newAppointmentDate: null,
-        newAppointmentTime: null
+        confirmed: false
     };
 }
 
-function hasActiveRescheduleSession(sessionId) {
+function hasActiveCancelSession(sessionId) {
     const session = mockSessions.getSession(sessionId);
 
     return Boolean(
         session &&
-        session.currentFlow === FLOWS.RESCHEDULE &&
-        session.rescheduleDraft &&
-        session.status !== "reschedule_completed"
+        session.currentFlow === FLOWS.CANCEL &&
+        session.cancelDraft &&
+        session.status !== "cancel_completed"
     );
 }
 
-function getMissingFields(draft) {
-    const missing = [];
+function detectConfirmation(message) {
+    const normalizedMessage = normalizeText(message);
 
-    if (!draft.bookingId) {
-        missing.push("bookingId");
+    const confirmKeywords = ["dong y", "xac nhan", "co", "ok", "duoc", "huy"];
+    const rejectKeywords = ["khong", "thoi", "dung", "khong huy"];
+
+    if (rejectKeywords.some((keyword) => normalizedMessage.includes(keyword))) {
+        return false;
     }
 
-    if (!draft.newAppointmentDate) {
-        missing.push("newAppointmentDate");
+    if (confirmKeywords.some((keyword) => normalizedMessage.includes(keyword))) {
+        return true;
     }
 
-    if (!draft.newAppointmentTime) {
-        missing.push("newAppointmentTime");
-    }
-
-    return missing;
+    return null;
 }
 
 function buildAskBookingIdReply(session) {
     if (session && session.confirmedBookingId) {
         return (
-            `Mình đã nhận yêu cầu đổi lịch. Nếu bạn muốn đổi lịch cho booking gần nhất ` +
-            `${session.confirmedBookingId}, bạn có thể gửi luôn ngày giờ mới. ` +
-            `Hoặc bạn gửi mã booking theo dạng BK... để mình hỗ trợ chính xác hơn.`
+            `Mình đã nhận yêu cầu hủy lịch. Nếu bạn muốn hủy booking gần nhất ` +
+            `${session.confirmedBookingId}, bạn có thể xác nhận luôn. ` +
+            `Hoặc gửi mã booking theo dạng BK... để mình kiểm tra chính xác hơn.`
         );
     }
 
     return (
-        "Mình đã nhận yêu cầu đổi lịch. Bạn vui lòng cung cấp mã booking theo dạng BK... " +
-        "để mình xác định lịch hẹn cần đổi."
+        "Mình đã nhận yêu cầu hủy lịch. Bạn vui lòng cung cấp mã booking theo dạng BK... " +
+        "để mình xác định lịch hẹn cần hủy."
     );
 }
 
-function buildAskNewScheduleReply(booking, draft) {
-    const knownParts = [];
-
-    if (draft.newAppointmentDate) {
-        knownParts.push(`Ngày mới: ${formatDisplayDate(draft.newAppointmentDate)}`);
-    }
-
-    if (draft.newAppointmentTime) {
-        knownParts.push(`Giờ mới: ${draft.newAppointmentTime}`);
-    }
-
-    let reply =
-        `Mình đã xác định booking ${booking.bookingId}. ` +
-        `Lịch hiện tại là ${formatDisplayDate(booking.appointmentDate)} lúc ${booking.appointmentTime}.`;
-
-    if (knownParts.length > 0) {
-        reply += ` Hiện mình đã ghi nhận: ${knownParts.join("; ")}.`;
-    }
-
-    if (!draft.newAppointmentDate && !draft.newAppointmentTime) {
-        reply +=
-            " Bạn vui lòng cung cấp ngày và giờ mới. Ví dụ: ngày mai 9h hoặc 28/03/2026 08:30.";
-        return reply;
-    }
-
-    if (!draft.newAppointmentDate) {
-        reply += " Bạn vui lòng cung cấp thêm ngày mới.";
-        return reply;
-    }
-
-    if (!draft.newAppointmentTime) {
-        reply += " Bạn vui lòng cung cấp thêm giờ mới.";
-        return reply;
-    }
-
-    return reply;
+function buildConfirmReply(booking) {
+    return (
+        `Mình đã tìm thấy booking ${booking.bookingId} vào ngày ${booking.appointmentDate} ` +
+        `lúc ${booking.appointmentTime}. Bạn có chắc muốn hủy lịch này không?`
+    );
 }
 
 function buildInvalidBookingReply(bookingId) {
@@ -107,67 +68,49 @@ function buildInvalidBookingReply(bookingId) {
     );
 }
 
-function buildRescheduledReply(oldBooking, updatedBooking) {
+function buildCancelledReply(booking) {
     return (
-        `Đã đổi lịch thành công cho booking ${updatedBooking.bookingId}. ` +
-        `Lịch cũ: ${formatDisplayDate(oldBooking.appointmentDate)} lúc ${oldBooking.appointmentTime}. ` +
-        `Lịch mới: ${formatDisplayDate(updatedBooking.appointmentDate)} lúc ${updatedBooking.appointmentTime}.`
+        `Đã hủy thành công booking ${booking.bookingId}. ` +
+        `Lịch hẹn ngày ${booking.appointmentDate} lúc ${booking.appointmentTime} đã được chuyển sang trạng thái cancelled.`
     );
 }
 
-async function handleRescheduleMessage({ message, sessionId }) {
+async function handleCancelMessage({ message, sessionId }) {
     const session = mockSessions.getSession(sessionId);
+    const extractedBookingId = extractBookingId(message);
+    const confirmation = detectConfirmation(message);
 
     const currentDraft =
         session &&
-            session.currentFlow === FLOWS.RESCHEDULE &&
-            session.rescheduleDraft
-            ? session.rescheduleDraft
-            : getEmptyRescheduleDraft(session?.confirmedBookingId || null);
-
-    const extractedBookingId = extractBookingId(message);
-    const extractedDate = detectDateFromMessage(message);
-    const extractedTime = detectTimeFromMessage(message);
-
-    const extractedSlots = {};
-
-    if (extractedBookingId) {
-        extractedSlots.bookingId = extractedBookingId;
-    }
-
-    if (extractedDate) {
-        extractedSlots.newAppointmentDate = extractedDate;
-    }
-
-    if (extractedTime) {
-        extractedSlots.newAppointmentTime = extractedTime;
-    }
+        session.currentFlow === FLOWS.CANCEL &&
+        session.cancelDraft
+            ? session.cancelDraft
+            : getEmptyCancelDraft(session?.confirmedBookingId || null);
 
     const nextDraft = {
         ...currentDraft,
-        ...extractedSlots
+        bookingId: extractedBookingId || currentDraft.bookingId,
+        confirmed: confirmation === true ? true : currentDraft.confirmed
     };
 
     if (!nextDraft.bookingId) {
         const updatedSession = mockSessions.upsertSession(sessionId, {
-            currentFlow: FLOWS.RESCHEDULE,
+            currentFlow: FLOWS.CANCEL,
             status: "awaiting_booking_id",
-            rescheduleDraft: nextDraft,
+            cancelDraft: nextDraft,
             confirmedBookingId: session?.confirmedBookingId || null
         });
 
         return createChatResult({
             sessionId,
             userMessage: message,
-            flow: FLOWS.RESCHEDULE,
-            action: ACTIONS.ASK_RESCHEDULE_BOOKING_ID,
+            flow: FLOWS.CANCEL,
+            action: ACTIONS.ASK_CANCEL_BOOKING_ID,
             reply: buildAskBookingIdReply(session),
             booking: null,
             meta: {
-                handledBy: "reschedule.service",
+                handledBy: "cancel.service",
                 sessionState: updatedSession.status,
-                extractedSlots,
-                missingFields: getMissingFields(nextDraft),
                 nextExpectedField: "bookingId"
             }
         });
@@ -177,24 +120,22 @@ async function handleRescheduleMessage({ message, sessionId }) {
 
     if (!existingBooking) {
         const updatedSession = mockSessions.upsertSession(sessionId, {
-            currentFlow: FLOWS.RESCHEDULE,
+            currentFlow: FLOWS.CANCEL,
             status: "awaiting_booking_id",
-            rescheduleDraft: nextDraft,
+            cancelDraft: getEmptyCancelDraft(session?.confirmedBookingId || null),
             confirmedBookingId: session?.confirmedBookingId || null
         });
 
         return createChatResult({
             sessionId,
             userMessage: message,
-            flow: FLOWS.RESCHEDULE,
-            action: ACTIONS.RESCHEDULE_BOOKING_NOT_FOUND,
+            flow: FLOWS.CANCEL,
+            action: ACTIONS.CANCEL_BOOKING_NOT_FOUND,
             reply: buildInvalidBookingReply(nextDraft.bookingId),
             booking: null,
             meta: {
-                handledBy: "reschedule.service",
+                handledBy: "cancel.service",
                 sessionState: updatedSession.status,
-                extractedSlots,
-                missingFields: getMissingFields(nextDraft),
                 nextExpectedField: "bookingId"
             }
         });
@@ -204,86 +145,94 @@ async function handleRescheduleMessage({ message, sessionId }) {
         return createChatResult({
             sessionId,
             userMessage: message,
-            flow: FLOWS.RESCHEDULE,
-            action: ACTIONS.RESCHEDULE_NOT_ALLOWED,
-            reply:
-                `Booking ${existingBooking.bookingId} hiện đã ở trạng thái cancelled nên không thể đổi lịch.`,
+            flow: FLOWS.CANCEL,
+            action: ACTIONS.CANCEL_ALREADY_CANCELLED,
+            reply: `Booking ${existingBooking.bookingId} hiện đã ở trạng thái cancelled.`,
             booking: existingBooking,
             meta: {
-                handledBy: "reschedule.service",
-                sessionState: "blocked",
-                extractedSlots,
-                missingFields: [],
+                handledBy: "cancel.service",
+                sessionState: "cancel_completed",
                 nextExpectedField: null
             }
         });
     }
 
-    if (!nextDraft.newAppointmentDate || !nextDraft.newAppointmentTime) {
-        const updatedSession = mockSessions.upsertSession(sessionId, {
-            currentFlow: FLOWS.RESCHEDULE,
-            status: "awaiting_new_schedule",
-            rescheduleDraft: nextDraft,
+    if (confirmation === false) {
+        mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.CANCEL,
+            status: "cancel_aborted",
+            cancelDraft: getEmptyCancelDraft(existingBooking.bookingId),
             confirmedBookingId: existingBooking.bookingId
         });
 
         return createChatResult({
             sessionId,
             userMessage: message,
-            flow: FLOWS.RESCHEDULE,
-            action: ACTIONS.ASK_RESCHEDULE_INFO,
-            reply: buildAskNewScheduleReply(existingBooking, nextDraft),
+            flow: FLOWS.CANCEL,
+            action: ACTIONS.ASK_CANCEL_CONFIRMATION,
+            reply: "Mình sẽ giữ nguyên lịch hẹn hiện tại. Nếu bạn muốn hủy lại, cứ gửi mã booking BK... cho mình.",
             booking: existingBooking,
             meta: {
-                handledBy: "reschedule.service",
-                sessionState: updatedSession.status,
-                extractedSlots,
-                missingFields: getMissingFields(nextDraft).filter(
-                    (field) => field !== "bookingId"
-                ),
-                nextExpectedField: !nextDraft.newAppointmentDate
-                    ? "newAppointmentDate"
-                    : "newAppointmentTime"
+                handledBy: "cancel.service",
+                sessionState: "cancel_aborted",
+                nextExpectedField: null
             }
         });
     }
 
-    const oldBookingSnapshot = {
-        ...existingBooking
-    };
+    if (confirmation !== true) {
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.CANCEL,
+            status: "awaiting_confirmation",
+            cancelDraft: nextDraft,
+            confirmedBookingId: existingBooking.bookingId
+        });
 
-    const updatedBooking = mockBookings.updateBooking(existingBooking.bookingId, {
-        appointmentDate: nextDraft.newAppointmentDate,
-        appointmentTime: nextDraft.newAppointmentTime,
-        status: "rescheduled"
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.CANCEL,
+            action: ACTIONS.ASK_CANCEL_CONFIRMATION,
+            reply: buildConfirmReply(existingBooking),
+            booking: existingBooking,
+            meta: {
+                handledBy: "cancel.service",
+                sessionState: updatedSession.status,
+                nextExpectedField: "confirmation"
+            }
+        });
+    }
+
+    const cancelledBooking = mockBookings.updateBooking(existingBooking.bookingId, {
+        status: "cancelled"
     });
 
     const updatedSession = mockSessions.upsertSession(sessionId, {
-        currentFlow: FLOWS.RESCHEDULE,
-        status: "reschedule_completed",
-        rescheduleDraft: nextDraft,
-        confirmedBookingId: updatedBooking.bookingId
+        currentFlow: FLOWS.CANCEL,
+        status: "cancel_completed",
+        cancelDraft: {
+            bookingId: cancelledBooking.bookingId,
+            confirmed: true
+        },
+        confirmedBookingId: cancelledBooking.bookingId
     });
 
     return createChatResult({
         sessionId,
         userMessage: message,
-        flow: FLOWS.RESCHEDULE,
-        action: ACTIONS.RESCHEDULE_COMPLETED,
-        reply: buildRescheduledReply(oldBookingSnapshot, updatedBooking),
-        booking: updatedBooking,
+        flow: FLOWS.CANCEL,
+        action: ACTIONS.CANCEL_COMPLETED,
+        reply: buildCancelledReply(cancelledBooking),
+        booking: cancelledBooking,
         meta: {
-            handledBy: "reschedule.service",
+            handledBy: "cancel.service",
             sessionState: updatedSession.status,
-            extractedSlots,
-            missingFields: [],
-            nextExpectedField: null,
-            rescheduledBookingId: updatedBooking.bookingId
+            nextExpectedField: null
         }
     });
 }
 
 module.exports = {
-    handleRescheduleMessage,
-    hasActiveRescheduleSession
+    handleCancelMessage,
+    hasActiveCancelSession
 };
