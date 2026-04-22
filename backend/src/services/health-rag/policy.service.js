@@ -59,8 +59,8 @@ function detectUrgencyLevel(message, topChunks) {
 
 function choosePolicyMode({ message, retrievedChunks }) {
     const topChunks = retrievedChunks.slice(0, 3);
-    const topTwoChunks = topChunks.slice(0, 2);
     const top1 = topChunks[0] || null;
+    const top2 = topChunks[1] || null;
     const normalizedMessage = normalizeText(message);
     const redFlagChunks = topChunks.filter((chunk) => chunk.section === "red_flags");
     const uniqueSources = [...new Set(topChunks.map((chunk) => chunk.source_id))];
@@ -142,7 +142,7 @@ function choosePolicyMode({ message, retrievedChunks }) {
         top2.source_id === top1.source_id &&
         top2.faq_type === "urgent_advice" &&
         Math.abs(top1.score - top2.score) <= 0.03 &&
-        !hasEmergencyPattern(normalizedMessage)
+        !hasAnyPattern(normalizedMessage, EMERGENCY_PATTERNS)
     ) {
         return {
             policyVersion: POLICY_VERSION,
