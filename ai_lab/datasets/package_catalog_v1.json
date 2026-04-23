@@ -1,0 +1,1012 @@
+{
+  "catalog_version": "package_catalog_v1",
+  "status": "draft",
+  "runtime_enabled": false,
+  "notes": [
+    "This catalog defines package recommendation candidates only.",
+    "It does not modify current runtime KB or retriever artifacts.",
+    "Only evidence-supported package components are included."
+  ],
+  "evidence_reference_policy": {
+    "authoritative_source_type": "medical_kb_v1_2",
+    "authoritative_reference_format": "medical_kb_v1_2#<kb_id>",
+    "legacy_support_policy": "Legacy notes must not be used as primary package support. If retained, they must be separated as legacy_support_notes."
+  },
+  "runtime_gating_defaults": {
+    "ready": {
+      "runtime_allowed": true,
+      "recommendation_exposure": "allowed",
+      "needs_manual_review": false
+    },
+    "partial": {
+      "runtime_allowed": false,
+      "recommendation_exposure": "guarded",
+      "needs_manual_review": true
+    },
+    "blocked": {
+      "runtime_allowed": false,
+      "recommendation_exposure": "none",
+      "needs_manual_review": true
+    }
+  },
+  "schema_fields": [
+    "package_id",
+    "internal_name",
+    "package_name",
+    "display_name",
+    "display_name_vi",
+    "version",
+    "package_status",
+    "runtime_allowed",
+    "recommendation_exposure",
+    "needs_manual_review",
+    "short_description",
+    "intended_use",
+    "goal",
+    "included_tests",
+    "recommended_tests",
+    "candidate_if",
+    "exclude_if",
+    "required_slots",
+    "optional_slots",
+    "eligibility_logic",
+    "exclusion_logic",
+    "prep_rules",
+    "prep_logic",
+    "escalation_rules",
+    "escalation_logic",
+    "interpretation_boundary",
+    "evidence_status",
+    "supported_sources",
+    "unsupported_or_missing",
+    "support_summary",
+    "legacy_support_notes",
+    "preparation_notes",
+    "exclusion_notes",
+    "escalation_notes",
+    "followup_question_templates",
+    "source_support_status"
+  ],
+  "packages": [
+    {
+      "package_id": "pkg_anemia_infection_basic_v1",
+      "internal_name": "basic_anemia_infection_screening",
+      "package_name": "Basic Anemia / Infection Screening",
+      "display_name": "Basic Anemia / Infection Screening",
+      "display_name_vi": "Goi sang loc co ban thieu mau / nhiem trung",
+      "version": "v1",
+      "package_status": "ready",
+      "runtime_allowed": true,
+      "recommendation_exposure": "allowed",
+      "needs_manual_review": false,
+      "short_description": "CBC-only basic screening package for low-blood-count or infection-oriented discussion when no red flags are active.",
+      "intended_use": "General, non-emergency screening-oriented recommendation for users asking about basic anemia or infection-related blood testing.",
+      "goal": "Offer a basic CBC-centered screening package for users asking about low-blood-count or infection-oriented blood testing at a general, non-emergency level.",
+      "included_tests": [
+        "Complete Blood Count (CBC)"
+      ],
+      "recommended_tests": [
+        {
+          "test_code": "cbc",
+          "display_name": "Complete Blood Count (CBC)",
+          "role": "core"
+        }
+      ],
+      "candidate_if": [
+        "User asks for a basic screening blood test for anemia concern.",
+        "User asks for a basic screening blood test for infection concern.",
+        "User wants a simple first-step blood package and no red-flag symptoms are present."
+      ],
+      "exclude_if": [
+        "Emergency or urgent red flags are present.",
+        "User asks the system to diagnose anemia or infection.",
+        "User requests unsupported add-on tests such as ferritin, iron studies, cultures, or pathogen-specific screening."
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "red_flag_screen_result",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present"
+      ],
+      "optional_slots": [
+        "age_band",
+        "symptom_duration",
+        "symptom_progression",
+        "fever_present",
+        "severe_weakness_present",
+        "known_chronic_condition_group",
+        "prior_abnormal_results",
+        "recent_meal_status"
+      ],
+      "eligibility_logic": {
+        "all_of": [
+          "slot:recommendation_goal_present",
+          "slot:symptom_summary_present",
+          "slot:red_flag_screen_result_present",
+          "flag:no_active_red_flags"
+        ],
+        "any_of": [
+          "goal:anemia_infection_screening",
+          "goal:basic_blood_package"
+        ],
+        "none_of": [
+          "request:diagnosis_required"
+        ],
+        "flags": [
+          "cbc_anchor_supported"
+        ],
+        "notes": [
+          "Structured logic is draft-only and is not a runtime rule engine yet."
+        ]
+      },
+      "exclusion_logic": {
+        "any_of": [
+          "flag:active_red_flags",
+          "request:diagnosis_required",
+          "request:unsupported_add_on_tests"
+        ],
+        "flags": [
+          "exclude_on_urgent_routing"
+        ],
+        "notes": [
+          "Unsupported ferritin, iron-study, culture, or pathogen-specific add-ons remain outside current package scope."
+        ]
+      },
+      "prep_rules": [
+        "No CBC-specific preparation rule is promoted in this pass.",
+        "Only generic blood-draw preparation may be referenced later if needed."
+      ],
+      "prep_logic": {
+        "all_of": [],
+        "any_of": [
+          "prep:no_specific_cbc_rule"
+        ],
+        "none_of": [
+          "prep:claim_required_fasting"
+        ],
+        "flags": [
+          "use_generic_blood_draw_prep_only_if_needed"
+        ],
+        "notes": [
+          "No authoritative CBC-specific preparation support is promoted in this draft."
+        ]
+      },
+      "escalation_rules": [
+        "Escalate if red-flag routing is triggered.",
+        "Escalate if user requests diagnosis or interpretation beyond basic package advice."
+      ],
+      "escalation_logic": {
+        "any_of": [
+          "flag:active_red_flags",
+          "request:diagnosis_required",
+          "request:result_interpretation_required"
+        ],
+        "flags": [
+          "escalate_for_urgent_care",
+          "escalate_for_medical_review"
+        ],
+        "notes": [
+          "Urgent care escalation takes priority over package recommendation."
+        ]
+      },
+      "interpretation_boundary": "CBC abnormalities may support further medical evaluation, but the package does not diagnose anemia, infection, or blood disorders.",
+      "evidence_status": "ready",
+      "supported_sources": [
+        "medical_kb_v1_2#kb_v1_2_019",
+        "medical_kb_v1_2#kb_v1_2_020"
+      ],
+      "unsupported_or_missing": [
+        "No dedicated ferritin or iron-study support",
+        "No package-specific interpretation rules"
+      ],
+      "support_summary": "Direct versioned KB support exists for CBC meaning and CBC use in anemia/infection-oriented evaluation.",
+      "legacy_support_notes": [],
+      "preparation_notes": [
+        "No CBC-specific fasting rule is promoted in the current draft.",
+        "If needed, only generic blood-draw preparation language should be used."
+      ],
+      "exclusion_notes": [
+        "Do not use when urgent red flags are present.",
+        "Do not use when the user is asking for diagnosis or unsupported add-on tests."
+      ],
+      "escalation_notes": [
+        "Escalate immediately for active red flags.",
+        "Escalate for medical review if the user wants diagnosis or result interpretation."
+      ],
+      "followup_question_templates": [
+        {
+          "slot_id": "symptom_summary",
+          "question_vi": "Ban co the mo ta ngan gon trieu chung hoac ly do muon kiem tra mau khong?"
+        },
+        {
+          "slot_id": "fever_present",
+          "question_vi": "Ban co sot hoac cam giac dang co nhiem trung khong?"
+        },
+        {
+          "slot_id": "severe_weakness_present",
+          "question_vi": "Ban co met rat nhieu, yeu nhanh, hoac tinh trang dang xau di khong?"
+        }
+      ],
+      "source_support_status": {
+        "supported_sources": [
+          "medical_kb_v1_2#kb_v1_2_019",
+          "medical_kb_v1_2#kb_v1_2_020"
+        ],
+        "legacy_support_notes": [],
+        "support_summary": "Direct versioned KB support exists for CBC meaning and CBC use in anemia/infection-oriented evaluation.",
+        "unsupported_or_missing": [
+          "No dedicated ferritin or iron-study support",
+          "No package-specific interpretation rules"
+        ]
+      }
+    },
+    {
+      "package_id": "pkg_diabetes_glucose_basic_v1",
+      "internal_name": "basic_glucose_screening",
+      "package_name": "Basic Glucose Screening",
+      "display_name": "Basic Glucose Screening",
+      "display_name_vi": "Goi sang loc co ban duong huyet",
+      "version": "v1",
+      "package_status": "partial",
+      "runtime_allowed": false,
+      "recommendation_exposure": "guarded",
+      "needs_manual_review": true,
+      "short_description": "Glucose-oriented screening draft with only generic support in the current KB.",
+      "intended_use": "Planning-only package candidate for basic blood sugar screening discussions when the request stays non-urgent and within current evidence limits.",
+      "goal": "Represent a basic glucose-oriented screening package candidate without claiming diabetes diagnosis.",
+      "included_tests": [
+        "Blood Glucose"
+      ],
+      "recommended_tests": [
+        {
+          "test_code": "blood_glucose",
+          "display_name": "Blood Glucose",
+          "role": "core"
+        }
+      ],
+      "candidate_if": [
+        "User asks generally about checking blood sugar.",
+        "User asks for a basic screening-oriented blood test package and no red flags are present."
+      ],
+      "exclude_if": [
+        "User has urgent symptoms needing medical review.",
+        "User asks the system to diagnose diabetes.",
+        "User requests HbA1c or other unsupported package components not grounded in current repo evidence."
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "red_flag_screen_result",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present"
+      ],
+      "optional_slots": [
+        "age_band",
+        "symptom_duration",
+        "symptom_progression",
+        "vomiting_present",
+        "dehydration_present",
+        "recent_meal_status",
+        "fasting_feasibility",
+        "known_chronic_condition_group",
+        "prior_abnormal_results"
+      ],
+      "eligibility_logic": {
+        "all_of": [
+          "slot:recommendation_goal_present",
+          "slot:symptom_summary_present",
+          "slot:red_flag_screen_result_present",
+          "flag:no_active_red_flags"
+        ],
+        "any_of": [
+          "goal:glucose_screening",
+          "goal:basic_blood_package"
+        ],
+        "none_of": [
+          "request:diagnosis_required"
+        ],
+        "flags": [
+          "generic_glucose_support_only"
+        ],
+        "notes": [
+          "This package remains partial because the current support is generic, not package-specific."
+        ]
+      },
+      "exclusion_logic": {
+        "any_of": [
+          "flag:active_red_flags",
+          "request:diagnosis_required",
+          "request:unsupported_hba1c_or_add_on_tests"
+        ],
+        "flags": [
+          "exclude_on_partial_support"
+        ],
+        "notes": [
+          "Partial support means this package must not be exposed as runtime-allowed."
+        ]
+      },
+      "prep_rules": [
+        "Some glucose tests may require fasting; the exact requirement must be confirmed with the care site.",
+        "Do not claim a single fasting rule for all glucose requests."
+      ],
+      "prep_logic": {
+        "all_of": [],
+        "any_of": [
+          "prep:fasting_may_be_required"
+        ],
+        "none_of": [
+          "prep:claim_universal_fasting_rule"
+        ],
+        "flags": [
+          "requires_site_confirmation"
+        ],
+        "notes": [
+          "Current preparation wording is supported only as a legacy support note, not as primary package evidence."
+        ]
+      },
+      "escalation_rules": [
+        "Escalate if symptoms are acute or concerning.",
+        "Escalate if the user requests diagnosis, treatment, or medication advice."
+      ],
+      "escalation_logic": {
+        "any_of": [
+          "flag:active_red_flags",
+          "request:diagnosis_required",
+          "request:treatment_required",
+          "request:medication_advice_required"
+        ],
+        "flags": [
+          "escalate_for_urgent_care",
+          "escalate_for_medical_review"
+        ],
+        "notes": [
+          "Because this package is partial, guarded handling is mandatory."
+        ]
+      },
+      "interpretation_boundary": "A glucose-oriented package may support general screening discussion, but it does not diagnose or exclude diabetes on its own.",
+      "evidence_status": "partial",
+      "supported_sources": [
+        "medical_kb_v1_2#kb_v1_007"
+      ],
+      "unsupported_or_missing": [
+        "No dedicated glucose explainer in the versioned KB",
+        "No dedicated package-level source support",
+        "No clean HbA1c support"
+      ],
+      "support_summary": "Versioned KB support is limited to generic blood-glucose mention as a common blood test. A legacy note exists for cautious fasting guidance.",
+      "legacy_support_notes": [
+        "knowledge_items#kb_002"
+      ],
+      "preparation_notes": [
+        "Some glucose tests may require fasting.",
+        "Preparation must be confirmed with the care site before recommendation is operationalized."
+      ],
+      "exclusion_notes": [
+        "Do not use for diagnosis requests.",
+        "Do not use when the user expects HbA1c or other unsupported diabetes package components."
+      ],
+      "escalation_notes": [
+        "Escalate for urgent symptoms or red flags.",
+        "Escalate for treatment or medication requests."
+      ],
+      "followup_question_templates": [
+        {
+          "slot_id": "recent_meal_status",
+          "question_vi": "Lan gan nhat ban an khi nao?"
+        },
+        {
+          "slot_id": "fasting_feasibility",
+          "question_vi": "Neu can nhin an truoc xet nghiem, ban co the sap xep duoc khong?"
+        },
+        {
+          "slot_id": "vomiting_present",
+          "question_vi": "Ban co non oi, mat nuoc, hoac tinh trang dang xau di nhanh khong?"
+        }
+      ],
+      "source_support_status": {
+        "supported_sources": [
+          "medical_kb_v1_2#kb_v1_007"
+        ],
+        "legacy_support_notes": [
+          "knowledge_items#kb_002"
+        ],
+        "support_summary": "Versioned KB support is limited to generic blood-glucose mention as a common blood test. A legacy note exists for cautious fasting guidance.",
+        "unsupported_or_missing": [
+          "No dedicated glucose explainer in the versioned KB",
+          "No dedicated package-level source support",
+          "No clean HbA1c support"
+        ]
+      }
+    },
+    {
+      "package_id": "pkg_lipid_cardiometabolic_basic_v1",
+      "internal_name": "basic_lipid_screening",
+      "package_name": "Basic Lipid Screening",
+      "display_name": "Basic Lipid Screening",
+      "display_name_vi": "Goi sang loc co ban mo mau",
+      "version": "v1",
+      "package_status": "partial",
+      "runtime_allowed": false,
+      "recommendation_exposure": "guarded",
+      "needs_manual_review": true,
+      "short_description": "Lipid-focused screening draft with only generic support in the current KB.",
+      "intended_use": "Planning-only package candidate for basic lipid or cholesterol screening discussions when the request stays non-urgent and within current evidence limits.",
+      "goal": "Represent a basic lipid-focused screening package candidate for non-emergency general health discussions.",
+      "included_tests": [
+        "Lipid Profile"
+      ],
+      "recommended_tests": [
+        {
+          "test_code": "lipid_profile",
+          "display_name": "Lipid Profile",
+          "role": "core"
+        }
+      ],
+      "candidate_if": [
+        "User asks generally about cholesterol testing.",
+        "User asks for a basic health-screening package and no red flags are present."
+      ],
+      "exclude_if": [
+        "User has chest pain, shortness of breath, stroke-like symptoms, or other urgent signals.",
+        "User asks the system to estimate cardiovascular risk clinically.",
+        "User requests unsupported metabolic add-ons not grounded in current repo evidence."
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "red_flag_screen_result",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present"
+      ],
+      "optional_slots": [
+        "age_band",
+        "symptom_duration",
+        "symptom_progression",
+        "recent_meal_status",
+        "fasting_feasibility",
+        "known_chronic_condition_group",
+        "prior_abnormal_results"
+      ],
+      "eligibility_logic": {
+        "all_of": [
+          "slot:recommendation_goal_present",
+          "slot:symptom_summary_present",
+          "slot:red_flag_screen_result_present",
+          "flag:no_active_red_flags"
+        ],
+        "any_of": [
+          "goal:lipid_screening",
+          "goal:basic_blood_package"
+        ],
+        "none_of": [
+          "request:clinical_cardiovascular_risk_estimate_required"
+        ],
+        "flags": [
+          "generic_lipid_support_only"
+        ],
+        "notes": [
+          "This package remains partial because the current support is generic and not dedicated to lipid-package reasoning."
+        ]
+      },
+      "exclusion_logic": {
+        "any_of": [
+          "flag:active_red_flags",
+          "request:clinical_cardiovascular_risk_estimate_required",
+          "request:unsupported_metabolic_add_on_tests"
+        ],
+        "flags": [
+          "exclude_on_partial_support"
+        ],
+        "notes": [
+          "Chest pain, shortness of breath, or stroke-like symptoms must route away from screening logic."
+        ]
+      },
+      "prep_rules": [
+        "Some lipid tests may require fasting depending on local instruction.",
+        "Do not claim fasting as universal unless the service later has structured local rules."
+      ],
+      "prep_logic": {
+        "all_of": [],
+        "any_of": [
+          "prep:fasting_may_be_required"
+        ],
+        "none_of": [
+          "prep:claim_universal_fasting_rule"
+        ],
+        "flags": [
+          "requires_site_confirmation"
+        ],
+        "notes": [
+          "Current preparation wording is supported only as a legacy support note, not as primary package evidence."
+        ]
+      },
+      "escalation_rules": [
+        "Escalate if current symptoms suggest urgent cardiovascular evaluation rather than screening.",
+        "Escalate if the user asks for diagnosis or treatment planning."
+      ],
+      "escalation_logic": {
+        "any_of": [
+          "flag:active_red_flags",
+          "request:diagnosis_required",
+          "request:treatment_required",
+          "request:clinical_cardiovascular_risk_estimate_required"
+        ],
+        "flags": [
+          "escalate_for_urgent_care",
+          "escalate_for_medical_review"
+        ],
+        "notes": [
+          "Because this package is partial, guarded handling is mandatory."
+        ]
+      },
+      "interpretation_boundary": "A lipid-focused package may support screening discussion, but it does not diagnose heart disease or determine treatment.",
+      "evidence_status": "partial",
+      "supported_sources": [
+        "medical_kb_v1_2#kb_v1_007"
+      ],
+      "unsupported_or_missing": [
+        "No dedicated lipid panel explainer in the versioned KB",
+        "No package-level cardiometabolic logic",
+        "No supported cardiovascular risk interpretation"
+      ],
+      "support_summary": "Versioned KB support is limited to generic lipid-profile mention as a common blood test. A legacy note exists for cautious fasting guidance.",
+      "legacy_support_notes": [
+        "knowledge_items#kb_001"
+      ],
+      "preparation_notes": [
+        "Some lipid tests may require fasting.",
+        "Preparation must be confirmed with the care site before recommendation is operationalized."
+      ],
+      "exclusion_notes": [
+        "Do not use when urgent cardiovascular-like symptoms are present.",
+        "Do not use for requests that require formal cardiovascular risk estimation."
+      ],
+      "escalation_notes": [
+        "Escalate for active red flags such as chest pain or shortness of breath.",
+        "Escalate for diagnosis or treatment requests."
+      ],
+      "followup_question_templates": [
+        {
+          "slot_id": "recent_meal_status",
+          "question_vi": "Ban vua an gan day chua, va neu co thi la khi nao?"
+        },
+        {
+          "slot_id": "fasting_feasibility",
+          "question_vi": "Neu can nhin an truoc xet nghiem mo mau, ban co the sap xep duoc khong?"
+        },
+        {
+          "slot_id": "chest_pain_present",
+          "question_vi": "Hien tai ban co dau nguc hoac kho tho khong?"
+        }
+      ],
+      "source_support_status": {
+        "supported_sources": [
+          "medical_kb_v1_2#kb_v1_007"
+        ],
+        "legacy_support_notes": [
+          "knowledge_items#kb_001"
+        ],
+        "support_summary": "Versioned KB support is limited to generic lipid-profile mention as a common blood test. A legacy note exists for cautious fasting guidance.",
+        "unsupported_or_missing": [
+          "No dedicated lipid panel explainer in the versioned KB",
+          "No package-level cardiometabolic logic",
+          "No supported cardiovascular risk interpretation"
+        ]
+      }
+    },
+    {
+      "package_id": "pkg_liver_function_metabolic_basic_v1",
+      "internal_name": "basic_liver_metabolic_screening",
+      "package_name": "Basic Liver / Metabolic Screening",
+      "display_name": "Basic Liver / Metabolic Screening",
+      "display_name_vi": "Goi sang loc co ban gan / chuyen hoa",
+      "version": "v1",
+      "package_status": "blocked",
+      "runtime_allowed": false,
+      "recommendation_exposure": "none",
+      "needs_manual_review": true,
+      "short_description": "Blocked placeholder for a future liver-oriented screening package.",
+      "intended_use": "Planning placeholder only. No current recommendation use is allowed.",
+      "goal": "Placeholder for a future liver-oriented basic package if raw/source support is added.",
+      "included_tests": [],
+      "recommended_tests": [],
+      "candidate_if": [
+        "Deferred in v1 planning only."
+      ],
+      "exclude_if": [
+        "Any runtime recommendation request in the current repo state."
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "red_flag_screen_result"
+      ],
+      "optional_slots": [
+        "age_band",
+        "known_chronic_condition_group",
+        "pregnancy_status"
+      ],
+      "eligibility_logic": {
+        "all_of": [],
+        "any_of": [],
+        "none_of": [],
+        "flags": [
+          "source_support_missing"
+        ],
+        "notes": [
+          "No active eligibility path is defined because this package is blocked."
+        ]
+      },
+      "exclusion_logic": {
+        "any_of": [
+          "flag:package_blocked",
+          "request:any_runtime_recommendation"
+        ],
+        "flags": [
+          "do_not_recommend"
+        ],
+        "notes": [
+          "Blocked packages must not be surfaced in runtime recommendation."
+        ]
+      },
+      "prep_rules": [
+        "No supported package preparation rules in current repo state."
+      ],
+      "prep_logic": {
+        "all_of": [],
+        "any_of": [],
+        "none_of": [],
+        "flags": [
+          "no_supported_prep_logic"
+        ],
+        "notes": [
+          "No prep logic is available because there is no authoritative package support."
+        ]
+      },
+      "escalation_rules": [
+        "Do not recommend; escalate for medical review or hold the request."
+      ],
+      "escalation_logic": {
+        "any_of": [
+          "flag:package_blocked"
+        ],
+        "flags": [
+          "do_not_recommend",
+          "escalate_for_medical_review"
+        ],
+        "notes": [
+          "Blocked status is the reason for escalation, not clinical sufficiency."
+        ]
+      },
+      "interpretation_boundary": "No liver-function package should be interpreted or recommended from the current evidence base.",
+      "evidence_status": "blocked",
+      "supported_sources": [],
+      "unsupported_or_missing": [
+        "No dedicated liver function test source",
+        "No supported AST/ALT/albumin/bilirubin package definition",
+        "No package-specific candidate logic"
+      ],
+      "support_summary": "Current repo artifacts do not cleanly support a liver-specific package.",
+      "legacy_support_notes": [],
+      "preparation_notes": [
+        "No preparation note should be shown because the package is blocked."
+      ],
+      "exclusion_notes": [
+        "This package must not be recommended in the current repo state."
+      ],
+      "escalation_notes": [
+        "Hold the request or escalate for medical review instead of recommending."
+      ],
+      "followup_question_templates": [
+        {
+          "slot_id": "recommendation_goal",
+          "question_vi": "Ban dang muon kiem tra vi muc dich gi?"
+        }
+      ],
+      "source_support_status": {
+        "supported_sources": [],
+        "legacy_support_notes": [],
+        "support_summary": "Current repo artifacts do not cleanly support a liver-specific package.",
+        "unsupported_or_missing": [
+          "No dedicated liver function test source",
+          "No supported AST/ALT/albumin/bilirubin package definition",
+          "No package-specific candidate logic"
+        ]
+      }
+    },
+    {
+      "package_id": "pkg_kidney_function_basic_v1",
+      "internal_name": "basic_kidney_function_screening",
+      "package_name": "Basic Kidney Function Screening",
+      "display_name": "Basic Kidney Function Screening",
+      "display_name_vi": "Goi sang loc co ban chuc nang than",
+      "version": "v1",
+      "package_status": "ready",
+      "runtime_allowed": true,
+      "recommendation_exposure": "allowed",
+      "needs_manual_review": false,
+      "short_description": "BMP-only basic screening package for kidney-function-oriented discussion when no red flags are active.",
+      "intended_use": "General, non-emergency screening-oriented recommendation for users asking about basic kidney-function blood testing.",
+      "goal": "Offer a BMP-centered basic package for general kidney and metabolic screening discussion at a non-emergency level.",
+      "included_tests": [
+        "Basic Metabolic Panel (BMP)"
+      ],
+      "recommended_tests": [
+        {
+          "test_code": "bmp",
+          "display_name": "Basic Metabolic Panel (BMP)",
+          "role": "core"
+        }
+      ],
+      "candidate_if": [
+        "User asks for a basic kidney-function blood package.",
+        "User wants a basic metabolic screening package and no red flags are present."
+      ],
+      "exclude_if": [
+        "User has urgent symptoms requiring acute medical evaluation.",
+        "User asks the system to diagnose kidney disease.",
+        "User requests unsupported kidney add-ons not grounded in current repo evidence."
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "red_flag_screen_result",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present"
+      ],
+      "optional_slots": [
+        "age_band",
+        "symptom_duration",
+        "symptom_progression",
+        "vomiting_present",
+        "dehydration_present",
+        "fasting_feasibility",
+        "known_chronic_condition_group",
+        "prior_abnormal_results"
+      ],
+      "eligibility_logic": {
+        "all_of": [
+          "slot:recommendation_goal_present",
+          "slot:symptom_summary_present",
+          "slot:red_flag_screen_result_present",
+          "flag:no_active_red_flags"
+        ],
+        "any_of": [
+          "goal:kidney_function_screening",
+          "goal:basic_blood_package"
+        ],
+        "none_of": [
+          "request:diagnosis_required"
+        ],
+        "flags": [
+          "bmp_anchor_supported"
+        ],
+        "notes": [
+          "Structured logic is draft-only and is not a runtime rule engine yet."
+        ]
+      },
+      "exclusion_logic": {
+        "any_of": [
+          "flag:active_red_flags",
+          "request:diagnosis_required",
+          "request:unsupported_kidney_add_on_tests"
+        ],
+        "flags": [
+          "exclude_on_urgent_routing"
+        ],
+        "notes": [
+          "Unsupported kidney add-ons remain outside current package scope."
+        ]
+      },
+      "prep_rules": [
+        "BMP may require fasting in some situations; the service must not overstate this rule.",
+        "If preparation is discussed, confirm that instructions depend on the care site."
+      ],
+      "prep_logic": {
+        "all_of": [],
+        "any_of": [
+          "prep:fasting_may_be_required"
+        ],
+        "none_of": [
+          "prep:claim_universal_fasting_rule"
+        ],
+        "flags": [
+          "requires_site_confirmation"
+        ],
+        "notes": [
+          "Current BMP prep wording is supported from the versioned KB but remains high-level."
+        ]
+      },
+      "escalation_rules": [
+        "Escalate if the user reports urgent symptoms.",
+        "Escalate if the user wants diagnosis or treatment recommendations."
+      ],
+      "escalation_logic": {
+        "any_of": [
+          "flag:active_red_flags",
+          "request:diagnosis_required",
+          "request:treatment_required"
+        ],
+        "flags": [
+          "escalate_for_urgent_care",
+          "escalate_for_medical_review"
+        ],
+        "notes": [
+          "Urgent care escalation takes priority over package recommendation."
+        ]
+      },
+      "interpretation_boundary": "A BMP-centered package may support basic kidney and metabolic screening discussion, but it does not diagnose kidney disease or explain specific abnormal values on its own.",
+      "evidence_status": "ready",
+      "supported_sources": [
+        "medical_kb_v1_2#kb_v1_2_017",
+        "medical_kb_v1_2#kb_v1_2_018"
+      ],
+      "unsupported_or_missing": [
+        "No package-specific interpretation rules beyond high-level boundary"
+      ],
+      "support_summary": "Direct versioned KB support exists for BMP meaning, use, metabolic framing, and kidney-related screening context.",
+      "legacy_support_notes": [],
+      "preparation_notes": [
+        "BMP preparation may vary.",
+        "If preparation is discussed, confirm that the care site may request fasting in some situations."
+      ],
+      "exclusion_notes": [
+        "Do not use when urgent symptoms are active.",
+        "Do not use when the user expects diagnosis or unsupported kidney-specific add-ons."
+      ],
+      "escalation_notes": [
+        "Escalate for active red flags.",
+        "Escalate for diagnosis or treatment requests."
+      ],
+      "followup_question_templates": [
+        {
+          "slot_id": "vomiting_present",
+          "question_vi": "Ban co non oi, mat nuoc, hoac cam thay dang yeu di nhanh khong?"
+        },
+        {
+          "slot_id": "known_chronic_condition_group",
+          "question_vi": "Ban co benh man tinh nao da biet truoc do khong, vi du benh than hoac dai thao duong?"
+        },
+        {
+          "slot_id": "fasting_feasibility",
+          "question_vi": "Neu can nhin an truoc xet nghiem, ban co the sap xep duoc khong?"
+        }
+      ],
+      "source_support_status": {
+        "supported_sources": [
+          "medical_kb_v1_2#kb_v1_2_017",
+          "medical_kb_v1_2#kb_v1_2_018"
+        ],
+        "legacy_support_notes": [],
+        "support_summary": "Direct versioned KB support exists for BMP meaning, use, metabolic framing, and kidney-related screening context.",
+        "unsupported_or_missing": [
+          "No package-specific interpretation rules beyond high-level boundary"
+        ]
+      }
+    },
+    {
+      "package_id": "pkg_infectious_screening_hbv_hiv_v1",
+      "internal_name": "basic_infectious_screening_hbv_hiv",
+      "package_name": "Basic Infectious Screening (HBV/HIV)",
+      "display_name": "Basic Infectious Screening (HBV/HIV)",
+      "display_name_vi": "Goi sang loc co ban nhiem trung HBV/HIV",
+      "version": "v1",
+      "package_status": "blocked",
+      "runtime_allowed": false,
+      "recommendation_exposure": "none",
+      "needs_manual_review": true,
+      "short_description": "Blocked placeholder for a future HBV/HIV screening package.",
+      "intended_use": "Planning placeholder only. No current recommendation use is allowed.",
+      "goal": "Deferred placeholder only. No recommendation should be made in the current repo state.",
+      "included_tests": [],
+      "recommended_tests": [],
+      "candidate_if": [
+        "Deferred in planning only."
+      ],
+      "exclude_if": [
+        "Any runtime recommendation request in the current repo state."
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "red_flag_screen_result"
+      ],
+      "optional_slots": [
+        "age_band",
+        "exposure_context"
+      ],
+      "eligibility_logic": {
+        "all_of": [],
+        "any_of": [],
+        "none_of": [],
+        "flags": [
+          "source_support_missing"
+        ],
+        "notes": [
+          "No active eligibility path is defined because this package is blocked."
+        ]
+      },
+      "exclusion_logic": {
+        "any_of": [
+          "flag:package_blocked",
+          "request:any_runtime_recommendation"
+        ],
+        "flags": [
+          "do_not_recommend"
+        ],
+        "notes": [
+          "Blocked packages must not be surfaced in runtime recommendation."
+        ]
+      },
+      "prep_rules": [
+        "No supported package preparation rules in current repo state."
+      ],
+      "prep_logic": {
+        "all_of": [],
+        "any_of": [],
+        "none_of": [],
+        "flags": [
+          "no_supported_prep_logic"
+        ],
+        "notes": [
+          "No prep logic is available because there is no authoritative package support."
+        ]
+      },
+      "escalation_rules": [
+        "Do not recommend; hold pending source-backed expansion."
+      ],
+      "escalation_logic": {
+        "any_of": [
+          "flag:package_blocked"
+        ],
+        "flags": [
+          "do_not_recommend",
+          "escalate_for_medical_review"
+        ],
+        "notes": [
+          "Blocked status is the reason for escalation, not clinical sufficiency."
+        ]
+      },
+      "interpretation_boundary": "No HBV/HIV screening package should be recommended or interpreted from the current evidence base.",
+      "evidence_status": "blocked",
+      "supported_sources": [],
+      "unsupported_or_missing": [
+        "No HBV test source",
+        "No HIV test source",
+        "No supported package-level screening policy"
+      ],
+      "support_summary": "No clean HBV/HIV screening support was found in inspected repo artifacts.",
+      "legacy_support_notes": [],
+      "preparation_notes": [
+        "No preparation note should be shown because the package is blocked."
+      ],
+      "exclusion_notes": [
+        "This package must not be recommended in the current repo state."
+      ],
+      "escalation_notes": [
+        "Hold the request or escalate for medical review instead of recommending."
+      ],
+      "followup_question_templates": [
+        {
+          "slot_id": "recommendation_goal",
+          "question_vi": "Ban dang muon kiem tra vi muc dich gi?"
+        }
+      ],
+      "source_support_status": {
+        "supported_sources": [],
+        "legacy_support_notes": [],
+        "support_summary": "No clean HBV/HIV screening support was found in inspected repo artifacts.",
+        "unsupported_or_missing": [
+          "No HBV test source",
+          "No HIV test source",
+          "No supported package-level screening policy"
+        ]
+      }
+    }
+  ]
+}

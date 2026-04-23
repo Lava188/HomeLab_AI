@@ -1,0 +1,552 @@
+{
+  "schema_version": "slot_schema_v1",
+  "status": "draft",
+  "purpose": "Minimal slot schema for asking follow-up questions before package recommendation.",
+  "slot_state_convention": {
+    "not_asked": "A slot that is absent from the collected slot state has not been asked yet.",
+    "unknown_value": "If a slot supports unknown, the explicit stored value must be the string 'unknown'.",
+    "boolean_like_encoding": "Boolean-like slots that support unknown may store true, false, or 'unknown'.",
+    "recommendation_goal_note": "For recommendation_goal, the explicit value 'unsure' means the user cannot specify a package direction yet. It is not the same as not_asked."
+  },
+  "notes": [
+    "This schema supports planning for recommendation-time clarification only.",
+    "It does not implement a live multi-turn controller."
+  ],
+  "slots": [
+    {
+      "slot_id": "recommendation_goal",
+      "display_name": "Recommendation Goal",
+      "question_vi": "Ban dang muon kiem tra theo huong nao?",
+      "question_en": "What kind of test package are you looking for?",
+      "value_type": "enum",
+      "allowed_values": [
+        "basic_blood_package",
+        "anemia_infection_screening",
+        "glucose_screening",
+        "lipid_screening",
+        "kidney_function_screening",
+        "liver_function_screening",
+        "infectious_screening",
+        "unsure"
+      ],
+      "required_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "optional_for": [],
+      "red_flag_relevance": "none",
+      "affects_eligibility": true,
+      "affects_exclusion": false,
+      "affects_prep": false,
+      "affects_escalation": false,
+      "collection_priority": 1,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Primary intent-routing slot. The explicit value 'unsure' means the user cannot choose a package direction yet."
+    },
+    {
+      "slot_id": "symptom_summary",
+      "display_name": "Symptom Summary",
+      "question_vi": "Ban co the mo ta ngan gon trieu chung hoac ly do muon kiem tra khong?",
+      "question_en": "Can you briefly describe your symptoms or reason for testing?",
+      "value_type": "text",
+      "allowed_values": [],
+      "required_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "optional_for": [],
+      "red_flag_relevance": "high",
+      "affects_eligibility": true,
+      "affects_exclusion": true,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 1,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Free-text summary used before more targeted slot collection."
+    },
+    {
+      "slot_id": "age_band",
+      "display_name": "Age Band",
+      "question_vi": "Ban thuoc nhom tuoi nao?",
+      "question_en": "Which age band are you in?",
+      "value_type": "enum",
+      "allowed_values": [
+        "under_18",
+        "18_to_39",
+        "40_to_64",
+        "65_plus",
+        "unknown"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "red_flag_relevance": "medium",
+      "affects_eligibility": true,
+      "affects_exclusion": false,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 3,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Included as a light contextual slot, not as a hard gate in current draft."
+    },
+    {
+      "slot_id": "symptom_duration",
+      "display_name": "Symptom Duration",
+      "question_vi": "Trieu chung da keo dai bao lau?",
+      "question_en": "How long have the symptoms been going on?",
+      "value_type": "duration",
+      "allowed_values": [],
+      "required_for": [],
+      "optional_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "red_flag_relevance": "medium",
+      "affects_eligibility": true,
+      "affects_exclusion": false,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 3,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Useful for future clarification and triage wording."
+    },
+    {
+      "slot_id": "symptom_progression",
+      "display_name": "Symptom Progression",
+      "question_vi": "Tinh trang dang on dinh, cai thien hay xau di nhanh?",
+      "question_en": "Are the symptoms stable, improving, or getting worse quickly?",
+      "value_type": "severity",
+      "allowed_values": [
+        "stable",
+        "improving",
+        "worsening",
+        "rapidly_worsening",
+        "unknown"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "red_flag_relevance": "high",
+      "affects_eligibility": true,
+      "affects_exclusion": true,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 2,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Rapid worsening should bias toward escalation."
+    },
+    {
+      "slot_id": "fever_present",
+      "display_name": "Fever Present",
+      "question_vi": "Ban co sot khong?",
+      "question_en": "Do you have a fever?",
+      "value_type": "boolean",
+      "allowed_values": [
+        true,
+        false,
+        "unknown"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "anemia_infection_flow"
+      ],
+      "red_flag_relevance": "medium",
+      "affects_eligibility": true,
+      "affects_exclusion": false,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 2,
+      "supports_unknown": true,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Relevant mainly to infection-oriented discussion."
+    },
+    {
+      "slot_id": "severe_weakness_present",
+      "display_name": "Severe Weakness Present",
+      "question_vi": "Ban co met rat nhieu hoac yeu nhanh bat thuong khong?",
+      "question_en": "Do you have severe weakness or feel rapidly more unwell?",
+      "value_type": "boolean",
+      "allowed_values": [
+        true,
+        false,
+        "unknown"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "anemia_infection_flow",
+        "kidney_function_flow"
+      ],
+      "red_flag_relevance": "high",
+      "affects_eligibility": true,
+      "affects_exclusion": true,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 2,
+      "supports_unknown": true,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Can contribute to urgent-care escalation in future logic."
+    },
+    {
+      "slot_id": "vomiting_present",
+      "display_name": "Vomiting Present",
+      "question_vi": "Ban co non oi khong?",
+      "question_en": "Are you vomiting?",
+      "value_type": "boolean",
+      "allowed_values": [
+        true,
+        false,
+        "unknown"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "glucose_flow",
+        "kidney_function_flow"
+      ],
+      "red_flag_relevance": "high",
+      "affects_eligibility": false,
+      "affects_exclusion": true,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 2,
+      "supports_unknown": true,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Included because vomiting is mentioned in current repo safety framing."
+    },
+    {
+      "slot_id": "dehydration_present",
+      "display_name": "Dehydration Present",
+      "question_vi": "Ban co dau hieu mat nuoc hoac khong uong duoc nuoc khong?",
+      "question_en": "Do you have signs of dehydration or trouble keeping fluids down?",
+      "value_type": "boolean",
+      "allowed_values": [
+        true,
+        false,
+        "unknown"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "glucose_flow",
+        "kidney_function_flow"
+      ],
+      "red_flag_relevance": "high",
+      "affects_eligibility": false,
+      "affects_exclusion": true,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 2,
+      "supports_unknown": true,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Used only as a light escalation-support slot in this draft."
+    },
+    {
+      "slot_id": "chest_pain_present",
+      "display_name": "Chest Pain Present",
+      "question_vi": "Ban co dau nguc khong?",
+      "question_en": "Do you have chest pain?",
+      "value_type": "boolean",
+      "allowed_values": [
+        true,
+        false,
+        "unknown"
+      ],
+      "required_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "optional_for": [],
+      "red_flag_relevance": "high",
+      "affects_eligibility": false,
+      "affects_exclusion": true,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 1,
+      "supports_unknown": true,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Direct red-flag check aligned with current HomeLab safety boundary."
+    },
+    {
+      "slot_id": "shortness_of_breath_present",
+      "display_name": "Shortness Of Breath Present",
+      "question_vi": "Ban co kho tho khong?",
+      "question_en": "Do you have shortness of breath?",
+      "value_type": "boolean",
+      "allowed_values": [
+        true,
+        false,
+        "unknown"
+      ],
+      "required_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "optional_for": [],
+      "red_flag_relevance": "high",
+      "affects_eligibility": false,
+      "affects_exclusion": true,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 1,
+      "supports_unknown": true,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Direct red-flag check aligned with current HomeLab safety boundary."
+    },
+    {
+      "slot_id": "fainting_or_altered_consciousness_present",
+      "display_name": "Fainting Or Altered Consciousness",
+      "question_vi": "Ban co ngat, lu lan, hoac thay doi y thuc khong?",
+      "question_en": "Have you fainted or had confusion or altered consciousness?",
+      "value_type": "boolean",
+      "allowed_values": [
+        true,
+        false,
+        "unknown"
+      ],
+      "required_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "optional_for": [],
+      "red_flag_relevance": "high",
+      "affects_eligibility": false,
+      "affects_exclusion": true,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 1,
+      "supports_unknown": true,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Direct safety boundary check."
+    },
+    {
+      "slot_id": "pregnancy_status",
+      "display_name": "Pregnancy Status",
+      "question_vi": "Ban co dang mang thai khong?",
+      "question_en": "Are you pregnant?",
+      "value_type": "enum",
+      "allowed_values": [
+        "yes",
+        "no",
+        "unknown",
+        "not_applicable"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "red_flag_relevance": "medium",
+      "affects_eligibility": false,
+      "affects_exclusion": false,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 4,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Included as optional contextual slot only."
+    },
+    {
+      "slot_id": "recent_meal_status",
+      "display_name": "Recent Meal Status",
+      "question_vi": "Lan gan nhat ban an khi nao?",
+      "question_en": "When did you last eat?",
+      "value_type": "enum",
+      "allowed_values": [
+        "within_2_hours",
+        "2_to_8_hours",
+        "more_than_8_hours",
+        "unknown"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "general_basic_screening_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow"
+      ],
+      "red_flag_relevance": "none",
+      "affects_eligibility": false,
+      "affects_exclusion": false,
+      "affects_prep": true,
+      "affects_escalation": false,
+      "collection_priority": 3,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Prep helper slot only."
+    },
+    {
+      "slot_id": "fasting_feasibility",
+      "display_name": "Fasting Feasibility",
+      "question_vi": "Neu can nhin an truoc xet nghiem, ban co the sap xep duoc khong?",
+      "question_en": "If fasting is needed, would you be able to arrange that?",
+      "value_type": "boolean",
+      "allowed_values": [
+        true,
+        false,
+        "unknown"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "general_basic_screening_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow"
+      ],
+      "red_flag_relevance": "none",
+      "affects_eligibility": false,
+      "affects_exclusion": false,
+      "affects_prep": true,
+      "affects_escalation": false,
+      "collection_priority": 3,
+      "supports_unknown": true,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Prep helper slot only."
+    },
+    {
+      "slot_id": "known_chronic_condition_group",
+      "display_name": "Known Chronic Condition Group",
+      "question_vi": "Ban co benh man tinh nao da biet truoc do khong?",
+      "question_en": "Do you have any known chronic condition already?",
+      "value_type": "enum",
+      "allowed_values": [
+        "none_known",
+        "diabetes",
+        "kidney_disease",
+        "high_cholesterol",
+        "liver_disease",
+        "other",
+        "unknown"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "general_basic_screening_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow"
+      ],
+      "red_flag_relevance": "low",
+      "affects_eligibility": true,
+      "affects_exclusion": false,
+      "affects_prep": false,
+      "affects_escalation": false,
+      "collection_priority": 4,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Context slot only. Does not enable diagnosis logic."
+    },
+    {
+      "slot_id": "prior_abnormal_results",
+      "display_name": "Prior Abnormal Results",
+      "question_vi": "Ban da tung co ket qua bat thuong truoc day chua?",
+      "question_en": "Have you had abnormal test results before?",
+      "value_type": "boolean",
+      "allowed_values": [
+        true,
+        false,
+        "unknown"
+      ],
+      "required_for": [],
+      "optional_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "red_flag_relevance": "low",
+      "affects_eligibility": true,
+      "affects_exclusion": false,
+      "affects_prep": false,
+      "affects_escalation": false,
+      "collection_priority": 4,
+      "supports_unknown": true,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Planning-only context slot."
+    },
+    {
+      "slot_id": "red_flag_screen_result",
+      "display_name": "Red Flag Screen Result",
+      "question_vi": "Khong hoi truc tiep. Slot nay duoc tong hop tu cac dau hieu canh bao.",
+      "question_en": "Not asked directly. This slot is derived from red-flag checks.",
+      "value_type": "enum",
+      "allowed_values": [
+        "positive",
+        "negative",
+        "unknown"
+      ],
+      "required_for": [
+        "general_basic_screening_flow",
+        "anemia_infection_flow",
+        "glucose_flow",
+        "lipid_flow",
+        "kidney_function_flow",
+        "blocked_package_flow"
+      ],
+      "optional_for": [],
+      "red_flag_relevance": "high",
+      "affects_eligibility": true,
+      "affects_exclusion": true,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 1,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Derived slot after evaluating chest pain, shortness of breath, fainting or altered consciousness, and symptom progression."
+    },
+    {
+      "slot_id": "exposure_context",
+      "display_name": "Exposure Context",
+      "question_vi": "Ban dang lo ve tiep xuc nguy co nao cu the khong?",
+      "question_en": "Are you concerned about any specific exposure risk?",
+      "value_type": "text",
+      "allowed_values": [],
+      "required_for": [],
+      "optional_for": [
+        "blocked_package_flow"
+      ],
+      "red_flag_relevance": "medium",
+      "affects_eligibility": false,
+      "affects_exclusion": false,
+      "affects_prep": false,
+      "affects_escalation": true,
+      "collection_priority": 5,
+      "not_asked_behavior": "slot_absent",
+      "notes": "Only used for blocked planning flow, not to enable recommendation."
+    }
+  ]
+}

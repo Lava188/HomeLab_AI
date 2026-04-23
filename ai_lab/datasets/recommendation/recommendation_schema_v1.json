@@ -1,0 +1,488 @@
+{
+  "schema_version": "recommendation_schema_v1",
+  "status": "draft",
+  "purpose": "Machine-usable mapping from entry intent and clarification slots to package candidates, exclusions, prep, and escalation outcomes.",
+  "notes": [
+    "This schema is for future recommendation-controller implementation.",
+    "It does not change the current runtime.",
+    "Slot state handling must follow slot_schema_v1: slot missing means not_asked; explicit string 'unknown' means asked but unknown where supported.",
+    "Guarded candidates are planning-only outputs. They must not become final package recommendations unless package_catalog runtime gating explicitly allows them."
+  ],
+  "flows": [
+    {
+      "flow_id": "general_basic_screening_flow",
+      "flow_name": "General Basic Screening Flow",
+      "symptom_cluster": "general_screening",
+      "entry_signals": [
+        "goal:basic_blood_package",
+        "goal:unsure",
+        "query:general_screening_request"
+      ],
+      "candidate_packages": [
+        "pkg_anemia_infection_basic_v1",
+        "pkg_diabetes_glucose_basic_v1",
+        "pkg_lipid_cardiometabolic_basic_v1",
+        "pkg_kidney_function_basic_v1"
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "optional_slots": [
+        "symptom_duration",
+        "symptom_progression",
+        "recent_meal_status",
+        "fasting_feasibility",
+        "known_chronic_condition_group"
+      ],
+      "slot_order": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "symptom_progression",
+        "red_flag_screen_result",
+        "known_chronic_condition_group",
+        "recent_meal_status",
+        "fasting_feasibility"
+      ],
+      "red_flag_checks": [
+        "slot:chest_pain_present",
+        "slot:shortness_of_breath_present",
+        "slot:fainting_or_altered_consciousness_present",
+        "slot:symptom_progression=rapidly_worsening"
+      ],
+      "exclusion_checks": [
+        "flag:active_red_flags",
+        "request:diagnosis_required"
+      ],
+      "recommendation_rules": [
+        {
+          "when_all": [
+            "goal:anemia_infection_screening",
+            "flag:no_active_red_flags"
+          ],
+          "recommend_package": "pkg_anemia_infection_basic_v1"
+        },
+        {
+          "when_all": [
+            "goal:kidney_function_screening",
+            "flag:no_active_red_flags"
+          ],
+          "recommend_package": "pkg_kidney_function_basic_v1"
+        },
+        {
+          "when_all": [
+            "goal:glucose_screening",
+            "flag:no_active_red_flags"
+          ],
+          "guarded_candidate": "pkg_diabetes_glucose_basic_v1",
+          "runtime_gate": {
+            "requires_package_runtime_allowed": true,
+            "blocked_when_runtime_not_allowed": true,
+            "blocked_outcome": "guarded_no_runtime_recommendation"
+          }
+        },
+        {
+          "when_all": [
+            "goal:lipid_screening",
+            "flag:no_active_red_flags"
+          ],
+          "guarded_candidate": "pkg_lipid_cardiometabolic_basic_v1",
+          "runtime_gate": {
+            "requires_package_runtime_allowed": true,
+            "blocked_when_runtime_not_allowed": true,
+            "blocked_outcome": "guarded_no_runtime_recommendation"
+          }
+        }
+      ],
+      "next_action_rules": [
+        {
+          "when_all": [
+            "goal:unsure"
+          ],
+          "next_action": "clarify_goal",
+          "recommendation_allowed": false,
+          "ask_next_slots": [
+            "symptom_summary",
+            "chest_pain_present",
+            "shortness_of_breath_present",
+            "fainting_or_altered_consciousness_present",
+            "symptom_progression",
+            "known_chronic_condition_group"
+          ],
+          "transition_when_goal_resolved": {
+            "anemia_infection_screening": "anemia_infection_flow",
+            "glucose_screening": "glucose_flow",
+            "lipid_screening": "lipid_flow",
+            "kidney_function_screening": "kidney_function_flow",
+            "liver_function_screening": "blocked_package_flow",
+            "infectious_screening": "blocked_package_flow"
+          },
+          "fallback_if_unresolved": "do_not_recommend_or_escalate"
+        },
+        {
+          "when_all": [
+            "goal:basic_blood_package"
+          ],
+          "next_action": "continue_slot_collection",
+          "recommendation_allowed": false,
+          "ask_next_slots": [
+            "symptom_summary",
+            "chest_pain_present",
+            "shortness_of_breath_present",
+            "fainting_or_altered_consciousness_present",
+            "symptom_progression",
+            "known_chronic_condition_group",
+            "recent_meal_status",
+            "fasting_feasibility"
+          ],
+          "transition_when_goal_resolved": {
+            "anemia_infection_screening": "anemia_infection_flow",
+            "glucose_screening": "glucose_flow",
+            "lipid_screening": "lipid_flow",
+            "kidney_function_screening": "kidney_function_flow",
+            "liver_function_screening": "blocked_package_flow",
+            "infectious_screening": "blocked_package_flow"
+          },
+          "fallback_if_unresolved": "do_not_recommend_or_escalate"
+        }
+      ],
+      "prep_rules": [
+        "Use package-level preparation_notes only after a package candidate is selected.",
+        "Do not state fasting as universal."
+      ],
+      "escalation_rules": [
+        "If any red-flag check is positive, do not recommend any package and escalate.",
+        "If the request is diagnostic or treatment-seeking, escalate for medical review."
+      ],
+      "no_recommendation_outcome": "do_not_recommend_or_escalate",
+      "clarification_strategy": "Ask high-priority red-flag questions first. If recommendation_goal is unsure or basic_blood_package, continue clarification until the goal is resolved to a package-specific direction before recommending."
+    },
+    {
+      "flow_id": "anemia_infection_flow",
+      "flow_name": "Basic Anemia / Infection Screening Flow",
+      "symptom_cluster": "anemia_infection",
+      "entry_signals": [
+        "goal:anemia_infection_screening",
+        "query:cbc_request"
+      ],
+      "candidate_packages": [
+        "pkg_anemia_infection_basic_v1"
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "optional_slots": [
+        "fever_present",
+        "severe_weakness_present",
+        "symptom_duration",
+        "symptom_progression",
+        "prior_abnormal_results"
+      ],
+      "slot_order": [
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "fever_present",
+        "severe_weakness_present",
+        "symptom_progression",
+        "red_flag_screen_result"
+      ],
+      "red_flag_checks": [
+        "slot:chest_pain_present",
+        "slot:shortness_of_breath_present",
+        "slot:fainting_or_altered_consciousness_present",
+        "slot:symptom_progression=rapidly_worsening"
+      ],
+      "exclusion_checks": [
+        "flag:active_red_flags",
+        "request:diagnosis_required",
+        "request:unsupported_add_on_tests"
+      ],
+      "recommendation_rules": [
+        {
+          "when_all": [
+            "flag:no_active_red_flags"
+          ],
+          "recommend_package": "pkg_anemia_infection_basic_v1"
+        }
+      ],
+      "prep_rules": [
+        "No CBC-specific prep should be asserted beyond generic blood-draw context."
+      ],
+      "escalation_rules": [
+        "Escalate if red flags are present.",
+        "Escalate if the user requests diagnosis or result interpretation."
+      ],
+      "no_recommendation_outcome": "escalate_for_medical_review",
+      "clarification_strategy": "Use fever and severe weakness as secondary clarification only after red flags are screened out."
+    },
+    {
+      "flow_id": "glucose_flow",
+      "flow_name": "Basic Glucose Screening Flow",
+      "symptom_cluster": "glucose",
+      "entry_signals": [
+        "goal:glucose_screening",
+        "query:blood_sugar_check_request"
+      ],
+      "candidate_packages": [
+        "pkg_diabetes_glucose_basic_v1"
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "optional_slots": [
+        "vomiting_present",
+        "dehydration_present",
+        "recent_meal_status",
+        "fasting_feasibility",
+        "known_chronic_condition_group"
+      ],
+      "slot_order": [
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "vomiting_present",
+        "dehydration_present",
+        "red_flag_screen_result",
+        "recent_meal_status",
+        "fasting_feasibility"
+      ],
+      "red_flag_checks": [
+        "slot:chest_pain_present",
+        "slot:shortness_of_breath_present",
+        "slot:fainting_or_altered_consciousness_present",
+        "slot:vomiting_present=true AND slot:dehydration_present=true"
+      ],
+      "exclusion_checks": [
+        "flag:active_red_flags",
+        "request:diagnosis_required",
+        "request:unsupported_hba1c_or_add_on_tests"
+      ],
+      "recommendation_rules": [
+        {
+          "when_all": [
+            "flag:no_active_red_flags"
+          ],
+          "guarded_candidate": "pkg_diabetes_glucose_basic_v1",
+          "runtime_gate": {
+            "requires_package_runtime_allowed": true,
+            "blocked_when_runtime_not_allowed": true,
+            "blocked_outcome": "guarded_no_runtime_recommendation"
+          }
+        }
+      ],
+      "prep_rules": [
+        "If surfaced later, prep wording must remain conditional and site-confirmed."
+      ],
+      "escalation_rules": [
+        "Escalate for red flags, diagnosis requests, medication requests, or acute concerning symptoms."
+      ],
+      "no_recommendation_outcome": "guarded_no_runtime_recommendation",
+      "clarification_strategy": "Ask red-flag questions first, then recent meal and fasting feasibility only if the request stays non-urgent."
+    },
+    {
+      "flow_id": "lipid_flow",
+      "flow_name": "Basic Lipid Screening Flow",
+      "symptom_cluster": "lipid",
+      "entry_signals": [
+        "goal:lipid_screening",
+        "query:lipid_or_cholesterol_request"
+      ],
+      "candidate_packages": [
+        "pkg_lipid_cardiometabolic_basic_v1"
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "optional_slots": [
+        "recent_meal_status",
+        "fasting_feasibility",
+        "known_chronic_condition_group"
+      ],
+      "slot_order": [
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result",
+        "recent_meal_status",
+        "fasting_feasibility"
+      ],
+      "red_flag_checks": [
+        "slot:chest_pain_present",
+        "slot:shortness_of_breath_present",
+        "slot:fainting_or_altered_consciousness_present"
+      ],
+      "exclusion_checks": [
+        "flag:active_red_flags",
+        "request:clinical_cardiovascular_risk_estimate_required",
+        "request:diagnosis_required"
+      ],
+      "recommendation_rules": [
+        {
+          "when_all": [
+            "flag:no_active_red_flags"
+          ],
+          "guarded_candidate": "pkg_lipid_cardiometabolic_basic_v1",
+          "runtime_gate": {
+            "requires_package_runtime_allowed": true,
+            "blocked_when_runtime_not_allowed": true,
+            "blocked_outcome": "guarded_no_runtime_recommendation"
+          }
+        }
+      ],
+      "prep_rules": [
+        "If surfaced later, prep wording must remain conditional and site-confirmed."
+      ],
+      "escalation_rules": [
+        "Escalate for chest pain, shortness of breath, or requests for clinical risk estimation."
+      ],
+      "no_recommendation_outcome": "guarded_no_runtime_recommendation",
+      "clarification_strategy": "Do not continue package clarification if cardiovascular-style red flags appear."
+    },
+    {
+      "flow_id": "kidney_function_flow",
+      "flow_name": "Basic Kidney Function Screening Flow",
+      "symptom_cluster": "kidney_function",
+      "entry_signals": [
+        "goal:kidney_function_screening",
+        "query:kidney_function_request",
+        "query:bmp_request"
+      ],
+      "candidate_packages": [
+        "pkg_kidney_function_basic_v1"
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "optional_slots": [
+        "vomiting_present",
+        "dehydration_present",
+        "symptom_progression",
+        "fasting_feasibility",
+        "known_chronic_condition_group"
+      ],
+      "slot_order": [
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "vomiting_present",
+        "dehydration_present",
+        "symptom_progression",
+        "red_flag_screen_result",
+        "fasting_feasibility"
+      ],
+      "red_flag_checks": [
+        "slot:chest_pain_present",
+        "slot:shortness_of_breath_present",
+        "slot:fainting_or_altered_consciousness_present",
+        "slot:symptom_progression=rapidly_worsening"
+      ],
+      "exclusion_checks": [
+        "flag:active_red_flags",
+        "request:diagnosis_required",
+        "request:unsupported_kidney_add_on_tests"
+      ],
+      "recommendation_rules": [
+        {
+          "when_all": [
+            "flag:no_active_red_flags"
+          ],
+          "recommend_package": "pkg_kidney_function_basic_v1"
+        }
+      ],
+      "prep_rules": [
+        "BMP preparation must remain conditional and site-confirmed."
+      ],
+      "escalation_rules": [
+        "Escalate for urgent symptoms, active red flags, or treatment requests."
+      ],
+      "no_recommendation_outcome": "escalate_for_medical_review",
+      "clarification_strategy": "Use vomiting and dehydration as secondary clarification only after red flags are screened out."
+    },
+    {
+      "flow_id": "blocked_package_flow",
+      "flow_name": "Blocked Package Flow",
+      "symptom_cluster": "blocked_scope",
+      "entry_signals": [
+        "goal:liver_function_screening",
+        "goal:infectious_screening",
+        "query:hbv_hiv_request",
+        "query:liver_function_request"
+      ],
+      "candidate_packages": [
+        "pkg_liver_function_metabolic_basic_v1",
+        "pkg_infectious_screening_hbv_hiv_v1"
+      ],
+      "required_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "optional_slots": [
+        "pregnancy_status",
+        "exposure_context"
+      ],
+      "slot_order": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result",
+        "exposure_context"
+      ],
+      "red_flag_checks": [
+        "slot:chest_pain_present",
+        "slot:shortness_of_breath_present",
+        "slot:fainting_or_altered_consciousness_present"
+      ],
+      "exclusion_checks": [
+        "flag:package_blocked"
+      ],
+      "recommendation_rules": [],
+      "prep_rules": [
+        "No prep rules should be surfaced because these packages are blocked."
+      ],
+      "escalation_rules": [
+        "Do not recommend any blocked package.",
+        "Use do_not_recommend or escalate_for_medical_review."
+      ],
+      "no_recommendation_outcome": "blocked_package_holdout",
+      "clarification_strategy": "Confirm the request area only enough to explain that the package is outside current supported scope."
+    }
+  ]
+}
