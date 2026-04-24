@@ -1,0 +1,255 @@
+{
+  "eval_name": "recommendation_controller_eval_v1",
+  "cases_path": "ai_lab/datasets/eval/recommendation_controller_cases_v1.json",
+  "controller_entrypoint": "ai_lab/recommendation/recommendation_controller.py:run_recommendation_controller",
+  "metrics": {
+    "total_cases": 9,
+    "passed_cases": 9,
+    "pass_rate": 1.0,
+    "status_accuracy": 1.0,
+    "recommendation_accuracy": 1.0,
+    "ask_next_slot_accuracy": 1.0,
+    "blocked_package_suppression_accuracy": 1.0,
+    "unsafe_recommendation_count": 0
+  },
+  "results": [
+    {
+      "id": "ask_more_missing_required_anemia",
+      "passed": true,
+      "notes": "Missing required red-flag slots should block recommendation.",
+      "expected": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "chest_pain_present",
+          "shortness_of_breath_present",
+          "fainting_or_altered_consciousness_present",
+          "red_flag_screen_result"
+        ],
+        "blocked_package_ids": []
+      },
+      "actual": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "chest_pain_present",
+          "shortness_of_breath_present",
+          "fainting_or_altered_consciousness_present",
+          "red_flag_screen_result"
+        ],
+        "blocked_package_ids": [],
+        "selected_flow_id": "anemia_infection_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Required slots are still missing."
+        ]
+      }
+    },
+    {
+      "id": "recommend_allowed_anemia_package",
+      "passed": true,
+      "notes": "Allowed package should be recommended when required slots are satisfied and red flags are negative.",
+      "expected": {
+        "status": "recommend",
+        "recommended_package_id": "pkg_anemia_infection_basic_v1",
+        "next_slot_ids": [],
+        "blocked_package_ids": []
+      },
+      "actual": {
+        "status": "recommend",
+        "recommended_package_id": "pkg_anemia_infection_basic_v1",
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "selected_flow_id": "anemia_infection_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Schema recommendation rule matched for pkg_anemia_infection_basic_v1."
+        ]
+      }
+    },
+    {
+      "id": "guarded_glucose_candidate_suppressed",
+      "passed": true,
+      "notes": "Guarded package may be a schema candidate but must not surface as final recommendation.",
+      "expected": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_diabetes_glucose_basic_v1"
+        ]
+      },
+      "actual": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_diabetes_glucose_basic_v1"
+        ],
+        "selected_flow_id": "glucose_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Candidate package pkg_diabetes_glucose_basic_v1 is gated by catalog exposure 'guarded'."
+        ]
+      }
+    },
+    {
+      "id": "blocked_package_path",
+      "passed": true,
+      "notes": "Blocked-scope packages must never be recommended.",
+      "expected": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_liver_function_metabolic_basic_v1",
+          "pkg_infectious_screening_hbv_hiv_v1"
+        ]
+      },
+      "actual": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_liver_function_metabolic_basic_v1",
+          "pkg_infectious_screening_hbv_hiv_v1"
+        ],
+        "selected_flow_id": "blocked_package_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Requested package area is outside the currently supported package scope."
+        ]
+      }
+    },
+    {
+      "id": "escalate_on_red_flag",
+      "passed": true,
+      "notes": "Rapid worsening is a schema red flag and should escalate immediately.",
+      "expected": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": []
+      },
+      "actual": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "selected_flow_id": "kidney_function_flow",
+        "active_red_flags": [
+          "slot:symptom_progression=rapidly_worsening"
+        ],
+        "reasons": [
+          "Red-flag check triggered: slot:symptom_progression=rapidly_worsening"
+        ]
+      }
+    },
+    {
+      "id": "ambiguous_input_path",
+      "passed": true,
+      "notes": "Without a flow or goal, the controller should ask for clarification instead of over-recommending.",
+      "expected": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "recommendation_goal",
+          "symptom_summary"
+        ],
+        "blocked_package_ids": []
+      },
+      "actual": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "recommendation_goal",
+          "symptom_summary"
+        ],
+        "blocked_package_ids": [],
+        "selected_flow_id": null,
+        "active_red_flags": [],
+        "reasons": [
+          "Flow is ambiguous. Collect recommendation_goal before recommending."
+        ]
+      }
+    },
+    {
+      "id": "ambiguous_non_empty_free_text_requires_clarification",
+      "passed": true,
+      "notes": "Non-empty free text alone should stay in clarification instead of auto-routing into general flow.",
+      "expected": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "recommendation_goal",
+          "symptom_summary"
+        ],
+        "blocked_package_ids": []
+      },
+      "actual": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "recommendation_goal",
+          "symptom_summary"
+        ],
+        "blocked_package_ids": [],
+        "selected_flow_id": null,
+        "active_red_flags": [],
+        "reasons": [
+          "Flow is ambiguous. Collect recommendation_goal before recommending."
+        ]
+      }
+    },
+    {
+      "id": "glucose_compound_red_flag_escalates",
+      "passed": true,
+      "notes": "The compound glucose red-flag rule should escalate when vomiting and dehydration are both true.",
+      "expected": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": []
+      },
+      "actual": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "selected_flow_id": "glucose_flow",
+        "active_red_flags": [
+          "slot:vomiting_present=true AND slot:dehydration_present=true"
+        ],
+        "reasons": [
+          "Red-flag check triggered: slot:vomiting_present=true AND slot:dehydration_present=true"
+        ]
+      }
+    },
+    {
+      "id": "runtime_mode_catalog_disabled_blocks_final_recommend",
+      "passed": true,
+      "notes": "Runtime mode must not emit final recommendations while the package catalog remains runtime-disabled.",
+      "expected": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_anemia_infection_basic_v1"
+        ]
+      },
+      "actual": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_anemia_infection_basic_v1"
+        ],
+        "selected_flow_id": "anemia_infection_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Candidate package pkg_anemia_infection_basic_v1 is catalog-gated because package_catalog_v1 runtime is not enabled."
+        ]
+      }
+    }
+  ]
+}
