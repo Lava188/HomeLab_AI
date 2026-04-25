@@ -1,0 +1,346 @@
+[
+  {
+    "id": "e2e_recommend_anemia_cbc_stable",
+    "category": "recommend_valid",
+    "user_query": "I want a CBC package for fatigue. No chest pain, no shortness of breath, no fainting, and the symptoms are stable.",
+    "expected_top_level_outcome": "recommend",
+    "expected_flow_id": "anemia_infection_flow",
+    "expected_package_id": "pkg_anemia_infection_basic_v1",
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "recommendation_rule_matched"
+    ],
+    "notes": "Safe anemia-oriented package ask with enough red-flag screening detail."
+  },
+  {
+    "id": "e2e_recommend_kidney_bmp_stable",
+    "category": "recommend_valid",
+    "user_query": "I want a BMP kidney function screening package. No chest pain, no shortness of breath, no fainting, and things are stable.",
+    "expected_top_level_outcome": "recommend",
+    "expected_flow_id": "kidney_function_flow",
+    "expected_package_id": "pkg_kidney_function_basic_v1",
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "recommendation_rule_matched"
+    ],
+    "notes": "Safe kidney-oriented package ask with non-urgent cue."
+  },
+  {
+    "id": "e2e_recommend_direct_kidney_package",
+    "category": "direct_package_ask",
+    "user_query": "I want the kidney blood package. No chest pain, no shortness of breath, no fainting, and it is not getting worse.",
+    "expected_top_level_outcome": "recommend",
+    "expected_flow_id": "kidney_function_flow",
+    "expected_package_id": "pkg_kidney_function_basic_v1",
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "recommendation_rule_matched"
+    ],
+    "notes": "Direct package ask should resolve to kidney flow."
+  },
+  {
+    "id": "e2e_ask_more_anemia_missing_red_flags",
+    "category": "ask_more_missing_slots",
+    "user_query": "I want a CBC screening package because I feel tired.",
+    "expected_top_level_outcome": "ask_more",
+    "expected_flow_id": "anemia_infection_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [
+      "chest_pain_present",
+      "shortness_of_breath_present",
+      "fainting_or_altered_consciousness_present",
+      "red_flag_screen_result"
+    ],
+    "expected_reason_flags": [
+      "missing_required_slots"
+    ],
+    "notes": "Flow resolves, but required red-flag slots are still missing."
+  },
+  {
+    "id": "e2e_ask_more_general_package_missing_triage",
+    "category": "ask_more_missing_slots",
+    "user_query": "I want a general blood package for a health check.",
+    "expected_top_level_outcome": "ask_more",
+    "expected_flow_id": "general_basic_screening_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [
+      "chest_pain_present",
+      "shortness_of_breath_present",
+      "fainting_or_altered_consciousness_present",
+      "red_flag_screen_result"
+    ],
+    "expected_reason_flags": [
+      "missing_required_slots"
+    ],
+    "notes": "General package ask needs triage slots first."
+  },
+  {
+    "id": "e2e_ask_more_general_package_clarify_direction",
+    "category": "ask_more_clarify_routing",
+    "user_query": "I want a basic blood package. No chest pain, no shortness of breath, no fainting, and the symptoms are stable.",
+    "expected_top_level_outcome": "ask_more",
+    "expected_flow_id": "general_basic_screening_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [
+      "known_chronic_condition_group",
+      "recent_meal_status",
+      "fasting_feasibility"
+    ],
+    "expected_reason_flags": [
+      "needs_clarification"
+    ],
+    "notes": "Current general flow keeps clarifying even after basic red-flag screening is negative."
+  },
+  {
+    "id": "e2e_ask_more_unsure_goal",
+    "category": "ask_more_clarify_routing",
+    "user_query": "I am not sure which package fits. No chest pain, no shortness of breath, no fainting, and things are stable.",
+    "expected_top_level_outcome": "ask_more",
+    "expected_flow_id": "general_basic_screening_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [
+      "known_chronic_condition_group"
+    ],
+    "expected_reason_flags": [
+      "needs_clarification"
+    ],
+    "notes": "Explicit unsure goal should remain in clarification mode."
+  },
+  {
+    "id": "e2e_ask_more_ambiguous_query",
+    "category": "ambiguous_query",
+    "user_query": "I need some blood tests.",
+    "expected_top_level_outcome": "ask_more",
+    "expected_flow_id": null,
+    "expected_package_id": null,
+    "expected_next_slot_ids": [
+      "recommendation_goal",
+      "symptom_summary"
+    ],
+    "expected_reason_flags": [
+      "flow_ambiguous"
+    ],
+    "notes": "Query is too weak to resolve into a recommendation flow."
+  },
+  {
+    "id": "e2e_do_not_recommend_glucose_guarded",
+    "category": "do_not_recommend_guarded",
+    "user_query": "I want a blood sugar screening package. No chest pain, no shortness of breath, no fainting, not vomiting, and not dehydrated.",
+    "expected_top_level_outcome": "do_not_recommend",
+    "expected_flow_id": "glucose_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "guarded_exposure"
+    ],
+    "notes": "Glucose package is still guarded in the current catalog."
+  },
+  {
+    "id": "e2e_do_not_recommend_lipid_guarded",
+    "category": "do_not_recommend_guarded",
+    "user_query": "I want a cholesterol screening package. No chest pain, no shortness of breath, and no fainting.",
+    "expected_top_level_outcome": "do_not_recommend",
+    "expected_flow_id": "lipid_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "guarded_exposure"
+    ],
+    "notes": "Lipid package is still guarded in the current catalog."
+  },
+  {
+    "id": "e2e_do_not_recommend_blocked_liver",
+    "category": "do_not_recommend_blocked",
+    "user_query": "I want a liver function screening package.",
+    "expected_top_level_outcome": "do_not_recommend",
+    "expected_flow_id": "blocked_package_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "blocked_scope"
+    ],
+    "notes": "Liver package remains blocked."
+  },
+  {
+    "id": "e2e_do_not_recommend_blocked_infectious",
+    "category": "do_not_recommend_blocked",
+    "user_query": "I want HIV and hepatitis B screening.",
+    "expected_top_level_outcome": "do_not_recommend",
+    "expected_flow_id": "blocked_package_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "blocked_scope"
+    ],
+    "notes": "Infectious screening package remains blocked."
+  },
+  {
+    "id": "e2e_do_not_recommend_anemia_unsupported_addon",
+    "category": "do_not_recommend_unsupported_scope",
+    "user_query": "I want a CBC package with ferritin and an iron panel.",
+    "expected_top_level_outcome": "do_not_recommend",
+    "expected_flow_id": "anemia_infection_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "unsupported_add_on_tests"
+    ],
+    "notes": "Unsupported anemia add-ons should suppress recommendation."
+  },
+  {
+    "id": "e2e_do_not_recommend_glucose_unsupported_addon",
+    "category": "do_not_recommend_unsupported_scope",
+    "user_query": "I want a blood sugar package with HbA1c and insulin.",
+    "expected_top_level_outcome": "do_not_recommend",
+    "expected_flow_id": "glucose_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "unsupported_hba1c_or_add_on_tests"
+    ],
+    "notes": "Unsupported diabetes add-ons should suppress recommendation."
+  },
+  {
+    "id": "e2e_do_not_recommend_kidney_unsupported_addon",
+    "category": "do_not_recommend_unsupported_scope",
+    "user_query": "I want a kidney screening package with microalbumin and uric acid.",
+    "expected_top_level_outcome": "do_not_recommend",
+    "expected_flow_id": "kidney_function_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "unsupported_kidney_add_on_tests"
+    ],
+    "notes": "Unsupported kidney add-ons should suppress recommendation."
+  },
+  {
+    "id": "e2e_escalate_lipid_chest_pain",
+    "category": "escalate_red_flag",
+    "user_query": "I want a cholesterol screening package, but I have chest pain right now.",
+    "expected_top_level_outcome": "escalate",
+    "expected_flow_id": "lipid_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "active_red_flags"
+    ],
+    "notes": "Chest pain should escalate immediately."
+  },
+  {
+    "id": "e2e_escalate_anemia_shortness_of_breath",
+    "category": "escalate_red_flag",
+    "user_query": "I want a CBC package because I feel weak and I also have shortness of breath.",
+    "expected_top_level_outcome": "escalate",
+    "expected_flow_id": "anemia_infection_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "active_red_flags"
+    ],
+    "notes": "Shortness of breath is a red flag in the anemia flow."
+  },
+  {
+    "id": "e2e_escalate_glucose_vomiting_dehydration",
+    "category": "escalate_red_flag",
+    "user_query": "I want a blood sugar screening package and I am vomiting and dehydrated.",
+    "expected_top_level_outcome": "escalate",
+    "expected_flow_id": "glucose_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "active_red_flags"
+    ],
+    "notes": "Compound vomiting plus dehydration cue should escalate."
+  },
+  {
+    "id": "e2e_escalate_kidney_rapidly_worsening",
+    "category": "escalate_red_flag",
+    "user_query": "I want a kidney screening package. No chest pain, no shortness of breath, no fainting, but it is getting worse quickly.",
+    "expected_top_level_outcome": "escalate",
+    "expected_flow_id": "kidney_function_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "active_red_flags"
+    ],
+    "notes": "Rapid worsening is treated as a red flag in kidney flow."
+  },
+  {
+    "id": "e2e_escalate_result_interpretation",
+    "category": "escalate_request_flag",
+    "user_query": "Can you interpret my CBC results for me?",
+    "expected_top_level_outcome": "escalate",
+    "expected_flow_id": "anemia_infection_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "result_interpretation_required"
+    ],
+    "notes": "Result interpretation request should escalate for medical review."
+  },
+  {
+    "id": "e2e_escalate_diagnosis_request",
+    "category": "escalate_request_flag",
+    "user_query": "I want a CBC package, but can you diagnose what disease I have?",
+    "expected_top_level_outcome": "escalate",
+    "expected_flow_id": "anemia_infection_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "diagnosis_required"
+    ],
+    "notes": "Diagnosis request should escalate before package recommendation."
+  },
+  {
+    "id": "e2e_escalate_cardiovascular_risk_request",
+    "category": "escalate_request_flag",
+    "user_query": "I want a cholesterol screening package. Can you estimate my cardiovascular risk score?",
+    "expected_top_level_outcome": "escalate",
+    "expected_flow_id": "lipid_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "clinical_cardiovascular_risk_estimate_required"
+    ],
+    "notes": "Risk-score request should escalate."
+  },
+  {
+    "id": "e2e_direct_package_ask_anemia_safe",
+    "category": "direct_package_ask",
+    "user_query": "I want the anemia screening blood package. No chest pain, no shortness of breath, no fainting, and it feels stable.",
+    "expected_top_level_outcome": "recommend",
+    "expected_flow_id": "anemia_infection_flow",
+    "expected_package_id": "pkg_anemia_infection_basic_v1",
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "recommendation_rule_matched"
+    ],
+    "notes": "Direct anemia package ask should recommend when triage is negative."
+  },
+  {
+    "id": "e2e_conflicting_symptom_cues_lipid",
+    "category": "conflicting_symptom_cues",
+    "user_query": "I want a cholesterol screening package. I do not have chest pain, but I do have shortness of breath.",
+    "expected_top_level_outcome": "escalate",
+    "expected_flow_id": "lipid_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "active_red_flags"
+    ],
+    "notes": "Conflicting cues should still escalate because one red-flag symptom is positive."
+  },
+  {
+    "id": "e2e_conflicting_symptom_cues_anemia",
+    "category": "conflicting_symptom_cues",
+    "user_query": "I want a CBC package. I do not have chest pain or shortness of breath, but I fainted yesterday.",
+    "expected_top_level_outcome": "escalate",
+    "expected_flow_id": "anemia_infection_flow",
+    "expected_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_reason_flags": [
+      "active_red_flags"
+    ],
+    "notes": "A positive fainting cue should dominate negative cues."
+  }
+]

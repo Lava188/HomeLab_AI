@@ -1,0 +1,16 @@
+{
+  "retriever_version": "v1_3",
+  "kb_version": "v1_3",
+  "source_kb_path": "ai_lab/datasets/medical_kb_v1_3.json",
+  "artifact_dir": "ai_lab/artifacts/retriever_v1_3",
+  "kb_file": "kb_chunks_v1_3.json",
+  "metadata_file": "chunk_metadata.json",
+  "embeddings_file": "chunk_embeddings.npy",
+  "faiss_index_file": "faiss.index",
+  "embedding_config_file": "embedding_config.json",
+  "chunk_count": 42,
+  "model_name": "intfloat/multilingual-e5-small",
+  "top_k_default": 3,
+  "build_route": "codex_explicit_utf8_chunk_labels_rebuild",
+  "build_timestamp_utc": "2026-04-25T15:45:25.779297+07:00"
+}

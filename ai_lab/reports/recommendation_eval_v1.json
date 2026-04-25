@@ -1,65 +1,137 @@
 {
   "eval_name": "recommendation_controller_eval_v1",
-  "cases_path": "ai_lab/datasets/eval/recommendation_controller_cases_v1.json",
+  "cases_path": "ai_lab\\datasets\\eval\\recommendation_controller_cases_v1.json",
   "controller_entrypoint": "ai_lab/recommendation/recommendation_controller.py:run_recommendation_controller",
   "metrics": {
-    "total_cases": 9,
-    "passed_cases": 9,
+    "total_cases": 24,
+    "passed_cases": 24,
+    "failed_cases": 0,
     "pass_rate": 1.0,
-    "status_accuracy": 1.0,
-    "recommendation_accuracy": 1.0,
-    "ask_next_slot_accuracy": 1.0,
-    "blocked_package_suppression_accuracy": 1.0,
-    "unsafe_recommendation_count": 0
+    "status_breakdown": {
+      "ask_more": 6,
+      "do_not_recommend": 8,
+      "escalate": 6,
+      "recommend": 4
+    },
+    "unsafe_recommendation_count": 0,
+    "category_breakdown": {
+      "ask_more_clarify_routing": {
+        "total_cases": 2,
+        "passed_cases": 2,
+        "failed_cases": 0,
+        "pass_rate": 1.0,
+        "status_breakdown": {
+          "ask_more": 2
+        }
+      },
+      "ask_more_missing_slots": {
+        "total_cases": 2,
+        "passed_cases": 2,
+        "failed_cases": 0,
+        "pass_rate": 1.0,
+        "status_breakdown": {
+          "ask_more": 2
+        }
+      },
+      "conflicting_slots": {
+        "total_cases": 1,
+        "passed_cases": 1,
+        "failed_cases": 0,
+        "pass_rate": 1.0,
+        "status_breakdown": {
+          "recommend": 1
+        }
+      },
+      "direct_package_ask": {
+        "total_cases": 3,
+        "passed_cases": 3,
+        "failed_cases": 0,
+        "pass_rate": 1.0,
+        "status_breakdown": {
+          "do_not_recommend": 2,
+          "recommend": 1
+        }
+      },
+      "do_not_recommend_guarded_or_blocked": {
+        "total_cases": 3,
+        "passed_cases": 3,
+        "failed_cases": 0,
+        "pass_rate": 1.0,
+        "status_breakdown": {
+          "do_not_recommend": 3
+        }
+      },
+      "do_not_recommend_unsupported_scope": {
+        "total_cases": 3,
+        "passed_cases": 3,
+        "failed_cases": 0,
+        "pass_rate": 1.0,
+        "status_breakdown": {
+          "do_not_recommend": 3
+        }
+      },
+      "escalate_red_flag": {
+        "total_cases": 3,
+        "passed_cases": 3,
+        "failed_cases": 0,
+        "pass_rate": 1.0,
+        "status_breakdown": {
+          "escalate": 3
+        }
+      },
+      "escalate_request_flag": {
+        "total_cases": 3,
+        "passed_cases": 3,
+        "failed_cases": 0,
+        "pass_rate": 1.0,
+        "status_breakdown": {
+          "escalate": 3
+        }
+      },
+      "recommend_valid": {
+        "total_cases": 2,
+        "passed_cases": 2,
+        "failed_cases": 0,
+        "pass_rate": 1.0,
+        "status_breakdown": {
+          "recommend": 2
+        }
+      },
+      "unknown_or_weak_input": {
+        "total_cases": 2,
+        "passed_cases": 2,
+        "failed_cases": 0,
+        "pass_rate": 1.0,
+        "status_breakdown": {
+          "ask_more": 2
+        }
+      }
+    }
   },
+  "failed_cases": [],
   "results": [
     {
-      "id": "ask_more_missing_required_anemia",
+      "id": "recommend_anemia_offline",
+      "category": "recommend_valid",
+      "short_description": "Offline eval should recommend the ready anemia package when required slots are complete and red flags are negative.",
       "passed": true,
-      "notes": "Missing required red-flag slots should block recommendation.",
       "expected": {
-        "status": "ask_more",
-        "recommended_package_id": null,
-        "next_slot_ids": [
-          "chest_pain_present",
-          "shortness_of_breath_present",
-          "fainting_or_altered_consciousness_present",
-          "red_flag_screen_result"
-        ],
-        "blocked_package_ids": []
-      },
-      "actual": {
-        "status": "ask_more",
-        "recommended_package_id": null,
-        "next_slot_ids": [
-          "chest_pain_present",
-          "shortness_of_breath_present",
-          "fainting_or_altered_consciousness_present",
-          "red_flag_screen_result"
-        ],
+        "status": "recommend",
+        "recommended_package_id": "pkg_anemia_infection_basic_v1",
+        "next_slot_ids": [],
         "blocked_package_ids": [],
-        "selected_flow_id": "anemia_infection_flow",
-        "active_red_flags": [],
-        "reasons": [
-          "Required slots are still missing."
+        "reason_flags": [
+          "recommendation_rule_matched"
         ]
-      }
-    },
-    {
-      "id": "recommend_allowed_anemia_package",
-      "passed": true,
-      "notes": "Allowed package should be recommended when required slots are satisfied and red flags are negative.",
-      "expected": {
-        "status": "recommend",
-        "recommended_package_id": "pkg_anemia_infection_basic_v1",
-        "next_slot_ids": [],
-        "blocked_package_ids": []
       },
       "actual": {
         "status": "recommend",
         "recommended_package_id": "pkg_anemia_infection_basic_v1",
         "next_slot_ids": [],
         "blocked_package_ids": [],
+        "reason_flags": [
+          "recommendation_rule_matched"
+        ],
         "selected_flow_id": "anemia_infection_flow",
         "active_red_flags": [],
         "reasons": [
@@ -68,74 +140,303 @@
       }
     },
     {
-      "id": "guarded_glucose_candidate_suppressed",
+      "id": "recommend_kidney_offline",
+      "category": "recommend_valid",
+      "short_description": "Offline eval should recommend the ready kidney package when required slots are complete and red flags are negative.",
       "passed": true,
-      "notes": "Guarded package may be a schema candidate but must not surface as final recommendation.",
       "expected": {
-        "status": "do_not_recommend",
-        "recommended_package_id": null,
+        "status": "recommend",
+        "recommended_package_id": "pkg_kidney_function_basic_v1",
         "next_slot_ids": [],
-        "blocked_package_ids": [
-          "pkg_diabetes_glucose_basic_v1"
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "recommendation_rule_matched"
         ]
       },
       "actual": {
-        "status": "do_not_recommend",
-        "recommended_package_id": null,
+        "status": "recommend",
+        "recommended_package_id": "pkg_kidney_function_basic_v1",
         "next_slot_ids": [],
-        "blocked_package_ids": [
-          "pkg_diabetes_glucose_basic_v1"
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "recommendation_rule_matched"
         ],
-        "selected_flow_id": "glucose_flow",
+        "selected_flow_id": "kidney_function_flow",
         "active_red_flags": [],
         "reasons": [
-          "Candidate package pkg_diabetes_glucose_basic_v1 is gated by catalog exposure 'guarded'."
+          "Schema recommendation rule matched for pkg_kidney_function_basic_v1."
         ]
       }
     },
     {
-      "id": "blocked_package_path",
+      "id": "direct_goal_mapping_kidney",
+      "category": "direct_package_ask",
+      "short_description": "A direct kidney goal without explicit flow_id should map to kidney_function_flow and recommend the kidney package.",
       "passed": true,
-      "notes": "Blocked-scope packages must never be recommended.",
       "expected": {
-        "status": "do_not_recommend",
-        "recommended_package_id": null,
+        "status": "recommend",
+        "recommended_package_id": "pkg_kidney_function_basic_v1",
         "next_slot_ids": [],
-        "blocked_package_ids": [
-          "pkg_liver_function_metabolic_basic_v1",
-          "pkg_infectious_screening_hbv_hiv_v1"
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "recommendation_rule_matched"
         ]
       },
       "actual": {
-        "status": "do_not_recommend",
-        "recommended_package_id": null,
+        "status": "recommend",
+        "recommended_package_id": "pkg_kidney_function_basic_v1",
         "next_slot_ids": [],
-        "blocked_package_ids": [
-          "pkg_liver_function_metabolic_basic_v1",
-          "pkg_infectious_screening_hbv_hiv_v1"
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "recommendation_rule_matched"
         ],
-        "selected_flow_id": "blocked_package_flow",
+        "selected_flow_id": "kidney_function_flow",
         "active_red_flags": [],
         "reasons": [
-          "Requested package area is outside the currently supported package scope."
+          "Schema recommendation rule matched for pkg_kidney_function_basic_v1."
         ]
       }
     },
     {
-      "id": "escalate_on_red_flag",
+      "id": "ask_more_missing_required_anemia",
+      "category": "ask_more_missing_slots",
+      "short_description": "Missing red-flag slots in anemia flow should block recommendation and request the remaining required slots.",
       "passed": true,
-      "notes": "Rapid worsening is a schema red flag and should escalate immediately.",
+      "expected": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "chest_pain_present",
+          "shortness_of_breath_present",
+          "fainting_or_altered_consciousness_present",
+          "red_flag_screen_result"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "missing_required_slots"
+        ]
+      },
+      "actual": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "chest_pain_present",
+          "shortness_of_breath_present",
+          "fainting_or_altered_consciousness_present",
+          "red_flag_screen_result"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "missing_required_slots"
+        ],
+        "selected_flow_id": "anemia_infection_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Required slots are still missing."
+        ]
+      }
+    },
+    {
+      "id": "ask_more_unknown_required_red_flag_kidney",
+      "category": "ask_more_missing_slots",
+      "short_description": "An explicit 'unknown' value on a required red-flag slot should still be treated as missing and require follow-up.",
+      "passed": true,
+      "expected": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "chest_pain_present",
+          "red_flag_screen_result"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "missing_required_slots"
+        ]
+      },
+      "actual": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "chest_pain_present",
+          "red_flag_screen_result"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "missing_required_slots"
+        ],
+        "selected_flow_id": "kidney_function_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Required slots are still missing."
+        ]
+      }
+    },
+    {
+      "id": "ask_more_general_basic_package_clarification",
+      "category": "ask_more_clarify_routing",
+      "short_description": "General basic package requests should continue clarification instead of recommending from the general flow.",
+      "passed": true,
+      "expected": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "symptom_progression",
+          "known_chronic_condition_group",
+          "recent_meal_status",
+          "fasting_feasibility"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "needs_clarification"
+        ]
+      },
+      "actual": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "symptom_progression",
+          "known_chronic_condition_group",
+          "recent_meal_status",
+          "fasting_feasibility"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "needs_clarification"
+        ],
+        "selected_flow_id": "general_basic_screening_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Flow requires more clarification before recommendation."
+        ]
+      }
+    },
+    {
+      "id": "ask_more_unsure_goal_clarification",
+      "category": "ask_more_clarify_routing",
+      "short_description": "An explicit unsure goal should stay in the general clarification path and ask for remaining differentiating slots.",
+      "passed": true,
+      "expected": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "symptom_progression",
+          "known_chronic_condition_group"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "needs_clarification"
+        ]
+      },
+      "actual": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "symptom_progression",
+          "known_chronic_condition_group"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "needs_clarification"
+        ],
+        "selected_flow_id": "general_basic_screening_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Flow requires more clarification before recommendation."
+        ]
+      }
+    },
+    {
+      "id": "ask_more_empty_input",
+      "category": "unknown_or_weak_input",
+      "short_description": "Completely empty input should stay in clarification and ask for recommendation_goal and symptom_summary.",
+      "passed": true,
+      "expected": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "recommendation_goal",
+          "symptom_summary"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "flow_ambiguous"
+        ]
+      },
+      "actual": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "recommendation_goal",
+          "symptom_summary"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "flow_ambiguous"
+        ],
+        "selected_flow_id": null,
+        "active_red_flags": [],
+        "reasons": [
+          "Flow is ambiguous. Collect recommendation_goal before recommending."
+        ]
+      }
+    },
+    {
+      "id": "ask_more_free_text_only_ambiguous",
+      "category": "unknown_or_weak_input",
+      "short_description": "Free text alone should not auto-route into a package flow and must ask for explicit clarification.",
+      "passed": true,
+      "expected": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "recommendation_goal",
+          "symptom_summary"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "flow_ambiguous"
+        ]
+      },
+      "actual": {
+        "status": "ask_more",
+        "recommended_package_id": null,
+        "next_slot_ids": [
+          "recommendation_goal",
+          "symptom_summary"
+        ],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "flow_ambiguous"
+        ],
+        "selected_flow_id": null,
+        "active_red_flags": [],
+        "reasons": [
+          "Flow is ambiguous. Collect recommendation_goal before recommending."
+        ]
+      }
+    },
+    {
+      "id": "escalate_kidney_rapid_worsening",
+      "category": "escalate_red_flag",
+      "short_description": "Rapidly worsening symptoms in kidney flow should trigger immediate escalation.",
+      "passed": true,
       "expected": {
         "status": "escalate",
         "recommended_package_id": null,
         "next_slot_ids": [],
-        "blocked_package_ids": []
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "active_red_flags"
+        ]
       },
       "actual": {
         "status": "escalate",
         "recommended_package_id": null,
         "next_slot_ids": [],
         "blocked_package_ids": [],
+        "reason_flags": [
+          "active_red_flags"
+        ],
         "selected_flow_id": "kidney_function_flow",
         "active_red_flags": [
           "slot:symptom_progression=rapidly_worsening"
@@ -146,76 +447,27 @@
       }
     },
     {
-      "id": "ambiguous_input_path",
+      "id": "escalate_glucose_vomiting_dehydration",
+      "category": "escalate_red_flag",
+      "short_description": "The compound glucose red-flag rule should escalate when vomiting and dehydration are both true.",
       "passed": true,
-      "notes": "Without a flow or goal, the controller should ask for clarification instead of over-recommending.",
-      "expected": {
-        "status": "ask_more",
-        "recommended_package_id": null,
-        "next_slot_ids": [
-          "recommendation_goal",
-          "symptom_summary"
-        ],
-        "blocked_package_ids": []
-      },
-      "actual": {
-        "status": "ask_more",
-        "recommended_package_id": null,
-        "next_slot_ids": [
-          "recommendation_goal",
-          "symptom_summary"
-        ],
-        "blocked_package_ids": [],
-        "selected_flow_id": null,
-        "active_red_flags": [],
-        "reasons": [
-          "Flow is ambiguous. Collect recommendation_goal before recommending."
-        ]
-      }
-    },
-    {
-      "id": "ambiguous_non_empty_free_text_requires_clarification",
-      "passed": true,
-      "notes": "Non-empty free text alone should stay in clarification instead of auto-routing into general flow.",
-      "expected": {
-        "status": "ask_more",
-        "recommended_package_id": null,
-        "next_slot_ids": [
-          "recommendation_goal",
-          "symptom_summary"
-        ],
-        "blocked_package_ids": []
-      },
-      "actual": {
-        "status": "ask_more",
-        "recommended_package_id": null,
-        "next_slot_ids": [
-          "recommendation_goal",
-          "symptom_summary"
-        ],
-        "blocked_package_ids": [],
-        "selected_flow_id": null,
-        "active_red_flags": [],
-        "reasons": [
-          "Flow is ambiguous. Collect recommendation_goal before recommending."
-        ]
-      }
-    },
-    {
-      "id": "glucose_compound_red_flag_escalates",
-      "passed": true,
-      "notes": "The compound glucose red-flag rule should escalate when vomiting and dehydration are both true.",
       "expected": {
         "status": "escalate",
         "recommended_package_id": null,
         "next_slot_ids": [],
-        "blocked_package_ids": []
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "active_red_flags"
+        ]
       },
       "actual": {
         "status": "escalate",
         "recommended_package_id": null,
         "next_slot_ids": [],
         "blocked_package_ids": [],
+        "reason_flags": [
+          "active_red_flags"
+        ],
         "selected_flow_id": "glucose_flow",
         "active_red_flags": [
           "slot:vomiting_present=true AND slot:dehydration_present=true"
@@ -226,15 +478,273 @@
       }
     },
     {
-      "id": "runtime_mode_catalog_disabled_blocks_final_recommend",
+      "id": "escalate_lipid_chest_pain",
+      "category": "escalate_red_flag",
+      "short_description": "Chest pain in lipid flow should escalate immediately rather than continue screening logic.",
       "passed": true,
-      "notes": "Runtime mode must not emit final recommendations while the package catalog remains runtime-disabled.",
+      "expected": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "active_red_flags"
+        ]
+      },
+      "actual": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "active_red_flags"
+        ],
+        "selected_flow_id": "lipid_flow",
+        "active_red_flags": [
+          "slot:chest_pain_present"
+        ],
+        "reasons": [
+          "Red-flag check triggered: slot:chest_pain_present"
+        ]
+      }
+    },
+    {
+      "id": "escalate_diagnosis_request_anemia",
+      "category": "escalate_request_flag",
+      "short_description": "Diagnosis-seeking requests should escalate before anemia package recommendation.",
+      "passed": true,
+      "expected": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "diagnosis_required"
+        ]
+      },
+      "actual": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "diagnosis_required"
+        ],
+        "selected_flow_id": "anemia_infection_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Request flag triggered: diagnosis_required."
+        ]
+      }
+    },
+    {
+      "id": "escalate_result_interpretation_request_anemia",
+      "category": "escalate_request_flag",
+      "short_description": "Result interpretation requests should escalate instead of returning a package recommendation.",
+      "passed": true,
+      "expected": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "result_interpretation_required"
+        ]
+      },
+      "actual": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "result_interpretation_required"
+        ],
+        "selected_flow_id": "anemia_infection_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Request flag triggered: result_interpretation_required."
+        ]
+      }
+    },
+    {
+      "id": "escalate_cardiovascular_risk_request_lipid",
+      "category": "escalate_request_flag",
+      "short_description": "Clinical cardiovascular risk requests should escalate instead of using the lipid screening package.",
+      "passed": true,
+      "expected": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "clinical_cardiovascular_risk_estimate_required"
+        ]
+      },
+      "actual": {
+        "status": "escalate",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "clinical_cardiovascular_risk_estimate_required"
+        ],
+        "selected_flow_id": "lipid_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Request flag triggered: clinical_cardiovascular_risk_estimate_required."
+        ]
+      }
+    },
+    {
+      "id": "do_not_recommend_glucose_guarded",
+      "category": "do_not_recommend_guarded_or_blocked",
+      "short_description": "Guarded glucose package should stay suppressed even in offline eval.",
+      "passed": true,
+      "expected": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_diabetes_glucose_basic_v1"
+        ],
+        "reason_flags": [
+          "guarded_exposure"
+        ]
+      },
+      "actual": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_diabetes_glucose_basic_v1"
+        ],
+        "reason_flags": [
+          "guarded_exposure"
+        ],
+        "selected_flow_id": "glucose_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Candidate package pkg_diabetes_glucose_basic_v1 is gated by catalog exposure 'guarded'."
+        ]
+      }
+    },
+    {
+      "id": "do_not_recommend_lipid_guarded",
+      "category": "do_not_recommend_guarded_or_blocked",
+      "short_description": "Guarded lipid package should stay suppressed even in offline eval.",
+      "passed": true,
+      "expected": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_lipid_cardiometabolic_basic_v1"
+        ],
+        "reason_flags": [
+          "guarded_exposure"
+        ]
+      },
+      "actual": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_lipid_cardiometabolic_basic_v1"
+        ],
+        "reason_flags": [
+          "guarded_exposure"
+        ],
+        "selected_flow_id": "lipid_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Candidate package pkg_lipid_cardiometabolic_basic_v1 is gated by catalog exposure 'guarded'."
+        ]
+      }
+    },
+    {
+      "id": "do_not_recommend_blocked_liver_direct",
+      "category": "direct_package_ask",
+      "short_description": "A direct liver package request should route into blocked scope and return do_not_recommend.",
+      "passed": true,
+      "expected": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_liver_function_metabolic_basic_v1",
+          "pkg_infectious_screening_hbv_hiv_v1"
+        ],
+        "reason_flags": [
+          "blocked_scope"
+        ]
+      },
+      "actual": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_liver_function_metabolic_basic_v1",
+          "pkg_infectious_screening_hbv_hiv_v1"
+        ],
+        "reason_flags": [
+          "blocked_scope"
+        ],
+        "selected_flow_id": "blocked_package_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Requested package area is outside the currently supported package scope."
+        ]
+      }
+    },
+    {
+      "id": "do_not_recommend_blocked_infectious_direct",
+      "category": "direct_package_ask",
+      "short_description": "A direct infectious screening request should route into blocked scope and return do_not_recommend.",
+      "passed": true,
+      "expected": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_liver_function_metabolic_basic_v1",
+          "pkg_infectious_screening_hbv_hiv_v1"
+        ],
+        "reason_flags": [
+          "blocked_scope"
+        ]
+      },
+      "actual": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_liver_function_metabolic_basic_v1",
+          "pkg_infectious_screening_hbv_hiv_v1"
+        ],
+        "reason_flags": [
+          "blocked_scope"
+        ],
+        "selected_flow_id": "blocked_package_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Requested package area is outside the currently supported package scope."
+        ]
+      }
+    },
+    {
+      "id": "do_not_recommend_unsupported_addon_anemia",
+      "category": "do_not_recommend_unsupported_scope",
+      "short_description": "Unsupported ferritin-style add-ons should suppress the anemia package recommendation.",
+      "passed": true,
       "expected": {
         "status": "do_not_recommend",
         "recommended_package_id": null,
         "next_slot_ids": [],
         "blocked_package_ids": [
           "pkg_anemia_infection_basic_v1"
+        ],
+        "reason_flags": [
+          "unsupported_add_on_tests"
         ]
       },
       "actual": {
@@ -244,10 +754,141 @@
         "blocked_package_ids": [
           "pkg_anemia_infection_basic_v1"
         ],
+        "reason_flags": [
+          "unsupported_add_on_tests"
+        ],
+        "selected_flow_id": "anemia_infection_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Request flag triggered: unsupported_add_on_tests."
+        ]
+      }
+    },
+    {
+      "id": "do_not_recommend_unsupported_hba1c_glucose",
+      "category": "do_not_recommend_unsupported_scope",
+      "short_description": "Unsupported HbA1c or insulin add-ons should suppress the glucose package recommendation.",
+      "passed": true,
+      "expected": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_diabetes_glucose_basic_v1"
+        ],
+        "reason_flags": [
+          "unsupported_hba1c_or_add_on_tests"
+        ]
+      },
+      "actual": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_diabetes_glucose_basic_v1"
+        ],
+        "reason_flags": [
+          "unsupported_hba1c_or_add_on_tests"
+        ],
+        "selected_flow_id": "glucose_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Request flag triggered: unsupported_hba1c_or_add_on_tests."
+        ]
+      }
+    },
+    {
+      "id": "do_not_recommend_unsupported_kidney_addon",
+      "category": "do_not_recommend_unsupported_scope",
+      "short_description": "Unsupported kidney add-ons such as microalbumin should suppress the kidney package recommendation.",
+      "passed": true,
+      "expected": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_kidney_function_basic_v1"
+        ],
+        "reason_flags": [
+          "unsupported_kidney_add_on_tests"
+        ]
+      },
+      "actual": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_kidney_function_basic_v1"
+        ],
+        "reason_flags": [
+          "unsupported_kidney_add_on_tests"
+        ],
+        "selected_flow_id": "kidney_function_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Request flag triggered: unsupported_kidney_add_on_tests."
+        ]
+      }
+    },
+    {
+      "id": "do_not_recommend_runtime_catalog_gate_anemia",
+      "category": "do_not_recommend_guarded_or_blocked",
+      "short_description": "Runtime mode should suppress even ready packages while the package catalog runtime flag remains disabled.",
+      "passed": true,
+      "expected": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_anemia_infection_basic_v1"
+        ],
+        "reason_flags": [
+          "catalog_runtime_disabled"
+        ]
+      },
+      "actual": {
+        "status": "do_not_recommend",
+        "recommended_package_id": null,
+        "next_slot_ids": [],
+        "blocked_package_ids": [
+          "pkg_anemia_infection_basic_v1"
+        ],
+        "reason_flags": [
+          "catalog_runtime_disabled"
+        ],
         "selected_flow_id": "anemia_infection_flow",
         "active_red_flags": [],
         "reasons": [
           "Candidate package pkg_anemia_infection_basic_v1 is catalog-gated because package_catalog_v1 runtime is not enabled."
+        ]
+      }
+    },
+    {
+      "id": "conflicting_goal_keeps_explicit_flow",
+      "category": "conflicting_slots",
+      "short_description": "When flow_id conflicts with recommendation_goal, the current controller follows the explicit flow_id and still recommends from that flow.",
+      "passed": true,
+      "expected": {
+        "status": "recommend",
+        "recommended_package_id": "pkg_anemia_infection_basic_v1",
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "recommendation_rule_matched"
+        ]
+      },
+      "actual": {
+        "status": "recommend",
+        "recommended_package_id": "pkg_anemia_infection_basic_v1",
+        "next_slot_ids": [],
+        "blocked_package_ids": [],
+        "reason_flags": [
+          "recommendation_rule_matched"
+        ],
+        "selected_flow_id": "anemia_infection_flow",
+        "active_red_flags": [],
+        "reasons": [
+          "Schema recommendation rule matched for pkg_anemia_infection_basic_v1."
         ]
       }
     }

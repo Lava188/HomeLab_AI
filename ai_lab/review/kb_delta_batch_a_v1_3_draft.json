@@ -1,0 +1,143 @@
+[
+  {
+    "id": "kb_v1_3_039",
+    "doc_id": "nice_sepsis_guideline_doc_001",
+    "source_id": "nice_sepsis_guideline",
+    "source_name": "NICE",
+    "source_url": "https://www.nice.org.uk/guidance/ng253/resources/suspected-sepsis-in-people-aged-16-or-over-recognition-assessment-and-early-management-pdf-66144015386053",
+    "section": "red_flags",
+    "title": "Suspected severe infection in people aged 16 or over needs early clinical assessment",
+    "content": "For people aged 16 or over, suspected sepsis or severe infection needs early clinical assessment and may require escalating care. HomeLab cannot confirm sepsis. If someone with a possible infection seems very unwell or is getting worse, seek urgent medical help.",
+    "source_excerpt": "This guideline covers the recognition, diagnosis and early management of suspected sepsis in people aged 16 or over who are not and have not recently been pregnant. It includes recommendations on recognition and early assessment, initial treatment, escalating care, finding and controlling the source of infection, early monitoring, information and support, and training and education.",
+    "language": "en",
+    "locale": "en",
+    "risk_level": "high",
+    "tags": [
+      "sepsis",
+      "severe_infection",
+      "red_flags",
+      "urgent_assessment"
+    ],
+    "keywords": [
+      "suspected sepsis",
+      "severe infection",
+      "early assessment",
+      "escalating care"
+    ],
+    "test_types": [],
+    "faq_type": "red_flag_general",
+    "safety_notes": "Non-diagnostic red-flag draft. Source scope is people aged 16 or over who are not and have not recently been pregnant; do not imply pediatric or pregnancy coverage.",
+    "review_status": "needs_manual_review",
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_3",
+    "release_version": "v1_3",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
+  },
+  {
+    "id": "kb_v1_3_040",
+    "doc_id": "chest_pain_doc_001",
+    "source_id": "chest_pain",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/chest-pain/",
+    "section": "red_flags",
+    "title": "Chest pain with sweating, sickness, light-headedness, or breathlessness needs emergency help",
+    "content": "Chest pain with sweating, feeling sick, light-headedness, or shortness of breath needs immediate medical help. HomeLab cannot decide whether chest pain is a heart attack; seek emergency care when these warning signs are present.",
+    "source_excerpt": "Call 999 if:\nyou have chest pain and you feel sweaty, sick, light headed or short of breath\nYou could be having a heart attack. Call 999 straight away as you need immediate treatment in hospital.",
+    "language": "en",
+    "locale": "en",
+    "risk_level": "high",
+    "tags": [
+      "chest_pain",
+      "red_flags",
+      "emergency_warning"
+    ],
+    "keywords": [
+      "chest pain",
+      "sweaty",
+      "sick",
+      "light headed",
+      "short of breath",
+      "emergency"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Do not diagnose heart attack. Use only as emergency escalation wording when warning signs are present.",
+    "review_status": "needs_manual_review",
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_3",
+    "release_version": "v1_3",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
+  },
+  {
+    "id": "kb_v1_3_041",
+    "doc_id": "shortness_of_breath_doc_001",
+    "source_id": "shortness_of_breath",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/symptoms/shortness-of-breath/",
+    "section": "red_flags",
+    "title": "Shortness of breath with blue or grey skin or sudden confusion needs emergency help",
+    "content": "Shortness of breath can be serious if lips or skin look very pale, blue, or grey, or if the person becomes suddenly confused. HomeLab cannot diagnose the cause; these warning signs need emergency help.",
+    "source_excerpt": "Call 999 or go to A&E immediately if:\nyour lips or skin are turning very pale, blue or grey - on brown or black skin, this may be easier to see on the palms of the hands\nyou feel suddenly confused",
+    "language": "en",
+    "locale": "en",
+    "risk_level": "high",
+    "tags": [
+      "shortness_of_breath",
+      "red_flags",
+      "emergency_warning"
+    ],
+    "keywords": [
+      "shortness of breath",
+      "blue lips",
+      "grey skin",
+      "suddenly confused",
+      "emergency"
+    ],
+    "test_types": [],
+    "faq_type": "emergency_warning",
+    "safety_notes": "Do not diagnose the cause of breathlessness. Keep emergency wording source-grounded and review-required.",
+    "review_status": "needs_manual_review",
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_3",
+    "release_version": "v1_3",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
+  },
+  {
+    "id": "kb_v1_3_042",
+    "doc_id": "blood_tests_doc_001",
+    "source_id": "blood_tests",
+    "source_name": "NHS",
+    "source_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+    "section": "test_explainers",
+    "title": "Blood test results may need clinical interpretation and sometimes further tests",
+    "content": "Blood tests can help check health, investigate symptoms, or monitor a condition, but results can be complicated and may not give the full answer on their own. Ask a healthcare professional to explain what the result means and whether more tests are needed.",
+    "source_excerpt": "If your results do not show anything, you may not need to do anything else. Sometimes you may need other tests, depending on why you had the blood test.\nBlood test results can be complicated. Ask to talk to a healthcare professional if you have questions about your results or do not understand them.",
+    "language": "en",
+    "locale": "en",
+    "risk_level": "low",
+    "tags": [
+      "blood_tests",
+      "test_explainers",
+      "test_results",
+      "clinical_interpretation"
+    ],
+    "keywords": [
+      "blood test results",
+      "complicated results",
+      "healthcare professional",
+      "other tests"
+    ],
+    "test_types": [],
+    "faq_type": "test_result_explainer",
+    "safety_notes": "Patient-facing explainer only. Do not imply that blood tests alone diagnose or rule out conditions.",
+    "review_status": "needs_manual_review",
+    "use_in_v1": false,
+    "kb_version": "medical_kb_v1_3",
+    "release_version": "v1_3",
+    "runtime_enabled": false,
+    "promotion_status": "draft_kb_only"
+  }
+]

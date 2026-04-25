@@ -80,6 +80,19 @@ const SOURCE_HINTS = [
         ]
     },
     {
+        sourceId: "nice_sepsis_guideline",
+        keywords: [
+            "nhiem trung",
+            "nhiem trung nang",
+            "sepsis",
+            "rat met",
+            "rat khong on",
+            "xau di nhanh",
+            "nguoi tu 16 tuoi",
+            "danh gia y te"
+        ]
+    },
+    {
         sourceId: "medlineplus_blood_culture_test",
         keywords: ["cay mau", "vi khuan trong mau", "nam trong mau", "nhiem trung"]
     },
@@ -145,7 +158,7 @@ const TOPIC_SOURCE_GROUPS = {
     blood_tests: ["blood_tests"],
     chest_pain: ["chest_pain"],
     shortness_of_breath: ["shortness_of_breath"],
-    sepsis: ["nice_sepsis_overview"],
+    sepsis: ["nice_sepsis_overview", "nice_sepsis_guideline"],
     stomach_ache: ["nhs_stomach_ache"],
     headache: ["nhs_headaches"],
     fainting: ["nhs_fainting_adults"],
@@ -240,7 +253,7 @@ const TOPIC_QUERY_EXPANSIONS = {
     blood_tests: ["xet nghiem", "blood test"],
     chest_pain: ["dau nguc", "chest pain"],
     shortness_of_breath: ["kho tho", "shortness of breath"],
-    sepsis: ["nhiem trung", "sepsis"]
+    sepsis: ["nhiem trung", "nhiem trung nang", "sepsis"]
 };
 
 function vectorTokenize(text) {
@@ -551,6 +564,10 @@ function retrieveTopChunks({ message, topK = 3 }) {
     const {
         chunks,
         manifest,
+        requestedRetrieverVersion,
+        loadedRetrieverVersion,
+        fallbackUsed,
+        fallbackReason,
         embeddingsByChunkId,
         embeddingConfig,
         runtimeCache
@@ -652,6 +669,10 @@ function retrieveTopChunks({ message, topK = 3 }) {
         topicIntent,
         topK,
         retrieverVersion: manifest.retriever_version || "v1",
+        requestedRetrieverVersion,
+        loadedRetrieverVersion,
+        fallbackUsed,
+        fallbackReason,
         modelName:
             manifest.model_name === "lexical_tfidf_fallback"
                 ? "hybrid_lexical_tfidf_runtime"

@@ -1,0 +1,5332 @@
+{
+  "eval_name": "retriever_v1_3_eval_v2",
+  "retriever_version": "v1_3",
+  "kb_version": "v1_3",
+  "artifact_dir": "ai_lab/artifacts/retriever_v1_3",
+  "model_name": "intfloat/multilingual-e5-small",
+  "text_field": "chunk_text",
+  "top_k": 5,
+  "chunk_count": 42,
+  "metadata_count": 42,
+  "faiss_ntotal": 42,
+  "query_count": 52,
+  "metrics": {
+    "hit_at_1": 0.9038461538461539,
+    "hit_at_3": 0.9807692307692307,
+    "hit_at_5": 0.9807692307692307,
+    "mrr_at_5": 0.9358974358974359,
+    "expected_source_hit_at_3": 0.9807692307692307,
+    "expected_source_hit_at_5": 0.9807692307692307,
+    "keyword_coverage_at_3": 0.9551282051282052
+  },
+  "group_breakdown": {
+    "cau_hoi_mo_ho_thieu_thong_tin": {
+      "query_count": 5,
+      "hit_at_1": 0.6,
+      "hit_at_3": 0.8,
+      "hit_at_5": 0.8,
+      "mrr_at_5": 0.7,
+      "expected_source_hit_at_3": 0.8,
+      "expected_source_hit_at_5": 0.8,
+      "keyword_coverage_at_3": 0.9333333333333333
+    },
+    "cau_hoi_nhieu_dien_dat_doi_thuong": {
+      "query_count": 5,
+      "hit_at_1": 0.8,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 0.8666666666666667,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    "dau_bung": {
+      "query_count": 5,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    "dau_dau": {
+      "query_count": 5,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    "di_ung_nang_phan_ve": {
+      "query_count": 5,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    "giai_thich_xet_nghiem_mau_pho_bien": {
+      "query_count": 10,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 0.9666666666666667
+    },
+    "ngat_xiu": {
+      "query_count": 5,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    "nhiem_trung_nang_sepsis": {
+      "query_count": 7,
+      "hit_at_1": 0.8571428571428571,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 0.9285714285714286,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 0.9523809523809523
+    },
+    "nhu_cau_khach_hang_tu_van_xet_nghiem": {
+      "query_count": 5,
+      "hit_at_1": 0.8,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 0.8666666666666667,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 0.7333333333333333
+    }
+  },
+  "failure_cases": [
+    {
+      "id": "v2_ambiguous_005",
+      "group": "cau_hoi_mo_ho_thieu_thong_tin",
+      "query": "triệu chứng của tôi có cần đi viện ngay hay chỉ theo dõi",
+      "risk_expectation": "urgent",
+      "expected_chunk_ids": [
+        "kb_v1_004_c1",
+        "kb_v1_2_029_c1",
+        "kb_v1_2_031_c1"
+      ],
+      "expected_source_ids": [
+        "nice_sepsis_overview",
+        "nhs_anaphylaxis",
+        "nhs_fainting_adults"
+      ],
+      "expected_keywords": [
+        "cấp cứu",
+        "đánh giá y tế",
+        "triệu chứng"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_038_c1",
+        "kb_v1_010_c1",
+        "kb_v1_2_033_c1",
+        "kb_v1_2_022_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "top5_sources": [
+        "nhs_stroke_symptoms",
+        "chest_pain",
+        "nhs_headaches",
+        "medlineplus_crp_test",
+        "medlineplus_ddimer_test"
+      ],
+      "keyword_coverage_at_3": 0.6666666666666666
+    },
+    {
+      "id": "v2_customer_need_003",
+      "group": "nhu_cau_khach_hang_tu_van_xet_nghiem",
+      "query": "tôi muốn xét nghiệm vì nghi nhiễm trùng thì chỉ số nào liên quan",
+      "risk_expectation": "informational",
+      "expected_chunk_ids": [
+        "kb_v1_2_019_c1",
+        "kb_v1_2_021_c1",
+        "kb_v1_2_016_c1"
+      ],
+      "expected_source_ids": [
+        "medlineplus_cbc_test",
+        "medlineplus_crp_test",
+        "medlineplus_blood_culture_test"
+      ],
+      "expected_keywords": [
+        "nhiễm trùng",
+        "CBC",
+        "CRP"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_2_016_c1",
+        "kb_v1_001_c1",
+        "kb_v1_2_020_c1"
+      ],
+      "top5_sources": [
+        "nice_sepsis_guideline",
+        "blood_tests",
+        "medlineplus_blood_culture_test",
+        "nice_sepsis_overview",
+        "medlineplus_cbc_test"
+      ],
+      "keyword_coverage_at_3": 0.3333333333333333
+    }
+  ],
+  "runtime_readiness": "not_ready_for_runtime_switch",
+  "runtime_recommendation": "Không nên switch runtime sau eval này; cần review các failure case và/hoặc mở rộng kiểm thử trước.",
+  "rows": [
+    {
+      "id": "v2_abdomen_001",
+      "group": "dau_bung",
+      "query": "đau bụng dữ dội kèm nôn ra máu có cần đi cấp cứu không",
+      "expected_chunk_ids": [
+        "kb_v1_2_035_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_stomach_ache"
+      ],
+      "expected_keywords": [
+        "đau bụng",
+        "nôn ra máu",
+        "cấp cứu"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9440468549728394,
+          "chunk_id": "kb_v1_2_035_c1",
+          "kb_id": "kb_v1_2_035",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.9142734408378601,
+          "chunk_id": "kb_v1_2_036_c1",
+          "kb_id": "kb_v1_2_036",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8923107385635376,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8891584873199463,
+          "chunk_id": "kb_v1_2_033_c1",
+          "kb_id": "kb_v1_2_033",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8842359781265259,
+          "chunk_id": "kb_v1_010_c1",
+          "kb_id": "kb_v1_010",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Khi nào đau ngực cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9440468549728394,
+        "chunk_id": "kb_v1_2_035_c1",
+        "kb_id": "kb_v1_2_035",
+        "source_id": "nhs_stomach_ache",
+        "section": "red_flags",
+        "title": "Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_035_c1",
+        "kb_v1_2_036_c1",
+        "kb_v1_3_040_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_035_c1",
+        "kb_v1_2_036_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_2_033_c1",
+        "kb_v1_010_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_abdomen_002",
+      "group": "dau_bung",
+      "query": "đi ngoài phân đen và đau bụng nhiều thì nên làm gì",
+      "expected_chunk_ids": [
+        "kb_v1_2_035_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_stomach_ache"
+      ],
+      "expected_keywords": [
+        "phân đen",
+        "đau bụng",
+        "cấp cứu"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9064368605613708,
+          "chunk_id": "kb_v1_2_035_c1",
+          "kb_id": "kb_v1_2_035",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8651206493377686,
+          "chunk_id": "kb_v1_2_036_c1",
+          "kb_id": "kb_v1_2_036",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8521052002906799,
+          "chunk_id": "kb_v1_002_c1",
+          "kb_id": "kb_v1_002",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8400431871414185,
+          "chunk_id": "kb_v1_003_c1",
+          "kb_id": "kb_v1_003",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8399266600608826,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9064368605613708,
+        "chunk_id": "kb_v1_2_035_c1",
+        "kb_id": "kb_v1_2_035",
+        "source_id": "nhs_stomach_ache",
+        "section": "red_flags",
+        "title": "Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_035_c1",
+        "kb_v1_2_036_c1",
+        "kb_v1_002_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_035_c1",
+        "kb_v1_2_036_c1",
+        "kb_v1_002_c1",
+        "kb_v1_003_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_abdomen_003",
+      "group": "dau_bung",
+      "query": "đau bụng kéo dài tái diễn kèm sốt có nên đi khám sớm không",
+      "expected_chunk_ids": [
+        "kb_v1_2_036_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_stomach_ache"
+      ],
+      "expected_keywords": [
+        "đau bụng kéo dài",
+        "tái diễn",
+        "sốt"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9499595165252686,
+          "chunk_id": "kb_v1_2_036_c1",
+          "kb_id": "kb_v1_2_036",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.9006040096282959,
+          "chunk_id": "kb_v1_011_c1",
+          "kb_id": "kb_v1_011",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Khi nào đau ngực nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8837538957595825,
+          "chunk_id": "kb_v1_2_034_c1",
+          "kb_id": "kb_v1_2_034",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8791062831878662,
+          "chunk_id": "kb_v1_2_035_c1",
+          "kb_id": "kb_v1_2_035",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8769187927246094,
+          "chunk_id": "kb_v1_2_032_c1",
+          "kb_id": "kb_v1_2_032",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9499595165252686,
+        "chunk_id": "kb_v1_2_036_c1",
+        "kb_id": "kb_v1_2_036",
+        "source_id": "nhs_stomach_ache",
+        "section": "red_flags",
+        "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_036_c1",
+        "kb_v1_011_c1",
+        "kb_v1_2_034_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_036_c1",
+        "kb_v1_011_c1",
+        "kb_v1_2_034_c1",
+        "kb_v1_2_035_c1",
+        "kb_v1_2_032_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_abdomen_004",
+      "group": "dau_bung",
+      "query": "bụng đau âm ỉ nhiều ngày rồi lại sốt nhẹ tôi cần được tư vấn gì",
+      "expected_chunk_ids": [
+        "kb_v1_2_036_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_stomach_ache"
+      ],
+      "expected_keywords": [
+        "đau bụng",
+        "kéo dài",
+        "khám sớm"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9041990041732788,
+          "chunk_id": "kb_v1_2_036_c1",
+          "kb_id": "kb_v1_2_036",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8662265539169312,
+          "chunk_id": "kb_v1_2_035_c1",
+          "kb_id": "kb_v1_2_035",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8618627786636353,
+          "chunk_id": "kb_v1_2_033_c1",
+          "kb_id": "kb_v1_2_033",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.860892117023468,
+          "chunk_id": "kb_v1_2_032_c1",
+          "kb_id": "kb_v1_2_032",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.857658863067627,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9041990041732788,
+        "chunk_id": "kb_v1_2_036_c1",
+        "kb_id": "kb_v1_2_036",
+        "source_id": "nhs_stomach_ache",
+        "section": "red_flags",
+        "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_036_c1",
+        "kb_v1_2_035_c1",
+        "kb_v1_2_033_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_036_c1",
+        "kb_v1_2_035_c1",
+        "kb_v1_2_033_c1",
+        "kb_v1_2_032_c1",
+        "kb_v1_3_040_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_abdomen_005",
+      "group": "dau_bung",
+      "query": "đau bụng nhưng chưa rõ vị trí và không biết có nguy hiểm không",
+      "expected_chunk_ids": [
+        "kb_v1_2_035_c1",
+        "kb_v1_2_036_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_stomach_ache"
+      ],
+      "expected_keywords": [
+        "đau bụng",
+        "cấp cứu",
+        "khám sớm"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8940842747688293,
+          "chunk_id": "kb_v1_2_036_c1",
+          "kb_id": "kb_v1_2_036",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8904333710670471,
+          "chunk_id": "kb_v1_2_035_c1",
+          "kb_id": "kb_v1_2_035",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8714599013328552,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8635017275810242,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8617103099822998,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8940842747688293,
+        "chunk_id": "kb_v1_2_036_c1",
+        "kb_id": "kb_v1_2_036",
+        "source_id": "nhs_stomach_ache",
+        "section": "red_flags",
+        "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_036_c1",
+        "kb_v1_2_035_c1",
+        "kb_v1_2_031_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_036_c1",
+        "kb_v1_2_035_c1",
+        "kb_v1_2_031_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_001_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_headache_001",
+      "group": "dau_dau",
+      "query": "đau đầu dữ dội đột ngột kèm nói khó có phải dấu hiệu cần cấp cứu không",
+      "expected_chunk_ids": [
+        "kb_v1_2_033_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_headaches"
+      ],
+      "expected_keywords": [
+        "đau đầu dữ dội",
+        "đột ngột",
+        "cấp cứu"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9532305598258972,
+          "chunk_id": "kb_v1_2_033_c1",
+          "kb_id": "kb_v1_2_033",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8942868113517761,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8939467668533325,
+          "chunk_id": "kb_v1_2_037_c1",
+          "kb_id": "kb_v1_2_037",
+          "source_id": "nhs_stroke_symptoms",
+          "section": "red_flags",
+          "title": "Dấu hiệu FAST của đột quỵ cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.893730878829956,
+          "chunk_id": "kb_v1_2_035_c1",
+          "kb_id": "kb_v1_2_035",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng dữ dội hoặc kèm nôn ra máu, phân đen cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8890153765678406,
+          "chunk_id": "kb_v1_2_034_c1",
+          "kb_id": "kb_v1_2_034",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9532305598258972,
+        "chunk_id": "kb_v1_2_033_c1",
+        "kb_id": "kb_v1_2_033",
+        "source_id": "nhs_headaches",
+        "section": "red_flags",
+        "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_033_c1",
+        "kb_v1_2_031_c1",
+        "kb_v1_2_037_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_033_c1",
+        "kb_v1_2_031_c1",
+        "kb_v1_2_037_c1",
+        "kb_v1_2_035_c1",
+        "kb_v1_2_034_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_headache_002",
+      "group": "dau_dau",
+      "query": "đau đầu kèm yếu một bên tay chân thì nên làm gì",
+      "expected_chunk_ids": [
+        "kb_v1_2_033_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_headaches"
+      ],
+      "expected_keywords": [
+        "đau đầu",
+        "thần kinh",
+        "cấp cứu"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8728935718536377,
+          "chunk_id": "kb_v1_2_033_c1",
+          "kb_id": "kb_v1_2_033",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8669308423995972,
+          "chunk_id": "kb_v1_2_034_c1",
+          "kb_id": "kb_v1_2_034",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8402533531188965,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8392200469970703,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8378077149391174,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8728935718536377,
+        "chunk_id": "kb_v1_2_033_c1",
+        "kb_id": "kb_v1_2_033",
+        "source_id": "nhs_headaches",
+        "section": "red_flags",
+        "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_033_c1",
+        "kb_v1_2_034_c1",
+        "kb_v1_3_041_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_033_c1",
+        "kb_v1_2_034_c1",
+        "kb_v1_3_041_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_2_031_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_headache_003",
+      "group": "dau_dau",
+      "query": "đau đầu kéo dài tái diễn và buồn nôn có cần khám bác sĩ không",
+      "expected_chunk_ids": [
+        "kb_v1_2_034_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_headaches"
+      ],
+      "expected_keywords": [
+        "đau đầu kéo dài",
+        "tái diễn",
+        "nôn"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9344024658203125,
+          "chunk_id": "kb_v1_2_034_c1",
+          "kb_id": "kb_v1_2_034",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8947424292564392,
+          "chunk_id": "kb_v1_2_036_c1",
+          "kb_id": "kb_v1_2_036",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8790872097015381,
+          "chunk_id": "kb_v1_2_033_c1",
+          "kb_id": "kb_v1_2_033",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8777875304222107,
+          "chunk_id": "kb_v1_2_032_c1",
+          "kb_id": "kb_v1_2_032",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8644824028015137,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9344024658203125,
+        "chunk_id": "kb_v1_2_034_c1",
+        "kb_id": "kb_v1_2_034",
+        "source_id": "nhs_headaches",
+        "section": "red_flags",
+        "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_034_c1",
+        "kb_v1_2_036_c1",
+        "kb_v1_2_033_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_034_c1",
+        "kb_v1_2_036_c1",
+        "kb_v1_2_033_c1",
+        "kb_v1_2_032_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_headache_004",
+      "group": "dau_dau",
+      "query": "nhức đầu nhiều ngày không hết tôi có nên đi kiểm tra sớm",
+      "expected_chunk_ids": [
+        "kb_v1_2_034_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_headaches"
+      ],
+      "expected_keywords": [
+        "đau đầu kéo dài",
+        "khám sớm"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8876036405563354,
+          "chunk_id": "kb_v1_2_034_c1",
+          "kb_id": "kb_v1_2_034",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8756678104400635,
+          "chunk_id": "kb_v1_2_032_c1",
+          "kb_id": "kb_v1_2_032",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8731438517570496,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.871677041053772,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8686883449554443,
+          "chunk_id": "kb_v1_2_036_c1",
+          "kb_id": "kb_v1_2_036",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8876036405563354,
+        "chunk_id": "kb_v1_2_034_c1",
+        "kb_id": "kb_v1_2_034",
+        "source_id": "nhs_headaches",
+        "section": "red_flags",
+        "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_034_c1",
+        "kb_v1_2_032_c1",
+        "kb_v1_3_039_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_034_c1",
+        "kb_v1_2_032_c1",
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_2_036_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_headache_005",
+      "group": "dau_dau",
+      "query": "tự nhiên đau đầu như sét đánh và chóng mặt",
+      "expected_chunk_ids": [
+        "kb_v1_2_033_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_headaches"
+      ],
+      "expected_keywords": [
+        "đau đầu dữ dội",
+        "đột ngột",
+        "cấp cứu"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8803225755691528,
+          "chunk_id": "kb_v1_2_034_c1",
+          "kb_id": "kb_v1_2_034",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8731270432472229,
+          "chunk_id": "kb_v1_2_033_c1",
+          "kb_id": "kb_v1_2_033",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8587403297424316,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8494307994842529,
+          "chunk_id": "kb_v1_2_032_c1",
+          "kb_id": "kb_v1_2_032",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8489145040512085,
+          "chunk_id": "kb_v1_2_038_c1",
+          "kb_id": "kb_v1_2_038",
+          "source_id": "nhs_stroke_symptoms",
+          "section": "red_flags",
+          "title": "Cơn thiếu máu não thoáng qua vẫn cần xử trí khẩn",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8803225755691528,
+        "chunk_id": "kb_v1_2_034_c1",
+        "kb_id": "kb_v1_2_034",
+        "source_id": "nhs_headaches",
+        "section": "red_flags",
+        "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_034_c1",
+        "kb_v1_2_033_c1",
+        "kb_v1_2_031_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_034_c1",
+        "kb_v1_2_033_c1",
+        "kb_v1_2_031_c1",
+        "kb_v1_2_032_c1",
+        "kb_v1_2_038_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_fainting_001",
+      "group": "ngat_xiu",
+      "query": "bị ngất kèm đau ngực và khó thở có cần gọi cấp cứu không",
+      "expected_chunk_ids": [
+        "kb_v1_2_031_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_fainting_adults"
+      ],
+      "expected_keywords": [
+        "ngất",
+        "đau ngực",
+        "khó thở"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9280511140823364,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.9189574718475342,
+          "chunk_id": "kb_v1_010_c1",
+          "kb_id": "kb_v1_010",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Khi nào đau ngực cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.902539074420929,
+          "chunk_id": "kb_v1_013_c1",
+          "kb_id": "kb_v1_013",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.902468204498291,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.889578104019165,
+          "chunk_id": "kb_v1_2_029_c1",
+          "kb_id": "kb_v1_2_029",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9280511140823364,
+        "chunk_id": "kb_v1_2_031_c1",
+        "kb_id": "kb_v1_2_031",
+        "source_id": "nhs_fainting_adults",
+        "section": "red_flags",
+        "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_031_c1",
+        "kb_v1_010_c1",
+        "kb_v1_013_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_031_c1",
+        "kb_v1_010_c1",
+        "kb_v1_013_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_2_029_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_fainting_002",
+      "group": "ngat_xiu",
+      "query": "xỉu rồi bị chấn thương đầu thì xử trí thế nào",
+      "expected_chunk_ids": [
+        "kb_v1_2_031_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_fainting_adults"
+      ],
+      "expected_keywords": [
+        "ngất",
+        "chấn thương",
+        "cấp cứu"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8506650924682617,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8502407073974609,
+          "chunk_id": "kb_v1_2_033_c1",
+          "kb_id": "kb_v1_2_033",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.843072235584259,
+          "chunk_id": "kb_v1_2_034_c1",
+          "kb_id": "kb_v1_2_034",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8430720567703247,
+          "chunk_id": "kb_v1_2_029_c1",
+          "kb_id": "kb_v1_2_029",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8389847278594971,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8506650924682617,
+        "chunk_id": "kb_v1_2_031_c1",
+        "kb_id": "kb_v1_2_031",
+        "source_id": "nhs_fainting_adults",
+        "section": "red_flags",
+        "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_031_c1",
+        "kb_v1_2_033_c1",
+        "kb_v1_2_034_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_031_c1",
+        "kb_v1_2_033_c1",
+        "kb_v1_2_034_c1",
+        "kb_v1_2_029_c1",
+        "kb_v1_3_041_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_fainting_003",
+      "group": "ngat_xiu",
+      "query": "ngất tái diễn nhưng chưa biết nguyên nhân có nên đi khám không",
+      "expected_chunk_ids": [
+        "kb_v1_2_032_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_fainting_adults"
+      ],
+      "expected_keywords": [
+        "ngất tái diễn",
+        "chưa rõ nguyên nhân",
+        "đánh giá y tế"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9327713847160339,
+          "chunk_id": "kb_v1_2_032_c1",
+          "kb_id": "kb_v1_2_032",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8841599225997925,
+          "chunk_id": "kb_v1_2_034_c1",
+          "kb_id": "kb_v1_2_034",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu kéo dài, tái diễn hoặc kèm nôn ói cần được khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8722651600837708,
+          "chunk_id": "kb_v1_2_036_c1",
+          "kb_id": "kb_v1_2_036",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8680042028427124,
+          "chunk_id": "kb_v1_003_c1",
+          "kb_id": "kb_v1_003",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8669854402542114,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9327713847160339,
+        "chunk_id": "kb_v1_2_032_c1",
+        "kb_id": "kb_v1_2_032",
+        "source_id": "nhs_fainting_adults",
+        "section": "red_flags",
+        "title": "Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_032_c1",
+        "kb_v1_2_034_c1",
+        "kb_v1_2_036_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_032_c1",
+        "kb_v1_2_034_c1",
+        "kb_v1_2_036_c1",
+        "kb_v1_003_c1",
+        "kb_v1_2_031_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_fainting_004",
+      "group": "ngat_xiu",
+      "query": "thi thoảng bị choáng rồi ngã quỵ có cần kiểm tra không",
+      "expected_chunk_ids": [
+        "kb_v1_2_032_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_fainting_adults"
+      ],
+      "expected_keywords": [
+        "ngất",
+        "tái diễn",
+        "đánh giá y tế"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8685027360916138,
+          "chunk_id": "kb_v1_2_032_c1",
+          "kb_id": "kb_v1_2_032",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8632446527481079,
+          "chunk_id": "kb_v1_2_038_c1",
+          "kb_id": "kb_v1_2_038",
+          "source_id": "nhs_stroke_symptoms",
+          "section": "red_flags",
+          "title": "Cơn thiếu máu não thoáng qua vẫn cần xử trí khẩn",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.85421222448349,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8526597023010254,
+          "chunk_id": "kb_v1_014_c1",
+          "kb_id": "kb_v1_014",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.851287305355072,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8685027360916138,
+        "chunk_id": "kb_v1_2_032_c1",
+        "kb_id": "kb_v1_2_032",
+        "source_id": "nhs_fainting_adults",
+        "section": "red_flags",
+        "title": "Ngất tái diễn hoặc chưa rõ nguyên nhân nên được đánh giá y tế",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_032_c1",
+        "kb_v1_2_038_c1",
+        "kb_v1_3_040_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_032_c1",
+        "kb_v1_2_038_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_014_c1",
+        "kb_v1_2_031_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_fainting_005",
+      "group": "ngat_xiu",
+      "query": "vừa ngất xong lại thấy khó thở và tức ngực",
+      "expected_chunk_ids": [
+        "kb_v1_2_031_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_fainting_adults"
+      ],
+      "expected_keywords": [
+        "ngất",
+        "khó thở",
+        "đau ngực"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.902119517326355,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.879141092300415,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8783571720123291,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8716936111450195,
+          "chunk_id": "kb_v1_013_c1",
+          "kb_id": "kb_v1_013",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8707060813903809,
+          "chunk_id": "kb_v1_014_c1",
+          "kb_id": "kb_v1_014",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.902119517326355,
+        "chunk_id": "kb_v1_2_031_c1",
+        "kb_id": "kb_v1_2_031",
+        "source_id": "nhs_fainting_adults",
+        "section": "red_flags",
+        "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_031_c1",
+        "kb_v1_3_041_c1",
+        "kb_v1_3_040_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_031_c1",
+        "kb_v1_3_041_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_013_c1",
+        "kb_v1_014_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_anaphylaxis_001",
+      "group": "di_ung_nang_phan_ve",
+      "query": "dị ứng nặng sưng môi khó thở cần gọi cấp cứu không",
+      "expected_chunk_ids": [
+        "kb_v1_2_029_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_anaphylaxis"
+      ],
+      "expected_keywords": [
+        "phản vệ",
+        "dị ứng nặng",
+        "khó thở"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9358158111572266,
+          "chunk_id": "kb_v1_2_029_c1",
+          "kb_id": "kb_v1_2_029",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.9007585048675537,
+          "chunk_id": "kb_v1_013_c1",
+          "kb_id": "kb_v1_013",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.89283287525177,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8891521692276001,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8856489658355713,
+          "chunk_id": "kb_v1_2_037_c1",
+          "kb_id": "kb_v1_2_037",
+          "source_id": "nhs_stroke_symptoms",
+          "section": "red_flags",
+          "title": "Dấu hiệu FAST của đột quỵ cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9358158111572266,
+        "chunk_id": "kb_v1_2_029_c1",
+        "kb_id": "kb_v1_2_029",
+        "source_id": "nhs_anaphylaxis",
+        "section": "red_flags",
+        "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_029_c1",
+        "kb_v1_013_c1",
+        "kb_v1_3_040_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_029_c1",
+        "kb_v1_013_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_3_041_c1",
+        "kb_v1_2_037_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_anaphylaxis_002",
+      "group": "di_ung_nang_phan_ve",
+      "query": "phản vệ nổi mẩn ngứa chóng mặt thở khó xử trí thế nào",
+      "expected_chunk_ids": [
+        "kb_v1_2_029_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_anaphylaxis"
+      ],
+      "expected_keywords": [
+        "phản vệ",
+        "cấp cứu",
+        "khó thở"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8847441673278809,
+          "chunk_id": "kb_v1_2_029_c1",
+          "kb_id": "kb_v1_2_029",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8476033806800842,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8464989066123962,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8454048037528992,
+          "chunk_id": "kb_v1_2_030_c1",
+          "kb_id": "kb_v1_2_030",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Nếu đã có bút tiêm adrenaline, cần dùng đúng lúc và vẫn đi cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8453506231307983,
+          "chunk_id": "kb_v1_013_c1",
+          "kb_id": "kb_v1_013",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8847441673278809,
+        "chunk_id": "kb_v1_2_029_c1",
+        "kb_id": "kb_v1_2_029",
+        "source_id": "nhs_anaphylaxis",
+        "section": "red_flags",
+        "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_029_c1",
+        "kb_v1_3_041_c1",
+        "kb_v1_2_031_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_029_c1",
+        "kb_v1_3_041_c1",
+        "kb_v1_2_031_c1",
+        "kb_v1_2_030_c1",
+        "kb_v1_013_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_anaphylaxis_003",
+      "group": "di_ung_nang_phan_ve",
+      "query": "có bút tiêm adrenaline khi phản vệ thì dùng xong có cần đi viện không",
+      "expected_chunk_ids": [
+        "kb_v1_2_030_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_anaphylaxis"
+      ],
+      "expected_keywords": [
+        "adrenaline",
+        "phản vệ",
+        "cấp cứu"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9266951680183411,
+          "chunk_id": "kb_v1_2_030_c1",
+          "kb_id": "kb_v1_2_030",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Nếu đã có bút tiêm adrenaline, cần dùng đúng lúc và vẫn đi cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8895307779312134,
+          "chunk_id": "kb_v1_2_029_c1",
+          "kb_id": "kb_v1_2_029",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8424813747406006,
+          "chunk_id": "kb_v1_2_022_c1",
+          "kb_id": "kb_v1_2_022",
+          "source_id": "medlineplus_crp_test",
+          "section": "test_explainers",
+          "title": "CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.8400720357894897,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 5,
+          "score": 0.8396039009094238,
+          "chunk_id": "kb_v1_004_c1",
+          "kb_id": "kb_v1_004",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9266951680183411,
+        "chunk_id": "kb_v1_2_030_c1",
+        "kb_id": "kb_v1_2_030",
+        "source_id": "nhs_anaphylaxis",
+        "section": "red_flags",
+        "title": "Nếu đã có bút tiêm adrenaline, cần dùng đúng lúc và vẫn đi cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_030_c1",
+        "kb_v1_2_029_c1",
+        "kb_v1_2_022_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_030_c1",
+        "kb_v1_2_029_c1",
+        "kb_v1_2_022_c1",
+        "kb_v1_2_024_c1",
+        "kb_v1_004_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_anaphylaxis_004",
+      "group": "di_ung_nang_phan_ve",
+      "query": "sau khi tiêm adrenaline triệu chứng đỡ hơn có thể ở nhà theo dõi không",
+      "expected_chunk_ids": [
+        "kb_v1_2_030_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_anaphylaxis"
+      ],
+      "expected_keywords": [
+        "adrenaline",
+        "vẫn đi cấp cứu",
+        "phản vệ"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8949493169784546,
+          "chunk_id": "kb_v1_2_030_c1",
+          "kb_id": "kb_v1_2_030",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Nếu đã có bút tiêm adrenaline, cần dùng đúng lúc và vẫn đi cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8648659586906433,
+          "chunk_id": "kb_v1_2_029_c1",
+          "kb_id": "kb_v1_2_029",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8625468611717224,
+          "chunk_id": "kb_v1_2_022_c1",
+          "kb_id": "kb_v1_2_022",
+          "source_id": "medlineplus_crp_test",
+          "section": "test_explainers",
+          "title": "CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.8599594235420227,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8568024635314941,
+          "chunk_id": "kb_v1_2_026_c1",
+          "kb_id": "kb_v1_2_026",
+          "source_id": "medlineplus_pulse_oximetry_test",
+          "section": "test_explainers",
+          "title": "Khi dùng máy đo SpO2 tại nhà, kết quả thấp hoặc có triệu chứng vẫn cần được đánh giá",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8949493169784546,
+        "chunk_id": "kb_v1_2_030_c1",
+        "kb_id": "kb_v1_2_030",
+        "source_id": "nhs_anaphylaxis",
+        "section": "red_flags",
+        "title": "Nếu đã có bút tiêm adrenaline, cần dùng đúng lúc và vẫn đi cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_030_c1",
+        "kb_v1_2_029_c1",
+        "kb_v1_2_022_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_030_c1",
+        "kb_v1_2_029_c1",
+        "kb_v1_2_022_c1",
+        "kb_v1_3_039_c1",
+        "kb_v1_2_026_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_anaphylaxis_005",
+      "group": "di_ung_nang_phan_ve",
+      "query": "ăn hải sản xong sưng họng khó thở tôi nên hỏi xét nghiệm hay đi cấp cứu",
+      "expected_chunk_ids": [
+        "kb_v1_2_029_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_anaphylaxis"
+      ],
+      "expected_keywords": [
+        "dị ứng nặng",
+        "khó thở",
+        "cấp cứu"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8749872446060181,
+          "chunk_id": "kb_v1_2_029_c1",
+          "kb_id": "kb_v1_2_029",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8742806911468506,
+          "chunk_id": "kb_v1_014_c1",
+          "kb_id": "kb_v1_014",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8677371740341187,
+          "chunk_id": "kb_v1_2_036_c1",
+          "kb_id": "kb_v1_2_036",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.867169976234436,
+          "chunk_id": "kb_v1_013_c1",
+          "kb_id": "kb_v1_013",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8620203137397766,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8749872446060181,
+        "chunk_id": "kb_v1_2_029_c1",
+        "kb_id": "kb_v1_2_029",
+        "source_id": "nhs_anaphylaxis",
+        "section": "red_flags",
+        "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_029_c1",
+        "kb_v1_014_c1",
+        "kb_v1_2_036_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_029_c1",
+        "kb_v1_014_c1",
+        "kb_v1_2_036_c1",
+        "kb_v1_013_c1",
+        "kb_v1_3_041_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_blood_test_001",
+      "group": "giai_thich_xet_nghiem_mau_pho_bien",
+      "query": "xét nghiệm máu là gì và dùng để kiểm tra những gì",
+      "expected_chunk_ids": [
+        "kb_v1_005_c1",
+        "kb_v1_006_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests"
+      ],
+      "expected_keywords": [
+        "xét nghiệm máu",
+        "bác sĩ",
+        "kiểm tra"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9338728189468384,
+          "chunk_id": "kb_v1_005_c1",
+          "kb_id": "kb_v1_005",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Xét nghiệm máu là gì",
+          "risk_level": "low"
+        },
+        {
+          "rank": 2,
+          "score": 0.906408965587616,
+          "chunk_id": "kb_v1_007_c1",
+          "kb_id": "kb_v1_007",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Một số loại xét nghiệm máu thường gặp",
+          "risk_level": "low"
+        },
+        {
+          "rank": 3,
+          "score": 0.9033148884773254,
+          "chunk_id": "kb_v1_006_c1",
+          "kb_id": "kb_v1_006",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Vì sao bác sĩ có thể chỉ định xét nghiệm máu",
+          "risk_level": "low"
+        },
+        {
+          "rank": 4,
+          "score": 0.9031639099121094,
+          "chunk_id": "kb_v1_2_019_c1",
+          "kb_id": "kb_v1_2_019",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC là công thức máu toàn bộ để kiểm tra tế bào máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 5,
+          "score": 0.9025880098342896,
+          "chunk_id": "kb_v1_2_016_c1",
+          "kb_id": "kb_v1_2_016",
+          "source_id": "medlineplus_blood_culture_test",
+          "section": "test_explainers",
+          "title": "Cấy máu giúp tìm vi khuẩn hoặc nấm trong máu",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9338728189468384,
+        "chunk_id": "kb_v1_005_c1",
+        "kb_id": "kb_v1_005",
+        "source_id": "blood_tests",
+        "section": "test_explainers",
+        "title": "Xét nghiệm máu là gì",
+        "risk_level": "low"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_005_c1",
+        "kb_v1_007_c1",
+        "kb_v1_006_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_005_c1",
+        "kb_v1_007_c1",
+        "kb_v1_006_c1",
+        "kb_v1_2_019_c1",
+        "kb_v1_2_016_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_blood_test_002",
+      "group": "giai_thich_xet_nghiem_mau_pho_bien",
+      "query": "tại sao bác sĩ chỉ định xét nghiệm máu",
+      "expected_chunk_ids": [
+        "kb_v1_006_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests"
+      ],
+      "expected_keywords": [
+        "chỉ định",
+        "xét nghiệm máu",
+        "bác sĩ"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9449546337127686,
+          "chunk_id": "kb_v1_006_c1",
+          "kb_id": "kb_v1_006",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Vì sao bác sĩ có thể chỉ định xét nghiệm máu",
+          "risk_level": "low"
+        },
+        {
+          "rank": 2,
+          "score": 0.8961159586906433,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 3,
+          "score": 0.8928741812705994,
+          "chunk_id": "kb_v1_005_c1",
+          "kb_id": "kb_v1_005",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Xét nghiệm máu là gì",
+          "risk_level": "low"
+        },
+        {
+          "rank": 4,
+          "score": 0.8920714855194092,
+          "chunk_id": "kb_v1_007_c1",
+          "kb_id": "kb_v1_007",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Một số loại xét nghiệm máu thường gặp",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8917253017425537,
+          "chunk_id": "kb_v1_008_c1",
+          "kb_id": "kb_v1_008",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Cần chuẩn bị gì trước khi xét nghiệm máu",
+          "risk_level": "low"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9449546337127686,
+        "chunk_id": "kb_v1_006_c1",
+        "kb_id": "kb_v1_006",
+        "source_id": "blood_tests",
+        "section": "test_explainers",
+        "title": "Vì sao bác sĩ có thể chỉ định xét nghiệm máu",
+        "risk_level": "low"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_006_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_005_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_006_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_005_c1",
+        "kb_v1_007_c1",
+        "kb_v1_008_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_blood_test_003",
+      "group": "giai_thich_xet_nghiem_mau_pho_bien",
+      "query": "có những loại xét nghiệm máu phổ biến nào",
+      "expected_chunk_ids": [
+        "kb_v1_007_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests"
+      ],
+      "expected_keywords": [
+        "loại xét nghiệm máu",
+        "thường gặp"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9157427549362183,
+          "chunk_id": "kb_v1_007_c1",
+          "kb_id": "kb_v1_007",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Một số loại xét nghiệm máu thường gặp",
+          "risk_level": "low"
+        },
+        {
+          "rank": 2,
+          "score": 0.9000777006149292,
+          "chunk_id": "kb_v1_005_c1",
+          "kb_id": "kb_v1_005",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Xét nghiệm máu là gì",
+          "risk_level": "low"
+        },
+        {
+          "rank": 3,
+          "score": 0.8934340476989746,
+          "chunk_id": "kb_v1_2_019_c1",
+          "kb_id": "kb_v1_2_019",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC là công thức máu toàn bộ để kiểm tra tế bào máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.8876140117645264,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8870380520820618,
+          "chunk_id": "kb_v1_2_020_c1",
+          "kb_id": "kb_v1_2_020",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9157427549362183,
+        "chunk_id": "kb_v1_007_c1",
+        "kb_id": "kb_v1_007",
+        "source_id": "blood_tests",
+        "section": "test_explainers",
+        "title": "Một số loại xét nghiệm máu thường gặp",
+        "risk_level": "low"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_007_c1",
+        "kb_v1_005_c1",
+        "kb_v1_2_019_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_007_c1",
+        "kb_v1_005_c1",
+        "kb_v1_2_019_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_2_020_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_blood_test_004",
+      "group": "giai_thich_xet_nghiem_mau_pho_bien",
+      "query": "trước khi xét nghiệm máu cần nhịn ăn hay chuẩn bị gì",
+      "expected_chunk_ids": [
+        "kb_v1_008_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests"
+      ],
+      "expected_keywords": [
+        "chuẩn bị",
+        "xét nghiệm máu"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9622020721435547,
+          "chunk_id": "kb_v1_008_c1",
+          "kb_id": "kb_v1_008",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Cần chuẩn bị gì trước khi xét nghiệm máu",
+          "risk_level": "low"
+        },
+        {
+          "rank": 2,
+          "score": 0.9163661599159241,
+          "chunk_id": "kb_v1_2_018_c1",
+          "kb_id": "kb_v1_2_018",
+          "source_id": "medlineplus_bmp_test",
+          "section": "test_explainers",
+          "title": "BMP thường được dùng để kiểm tra sức khỏe chung và theo dõi chức năng thận",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 3,
+          "score": 0.8892759680747986,
+          "chunk_id": "kb_v1_006_c1",
+          "kb_id": "kb_v1_006",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Vì sao bác sĩ có thể chỉ định xét nghiệm máu",
+          "risk_level": "low"
+        },
+        {
+          "rank": 4,
+          "score": 0.8839556574821472,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8788699507713318,
+          "chunk_id": "kb_v1_007_c1",
+          "kb_id": "kb_v1_007",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Một số loại xét nghiệm máu thường gặp",
+          "risk_level": "low"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9622020721435547,
+        "chunk_id": "kb_v1_008_c1",
+        "kb_id": "kb_v1_008",
+        "source_id": "blood_tests",
+        "section": "test_explainers",
+        "title": "Cần chuẩn bị gì trước khi xét nghiệm máu",
+        "risk_level": "low"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_008_c1",
+        "kb_v1_2_018_c1",
+        "kb_v1_006_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_008_c1",
+        "kb_v1_2_018_c1",
+        "kb_v1_006_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_007_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_blood_test_005",
+      "group": "giai_thich_xet_nghiem_mau_pho_bien",
+      "query": "kết quả xét nghiệm máu phức tạp cần hỏi ai giải thích",
+      "expected_chunk_ids": [
+        "kb_v1_009_c1",
+        "kb_v1_3_042_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests"
+      ],
+      "expected_keywords": [
+        "kết quả xét nghiệm máu",
+        "nhân viên y tế",
+        "giải thích"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9343134164810181,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 2,
+          "score": 0.8939645290374756,
+          "chunk_id": "kb_v1_009_c1",
+          "kb_id": "kb_v1_009",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Sau khi xét nghiệm máu và khi nhận kết quả",
+          "risk_level": "low"
+        },
+        {
+          "rank": 3,
+          "score": 0.8930678963661194,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.8924897313117981,
+          "chunk_id": "kb_v1_006_c1",
+          "kb_id": "kb_v1_006",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Vì sao bác sĩ có thể chỉ định xét nghiệm máu",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8847639560699463,
+          "chunk_id": "kb_v1_007_c1",
+          "kb_id": "kb_v1_007",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Một số loại xét nghiệm máu thường gặp",
+          "risk_level": "low"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9343134164810181,
+        "chunk_id": "kb_v1_3_042_c1",
+        "kb_id": "kb_v1_3_042",
+        "source_id": "blood_tests",
+        "section": "test_explainers",
+        "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+        "risk_level": "low"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_042_c1",
+        "kb_v1_009_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_042_c1",
+        "kb_v1_009_c1",
+        "kb_v1_2_024_c1",
+        "kb_v1_006_c1",
+        "kb_v1_007_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_blood_test_006",
+      "group": "giai_thich_xet_nghiem_mau_pho_bien",
+      "query": "CBC công thức máu toàn bộ giúp kiểm tra thiếu máu hay nhiễm trùng không",
+      "expected_chunk_ids": [
+        "kb_v1_2_019_c1",
+        "kb_v1_2_020_c1"
+      ],
+      "expected_source_ids": [
+        "medlineplus_cbc_test"
+      ],
+      "expected_keywords": [
+        "CBC",
+        "tế bào máu",
+        "thiếu máu"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9314925670623779,
+          "chunk_id": "kb_v1_2_019_c1",
+          "kb_id": "kb_v1_2_019",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC là công thức máu toàn bộ để kiểm tra tế bào máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 2,
+          "score": 0.9162532091140747,
+          "chunk_id": "kb_v1_2_020_c1",
+          "kb_id": "kb_v1_2_020",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 3,
+          "score": 0.8741281628608704,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 4,
+          "score": 0.8738700151443481,
+          "chunk_id": "kb_v1_2_016_c1",
+          "kb_id": "kb_v1_2_016",
+          "source_id": "medlineplus_blood_culture_test",
+          "section": "test_explainers",
+          "title": "Cấy máu giúp tìm vi khuẩn hoặc nấm trong máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 5,
+          "score": 0.8658777475357056,
+          "chunk_id": "kb_v1_2_022_c1",
+          "kb_id": "kb_v1_2_022",
+          "source_id": "medlineplus_crp_test",
+          "section": "test_explainers",
+          "title": "CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9314925670623779,
+        "chunk_id": "kb_v1_2_019_c1",
+        "kb_id": "kb_v1_2_019",
+        "source_id": "medlineplus_cbc_test",
+        "section": "test_explainers",
+        "title": "CBC là công thức máu toàn bộ để kiểm tra tế bào máu",
+        "risk_level": "medium"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_019_c1",
+        "kb_v1_2_020_c1",
+        "kb_v1_3_042_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_019_c1",
+        "kb_v1_2_020_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_2_016_c1",
+        "kb_v1_2_022_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_blood_test_007",
+      "group": "giai_thich_xet_nghiem_mau_pho_bien",
+      "query": "BMP xét nghiệm chuyển hóa cơ bản liên quan chức năng thận như thế nào",
+      "expected_chunk_ids": [
+        "kb_v1_2_017_c1",
+        "kb_v1_2_018_c1"
+      ],
+      "expected_source_ids": [
+        "medlineplus_bmp_test"
+      ],
+      "expected_keywords": [
+        "BMP",
+        "chuyển hóa cơ bản",
+        "chức năng thận"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9088664054870605,
+          "chunk_id": "kb_v1_2_017_c1",
+          "kb_id": "kb_v1_2_017",
+          "source_id": "medlineplus_bmp_test",
+          "section": "test_explainers",
+          "title": "BMP là xét nghiệm đánh giá các chất cơ bản trong máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 2,
+          "score": 0.904350996017456,
+          "chunk_id": "kb_v1_2_018_c1",
+          "kb_id": "kb_v1_2_018",
+          "source_id": "medlineplus_bmp_test",
+          "section": "test_explainers",
+          "title": "BMP thường được dùng để kiểm tra sức khỏe chung và theo dõi chức năng thận",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 3,
+          "score": 0.8527103662490845,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 4,
+          "score": 0.8495066165924072,
+          "chunk_id": "kb_v1_007_c1",
+          "kb_id": "kb_v1_007",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Một số loại xét nghiệm máu thường gặp",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8455685377120972,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9088664054870605,
+        "chunk_id": "kb_v1_2_017_c1",
+        "kb_id": "kb_v1_2_017",
+        "source_id": "medlineplus_bmp_test",
+        "section": "test_explainers",
+        "title": "BMP là xét nghiệm đánh giá các chất cơ bản trong máu",
+        "risk_level": "medium"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_017_c1",
+        "kb_v1_2_018_c1",
+        "kb_v1_3_042_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_017_c1",
+        "kb_v1_2_018_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_007_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 0.6666666666666666
+    },
+    {
+      "id": "v2_blood_test_008",
+      "group": "giai_thich_xet_nghiem_mau_pho_bien",
+      "query": "CRP có cho biết vị trí viêm trong cơ thể không",
+      "expected_chunk_ids": [
+        "kb_v1_2_021_c1",
+        "kb_v1_2_022_c1"
+      ],
+      "expected_source_ids": [
+        "medlineplus_crp_test"
+      ],
+      "expected_keywords": [
+        "CRP",
+        "viêm",
+        "không chỉ ra vị trí"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9378295540809631,
+          "chunk_id": "kb_v1_2_022_c1",
+          "kb_id": "kb_v1_2_022",
+          "source_id": "medlineplus_crp_test",
+          "section": "test_explainers",
+          "title": "CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 2,
+          "score": 0.9353401064872742,
+          "chunk_id": "kb_v1_2_021_c1",
+          "kb_id": "kb_v1_2_021",
+          "source_id": "medlineplus_crp_test",
+          "section": "test_explainers",
+          "title": "CRP là xét nghiệm gợi ý mức độ viêm trong cơ thể",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 3,
+          "score": 0.8546220064163208,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8501929044723511,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8439508676528931,
+          "chunk_id": "kb_v1_004_c1",
+          "kb_id": "kb_v1_004",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9378295540809631,
+        "chunk_id": "kb_v1_2_022_c1",
+        "kb_id": "kb_v1_2_022",
+        "source_id": "medlineplus_crp_test",
+        "section": "test_explainers",
+        "title": "CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm",
+        "risk_level": "medium"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_022_c1",
+        "kb_v1_2_021_c1",
+        "kb_v1_3_039_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_022_c1",
+        "kb_v1_2_021_c1",
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_004_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_blood_test_009",
+      "group": "giai_thich_xet_nghiem_mau_pho_bien",
+      "query": "D-dimer bất thường có tự kết luận cục máu đông được không",
+      "expected_chunk_ids": [
+        "kb_v1_2_023_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "expected_source_ids": [
+        "medlineplus_ddimer_test"
+      ],
+      "expected_keywords": [
+        "D-dimer",
+        "cục máu đông",
+        "xét nghiệm tiếp"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9300804138183594,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 2,
+          "score": 0.9247571229934692,
+          "chunk_id": "kb_v1_2_023_c1",
+          "kb_id": "kb_v1_2_023",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer là xét nghiệm hỗ trợ đánh giá nguy cơ cục máu đông",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 3,
+          "score": 0.8630383014678955,
+          "chunk_id": "kb_v1_2_028_c1",
+          "kb_id": "kb_v1_2_028",
+          "source_id": "medlineplus_troponin_test",
+          "section": "test_explainers",
+          "title": "Troponin tăng không phải lúc nào cũng đồng nghĩa nhồi máu cơ tim",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.857732892036438,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8553441762924194,
+          "chunk_id": "kb_v1_2_020_c1",
+          "kb_id": "kb_v1_2_020",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9300804138183594,
+        "chunk_id": "kb_v1_2_024_c1",
+        "kb_id": "kb_v1_2_024",
+        "source_id": "medlineplus_ddimer_test",
+        "section": "test_explainers",
+        "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+        "risk_level": "medium"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_024_c1",
+        "kb_v1_2_023_c1",
+        "kb_v1_2_028_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_024_c1",
+        "kb_v1_2_023_c1",
+        "kb_v1_2_028_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_2_020_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_blood_test_010",
+      "group": "giai_thich_xet_nghiem_mau_pho_bien",
+      "query": "troponin tăng có chắc là nhồi máu cơ tim không",
+      "expected_chunk_ids": [
+        "kb_v1_2_027_c1",
+        "kb_v1_2_028_c1"
+      ],
+      "expected_source_ids": [
+        "medlineplus_troponin_test"
+      ],
+      "expected_keywords": [
+        "Troponin",
+        "nhồi máu cơ tim",
+        "không phải lúc nào"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9507707953453064,
+          "chunk_id": "kb_v1_2_028_c1",
+          "kb_id": "kb_v1_2_028",
+          "source_id": "medlineplus_troponin_test",
+          "section": "test_explainers",
+          "title": "Troponin tăng không phải lúc nào cũng đồng nghĩa nhồi máu cơ tim",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 2,
+          "score": 0.9157724380493164,
+          "chunk_id": "kb_v1_2_027_c1",
+          "kb_id": "kb_v1_2_027",
+          "source_id": "medlineplus_troponin_test",
+          "section": "test_explainers",
+          "title": "Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 3,
+          "score": 0.8694494962692261,
+          "chunk_id": "kb_v1_2_023_c1",
+          "kb_id": "kb_v1_2_023",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer là xét nghiệm hỗ trợ đánh giá nguy cơ cục máu đông",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.853154182434082,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8469633460044861,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9507707953453064,
+        "chunk_id": "kb_v1_2_028_c1",
+        "kb_id": "kb_v1_2_028",
+        "source_id": "medlineplus_troponin_test",
+        "section": "test_explainers",
+        "title": "Troponin tăng không phải lúc nào cũng đồng nghĩa nhồi máu cơ tim",
+        "risk_level": "medium"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_028_c1",
+        "kb_v1_2_027_c1",
+        "kb_v1_2_023_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_028_c1",
+        "kb_v1_2_027_c1",
+        "kb_v1_2_023_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_3_041_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_sepsis_001",
+      "group": "nhiem_trung_nang_sepsis",
+      "query": "nghi nhiễm trùng nặng rất mệt và xấu đi nhanh cần làm gì",
+      "expected_chunk_ids": [
+        "kb_v1_001_c1",
+        "kb_v1_3_039_c1"
+      ],
+      "expected_source_ids": [
+        "nice_sepsis_overview",
+        "nice_sepsis_guideline"
+      ],
+      "expected_keywords": [
+        "nhiễm trùng",
+        "rất mệt",
+        "đánh giá y tế"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9108892679214478,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.9022880792617798,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8876946568489075,
+          "chunk_id": "kb_v1_004_c1",
+          "kb_id": "kb_v1_004",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8852828741073608,
+          "chunk_id": "kb_v1_002_c1",
+          "kb_id": "kb_v1_002",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8777100443840027,
+          "chunk_id": "kb_v1_003_c1",
+          "kb_id": "kb_v1_003",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9108892679214478,
+        "chunk_id": "kb_v1_001_c1",
+        "kb_id": "kb_v1_001",
+        "source_id": "nice_sepsis_overview",
+        "section": "red_flags",
+        "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_001_c1",
+        "kb_v1_3_039_c1",
+        "kb_v1_004_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_001_c1",
+        "kb_v1_3_039_c1",
+        "kb_v1_004_c1",
+        "kb_v1_002_c1",
+        "kb_v1_003_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_sepsis_002",
+      "group": "nhiem_trung_nang_sepsis",
+      "query": "sepsis ở người từ 16 tuổi trở lên có dấu hiệu không ổn cần đánh giá không",
+      "expected_chunk_ids": [
+        "kb_v1_3_039_c1"
+      ],
+      "expected_source_ids": [
+        "nice_sepsis_guideline"
+      ],
+      "expected_keywords": [
+        "sepsis",
+        "người từ 16 tuổi",
+        "đánh giá y tế"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9309206008911133,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.9095841646194458,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8785623908042908,
+          "chunk_id": "kb_v1_003_c1",
+          "kb_id": "kb_v1_003",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8768588304519653,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8742062449455261,
+          "chunk_id": "kb_v1_002_c1",
+          "kb_id": "kb_v1_002",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9309206008911133,
+        "chunk_id": "kb_v1_3_039_c1",
+        "kb_id": "kb_v1_3_039",
+        "source_id": "nice_sepsis_guideline",
+        "section": "red_flags",
+        "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_003_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_003_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_002_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_sepsis_003",
+      "group": "nhiem_trung_nang_sepsis",
+      "query": "dấu hiệu bên ngoài nào làm tăng cảnh giác nhiễm trùng nặng",
+      "expected_chunk_ids": [
+        "kb_v1_002_c1"
+      ],
+      "expected_source_ids": [
+        "nice_sepsis_overview"
+      ],
+      "expected_keywords": [
+        "dấu hiệu",
+        "cảnh giác",
+        "nhiễm trùng nặng"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9295313358306885,
+          "chunk_id": "kb_v1_002_c1",
+          "kb_id": "kb_v1_002",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8997172117233276,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8892108201980591,
+          "chunk_id": "kb_v1_004_c1",
+          "kb_id": "kb_v1_004",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8866690993309021,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8695316910743713,
+          "chunk_id": "kb_v1_003_c1",
+          "kb_id": "kb_v1_003",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9295313358306885,
+        "chunk_id": "kb_v1_002_c1",
+        "kb_id": "kb_v1_002",
+        "source_id": "nice_sepsis_overview",
+        "section": "red_flags",
+        "title": "Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_002_c1",
+        "kb_v1_001_c1",
+        "kb_v1_004_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_002_c1",
+        "kb_v1_001_c1",
+        "kb_v1_004_c1",
+        "kb_v1_3_039_c1",
+        "kb_v1_003_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_sepsis_004",
+      "group": "nhiem_trung_nang_sepsis",
+      "query": "nhiễm trùng có nguy cơ cao khi nào cần chuyển cấp cứu ngay",
+      "expected_chunk_ids": [
+        "kb_v1_004_c1"
+      ],
+      "expected_source_ids": [
+        "nice_sepsis_overview"
+      ],
+      "expected_keywords": [
+        "nguy cơ cao",
+        "nhiễm trùng nặng",
+        "cấp cứu"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9405883550643921,
+          "chunk_id": "kb_v1_004_c1",
+          "kb_id": "kb_v1_004",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.896803081035614,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8918395638465881,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8840295076370239,
+          "chunk_id": "kb_v1_013_c1",
+          "kb_id": "kb_v1_013",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8749488592147827,
+          "chunk_id": "kb_v1_2_029_c1",
+          "kb_id": "kb_v1_2_029",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9405883550643921,
+        "chunk_id": "kb_v1_004_c1",
+        "kb_id": "kb_v1_004",
+        "source_id": "nice_sepsis_overview",
+        "section": "red_flags",
+        "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_004_c1",
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_004_c1",
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_013_c1",
+        "kb_v1_2_029_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_sepsis_005",
+      "group": "nhiem_trung_nang_sepsis",
+      "query": "người bệnh nhiễm trùng trước đó chưa quá xấu nhưng nay lo ngại tăng lên",
+      "expected_chunk_ids": [
+        "kb_v1_003_c1"
+      ],
+      "expected_source_ids": [
+        "nice_sepsis_overview"
+      ],
+      "expected_keywords": [
+        "lo ngại",
+        "theo dõi",
+        "chưa quá xấu"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.885543704032898,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8842625617980957,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8780200481414795,
+          "chunk_id": "kb_v1_003_c1",
+          "kb_id": "kb_v1_003",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8697308301925659,
+          "chunk_id": "kb_v1_004_c1",
+          "kb_id": "kb_v1_004",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8692406415939331,
+          "chunk_id": "kb_v1_002_c1",
+          "kb_id": "kb_v1_002",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.885543704032898,
+        "chunk_id": "kb_v1_3_039_c1",
+        "kb_id": "kb_v1_3_039",
+        "source_id": "nice_sepsis_guideline",
+        "section": "red_flags",
+        "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_003_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_003_c1",
+        "kb_v1_004_c1",
+        "kb_v1_002_c1"
+      ],
+      "hit_at_1": 0.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 0.5,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_sepsis_006",
+      "group": "nhiem_trung_nang_sepsis",
+      "query": "sepsis có áp dụng cho trẻ em hoặc người đang mang thai không",
+      "expected_chunk_ids": [
+        "kb_v1_3_039_c1"
+      ],
+      "expected_source_ids": [
+        "nice_sepsis_guideline"
+      ],
+      "expected_keywords": [
+        "không áp dụng",
+        "trẻ em",
+        "mang thai"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9031387567520142,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8564450144767761,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8464745283126831,
+          "chunk_id": "kb_v1_004_c1",
+          "kb_id": "kb_v1_004",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8430874943733215,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.842178463935852,
+          "chunk_id": "kb_v1_2_016_c1",
+          "kb_id": "kb_v1_2_016",
+          "source_id": "medlineplus_blood_culture_test",
+          "section": "test_explainers",
+          "title": "Cấy máu giúp tìm vi khuẩn hoặc nấm trong máu",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9031387567520142,
+        "chunk_id": "kb_v1_3_039_c1",
+        "kb_id": "kb_v1_3_039",
+        "source_id": "nice_sepsis_guideline",
+        "section": "red_flags",
+        "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_004_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_004_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_2_016_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_sepsis_007",
+      "group": "nhiem_trung_nang_sepsis",
+      "query": "bị nhiễm trùng thấy rất không ổn thì HomeLab có chẩn đoán sepsis được không",
+      "expected_chunk_ids": [
+        "kb_v1_001_c1",
+        "kb_v1_3_039_c1"
+      ],
+      "expected_source_ids": [
+        "nice_sepsis_overview",
+        "nice_sepsis_guideline"
+      ],
+      "expected_keywords": [
+        "không chẩn đoán",
+        "đánh giá y tế",
+        "nhiễm trùng"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9162591099739075,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.889395534992218,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8723882436752319,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8685297966003418,
+          "chunk_id": "kb_v1_004_c1",
+          "kb_id": "kb_v1_004",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nguy cơ cao của nhiễm trùng nặng, cần chuyển cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8670974373817444,
+          "chunk_id": "kb_v1_2_016_c1",
+          "kb_id": "kb_v1_2_016",
+          "source_id": "medlineplus_blood_culture_test",
+          "section": "test_explainers",
+          "title": "Cấy máu giúp tìm vi khuẩn hoặc nấm trong máu",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9162591099739075,
+        "chunk_id": "kb_v1_3_039_c1",
+        "kb_id": "kb_v1_3_039",
+        "source_id": "nice_sepsis_guideline",
+        "section": "red_flags",
+        "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_3_040_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_001_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_004_c1",
+        "kb_v1_2_016_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 0.6666666666666666
+    },
+    {
+      "id": "v2_ambiguous_001",
+      "group": "cau_hoi_mo_ho_thieu_thong_tin",
+      "query": "tôi thấy rất không ổn nhưng không biết mô tả triệu chứng thế nào",
+      "expected_chunk_ids": [
+        "kb_v1_001_c1",
+        "kb_v1_3_039_c1"
+      ],
+      "expected_source_ids": [
+        "nice_sepsis_overview",
+        "nice_sepsis_guideline"
+      ],
+      "expected_keywords": [
+        "rất không ổn",
+        "đánh giá y tế",
+        "nhiễm trùng"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8691284656524658,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8665799498558044,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8595072031021118,
+          "chunk_id": "kb_v1_003_c1",
+          "kb_id": "kb_v1_003",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8587181568145752,
+          "chunk_id": "kb_v1_2_038_c1",
+          "kb_id": "kb_v1_2_038",
+          "source_id": "nhs_stroke_symptoms",
+          "section": "red_flags",
+          "title": "Cơn thiếu máu não thoáng qua vẫn cần xử trí khẩn",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8517583608627319,
+          "chunk_id": "kb_v1_002_c1",
+          "kb_id": "kb_v1_002",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu bên ngoài làm tăng mức độ cảnh giác nhiễm trùng nặng",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8691284656524658,
+        "chunk_id": "kb_v1_3_041_c1",
+        "kb_id": "kb_v1_3_041",
+        "source_id": "shortness_of_breath",
+        "section": "red_flags",
+        "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_041_c1",
+        "kb_v1_001_c1",
+        "kb_v1_003_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_041_c1",
+        "kb_v1_001_c1",
+        "kb_v1_003_c1",
+        "kb_v1_2_038_c1",
+        "kb_v1_002_c1"
+      ],
+      "hit_at_1": 0.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 0.5,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_ambiguous_002",
+      "group": "cau_hoi_mo_ho_thieu_thong_tin",
+      "query": "tôi bị đau nhưng không rõ đau ở đâu và có cần khám không",
+      "expected_chunk_ids": [
+        "kb_v1_2_036_c1",
+        "kb_v1_2_034_c1",
+        "kb_v1_011_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_stomach_ache",
+        "nhs_headaches",
+        "chest_pain"
+      ],
+      "expected_keywords": [
+        "khám sớm",
+        "đau",
+        "đánh giá"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8780723810195923,
+          "chunk_id": "kb_v1_011_c1",
+          "kb_id": "kb_v1_011",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Khi nào đau ngực nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8742210865020752,
+          "chunk_id": "kb_v1_2_036_c1",
+          "kb_id": "kb_v1_2_036",
+          "source_id": "nhs_stomach_ache",
+          "section": "red_flags",
+          "title": "Đau bụng kéo dài, tái diễn hoặc kèm sốt nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.873491644859314,
+          "chunk_id": "kb_v1_010_c1",
+          "kb_id": "kb_v1_010",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Khi nào đau ngực cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8665993213653564,
+          "chunk_id": "kb_v1_2_033_c1",
+          "kb_id": "kb_v1_2_033",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8657264113426208,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8780723810195923,
+        "chunk_id": "kb_v1_011_c1",
+        "kb_id": "kb_v1_011",
+        "source_id": "chest_pain",
+        "section": "red_flags",
+        "title": "Khi nào đau ngực nên đi khám sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_011_c1",
+        "kb_v1_2_036_c1",
+        "kb_v1_010_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_011_c1",
+        "kb_v1_2_036_c1",
+        "kb_v1_010_c1",
+        "kb_v1_2_033_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_ambiguous_003",
+      "group": "cau_hoi_mo_ho_thieu_thong_tin",
+      "query": "kết quả xét nghiệm có vài chỉ số lạ tôi không hiểu",
+      "expected_chunk_ids": [
+        "kb_v1_009_c1",
+        "kb_v1_3_042_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests"
+      ],
+      "expected_keywords": [
+        "kết quả",
+        "nhân viên y tế",
+        "giải thích"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8854181170463562,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 2,
+          "score": 0.8735546469688416,
+          "chunk_id": "kb_v1_007_c1",
+          "kb_id": "kb_v1_007",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Một số loại xét nghiệm máu thường gặp",
+          "risk_level": "low"
+        },
+        {
+          "rank": 3,
+          "score": 0.8723849058151245,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.871192991733551,
+          "chunk_id": "kb_v1_2_020_c1",
+          "kb_id": "kb_v1_2_020",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 5,
+          "score": 0.869492769241333,
+          "chunk_id": "kb_v1_009_c1",
+          "kb_id": "kb_v1_009",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Sau khi xét nghiệm máu và khi nhận kết quả",
+          "risk_level": "low"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8854181170463562,
+        "chunk_id": "kb_v1_3_042_c1",
+        "kb_id": "kb_v1_3_042",
+        "source_id": "blood_tests",
+        "section": "test_explainers",
+        "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+        "risk_level": "low"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_042_c1",
+        "kb_v1_007_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_042_c1",
+        "kb_v1_007_c1",
+        "kb_v1_2_024_c1",
+        "kb_v1_2_020_c1",
+        "kb_v1_009_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_ambiguous_004",
+      "group": "cau_hoi_mo_ho_thieu_thong_tin",
+      "query": "tôi hơi khó chịu trong người không biết nên xét nghiệm gì",
+      "expected_chunk_ids": [
+        "kb_v1_006_c1",
+        "kb_v1_3_042_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests"
+      ],
+      "expected_keywords": [
+        "bác sĩ",
+        "xét nghiệm máu",
+        "giải thích"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8726987838745117,
+          "chunk_id": "kb_v1_009_c1",
+          "kb_id": "kb_v1_009",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Sau khi xét nghiệm máu và khi nhận kết quả",
+          "risk_level": "low"
+        },
+        {
+          "rank": 2,
+          "score": 0.8701300621032715,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 3,
+          "score": 0.8666565418243408,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.8643739223480225,
+          "chunk_id": "kb_v1_008_c1",
+          "kb_id": "kb_v1_008",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Cần chuẩn bị gì trước khi xét nghiệm máu",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8641538619995117,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8726987838745117,
+        "chunk_id": "kb_v1_009_c1",
+        "kb_id": "kb_v1_009",
+        "source_id": "blood_tests",
+        "section": "test_explainers",
+        "title": "Sau khi xét nghiệm máu và khi nhận kết quả",
+        "risk_level": "low"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_009_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_009_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_2_024_c1",
+        "kb_v1_008_c1",
+        "kb_v1_3_039_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_ambiguous_005",
+      "group": "cau_hoi_mo_ho_thieu_thong_tin",
+      "query": "triệu chứng của tôi có cần đi viện ngay hay chỉ theo dõi",
+      "expected_chunk_ids": [
+        "kb_v1_004_c1",
+        "kb_v1_2_029_c1",
+        "kb_v1_2_031_c1"
+      ],
+      "expected_source_ids": [
+        "nice_sepsis_overview",
+        "nhs_anaphylaxis",
+        "nhs_fainting_adults"
+      ],
+      "expected_keywords": [
+        "cấp cứu",
+        "đánh giá y tế",
+        "triệu chứng"
+      ],
+      "risk_expectation": "urgent",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8729406595230103,
+          "chunk_id": "kb_v1_2_038_c1",
+          "kb_id": "kb_v1_2_038",
+          "source_id": "nhs_stroke_symptoms",
+          "section": "red_flags",
+          "title": "Cơn thiếu máu não thoáng qua vẫn cần xử trí khẩn",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.865803599357605,
+          "chunk_id": "kb_v1_010_c1",
+          "kb_id": "kb_v1_010",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Khi nào đau ngực cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8652341365814209,
+          "chunk_id": "kb_v1_2_033_c1",
+          "kb_id": "kb_v1_2_033",
+          "source_id": "nhs_headaches",
+          "section": "red_flags",
+          "title": "Đau đầu dữ dội đột ngột hoặc kèm thần kinh khu trú cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8644165992736816,
+          "chunk_id": "kb_v1_2_022_c1",
+          "kb_id": "kb_v1_2_022",
+          "source_id": "medlineplus_crp_test",
+          "section": "test_explainers",
+          "title": "CRP có thể được dùng để theo dõi đáp ứng điều trị nhưng không chỉ ra vị trí viêm",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 5,
+          "score": 0.8638241291046143,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8729406595230103,
+        "chunk_id": "kb_v1_2_038_c1",
+        "kb_id": "kb_v1_2_038",
+        "source_id": "nhs_stroke_symptoms",
+        "section": "red_flags",
+        "title": "Cơn thiếu máu não thoáng qua vẫn cần xử trí khẩn",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_038_c1",
+        "kb_v1_010_c1",
+        "kb_v1_2_033_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_038_c1",
+        "kb_v1_010_c1",
+        "kb_v1_2_033_c1",
+        "kb_v1_2_022_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.0,
+      "hit_at_5": 0.0,
+      "mrr_at_5": 0.0,
+      "expected_source_hit_at_3": 0.0,
+      "expected_source_hit_at_5": 0.0,
+      "keyword_coverage_at_3": 0.6666666666666666
+    },
+    {
+      "id": "v2_customer_need_001",
+      "group": "nhu_cau_khach_hang_tu_van_xet_nghiem",
+      "query": "tôi muốn đặt gói xét nghiệm máu tổng quát thì cần hiểu điều gì trước",
+      "expected_chunk_ids": [
+        "kb_v1_005_c1",
+        "kb_v1_006_c1",
+        "kb_v1_008_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests"
+      ],
+      "expected_keywords": [
+        "xét nghiệm máu",
+        "chuẩn bị",
+        "bác sĩ"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8916172981262207,
+          "chunk_id": "kb_v1_008_c1",
+          "kb_id": "kb_v1_008",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Cần chuẩn bị gì trước khi xét nghiệm máu",
+          "risk_level": "low"
+        },
+        {
+          "rank": 2,
+          "score": 0.8893029689788818,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 3,
+          "score": 0.8849096298217773,
+          "chunk_id": "kb_v1_006_c1",
+          "kb_id": "kb_v1_006",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Vì sao bác sĩ có thể chỉ định xét nghiệm máu",
+          "risk_level": "low"
+        },
+        {
+          "rank": 4,
+          "score": 0.8754347562789917,
+          "chunk_id": "kb_v1_007_c1",
+          "kb_id": "kb_v1_007",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Một số loại xét nghiệm máu thường gặp",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8744362592697144,
+          "chunk_id": "kb_v1_009_c1",
+          "kb_id": "kb_v1_009",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Sau khi xét nghiệm máu và khi nhận kết quả",
+          "risk_level": "low"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8916172981262207,
+        "chunk_id": "kb_v1_008_c1",
+        "kb_id": "kb_v1_008",
+        "source_id": "blood_tests",
+        "section": "test_explainers",
+        "title": "Cần chuẩn bị gì trước khi xét nghiệm máu",
+        "risk_level": "low"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_008_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_006_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_008_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_006_c1",
+        "kb_v1_007_c1",
+        "kb_v1_009_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_customer_need_002",
+      "group": "nhu_cau_khach_hang_tu_van_xet_nghiem",
+      "query": "HomeLab tư vấn tôi nên chọn CBC hay xét nghiệm máu loại nào",
+      "expected_chunk_ids": [
+        "kb_v1_007_c1",
+        "kb_v1_2_019_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests",
+        "medlineplus_cbc_test"
+      ],
+      "expected_keywords": [
+        "loại xét nghiệm máu",
+        "CBC",
+        "tế bào máu"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8943939208984375,
+          "chunk_id": "kb_v1_2_020_c1",
+          "kb_id": "kb_v1_2_020",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 2,
+          "score": 0.8888137340545654,
+          "chunk_id": "kb_v1_2_019_c1",
+          "kb_id": "kb_v1_2_019",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC là công thức máu toàn bộ để kiểm tra tế bào máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 3,
+          "score": 0.8654029369354248,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.8651139736175537,
+          "chunk_id": "kb_v1_007_c1",
+          "kb_id": "kb_v1_007",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Một số loại xét nghiệm máu thường gặp",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.864142894744873,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8943939208984375,
+        "chunk_id": "kb_v1_2_020_c1",
+        "kb_id": "kb_v1_2_020",
+        "source_id": "medlineplus_cbc_test",
+        "section": "test_explainers",
+        "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+        "risk_level": "medium"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_020_c1",
+        "kb_v1_2_019_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_020_c1",
+        "kb_v1_2_019_c1",
+        "kb_v1_2_024_c1",
+        "kb_v1_007_c1",
+        "kb_v1_3_039_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 0.6666666666666666
+    },
+    {
+      "id": "v2_customer_need_003",
+      "group": "nhu_cau_khach_hang_tu_van_xet_nghiem",
+      "query": "tôi muốn xét nghiệm vì nghi nhiễm trùng thì chỉ số nào liên quan",
+      "expected_chunk_ids": [
+        "kb_v1_2_019_c1",
+        "kb_v1_2_021_c1",
+        "kb_v1_2_016_c1"
+      ],
+      "expected_source_ids": [
+        "medlineplus_cbc_test",
+        "medlineplus_crp_test",
+        "medlineplus_blood_culture_test"
+      ],
+      "expected_keywords": [
+        "nhiễm trùng",
+        "CBC",
+        "CRP"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8923661708831787,
+          "chunk_id": "kb_v1_3_039_c1",
+          "kb_id": "kb_v1_3_039",
+          "source_id": "nice_sepsis_guideline",
+          "section": "red_flags",
+          "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8870375156402588,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 3,
+          "score": 0.8831015825271606,
+          "chunk_id": "kb_v1_2_016_c1",
+          "kb_id": "kb_v1_2_016",
+          "source_id": "medlineplus_blood_culture_test",
+          "section": "test_explainers",
+          "title": "Cấy máu giúp tìm vi khuẩn hoặc nấm trong máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.8768897652626038,
+          "chunk_id": "kb_v1_001_c1",
+          "kb_id": "kb_v1_001",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Khi có dấu hiệu nhiễm trùng và cảm giác rất mệt hoặc rất không ổn, cần được đánh giá sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8763216733932495,
+          "chunk_id": "kb_v1_2_020_c1",
+          "kb_id": "kb_v1_2_020",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8923661708831787,
+        "chunk_id": "kb_v1_3_039_c1",
+        "kb_id": "kb_v1_3_039",
+        "source_id": "nice_sepsis_guideline",
+        "section": "red_flags",
+        "title": "Nghi ngờ nhiễm trùng nặng hoặc sepsis ở người từ 16 tuổi trở lên cần được đánh giá y tế sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_2_016_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_039_c1",
+        "kb_v1_3_042_c1",
+        "kb_v1_2_016_c1",
+        "kb_v1_001_c1",
+        "kb_v1_2_020_c1"
+      ],
+      "hit_at_1": 0.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 0.3333333333333333,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 0.3333333333333333
+    },
+    {
+      "id": "v2_customer_need_004",
+      "group": "nhu_cau_khach_hang_tu_van_xet_nghiem",
+      "query": "đau ngực thì tôi nên xét nghiệm troponin hay đi cấp cứu trước",
+      "expected_chunk_ids": [
+        "kb_v1_010_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_2_027_c1"
+      ],
+      "expected_source_ids": [
+        "chest_pain",
+        "medlineplus_troponin_test"
+      ],
+      "expected_keywords": [
+        "đau ngực",
+        "cấp cứu",
+        "Troponin"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.907945454120636,
+          "chunk_id": "kb_v1_2_027_c1",
+          "kb_id": "kb_v1_2_027",
+          "source_id": "medlineplus_troponin_test",
+          "section": "test_explainers",
+          "title": "Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 2,
+          "score": 0.894933819770813,
+          "chunk_id": "kb_v1_010_c1",
+          "kb_id": "kb_v1_010",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Khi nào đau ngực cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8930456042289734,
+          "chunk_id": "kb_v1_2_028_c1",
+          "kb_id": "kb_v1_2_028",
+          "source_id": "medlineplus_troponin_test",
+          "section": "test_explainers",
+          "title": "Troponin tăng không phải lúc nào cũng đồng nghĩa nhồi máu cơ tim",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.8885917067527771,
+          "chunk_id": "kb_v1_011_c1",
+          "kb_id": "kb_v1_011",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Khi nào đau ngực nên đi khám sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.881563663482666,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.907945454120636,
+        "chunk_id": "kb_v1_2_027_c1",
+        "kb_id": "kb_v1_2_027",
+        "source_id": "medlineplus_troponin_test",
+        "section": "test_explainers",
+        "title": "Troponin là xét nghiệm quan trọng khi nghi tổn thương cơ tim",
+        "risk_level": "medium"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_027_c1",
+        "kb_v1_010_c1",
+        "kb_v1_2_028_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_027_c1",
+        "kb_v1_010_c1",
+        "kb_v1_2_028_c1",
+        "kb_v1_011_c1",
+        "kb_v1_3_040_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_customer_need_005",
+      "group": "nhu_cau_khach_hang_tu_van_xet_nghiem",
+      "query": "kết quả xét nghiệm máu có đủ để loại trừ bệnh không",
+      "expected_chunk_ids": [
+        "kb_v1_3_042_c1",
+        "kb_v1_009_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests"
+      ],
+      "expected_keywords": [
+        "xét nghiệm máu",
+        "không tự kết luận",
+        "nhân viên y tế"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9178135395050049,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 2,
+          "score": 0.9015511870384216,
+          "chunk_id": "kb_v1_006_c1",
+          "kb_id": "kb_v1_006",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Vì sao bác sĩ có thể chỉ định xét nghiệm máu",
+          "risk_level": "low"
+        },
+        {
+          "rank": 3,
+          "score": 0.8895355463027954,
+          "chunk_id": "kb_v1_2_020_c1",
+          "kb_id": "kb_v1_2_020",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 4,
+          "score": 0.8856458067893982,
+          "chunk_id": "kb_v1_009_c1",
+          "kb_id": "kb_v1_009",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Sau khi xét nghiệm máu và khi nhận kết quả",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8842288255691528,
+          "chunk_id": "kb_v1_2_024_c1",
+          "kb_id": "kb_v1_2_024",
+          "source_id": "medlineplus_ddimer_test",
+          "section": "test_explainers",
+          "title": "D-dimer bất thường thường cần xét nghiệm tiếp chứ không đủ để tự kết luận",
+          "risk_level": "medium"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9178135395050049,
+        "chunk_id": "kb_v1_3_042_c1",
+        "kb_id": "kb_v1_3_042",
+        "source_id": "blood_tests",
+        "section": "test_explainers",
+        "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+        "risk_level": "low"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_042_c1",
+        "kb_v1_006_c1",
+        "kb_v1_2_020_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_042_c1",
+        "kb_v1_006_c1",
+        "kb_v1_2_020_c1",
+        "kb_v1_009_c1",
+        "kb_v1_2_024_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 0.6666666666666666
+    },
+    {
+      "id": "v2_noisy_001",
+      "group": "cau_hoi_nhieu_dien_dat_doi_thuong",
+      "query": "đau ngực toát mồ hôi buồn nôn thở không nổi giờ sao",
+      "expected_chunk_ids": [
+        "kb_v1_010_c1",
+        "kb_v1_3_040_c1"
+      ],
+      "expected_source_ids": [
+        "chest_pain"
+      ],
+      "expected_keywords": [
+        "đau ngực",
+        "vã mồ hôi",
+        "khó thở"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.9033011198043823,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8753308057785034,
+          "chunk_id": "kb_v1_010_c1",
+          "kb_id": "kb_v1_010",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Khi nào đau ngực cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8672837018966675,
+          "chunk_id": "kb_v1_014_c1",
+          "kb_id": "kb_v1_014",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8638263940811157,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8636660575866699,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.9033011198043823,
+        "chunk_id": "kb_v1_3_040_c1",
+        "kb_id": "kb_v1_3_040",
+        "source_id": "chest_pain",
+        "section": "red_flags",
+        "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_040_c1",
+        "kb_v1_010_c1",
+        "kb_v1_014_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_040_c1",
+        "kb_v1_010_c1",
+        "kb_v1_014_c1",
+        "kb_v1_2_031_c1",
+        "kb_v1_3_041_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_noisy_002",
+      "group": "cau_hoi_nhieu_dien_dat_doi_thuong",
+      "query": "khó thở môi tím người lơ mơ có nguy hiểm lắm không",
+      "expected_chunk_ids": [
+        "kb_v1_013_c1",
+        "kb_v1_3_041_c1"
+      ],
+      "expected_source_ids": [
+        "shortness_of_breath"
+      ],
+      "expected_keywords": [
+        "khó thở",
+        "xanh tím",
+        "lú lẫn"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.880554735660553,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.871340274810791,
+          "chunk_id": "kb_v1_003_c1",
+          "kb_id": "kb_v1_003",
+          "source_id": "nice_sepsis_overview",
+          "section": "red_flags",
+          "title": "Một số dấu hiệu có thể làm mức độ lo ngại tăng lên dù theo dõi trước đó chưa quá xấu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8646454811096191,
+          "chunk_id": "kb_v1_015_c1",
+          "kb_id": "kb_v1_015",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Không nên tự chẩn đoán nguyên nhân khó thở",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8630499243736267,
+          "chunk_id": "kb_v1_2_029_c1",
+          "kb_id": "kb_v1_2_029",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8620284199714661,
+          "chunk_id": "kb_v1_013_c1",
+          "kb_id": "kb_v1_013",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.880554735660553,
+        "chunk_id": "kb_v1_3_041_c1",
+        "kb_id": "kb_v1_3_041",
+        "source_id": "shortness_of_breath",
+        "section": "red_flags",
+        "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_041_c1",
+        "kb_v1_003_c1",
+        "kb_v1_015_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_041_c1",
+        "kb_v1_003_c1",
+        "kb_v1_015_c1",
+        "kb_v1_2_029_c1",
+        "kb_v1_013_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_noisy_003",
+      "group": "cau_hoi_nhieu_dien_dat_doi_thuong",
+      "query": "xỉu cái rầm xong tức ngực khó thở",
+      "expected_chunk_ids": [
+        "kb_v1_2_031_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_fainting_adults"
+      ],
+      "expected_keywords": [
+        "ngất",
+        "đau ngực",
+        "khó thở"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8771252036094666,
+          "chunk_id": "kb_v1_014_c1",
+          "kb_id": "kb_v1_014",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần được đánh giá y tế sớm",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8730924129486084,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8724625110626221,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8704053163528442,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8684337735176086,
+          "chunk_id": "kb_v1_013_c1",
+          "kb_id": "kb_v1_013",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8771252036094666,
+        "chunk_id": "kb_v1_014_c1",
+        "kb_id": "kb_v1_014",
+        "source_id": "shortness_of_breath",
+        "section": "red_flags",
+        "title": "Khi nào khó thở cần được đánh giá y tế sớm",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_014_c1",
+        "kb_v1_3_041_c1",
+        "kb_v1_2_031_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_014_c1",
+        "kb_v1_3_041_c1",
+        "kb_v1_2_031_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_013_c1"
+      ],
+      "hit_at_1": 0.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 0.3333333333333333,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_noisy_004",
+      "group": "cau_hoi_nhieu_dien_dat_doi_thuong",
+      "query": "bị dị ứng sưng phù mặt nghẹn cổ thở khò khè",
+      "expected_chunk_ids": [
+        "kb_v1_2_029_c1"
+      ],
+      "expected_source_ids": [
+        "nhs_anaphylaxis"
+      ],
+      "expected_keywords": [
+        "dị ứng nặng",
+        "khó thở",
+        "cấp cứu"
+      ],
+      "risk_expectation": "emergency",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.8917953968048096,
+          "chunk_id": "kb_v1_2_029_c1",
+          "kb_id": "kb_v1_2_029",
+          "source_id": "nhs_anaphylaxis",
+          "section": "red_flags",
+          "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+          "risk_level": "high"
+        },
+        {
+          "rank": 2,
+          "score": 0.8782957196235657,
+          "chunk_id": "kb_v1_3_041_c1",
+          "kb_id": "kb_v1_3_041",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khó thở kèm môi hoặc da rất nhợt, xanh tím, xám, hoặc lú lẫn đột ngột cần cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 3,
+          "score": 0.8737590312957764,
+          "chunk_id": "kb_v1_3_040_c1",
+          "kb_id": "kb_v1_3_040",
+          "source_id": "chest_pain",
+          "section": "red_flags",
+          "title": "Đau ngực kèm vã mồ hôi, buồn nôn, choáng váng hoặc khó thở cần được cấp cứu",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.8730453252792358,
+          "chunk_id": "kb_v1_013_c1",
+          "kb_id": "kb_v1_013",
+          "source_id": "shortness_of_breath",
+          "section": "red_flags",
+          "title": "Khi nào khó thở cần hỗ trợ khẩn cấp",
+          "risk_level": "high"
+        },
+        {
+          "rank": 5,
+          "score": 0.8714903593063354,
+          "chunk_id": "kb_v1_2_031_c1",
+          "kb_id": "kb_v1_2_031",
+          "source_id": "nhs_fainting_adults",
+          "section": "red_flags",
+          "title": "Ngất kèm đau ngực, khó thở hoặc chấn thương cần cấp cứu",
+          "risk_level": "high"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.8917953968048096,
+        "chunk_id": "kb_v1_2_029_c1",
+        "kb_id": "kb_v1_2_029",
+        "source_id": "nhs_anaphylaxis",
+        "section": "red_flags",
+        "title": "Phản vệ là tình huống cấp cứu cần gọi cấp cứu ngay",
+        "risk_level": "high"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_2_029_c1",
+        "kb_v1_3_041_c1",
+        "kb_v1_3_040_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_2_029_c1",
+        "kb_v1_3_041_c1",
+        "kb_v1_3_040_c1",
+        "kb_v1_013_c1",
+        "kb_v1_2_031_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    },
+    {
+      "id": "v2_noisy_005",
+      "group": "cau_hoi_nhieu_dien_dat_doi_thuong",
+      "query": "kq máu nhiều chỉ số cao thấp đọc không hiểu hỏi ai",
+      "expected_chunk_ids": [
+        "kb_v1_009_c1",
+        "kb_v1_3_042_c1"
+      ],
+      "expected_source_ids": [
+        "blood_tests"
+      ],
+      "expected_keywords": [
+        "kết quả xét nghiệm máu",
+        "nhân viên y tế",
+        "giải thích"
+      ],
+      "risk_expectation": "informational",
+      "results": [
+        {
+          "rank": 1,
+          "score": 0.870479941368103,
+          "chunk_id": "kb_v1_3_042_c1",
+          "kb_id": "kb_v1_3_042",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+          "risk_level": "low"
+        },
+        {
+          "rank": 2,
+          "score": 0.8565482497215271,
+          "chunk_id": "kb_v1_2_020_c1",
+          "kb_id": "kb_v1_2_020",
+          "source_id": "medlineplus_cbc_test",
+          "section": "test_explainers",
+          "title": "CBC thường là xét nghiệm nền để tìm thiếu máu, nhiễm trùng hoặc rối loạn máu",
+          "risk_level": "medium"
+        },
+        {
+          "rank": 3,
+          "score": 0.8557220697402954,
+          "chunk_id": "kb_v1_2_038_c1",
+          "kb_id": "kb_v1_2_038",
+          "source_id": "nhs_stroke_symptoms",
+          "section": "red_flags",
+          "title": "Cơn thiếu máu não thoáng qua vẫn cần xử trí khẩn",
+          "risk_level": "high"
+        },
+        {
+          "rank": 4,
+          "score": 0.85511314868927,
+          "chunk_id": "kb_v1_009_c1",
+          "kb_id": "kb_v1_009",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Sau khi xét nghiệm máu và khi nhận kết quả",
+          "risk_level": "low"
+        },
+        {
+          "rank": 5,
+          "score": 0.8532603979110718,
+          "chunk_id": "kb_v1_007_c1",
+          "kb_id": "kb_v1_007",
+          "source_id": "blood_tests",
+          "section": "test_explainers",
+          "title": "Một số loại xét nghiệm máu thường gặp",
+          "risk_level": "low"
+        }
+      ],
+      "top1": {
+        "rank": 1,
+        "score": 0.870479941368103,
+        "chunk_id": "kb_v1_3_042_c1",
+        "kb_id": "kb_v1_3_042",
+        "source_id": "blood_tests",
+        "section": "test_explainers",
+        "title": "Kết quả xét nghiệm máu có thể cần nhân viên y tế giải thích và đôi khi cần bước tiếp theo",
+        "risk_level": "low"
+      },
+      "top3_chunk_ids": [
+        "kb_v1_3_042_c1",
+        "kb_v1_2_020_c1",
+        "kb_v1_2_038_c1"
+      ],
+      "top5_chunk_ids": [
+        "kb_v1_3_042_c1",
+        "kb_v1_2_020_c1",
+        "kb_v1_2_038_c1",
+        "kb_v1_009_c1",
+        "kb_v1_007_c1"
+      ],
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "mrr_at_5": 1.0,
+      "expected_source_hit_at_3": 1.0,
+      "expected_source_hit_at_5": 1.0,
+      "keyword_coverage_at_3": 1.0
+    }
+  ],
+  "no_rebuild_confirmation": {
+    "kb_modified": false,
+    "chunks_rebuilt": false,
+    "embeddings_rebuilt": false,
+    "faiss_rebuilt": false,
+    "runtime_switched": false,
+    "backend_frontend_recommendation_modified": false
+  }
+}

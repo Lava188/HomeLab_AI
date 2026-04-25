@@ -1,0 +1,219 @@
+{
+  "benchmark_name": "recommendation_before_after_benchmark_v1",
+  "dataset_path": "ai_lab\\datasets\\eval\\recommendation_e2e_cases_v1.json",
+  "before_mode": {
+    "name": "before",
+    "description": "Free-text-only baseline: send latest_user_text directly into the current controller without slot extraction.",
+    "metrics": {
+      "total": 25,
+      "passed": 1,
+      "failed": 24,
+      "pass_rate": 0.04,
+      "outcome_accuracy": 0.44,
+      "package_accuracy": 0.84,
+      "next_slot_accuracy": 0.28,
+      "unsafe_recommendation_count": 0,
+      "outcome_breakdown": {
+        "ask_more": 19,
+        "do_not_recommend": 3,
+        "escalate": 3
+      }
+    }
+  },
+  "after_mode": {
+    "name": "after",
+    "description": "Thin current E2E adapter: extract current-schema slot state from text, then call the unchanged controller.",
+    "metrics": {
+      "total": 25,
+      "passed": 25,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "outcome_accuracy": 1.0,
+      "package_accuracy": 1.0,
+      "next_slot_accuracy": 1.0,
+      "unsafe_recommendation_count": 0,
+      "outcome_breakdown": {
+        "ask_more": 5,
+        "do_not_recommend": 7,
+        "escalate": 9,
+        "recommend": 4
+      }
+    }
+  },
+  "comparison": {
+    "outcome_accuracy": {
+      "before": 0.44,
+      "after": 1.0
+    },
+    "package_accuracy": {
+      "before": 0.84,
+      "after": 1.0
+    },
+    "unsafe_recommendation_count": {
+      "before": 0,
+      "after": 0
+    },
+    "case_delta_counts": {
+      "improved": 24,
+      "unchanged": 1,
+      "regressed": 0
+    }
+  },
+  "limitations": [
+    "The repo does not expose a dedicated runtime query-to-recommendation entrypoint yet.",
+    "The before path is the current controller called with free text only and no extracted slot state.",
+    "The after path is a thin benchmark adapter that extracts only current-schema slots from text before calling the unchanged controller."
+  ],
+  "case_deltas": [
+    {
+      "id": "e2e_recommend_anemia_cbc_stable",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_recommend_kidney_bmp_stable",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_recommend_direct_kidney_package",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_ask_more_anemia_missing_red_flags",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_ask_more_general_package_missing_triage",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_ask_more_general_package_clarify_direction",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_ask_more_unsure_goal",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_ask_more_ambiguous_query",
+      "before_passed": true,
+      "after_passed": true,
+      "delta": "unchanged"
+    },
+    {
+      "id": "e2e_do_not_recommend_glucose_guarded",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_do_not_recommend_lipid_guarded",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_do_not_recommend_blocked_liver",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_do_not_recommend_blocked_infectious",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_do_not_recommend_anemia_unsupported_addon",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_do_not_recommend_glucose_unsupported_addon",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_do_not_recommend_kidney_unsupported_addon",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_escalate_lipid_chest_pain",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_escalate_anemia_shortness_of_breath",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_escalate_glucose_vomiting_dehydration",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_escalate_kidney_rapidly_worsening",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_escalate_result_interpretation",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_escalate_diagnosis_request",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_escalate_cardiovascular_risk_request",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_direct_package_ask_anemia_safe",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_conflicting_symptom_cues_lipid",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    },
+    {
+      "id": "e2e_conflicting_symptom_cues_anemia",
+      "before_passed": false,
+      "after_passed": true,
+      "delta": "improved"
+    }
+  ]
+}

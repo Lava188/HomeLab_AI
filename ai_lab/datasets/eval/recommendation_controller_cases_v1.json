@@ -1,6 +1,107 @@
 [
   {
+    "id": "recommend_anemia_offline",
+    "category": "recommend_valid",
+    "short_description": "Offline eval should recommend the ready anemia package when required slots are complete and red flags are negative.",
+    "input_state": {
+      "flow_id": "anemia_infection_flow",
+      "collected_slots": {
+        "recommendation_goal": "anemia_infection_screening",
+        "symptom_summary": "I feel tired and want a simple blood check.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "recommend",
+    "expected_recommended_package_id": "pkg_anemia_infection_basic_v1",
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "recommendation_rule_matched"
+    ]
+  },
+  {
+    "id": "recommend_kidney_offline",
+    "category": "recommend_valid",
+    "short_description": "Offline eval should recommend the ready kidney package when required slots are complete and red flags are negative.",
+    "input_state": {
+      "flow_id": "kidney_function_flow",
+      "collected_slots": {
+        "recommendation_goal": "kidney_function_screening",
+        "symptom_summary": "I want a kidney blood test.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "recommend",
+    "expected_recommended_package_id": "pkg_kidney_function_basic_v1",
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "recommendation_rule_matched"
+    ]
+  },
+  {
+    "id": "direct_goal_mapping_kidney",
+    "category": "direct_package_ask",
+    "short_description": "A direct kidney goal without explicit flow_id should map to kidney_function_flow and recommend the kidney package.",
+    "input_state": {
+      "flow_id": null,
+      "collected_slots": {
+        "recommendation_goal": "kidney_function_screening",
+        "symptom_summary": "I want the kidney blood package.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "recommend",
+    "expected_recommended_package_id": "pkg_kidney_function_basic_v1",
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "recommendation_rule_matched"
+    ]
+  },
+  {
     "id": "ask_more_missing_required_anemia",
+    "category": "ask_more_missing_slots",
+    "short_description": "Missing red-flag slots in anemia flow should block recommendation and request the remaining required slots.",
     "input_state": {
       "flow_id": "anemia_infection_flow",
       "collected_slots": {
@@ -22,15 +123,54 @@
       "fainting_or_altered_consciousness_present",
       "red_flag_screen_result"
     ],
-    "notes": "Missing required red-flag slots should block recommendation."
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "missing_required_slots"
+    ]
   },
   {
-    "id": "recommend_allowed_anemia_package",
+    "id": "ask_more_unknown_required_red_flag_kidney",
+    "category": "ask_more_missing_slots",
+    "short_description": "An explicit 'unknown' value on a required red-flag slot should still be treated as missing and require follow-up.",
     "input_state": {
-      "flow_id": "anemia_infection_flow",
+      "flow_id": "kidney_function_flow",
       "collected_slots": {
-        "recommendation_goal": "anemia_infection_screening",
-        "symptom_summary": "I want a simple screening blood test because I feel tired.",
+        "recommendation_goal": "kidney_function_screening",
+        "symptom_summary": "I want a kidney blood test.",
+        "chest_pain_present": "unknown",
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "ask_more",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [
+      "chest_pain_present",
+      "red_flag_screen_result"
+    ],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "missing_required_slots"
+    ]
+  },
+  {
+    "id": "ask_more_general_basic_package_clarification",
+    "category": "ask_more_clarify_routing",
+    "short_description": "General basic package requests should continue clarification instead of recommending from the general flow.",
+    "input_state": {
+      "flow_id": null,
+      "collected_slots": {
+        "recommendation_goal": "basic_blood_package",
+        "symptom_summary": "I want a general blood check.",
         "chest_pain_present": false,
         "shortness_of_breath_present": false,
         "fainting_or_altered_consciousness_present": false,
@@ -47,13 +187,306 @@
       "execution_mode": "offline_eval",
       "debug": true
     },
-    "expected_status": "recommend",
-    "expected_recommended_package_id": "pkg_anemia_infection_basic_v1",
-    "expected_next_slot_ids": [],
-    "notes": "Allowed package should be recommended when required slots are satisfied and red flags are negative."
+    "expected_status": "ask_more",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [
+      "symptom_progression",
+      "known_chronic_condition_group",
+      "recent_meal_status",
+      "fasting_feasibility"
+    ],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "needs_clarification"
+    ]
   },
   {
-    "id": "guarded_glucose_candidate_suppressed",
+    "id": "ask_more_unsure_goal_clarification",
+    "category": "ask_more_clarify_routing",
+    "short_description": "An explicit unsure goal should stay in the general clarification path and ask for remaining differentiating slots.",
+    "input_state": {
+      "flow_id": null,
+      "collected_slots": {
+        "recommendation_goal": "unsure",
+        "symptom_summary": "I want some blood tests but I am not sure which package fits.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "ask_more",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [
+      "symptom_progression",
+      "known_chronic_condition_group"
+    ],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "needs_clarification"
+    ]
+  },
+  {
+    "id": "ask_more_empty_input",
+    "category": "unknown_or_weak_input",
+    "short_description": "Completely empty input should stay in clarification and ask for recommendation_goal and symptom_summary.",
+    "input_state": {
+      "flow_id": null,
+      "collected_slots": {},
+      "asked_slots": [],
+      "execution_mode": "offline_eval",
+      "latest_user_text": "",
+      "debug": true
+    },
+    "expected_status": "ask_more",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [
+      "recommendation_goal",
+      "symptom_summary"
+    ],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "flow_ambiguous"
+    ]
+  },
+  {
+    "id": "ask_more_free_text_only_ambiguous",
+    "category": "unknown_or_weak_input",
+    "short_description": "Free text alone should not auto-route into a package flow and must ask for explicit clarification.",
+    "input_state": {
+      "flow_id": null,
+      "collected_slots": {},
+      "asked_slots": [],
+      "execution_mode": "offline_eval",
+      "latest_user_text": "I want to do some blood tests but I am not sure which package fits.",
+      "debug": true
+    },
+    "expected_status": "ask_more",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [
+      "recommendation_goal",
+      "symptom_summary"
+    ],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "flow_ambiguous"
+    ]
+  },
+  {
+    "id": "escalate_kidney_rapid_worsening",
+    "category": "escalate_red_flag",
+    "short_description": "Rapidly worsening symptoms in kidney flow should trigger immediate escalation.",
+    "input_state": {
+      "flow_id": "kidney_function_flow",
+      "collected_slots": {
+        "recommendation_goal": "kidney_function_screening",
+        "symptom_summary": "I want a kidney blood test and I am getting worse quickly.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "symptom_progression": "rapidly_worsening"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "symptom_progression"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "escalate",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "active_red_flags"
+    ]
+  },
+  {
+    "id": "escalate_glucose_vomiting_dehydration",
+    "category": "escalate_red_flag",
+    "short_description": "The compound glucose red-flag rule should escalate when vomiting and dehydration are both true.",
+    "input_state": {
+      "flow_id": "glucose_flow",
+      "collected_slots": {
+        "recommendation_goal": "glucose_screening",
+        "symptom_summary": "I want a blood sugar test and I am vomiting and dehydrated.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "vomiting_present": true,
+        "dehydration_present": true
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "vomiting_present",
+        "dehydration_present"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "escalate",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "active_red_flags"
+    ]
+  },
+  {
+    "id": "escalate_lipid_chest_pain",
+    "category": "escalate_red_flag",
+    "short_description": "Chest pain in lipid flow should escalate immediately rather than continue screening logic.",
+    "input_state": {
+      "flow_id": "lipid_flow",
+      "collected_slots": {
+        "recommendation_goal": "lipid_screening",
+        "symptom_summary": "I want cholesterol testing but I have chest pain right now.",
+        "chest_pain_present": true,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "escalate",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "active_red_flags"
+    ]
+  },
+  {
+    "id": "escalate_diagnosis_request_anemia",
+    "category": "escalate_request_flag",
+    "short_description": "Diagnosis-seeking requests should escalate before anemia package recommendation.",
+    "input_state": {
+      "flow_id": "anemia_infection_flow",
+      "collected_slots": {
+        "recommendation_goal": "anemia_infection_screening",
+        "symptom_summary": "I feel tired and want to know what disease I have.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "latest_user_text": "Can you diagnose what disease I have?",
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "escalate",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "diagnosis_required"
+    ]
+  },
+  {
+    "id": "escalate_result_interpretation_request_anemia",
+    "category": "escalate_request_flag",
+    "short_description": "Result interpretation requests should escalate instead of returning a package recommendation.",
+    "input_state": {
+      "flow_id": "anemia_infection_flow",
+      "collected_slots": {
+        "recommendation_goal": "anemia_infection_screening",
+        "symptom_summary": "I have CBC results already.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "latest_user_text": "Can you interpret my result?",
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "escalate",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "result_interpretation_required"
+    ]
+  },
+  {
+    "id": "escalate_cardiovascular_risk_request_lipid",
+    "category": "escalate_request_flag",
+    "short_description": "Clinical cardiovascular risk requests should escalate instead of using the lipid screening package.",
+    "input_state": {
+      "flow_id": "lipid_flow",
+      "collected_slots": {
+        "recommendation_goal": "lipid_screening",
+        "symptom_summary": "I want cholesterol testing.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "latest_user_text": "Can you estimate my cardiovascular risk score?",
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "escalate",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "clinical_cardiovascular_risk_estimate_required"
+    ]
+  },
+  {
+    "id": "do_not_recommend_glucose_guarded",
+    "category": "do_not_recommend_guarded_or_blocked",
+    "short_description": "Guarded glucose package should stay suppressed even in offline eval.",
     "input_state": {
       "flow_id": "glucose_flow",
       "collected_slots": {
@@ -81,10 +514,85 @@
     "expected_blocked_package_ids": [
       "pkg_diabetes_glucose_basic_v1"
     ],
-    "notes": "Guarded package may be a schema candidate but must not surface as final recommendation."
+    "expected_reason_flags": [
+      "guarded_exposure"
+    ]
   },
   {
-    "id": "blocked_package_path",
+    "id": "do_not_recommend_lipid_guarded",
+    "category": "do_not_recommend_guarded_or_blocked",
+    "short_description": "Guarded lipid package should stay suppressed even in offline eval.",
+    "input_state": {
+      "flow_id": "lipid_flow",
+      "collected_slots": {
+        "recommendation_goal": "lipid_screening",
+        "symptom_summary": "I want a cholesterol test.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "do_not_recommend",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [
+      "pkg_lipid_cardiometabolic_basic_v1"
+    ],
+    "expected_reason_flags": [
+      "guarded_exposure"
+    ]
+  },
+  {
+    "id": "do_not_recommend_blocked_liver_direct",
+    "category": "direct_package_ask",
+    "short_description": "A direct liver package request should route into blocked scope and return do_not_recommend.",
+    "input_state": {
+      "flow_id": null,
+      "collected_slots": {
+        "recommendation_goal": "liver_function_screening",
+        "symptom_summary": "I want liver blood tests.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "do_not_recommend",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [
+      "pkg_liver_function_metabolic_basic_v1",
+      "pkg_infectious_screening_hbv_hiv_v1"
+    ],
+    "expected_reason_flags": [
+      "blocked_scope"
+    ]
+  },
+  {
+    "id": "do_not_recommend_blocked_infectious_direct",
+    "category": "direct_package_ask",
+    "short_description": "A direct infectious screening request should route into blocked scope and return do_not_recommend.",
     "input_state": {
       "flow_id": null,
       "collected_slots": {
@@ -113,109 +621,127 @@
       "pkg_liver_function_metabolic_basic_v1",
       "pkg_infectious_screening_hbv_hiv_v1"
     ],
-    "notes": "Blocked-scope packages must never be recommended."
+    "expected_reason_flags": [
+      "blocked_scope"
+    ]
   },
   {
-    "id": "escalate_on_red_flag",
-    "input_state": {
-      "flow_id": "kidney_function_flow",
-      "collected_slots": {
-        "recommendation_goal": "kidney_function_screening",
-        "symptom_summary": "I want a kidney blood test and my symptoms are getting worse fast.",
-        "chest_pain_present": false,
-        "shortness_of_breath_present": false,
-        "fainting_or_altered_consciousness_present": false,
-        "symptom_progression": "rapidly_worsening"
-      },
-      "asked_slots": [
-        "recommendation_goal",
-        "symptom_summary",
-        "chest_pain_present",
-        "shortness_of_breath_present",
-        "fainting_or_altered_consciousness_present",
-        "symptom_progression"
-      ],
-      "execution_mode": "offline_eval",
-      "debug": true
-    },
-    "expected_status": "escalate",
-    "expected_recommended_package_id": null,
-    "expected_next_slot_ids": [],
-    "notes": "Rapid worsening is a schema red flag and should escalate immediately."
-  },
-  {
-    "id": "ambiguous_input_path",
-    "input_state": {
-      "flow_id": null,
-      "collected_slots": {},
-      "asked_slots": [],
-      "execution_mode": "offline_eval",
-      "latest_user_text": "",
-      "debug": true
-    },
-    "expected_status": "ask_more",
-    "expected_recommended_package_id": null,
-    "expected_next_slot_ids": [
-      "recommendation_goal",
-      "symptom_summary"
-    ],
-    "notes": "Without a flow or goal, the controller should ask for clarification instead of over-recommending."
-  },
-  {
-    "id": "ambiguous_non_empty_free_text_requires_clarification",
-    "input_state": {
-      "flow_id": null,
-      "collected_slots": {},
-      "asked_slots": [],
-      "execution_mode": "offline_eval",
-      "latest_user_text": "I want to do some blood tests but I'm not sure which package fits.",
-      "debug": true
-    },
-    "expected_status": "ask_more",
-    "expected_recommended_package_id": null,
-    "expected_next_slot_ids": [
-      "recommendation_goal",
-      "symptom_summary"
-    ],
-    "notes": "Non-empty free text alone should stay in clarification instead of auto-routing into general flow."
-  },
-  {
-    "id": "glucose_compound_red_flag_escalates",
-    "input_state": {
-      "flow_id": "glucose_flow",
-      "collected_slots": {
-        "recommendation_goal": "glucose_screening",
-        "symptom_summary": "I want a blood sugar test and I'm vomiting and dehydrated.",
-        "chest_pain_present": false,
-        "shortness_of_breath_present": false,
-        "fainting_or_altered_consciousness_present": false,
-        "vomiting_present": true,
-        "dehydration_present": true
-      },
-      "asked_slots": [
-        "recommendation_goal",
-        "symptom_summary",
-        "chest_pain_present",
-        "shortness_of_breath_present",
-        "fainting_or_altered_consciousness_present",
-        "vomiting_present",
-        "dehydration_present"
-      ],
-      "execution_mode": "offline_eval",
-      "debug": true
-    },
-    "expected_status": "escalate",
-    "expected_recommended_package_id": null,
-    "expected_next_slot_ids": [],
-    "notes": "The compound glucose red-flag rule should escalate when vomiting and dehydration are both true."
-  },
-  {
-    "id": "runtime_mode_catalog_disabled_blocks_final_recommend",
+    "id": "do_not_recommend_unsupported_addon_anemia",
+    "category": "do_not_recommend_unsupported_scope",
+    "short_description": "Unsupported ferritin-style add-ons should suppress the anemia package recommendation.",
     "input_state": {
       "flow_id": "anemia_infection_flow",
       "collected_slots": {
         "recommendation_goal": "anemia_infection_screening",
-        "symptom_summary": "I want a simple screening blood test because I feel tired.",
+        "symptom_summary": "I want CBC and ferritin.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "latest_user_text": "I want CBC and ferritin.",
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "do_not_recommend",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [
+      "pkg_anemia_infection_basic_v1"
+    ],
+    "expected_reason_flags": [
+      "unsupported_add_on_tests"
+    ]
+  },
+  {
+    "id": "do_not_recommend_unsupported_hba1c_glucose",
+    "category": "do_not_recommend_unsupported_scope",
+    "short_description": "Unsupported HbA1c or insulin add-ons should suppress the glucose package recommendation.",
+    "input_state": {
+      "flow_id": "glucose_flow",
+      "collected_slots": {
+        "recommendation_goal": "glucose_screening",
+        "symptom_summary": "I want blood sugar tests.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "latest_user_text": "I want HbA1c and insulin too.",
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "do_not_recommend",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [
+      "pkg_diabetes_glucose_basic_v1"
+    ],
+    "expected_reason_flags": [
+      "unsupported_hba1c_or_add_on_tests"
+    ]
+  },
+  {
+    "id": "do_not_recommend_unsupported_kidney_addon",
+    "category": "do_not_recommend_unsupported_scope",
+    "short_description": "Unsupported kidney add-ons such as microalbumin should suppress the kidney package recommendation.",
+    "input_state": {
+      "flow_id": "kidney_function_flow",
+      "collected_slots": {
+        "recommendation_goal": "kidney_function_screening",
+        "symptom_summary": "I want kidney tests.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "latest_user_text": "Please include microalbumin and uric acid.",
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "do_not_recommend",
+    "expected_recommended_package_id": null,
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [
+      "pkg_kidney_function_basic_v1"
+    ],
+    "expected_reason_flags": [
+      "unsupported_kidney_add_on_tests"
+    ]
+  },
+  {
+    "id": "do_not_recommend_runtime_catalog_gate_anemia",
+    "category": "do_not_recommend_guarded_or_blocked",
+    "short_description": "Runtime mode should suppress even ready packages while the package catalog runtime flag remains disabled.",
+    "input_state": {
+      "flow_id": "anemia_infection_flow",
+      "collected_slots": {
+        "recommendation_goal": "anemia_infection_screening",
+        "symptom_summary": "I feel tired and want a simple blood check.",
         "chest_pain_present": false,
         "shortness_of_breath_present": false,
         "fainting_or_altered_consciousness_present": false,
@@ -238,6 +764,41 @@
     "expected_blocked_package_ids": [
       "pkg_anemia_infection_basic_v1"
     ],
-    "notes": "Runtime mode must not emit final recommendations while the package catalog remains runtime-disabled."
+    "expected_reason_flags": [
+      "catalog_runtime_disabled"
+    ]
+  },
+  {
+    "id": "conflicting_goal_keeps_explicit_flow",
+    "category": "conflicting_slots",
+    "short_description": "When flow_id conflicts with recommendation_goal, the current controller follows the explicit flow_id and still recommends from that flow.",
+    "input_state": {
+      "flow_id": "anemia_infection_flow",
+      "collected_slots": {
+        "recommendation_goal": "kidney_function_screening",
+        "symptom_summary": "I want a kidney panel.",
+        "chest_pain_present": false,
+        "shortness_of_breath_present": false,
+        "fainting_or_altered_consciousness_present": false,
+        "red_flag_screen_result": "negative"
+      },
+      "asked_slots": [
+        "recommendation_goal",
+        "symptom_summary",
+        "chest_pain_present",
+        "shortness_of_breath_present",
+        "fainting_or_altered_consciousness_present",
+        "red_flag_screen_result"
+      ],
+      "execution_mode": "offline_eval",
+      "debug": true
+    },
+    "expected_status": "recommend",
+    "expected_recommended_package_id": "pkg_anemia_infection_basic_v1",
+    "expected_next_slot_ids": [],
+    "expected_blocked_package_ids": [],
+    "expected_reason_flags": [
+      "recommendation_rule_matched"
+    ]
   }
 ]

@@ -20,6 +20,27 @@ function mergeRouterMeta(result, safetyMeta, routeResult) {
     };
 }
 
+function applyCustomerTestSafetyGate(result, routeResult) {
+    if (
+        !routeResult?.routerDebug?.customerTestSafetyGate ||
+        result.flow !== "health_rag"
+    ) {
+        return result;
+    }
+
+    const safetyPrefix =
+        "Vì bạn nhắc đến nghi nhiễm trùng, nếu bạn rất mệt, rất không ổn, lú lẫn, khó thở, đau ngực hoặc xấu đi nhanh, hãy liên hệ cơ sở y tế khẩn cấp thay vì chỉ chọn xét nghiệm. Xét nghiệm chỉ là thông tin hỗ trợ và không tự chẩn đoán hoặc loại trừ nhiễm trùng. ";
+
+    return {
+        ...result,
+        reply: `${safetyPrefix}${result.reply || ""}`.trim(),
+        meta: {
+            ...result.meta,
+            customerTestSafetyGateApplied: true
+        }
+    };
+}
+
 async function routeMessage({ message, sessionId }) {
     const safetyResult = safetyService.checkSafety({ message });
 
@@ -43,10 +64,13 @@ async function routeMessage({ message, sessionId }) {
     const routeResult = detectFlow(message);
 
     if (routeResult.flow === "health_rag") {
-        const ragResult = await ragService.answerHealthQuery({
+        const ragResult = applyCustomerTestSafetyGate(
+            await ragService.answerHealthQuery({
             message,
             sessionId
-        });
+            }),
+            routeResult
+        );
 
         return {
             ...ragResult,

@@ -8,9 +8,27 @@ const AI_LAB_ARTIFACTS_ROOT = path.join(
 );
 
 const artifactCache = new Map();
+const DEFAULT_RETRIEVER_VERSION = "v1_2";
 
 function readJsonFile(filePath) {
     return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+}
+
+function getRequestedRetrieverVersion(options = {}) {
+    return (
+        options.version ||
+        process.env.HOMELAB_RETRIEVER_VERSION ||
+        process.env.HOMELAB_HEALTH_RAG_VERSION ||
+        DEFAULT_RETRIEVER_VERSION
+    );
+}
+
+function getFallbackRetrieverVersion(options = {}) {
+    return (
+        options.fallbackVersion ||
+        process.env.HOMELAB_RETRIEVER_FALLBACK_VERSION ||
+        DEFAULT_RETRIEVER_VERSION
+    );
 }
 
 function resolveArtifactBasePath(options = {}) {
@@ -25,7 +43,7 @@ function resolveArtifactBasePath(options = {}) {
         );
     }
 
-    const version = options.version || process.env.HOMELAB_HEALTH_RAG_VERSION || "v1_2";
+    const version = getRequestedRetrieverVersion(options);
     return path.join(AI_LAB_ARTIFACTS_ROOT, `retriever_${version}`);
 }
 
@@ -68,6 +86,53 @@ function resolveArtifactLayout(options = {}) {
         embeddingConfigPath,
         embeddingsPath
     };
+}
+
+function resolveArtifactLayoutWithFallback(options = {}) {
+    const requestedRetrieverVersion = getRequestedRetrieverVersion(options);
+    const fallbackRetrieverVersion = getFallbackRetrieverVersion(options);
+
+    try {
+        const layout = resolveArtifactLayout({
+            ...options,
+            version: requestedRetrieverVersion
+        });
+
+        return {
+            ...layout,
+            requestedRetrieverVersion,
+            loadedRetrieverVersion:
+                layout.manifest.retriever_version || requestedRetrieverVersion,
+            fallbackRetrieverVersion,
+            fallbackUsed: false,
+            fallbackReason: null
+        };
+    } catch (error) {
+        if (
+            options.artifactDir ||
+            process.env.HEALTH_RAG_ARTIFACT_DIR ||
+            !fallbackRetrieverVersion ||
+            fallbackRetrieverVersion === requestedRetrieverVersion
+        ) {
+            throw error;
+        }
+
+        const fallbackLayout = resolveArtifactLayout({
+            ...options,
+            version: fallbackRetrieverVersion
+        });
+
+        return {
+            ...fallbackLayout,
+            requestedRetrieverVersion,
+            loadedRetrieverVersion:
+                fallbackLayout.manifest.retriever_version ||
+                fallbackRetrieverVersion,
+            fallbackRetrieverVersion,
+            fallbackUsed: true,
+            fallbackReason: error.message
+        };
+    }
 }
 
 function buildChunkText(chunk) {
@@ -129,12 +194,12 @@ function loadJsonEmbeddings(embeddingsPath, chunks) {
 }
 
 function loadArtifacts(options = {}) {
+    const requestedRetrieverVersion = getRequestedRetrieverVersion(options);
+    const fallbackRetrieverVersion = getFallbackRetrieverVersion(options);
     const cacheKey =
         options.artifactDir ||
         process.env.HEALTH_RAG_ARTIFACT_DIR ||
-        options.version ||
-        process.env.HOMELAB_HEALTH_RAG_VERSION ||
-        "v1_2";
+        `${requestedRetrieverVersion}->${fallbackRetrieverVersion}`;
 
     if (artifactCache.has(cacheKey)) {
         return artifactCache.get(cacheKey);
@@ -146,8 +211,13 @@ function loadArtifacts(options = {}) {
         chunksPath,
         metadataPath,
         embeddingConfigPath,
-        embeddingsPath
-    } = resolveArtifactLayout(options);
+        embeddingsPath,
+        requestedRetrieverVersion: resolvedRequestedRetrieverVersion,
+        loadedRetrieverVersion,
+        fallbackRetrieverVersion: resolvedFallbackRetrieverVersion,
+        fallbackUsed,
+        fallbackReason
+    } = resolveArtifactLayoutWithFallback(options);
 
     const chunks = readJsonFile(chunksPath);
     const metadata = fs.existsSync(metadataPath) ? readJsonFile(metadataPath) : [];
@@ -165,7 +235,12 @@ function loadArtifacts(options = {}) {
 
     const loadedArtifacts = {
         basePath: artifactBasePath,
-        requestedVersion: manifest.retriever_version || cacheKey,
+        requestedVersion: manifest.retriever_version || loadedRetrieverVersion,
+        requestedRetrieverVersion: resolvedRequestedRetrieverVersion,
+        loadedRetrieverVersion,
+        fallbackRetrieverVersion: resolvedFallbackRetrieverVersion,
+        fallbackUsed,
+        fallbackReason,
         manifest,
         chunks,
         metadataByChunkId,
@@ -179,5 +254,7 @@ function loadArtifacts(options = {}) {
 }
 
 module.exports = {
-    loadArtifacts
+    loadArtifacts,
+    getRequestedRetrieverVersion,
+    getFallbackRetrieverVersion
 };

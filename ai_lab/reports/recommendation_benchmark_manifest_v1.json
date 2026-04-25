@@ -1,0 +1,45 @@
+{
+  "source_of_truth_artifacts": [
+    "ai_lab/reports/recommendation_e2e_summary_v1.md",
+    "ai_lab/reports/recommendation_e2e_eval_v1.json"
+  ],
+  "derived_reporting_artifacts": [
+    "ai_lab/reports/recommendation_upgrade_narrative_v1.md",
+    "ai_lab/reports/recommendation_benchmark_freeze_v1.md",
+    "ai_lab/reports/recommendation_benchmark_manifest_v1.json"
+  ],
+  "benchmark_scope": "recommendation-layer E2E-style benchmark evidence; not full frontend/backend/AI production runtime validation",
+  "frozen_metrics": {
+    "total_cases": 25,
+    "passed_cases": 25,
+    "failed_cases": 0,
+    "pass_rate": 1.0,
+    "before_outcome_accuracy": 0.76,
+    "after_outcome_accuracy": 1.0,
+    "before_flow_accuracy": 1.0,
+    "after_flow_accuracy": 1.0,
+    "before_package_accuracy": 0.84,
+    "after_package_accuracy": 1.0,
+    "before_next_slot_accuracy": 0.72,
+    "after_next_slot_accuracy": 1.0,
+    "before_unsafe_recommendation_count": 0,
+    "after_unsafe_recommendation_count": 0,
+    "improved_cases": 8,
+    "unchanged_cases": 17,
+    "regressed_cases": 0,
+    "current_outcome_breakdown": {
+      "recommend": 4,
+      "ask_more": 5,
+      "do_not_recommend": 7,
+      "escalate": 9
+    }
+  },
+  "limitations": [
+    "This package freezes recommendation-layer benchmark evidence only.",
+    "It does not establish full-system runtime correctness across frontend, backend routing, and live AI integration.",
+    "The before path is a frozen weaker recommendation-layer baseline with literal extraction and no derived-slot inference.",
+    "The after path is the current recommendation-layer benchmark adapter with conservative derived-slot inference before calling the unchanged controller.",
+    "The repository does not expose a dedicated production query-to-recommendation runtime entrypoint."
+  ],
+  "status": "frozen_for_thesis_narrative"
+}

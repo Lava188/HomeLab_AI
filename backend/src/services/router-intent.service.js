@@ -317,6 +317,50 @@ function getShortRiskClarifyingReply(expandedMessage) {
     );
 }
 
+function isAmbiguousUrgentQuery(expandedMessage, tokenCount) {
+    const asksUrgentDisposition =
+        expandedMessage.includes("di vien") ||
+        expandedMessage.includes("cap cuu") ||
+        expandedMessage.includes("khan cap") ||
+        expandedMessage.includes("theo doi");
+    const vagueSymptomReference =
+        expandedMessage.includes("trieu chung") ||
+        expandedMessage.includes("dau hieu") ||
+        expandedMessage.includes("tinh trang") ||
+        expandedMessage.includes("khong on");
+    const hasConcreteHighRiskSignal = HIGH_RISK_SHORT_QUERY_SIGNALS.some((signal) =>
+        expandedMessage.includes(signal)
+    );
+
+    return (
+        tokenCount <= 12 &&
+        asksUrgentDisposition &&
+        vagueSymptomReference &&
+        !hasConcreteHighRiskSignal
+    );
+}
+
+function getAmbiguousUrgentClarifyingReply() {
+    return (
+        "Mình chưa đủ thông tin để kết luận bạn cần đi viện ngay hay có thể theo dõi. " +
+        "Bạn hãy mô tả triệu chứng chính, thời điểm bắt đầu, mức độ nặng lên và có kèm khó thở, đau ngực, ngất, lú lẫn, môi tím, nôn ra máu, phân đen hoặc tình trạng xấu đi nhanh không. " +
+        "Nếu có các dấu hiệu đó, bạn nên liên hệ cấp cứu hoặc cơ sở y tế khẩn cấp thay vì tự theo dõi."
+    );
+}
+
+function isCustomerTestSafetyQuery(expandedMessage) {
+    const testIntent =
+        expandedMessage.includes("xet nghiem") ||
+        expandedMessage.includes("chi so") ||
+        expandedMessage.includes("goi xet nghiem");
+    const infectionConcern =
+        expandedMessage.includes("nhiem trung") ||
+        expandedMessage.includes("sepsis") ||
+        expandedMessage.includes("viem");
+
+    return testIntent && infectionConcern;
+}
+
 function detectFlow(message) {
     const rewritten = rewriteForRouting(message);
     const { vocabIndex, idfByToken, prototypeVectors } = buildClassifierCache();
@@ -353,6 +397,36 @@ function detectFlow(message) {
         rewritten.expandedMessage.includes("tu van suc khoe") ||
         rewritten.expandedMessage.includes("hoi ve suc khoe") ||
         rewritten.expandedMessage.includes("tu van mot chut");
+    const ambiguousUrgentQuery = isAmbiguousUrgentQuery(
+        rewritten.expandedMessage,
+        tokenCount
+    );
+    const customerTestSafetyQuery = isCustomerTestSafetyQuery(
+        rewritten.expandedMessage
+    );
+
+    if (ambiguousUrgentQuery) {
+        return {
+            flow: FLOWS.FALLBACK,
+            action: ACTIONS.FALLBACK_RESPONSE,
+            reply: getAmbiguousUrgentClarifyingReply(),
+            routerDebug: {
+                normalizedMessage: rewritten.normalizedMessage,
+                expandedMessage: rewritten.expandedMessage,
+                expansions: rewritten.expansions,
+                classifierMode: "tfidf_prototype_intent_router",
+                customerTestSafetyGate: customerTestSafetyQuery,
+                lowConfidenceGuard: {
+                    triggered: true,
+                    tokenCount,
+                    topScore: topIntent.score,
+                    nextScore: nextIntent?.score || null,
+                    reason: "ambiguous_urgent_query_needs_clarification"
+                },
+                scoredIntents
+            }
+        };
+    }
 
     if (
         topIntent &&
@@ -369,6 +443,7 @@ function detectFlow(message) {
                 expandedMessage: rewritten.expandedMessage,
                 expansions: rewritten.expansions,
                 classifierMode: "tfidf_prototype_intent_router",
+                customerTestSafetyGate: customerTestSafetyQuery,
                 lowConfidenceGuard: {
                     triggered: true,
                     tokenCount,
@@ -399,6 +474,7 @@ function detectFlow(message) {
                 expandedMessage: rewritten.expandedMessage,
                 expansions: rewritten.expansions,
                 classifierMode: "tfidf_prototype_intent_router",
+                customerTestSafetyGate: customerTestSafetyQuery,
                 lowConfidenceGuard: {
                     triggered: true,
                     tokenCount,
@@ -429,6 +505,7 @@ function detectFlow(message) {
                 expandedMessage: rewritten.expandedMessage,
                 expansions: rewritten.expansions,
                 classifierMode: "tfidf_prototype_intent_router",
+                customerTestSafetyGate: customerTestSafetyQuery,
                 lowConfidenceGuard: {
                     triggered: false,
                     tokenCount,
@@ -451,6 +528,7 @@ function detectFlow(message) {
             expandedMessage: rewritten.expandedMessage,
             expansions: rewritten.expansions,
             classifierMode: "tfidf_prototype_intent_router",
+            customerTestSafetyGate: customerTestSafetyQuery,
             lowConfidenceGuard: {
                 triggered: true,
                 tokenCount,

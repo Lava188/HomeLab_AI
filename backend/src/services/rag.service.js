@@ -39,6 +39,14 @@ async function answerHealthQuery({ message, sessionId }) {
                     reason: policyDecision.reason,
                     policyVersion: policyDecision.policyVersion,
                     retrieverVersion: retrievalResult.retrieverVersion,
+                    requestedRetrieverVersion:
+                        retrievalResult.requestedRetrieverVersion || null,
+                    loadedRetrieverVersion:
+                        retrievalResult.loadedRetrieverVersion ||
+                        retrievalResult.retrieverVersion ||
+                        null,
+                    fallbackUsed: Boolean(retrievalResult.fallbackUsed),
+                    fallbackReason: retrievalResult.fallbackReason || null,
                     modelName: retrievalResult.modelName,
                     debug: {
                         runtimeMode: retrievalResult.runtimeMode || null,
@@ -79,6 +87,14 @@ async function answerHealthQuery({ message, sessionId }) {
                 reason: policyDecision.reason,
                 policyVersion: policyDecision.policyVersion,
                 retrieverVersion: retrievalResult.retrieverVersion,
+                requestedRetrieverVersion:
+                    retrievalResult.requestedRetrieverVersion || null,
+                loadedRetrieverVersion:
+                    retrievalResult.loadedRetrieverVersion ||
+                    retrievalResult.retrieverVersion ||
+                    null,
+                fallbackUsed: Boolean(retrievalResult.fallbackUsed),
+                fallbackReason: retrievalResult.fallbackReason || null,
                 modelName: retrievalResult.modelName,
                 debug: {
                     runtimeMode: retrievalResult.runtimeMode || null,
