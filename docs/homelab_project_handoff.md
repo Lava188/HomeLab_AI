@@ -54,7 +54,7 @@ HomeLab has passed the controlled semantic retrieval milestone. The backend can 
 - Offline eval v1_3 and eval v2 completed.
 - Controlled runtime flags added/reported: `HOMELAB_RETRIEVER_VERSION`, `HOMELAB_RETRIEVER_FALLBACK_VERSION`, legacy `HOMELAB_HEALTH_RAG_VERSION`.
 - Fallback and safety gates were reported as passing controlled smoke/API smoke.
-- Frontend manual smoke checklist/template exists, but no completed result was found.
+- Frontend manual/runtime smoke passed 8/8 for controlled semantic retrieval and intentGroup routing.
 - Controlled semantic retrieval with persistent bridge verified in runtime.
 - `intentGroup` routing added so urgent health, test advice, and booking are easier to inspect in Network/debug metadata.
 - Manual frontend/runtime test passed 8/8 for urgent health, test advice, normal booking, and mixed booking + urgent health cases.
@@ -108,14 +108,20 @@ New chat/developer should read these first:
 2. `docs/homelab_metrics_and_benchmarks.md`
 3. `docs/homelab_decision_log.md`
 4. `ai_lab/reports/runtime_semantic_activation_audit_v1_3.md`
-5. `ai_lab/reports/retriever_v1_3_release_decision_report.md`
-6. `ai_lab/reports/retriever_v1_3_api_smoke_report.md`
-7. `ai_lab/reports/retriever_v1_3_eval_v2_report.md`
-8. `ai_lab/reports/retriever_v1_3_build_report.md`
-9. `backend/src/services/health-rag/artifact-loader.service.js`
-10. `backend/src/services/health-rag/retriever.service.js`
-11. `backend/src/services/router-intent.service.js`
-12. `backend/src/services/router.service.js`
+5. `ai_lab/reports/semantic_retrieval_controlled_hybrid_report.md`
+6. `ai_lab/reports/retriever_v1_3_release_decision_report.md`
+7. `ai_lab/reports/retriever_v1_3_api_smoke_report.md`
+8. `ai_lab/reports/retriever_v1_3_eval_v2_report.md`
+9. `ai_lab/reports/retriever_v1_3_build_report.md`
+10. `backend/src/services/rag.service.js`
+11. `backend/src/services/health-rag/answer.service.js`
+12. `backend/src/services/health-rag/semantic-bridge.service.js`
+13. `backend/src/services/health-rag/artifact-loader.service.js`
+14. `backend/src/services/health-rag/retriever.service.js`
+15. `backend/src/services/router-intent.service.js`
+16. `backend/src/services/router.service.js`
+17. `ai_lab/scripts/semantic_retriever_bridge_v1_3.py`
+18. `backend/scripts/smoke_semantic_bridge_v1_3.js`
 
 ## How To Continue From Here
 

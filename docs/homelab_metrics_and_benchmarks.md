@@ -91,7 +91,7 @@ Result: **8/8 PASS**.
 
 Meaning: this milestone reduces dependence on keyword-only routing and lowers the risk of confusing booking, test advice, and urgent health flows. Safety priority is now observable: urgent red flags override booking even in mixed queries.
 
-## Runtime Semantic Audit Findings
+## Historical Runtime Semantic Audit Findings
 
 | Finding | Status |
 | --- | --- |
@@ -104,6 +104,8 @@ Meaning: this milestone reduces dependence on keyword-only routing and lowers th
 | `semanticScore` in audited runtime chunks | 0 |
 | Reported runtime mode | `lexical_only` |
 | Default switch readiness | BLOCKED |
+
+These findings describe the older pre-bridge runtime audit. Current controlled mode is verified separately above with `selectedRetrievalMode="semantic_faiss"` and 8/8 intentGroup/manual smoke PASS. Default/global runtime remains not switched.
 
 ## Pass / Fail / Blocker Table
 
