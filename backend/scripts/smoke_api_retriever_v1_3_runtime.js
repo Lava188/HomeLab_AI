@@ -7,6 +7,7 @@ const EXPECTED_RETRIEVER_VERSION =
     process.env.HOMELAB_RETRIEVER_VERSION || "v1_3";
 const EXPECTED_FALLBACK_VERSION =
     process.env.HOMELAB_RETRIEVER_FALLBACK_VERSION || "v1_2";
+const DIRECT_ARTIFACT_DIR = process.env.HEALTH_RAG_ARTIFACT_DIR || null;
 
 const REPO_ROOT = path.join(__dirname, "../..");
 const REPORTS_DIR = path.join(REPO_ROOT, "ai_lab/reports");
@@ -261,7 +262,9 @@ function writeReports(report) {
         f("- API base URL: `%s`", report.apiBaseUrl),
         f("- Expected retriever version: `%s`", report.expectedRetrieverVersion),
         f("- Expected fallback version: `%s`", report.expectedFallbackVersion),
+        f("- Direct artifact override: `%s`", report.directArtifactDir || "not set"),
         "- Backend should be started separately with `HOMELAB_RETRIEVER_VERSION=v1_3` and `HOMELAB_RETRIEVER_FALLBACK_VERSION=v1_2`.",
+        "- If an existing backend `.env` sets `HEALTH_RAG_ARTIFACT_DIR`, use a controlled override such as `HEALTH_RAG_ARTIFACT_DIR=retriever_v1_3` for this smoke only.",
         "",
         "## Summary",
         "",
@@ -324,6 +327,9 @@ async function main() {
     console.log("Expected backend env for this API smoke:");
     console.log(`HOMELAB_RETRIEVER_VERSION=${EXPECTED_RETRIEVER_VERSION}`);
     console.log(`HOMELAB_RETRIEVER_FALLBACK_VERSION=${EXPECTED_FALLBACK_VERSION}`);
+    console.log(
+        `HEALTH_RAG_ARTIFACT_DIR=${DIRECT_ARTIFACT_DIR || "(not set by smoke script)"}`
+    );
     console.log(`HOMELAB_API_BASE_URL=${API_BASE_URL}`);
 
     const rows = [];
@@ -392,6 +398,7 @@ async function main() {
         apiBaseUrl: API_BASE_URL,
         expectedRetrieverVersion: EXPECTED_RETRIEVER_VERSION,
         expectedFallbackVersion: EXPECTED_FALLBACK_VERSION,
+        directArtifactDir: DIRECT_ARTIFACT_DIR,
         total: rows.length,
         passed,
         failed,

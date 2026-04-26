@@ -62,6 +62,8 @@ const INTENT_DEFINITIONS = [
         flow: FLOWS.BOOKING,
         keywords: [
             "dat lich",
+            "dat lich xet nghiem",
+            "lay mau",
             "lay mau tai nha",
             "xet nghiem tai nha",
             "dang ky lich",
@@ -160,6 +162,38 @@ const HIGH_RISK_SHORT_QUERY_SIGNALS = [
     "ho ra mau"
 ];
 
+const BOOKING_ACTION_SIGNALS = [
+    "dat lich",
+    "dang ky lich",
+    "hen lay mau",
+    "lay mau",
+    "lay mau tai nha",
+    "xet nghiem tai nha"
+];
+
+const TEST_ADVICE_SIGNALS = [
+    "nen xet nghiem gi",
+    "xet nghiem gi",
+    "goi xet nghiem",
+    "goi xet nghiem nao",
+    "xet nghiem tong quat",
+    "kiem tra suc khoe tong quat",
+    "goi nao phu hop"
+];
+
+const URGENT_HEALTH_INTENT_SIGNALS = [
+    ...HIGH_RISK_SHORT_QUERY_SIGNALS,
+    "dau nguc",
+    "va mo hoi",
+    "sot cao",
+    "ret run",
+    "la di",
+    "nhiem trung",
+    "xau di nhanh",
+    "sepsis",
+    "lu lan"
+];
+
 function tokenize(text) {
     return normalizeText(text)
         .split(/[^a-z0-9]+/i)
@@ -186,6 +220,34 @@ function rewriteForRouting(message) {
         expandedMessage: [normalizedMessage, ...additions].join(" ").trim(),
         expansions: [...additions]
     };
+}
+
+function includesAny(text, signals) {
+    return signals.some((signal) => text.includes(signal));
+}
+
+function hasExplicitBookingActionText(expandedMessage) {
+    return includesAny(expandedMessage, BOOKING_ACTION_SIGNALS);
+}
+
+function isTestAdviceQuery(expandedMessage) {
+    return includesAny(expandedMessage, TEST_ADVICE_SIGNALS);
+}
+
+function getIntentGroup(expandedMessage) {
+    if (includesAny(expandedMessage, URGENT_HEALTH_INTENT_SIGNALS)) {
+        return "urgent_health";
+    }
+
+    if (hasExplicitBookingActionText(expandedMessage)) {
+        return "booking";
+    }
+
+    if (isTestAdviceQuery(expandedMessage)) {
+        return "test_advice";
+    }
+
+    return "general_health";
 }
 
 function buildClassifierCache() {
@@ -404,6 +466,51 @@ function detectFlow(message) {
     const customerTestSafetyQuery = isCustomerTestSafetyQuery(
         rewritten.expandedMessage
     );
+    const intentGroup = getIntentGroup(rewritten.expandedMessage);
+
+    if (intentGroup === "urgent_health") {
+        return {
+            flow: FLOWS.HEALTH_RAG,
+            routerDebug: {
+                normalizedMessage: rewritten.normalizedMessage,
+                expandedMessage: rewritten.expandedMessage,
+                expansions: rewritten.expansions,
+                classifierMode: "tfidf_prototype_intent_router",
+                intentGroup,
+                customerTestSafetyGate: customerTestSafetyQuery,
+                lowConfidenceGuard: {
+                    triggered: false,
+                    tokenCount,
+                    topScore: topIntent?.score || null,
+                    nextScore: nextIntent?.score || null,
+                    reason: "urgent_health_business_intent"
+                },
+                scoredIntents
+            }
+        };
+    }
+
+    if (intentGroup === "test_advice") {
+        return {
+            flow: FLOWS.HEALTH_RAG,
+            routerDebug: {
+                normalizedMessage: rewritten.normalizedMessage,
+                expandedMessage: rewritten.expandedMessage,
+                expansions: rewritten.expansions,
+                classifierMode: "tfidf_prototype_intent_router",
+                intentGroup,
+                customerTestSafetyGate: customerTestSafetyQuery,
+                lowConfidenceGuard: {
+                    triggered: false,
+                    tokenCount,
+                    topScore: topIntent?.score || null,
+                    nextScore: nextIntent?.score || null,
+                    reason: "test_advice_business_intent"
+                },
+                scoredIntents
+            }
+        };
+    }
 
     if (ambiguousUrgentQuery) {
         return {
@@ -415,6 +522,7 @@ function detectFlow(message) {
                 expandedMessage: rewritten.expandedMessage,
                 expansions: rewritten.expansions,
                 classifierMode: "tfidf_prototype_intent_router",
+                intentGroup,
                 customerTestSafetyGate: customerTestSafetyQuery,
                 lowConfidenceGuard: {
                     triggered: true,
@@ -443,6 +551,7 @@ function detectFlow(message) {
                 expandedMessage: rewritten.expandedMessage,
                 expansions: rewritten.expansions,
                 classifierMode: "tfidf_prototype_intent_router",
+                intentGroup,
                 customerTestSafetyGate: customerTestSafetyQuery,
                 lowConfidenceGuard: {
                     triggered: true,
@@ -474,6 +583,7 @@ function detectFlow(message) {
                 expandedMessage: rewritten.expandedMessage,
                 expansions: rewritten.expansions,
                 classifierMode: "tfidf_prototype_intent_router",
+                intentGroup,
                 customerTestSafetyGate: customerTestSafetyQuery,
                 lowConfidenceGuard: {
                     triggered: true,
@@ -505,6 +615,7 @@ function detectFlow(message) {
                 expandedMessage: rewritten.expandedMessage,
                 expansions: rewritten.expansions,
                 classifierMode: "tfidf_prototype_intent_router",
+                intentGroup,
                 customerTestSafetyGate: customerTestSafetyQuery,
                 lowConfidenceGuard: {
                     triggered: false,
@@ -528,6 +639,7 @@ function detectFlow(message) {
             expandedMessage: rewritten.expandedMessage,
             expansions: rewritten.expansions,
             classifierMode: "tfidf_prototype_intent_router",
+            intentGroup,
             customerTestSafetyGate: customerTestSafetyQuery,
             lowConfidenceGuard: {
                 triggered: true,

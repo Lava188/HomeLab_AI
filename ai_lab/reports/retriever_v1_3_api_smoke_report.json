@@ -1,23 +1,22 @@
 {
   "reportName": "retriever_v1_3_api_smoke_report",
-  "apiBaseUrl": "http://localhost:5013",
+  "apiBaseUrl": "http://localhost:5016",
   "expectedRetrieverVersion": "v1_3",
   "expectedFallbackVersion": "v1_2",
+  "directArtifactDir": "retriever_v1_3",
   "total": 6,
-  "passed": 1,
-  "failed": 5,
+  "passed": 6,
+  "failed": 0,
   "missingMetaCount": 0,
-  "recommendation": "do_not_switch_runtime_api_smoke_failed",
+  "recommendation": "do_not_switch_default_yet_controlled_api_smoke_passed",
   "defaultRuntimeSwitched": false,
   "rows": [
     {
       "id": "api_chest_pain_emergency",
       "label": "đau ngực nguy hiểm",
       "query": "đau ngực vã mồ hôi khó thở cần làm gì",
-      "pass": false,
-      "failures": [
-        "expected loadedRetrieverVersion=v1_3, got v1_2"
-      ],
+      "pass": true,
+      "failures": [],
       "missingMeta": [],
       "httpStatus": 200,
       "flow": "health_rag",
@@ -26,26 +25,23 @@
       "primaryMode": "emergency_or_urgent",
       "urgencyLevel": "emergency",
       "requestedRetrieverVersion": "v1_3",
-      "loadedRetrieverVersion": "v1_2",
+      "loadedRetrieverVersion": "v1_3",
       "fallbackUsed": false,
       "fallbackReason": null,
       "customerTestSafetyGate": false,
       "customerTestSafetyGateApplied": false,
       "lowConfidenceReason": null,
       "topChunks": [
-        "kb_v1_012_c1",
-        "kb_v1_010_c1",
-        "kb_v1_011_c1"
+        "kb_v1_3_040_c1",
+        "kb_v1_012_c1"
       ]
     },
     {
       "id": "api_shortness_blue_confused",
       "label": "khó thở môi xanh/lú lẫn",
       "query": "khó thở môi xanh tím lú lẫn",
-      "pass": false,
-      "failures": [
-        "expected loadedRetrieverVersion=v1_3, got v1_2"
-      ],
+      "pass": true,
+      "failures": [],
       "missingMeta": [],
       "httpStatus": 200,
       "flow": "health_rag",
@@ -54,26 +50,24 @@
       "primaryMode": "emergency_or_urgent",
       "urgencyLevel": "emergency",
       "requestedRetrieverVersion": "v1_3",
-      "loadedRetrieverVersion": "v1_2",
+      "loadedRetrieverVersion": "v1_3",
       "fallbackUsed": false,
       "fallbackReason": null,
       "customerTestSafetyGate": false,
       "customerTestSafetyGateApplied": false,
       "lowConfidenceReason": null,
       "topChunks": [
+        "kb_v1_3_041_c1",
         "kb_v1_013_c1",
-        "kb_v1_015_c1",
-        "kb_v1_014_c1"
+        "kb_v1_015_c1"
       ]
     },
     {
       "id": "api_sepsis_worse_fast",
       "label": "nhiễm trùng nặng xấu đi nhanh",
       "query": "nhiễm trùng nặng rất mệt xấu đi nhanh sepsis",
-      "pass": false,
-      "failures": [
-        "expected loadedRetrieverVersion=v1_3, got v1_2"
-      ],
+      "pass": true,
+      "failures": [],
       "missingMeta": [],
       "httpStatus": 200,
       "flow": "health_rag",
@@ -82,16 +76,16 @@
       "primaryMode": "emergency_or_urgent",
       "urgencyLevel": "emergency",
       "requestedRetrieverVersion": "v1_3",
-      "loadedRetrieverVersion": "v1_2",
+      "loadedRetrieverVersion": "v1_3",
       "fallbackUsed": false,
       "fallbackReason": null,
       "customerTestSafetyGate": false,
       "customerTestSafetyGateApplied": false,
       "lowConfidenceReason": null,
       "topChunks": [
+        "kb_v1_3_039_c1",
         "kb_v1_001_c1",
-        "kb_v1_002_c1",
-        "kb_v1_004_c1"
+        "kb_v1_002_c1"
       ]
     },
     {
@@ -120,10 +114,8 @@
       "id": "api_customer_infection_test",
       "label": "nghi nhiễm trùng hỏi chỉ số xét nghiệm",
       "query": "tôi muốn xét nghiệm vì nghi nhiễm trùng thì chỉ số nào liên quan",
-      "pass": false,
-      "failures": [
-        "expected loadedRetrieverVersion=v1_3, got v1_2"
-      ],
+      "pass": true,
+      "failures": [],
       "missingMeta": [],
       "httpStatus": 200,
       "flow": "health_rag",
@@ -132,26 +124,24 @@
       "primaryMode": "informational_test",
       "urgencyLevel": "none",
       "requestedRetrieverVersion": "v1_3",
-      "loadedRetrieverVersion": "v1_2",
+      "loadedRetrieverVersion": "v1_3",
       "fallbackUsed": false,
       "fallbackReason": null,
       "customerTestSafetyGate": true,
       "customerTestSafetyGateApplied": true,
       "lowConfidenceReason": null,
       "topChunks": [
+        "kb_v1_3_042_c1",
         "kb_v1_006_c1",
-        "kb_v1_005_c1",
-        "kb_v1_008_c1"
+        "kb_v1_005_c1"
       ]
     },
     {
       "id": "api_general_test_package",
       "label": "hỏi gói/xét nghiệm tổng quát",
       "query": "tôi muốn tư vấn gói xét nghiệm tổng quát",
-      "pass": false,
-      "failures": [
-        "expected loadedRetrieverVersion=v1_3, got v1_2"
-      ],
+      "pass": true,
+      "failures": [],
       "missingMeta": [],
       "httpStatus": 200,
       "flow": "health_rag",
@@ -160,7 +150,7 @@
       "primaryMode": "informational_test",
       "urgencyLevel": "none",
       "requestedRetrieverVersion": "v1_3",
-      "loadedRetrieverVersion": "v1_2",
+      "loadedRetrieverVersion": "v1_3",
       "fallbackUsed": false,
       "fallbackReason": null,
       "customerTestSafetyGate": false,
@@ -169,7 +159,7 @@
       "topChunks": [
         "kb_v1_005_c1",
         "kb_v1_006_c1",
-        "kb_v1_008_c1"
+        "kb_v1_3_042_c1"
       ]
     }
   ]

@@ -36,7 +36,7 @@ function buildInformationalReply(topChunks) {
     return dedupeTexts([
         getLeadSentence(primary.content),
         support ? getLeadSentence(support.content) : "",
-        "HomeLab chi ho tro thong tin suc khoe co ban va khong thay the tu van y te truc tiep."
+        "HomeLab chỉ hỗ trợ thông tin sức khỏe cơ bản và không thay thế tư vấn y tế trực tiếp."
     ]).join(" ");
 }
 
@@ -50,11 +50,11 @@ function buildEmergencyReply(topChunks, urgencyLevel) {
 
     const closing =
         urgencyLevel === "emergency"
-            ? "Ban nen di cap cuu hoac den co so y te khan cap ngay, thay vi tu theo doi tai nha."
-            : "Ban nen duoc danh gia y te som va khong nen tu chan doan tai nha.";
+            ? "Bạn nên đi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay, thay vì tự theo dõi tại nhà."
+            : "Bạn nên được đánh giá y tế sớm và không nên tự chẩn đoán tại nhà.";
 
     return dedupeTexts([
-        "Nhung thong tin phu hop nhat hien tai cho thay day la dau hieu dang lo ngai.",
+        "Những thông tin phù hợp nhất hiện tại cho thấy đây là dấu hiệu đáng lo ngại.",
         getLeadSentence(primary.content),
         supportText,
         closing
@@ -73,7 +73,22 @@ function buildUrgentReply(topChunks) {
     return dedupeTexts([
         getLeadSentence(primary.content),
         support ? getLeadSentence(support.content) : "",
-        "Ban nen di kham som de duoc danh gia phu hop, thay vi tu theo doi qua lau tai nha."
+        "Bạn nên đi khám sớm để được đánh giá phù hợp, thay vì tự theo dõi quá lâu tại nhà."
+    ]).join(" ");
+}
+
+function buildTestAdviceReply(topChunks) {
+    const primary = topChunks[0];
+    const primaryInfo =
+        primary && primary.section !== "red_flags"
+            ? getLeadSentence(primary.content)
+            : "";
+
+    return dedupeTexts([
+        primaryInfo,
+        "Để gợi ý nhóm xét nghiệm phù hợp hơn, mình cần biết thêm mục tiêu kiểm tra, tuổi, giới tính, thời gian bạn bị mệt, bệnh nền hoặc thuốc đang dùng, và có kèm sốt, sụt cân, đau ngực, khó thở, chóng mặt hoặc ngất không.",
+        "Nếu chỉ muốn kiểm tra tổng quát, bác sĩ thường cân nhắc theo bối cảnh các nhóm như công thức máu, đường huyết, chức năng gan thận, tuyến giáp, sắt/ferritin và nước tiểu; lựa chọn cụ thể còn phụ thuộc triệu chứng và tiền sử của bạn.",
+        "HomeLab không dùng các xét nghiệm này để tự chẩn đoán bệnh. Nếu có đau ngực, khó thở, ngất, lả đi, sốt cao rét run hoặc tình trạng xấu đi nhanh, bạn nên đi khám khẩn cấp thay vì chỉ chọn gói xét nghiệm."
     ]).join(" ");
 }
 
@@ -84,20 +99,20 @@ function buildMixedEmergencyReply(topChunks) {
 
     const lead =
         sourceLabels.length > 0
-            ? `Cac nguon phu hop nhat hien tai (${sourceLabels}) deu dang nghieng ve nhieu nhom canh bao nguy hiem chong lap.`
-            : "Cac thong tin phu hop nhat hien tai cho thay day la tinh huong co nhieu dau hieu canh bao nguy hiem chong lap.";
+            ? `Các nguồn phù hợp nhất hiện tại (${sourceLabels}) đều đang nghiêng về nhiều nhóm cảnh báo nguy hiểm chồng lấp.`
+            : "Các thông tin phù hợp nhất hiện tại cho thấy đây là tình huống có nhiều dấu hiệu cảnh báo nguy hiểm chồng lấp.";
 
     return [
         lead,
-        "Ban nen goi cap cuu hoac den co so y te khan cap ngay, thay vi tu theo doi tai nha.",
-        "HomeLab khong dung cac tin hieu nay de tu chan doan nguyen nhan cu the."
+        "Bạn nên gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay, thay vì tự theo dõi tại nhà.",
+        "HomeLab không dùng các tín hiệu này để tự chẩn đoán nguyên nhân cụ thể."
     ].join(" ");
 }
 
 function buildFallbackReply() {
     return (
-        "Minh chua du chac chan de tra loi an toan dua tren knowledge base hien tai. " +
-        "Ban co the mo ta ro hon ten xet nghiem, trieu chung, hoac dau hieu dang lo ngai de minh tim dung thong tin hon khong?"
+        "Mình chưa đủ chắc chắn để trả lời an toàn dựa trên knowledge base hiện tại. " +
+        "Bạn có thể mô tả rõ hơn tên xét nghiệm, triệu chứng, hoặc dấu hiệu đang lo ngại để mình tìm đúng thông tin hơn không?"
     );
 }
 
@@ -116,6 +131,10 @@ function composeGroundedAnswer({ policyDecision, topChunks }) {
 
     if (policyDecision.primaryMode === "urgent_advice") {
         return buildUrgentReply(topChunks);
+    }
+
+    if (policyDecision.primaryMode === "test_advice") {
+        return buildTestAdviceReply(topChunks);
     }
 
     if (policyDecision.primaryMode === "mixed_emergency") {
