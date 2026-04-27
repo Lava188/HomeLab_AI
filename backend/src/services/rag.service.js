@@ -80,10 +80,14 @@ function getIntentGroup(message) {
         "goi xet nghiem",
         "goi xet nghiem nao",
         "xet nghiem tong quat",
+        "kiem tra tong quat",
         "kiem tra suc khoe tong quat",
         "goi nao phu hop",
         "kiem tra than",
-        "chuc nang than"
+        "chuc nang than",
+        "kiem tra thieu mau",
+        "thieu mau",
+        "cbc"
     ];
 
     if (
@@ -321,14 +325,10 @@ function buildRecommendationReply(recommendationDecision, fallbackReply) {
     }
 
     if (recommendationDecision.status === "do_not_recommend") {
-        const reason =
-            recommendationDecision.packageDecision?.reasons?.[0] ||
-            "Recommendation runtime is currently blocked.";
-
         return [
             "HomeLab chua de xuat goi xet nghiem trong buoc nay.",
-            reason,
-            "Neu ban muon, hay mo ta muc tieu kiem tra va trieu chung hien tai; HomeLab van se uu tien sang loc dau hieu can kham khan cap truoc."
+            "HomeLab can giu goi y o muc an toan va khong dung goi xet nghiem de ket luan benh.",
+            "Neu ban muon, hay mo ta muc tieu kiem tra, trieu chung hien tai va cac dau hieu can kham gap neu co."
         ].join(" ");
     }
 

@@ -18,6 +18,7 @@ const GOAL_TO_CANDIDATE_PACKAGES = {
     anemia_infection_screening: ["pkg_anemia_infection_basic_v1"],
     kidney_function_screening: ["pkg_kidney_function_basic_v1"],
     glucose_screening: ["pkg_diabetes_glucose_basic_v1"],
+    lipid_screening: ["pkg_lipid_cardiometabolic_basic_v1"],
     basic_blood_package: [
         "pkg_anemia_infection_basic_v1",
         "pkg_kidney_function_basic_v1",
@@ -46,6 +47,13 @@ function baseDecision({
     eligiblePackageIds = [],
     blockedPackageIds = [],
     reasons = [],
+    missingSlots = [],
+    extractedSlots = {},
+    decisionType = null,
+    confidence = "low",
+    userSafeSummary = null,
+    candidatePackages = [],
+    blockedReason = null,
     debug = {}
 }) {
     return {
@@ -53,6 +61,11 @@ function baseDecision({
         replyMode,
         recommendedPackage,
         nextQuestions,
+        missingSlots,
+        extractedSlots,
+        decisionType,
+        confidence,
+        userSafeSummary,
         safety: {
             redFlagStatus,
             activeRedFlags,
@@ -61,9 +74,11 @@ function baseDecision({
         packageDecision: {
             catalogVersion,
             catalogRuntimeEnabled,
+            candidatePackages,
             candidatePackageIds,
             eligiblePackageIds,
             blockedPackageIds,
+            blockedReason,
             reasons
         },
         debug
@@ -78,16 +93,38 @@ function getMissingQuestions(collectedSlots) {
             slotId: "recommendation_goal",
             question:
                 "Ban muon xet nghiem theo muc tieu nao: tong quat, met/thieu mau, duong huyet/chuyen hoa, hay chuc nang than?",
-            priority: 1
+            priority: 1,
+            blocking: true
         });
     }
 
-    if (!collectedSlots.symptom_summary) {
+    if (!collectedSlots.age) {
         questions.push({
-            slotId: "symptom_summary",
-            question:
-                "Ban co the mo ta ngan gon trieu chung hoac ly do muon kiem tra khong?",
-            priority: 1
+            slotId: "age",
+            question: "Ban bao nhieu tuoi?",
+            priority: 2,
+            blocking: false
+        });
+    }
+
+    if (!collectedSlots.sex) {
+        questions.push({
+            slotId: "sex",
+            question: "Gioi tinh sinh hoc cua ban la nam hay nu?",
+            priority: 2,
+            blocking: false
+        });
+    }
+
+    if (
+        collectedSlots.main_concern === "fatigue" &&
+        !collectedSlots.symptom_duration
+    ) {
+        questions.push({
+            slotId: "symptom_duration",
+            question: "Tinh trang met moi da keo dai bao lau?",
+            priority: 1,
+            blocking: true
         });
     }
 
@@ -96,12 +133,15 @@ function getMissingQuestions(collectedSlots) {
             questions.push({
                 slotId,
                 question: getRedFlagQuestion(slotId),
-                priority: 1
+                priority: 1,
+                blocking: true
             });
         }
     }
 
-    return questions;
+    return questions
+        .sort((left, right) => left.priority - right.priority)
+        .slice(0, 5);
 }
 
 function getRedFlagQuestion(slotId) {
@@ -136,6 +176,54 @@ function buildBlockedIds(candidatePackageIds, packageById) {
             gate.needsManualReview
         );
     });
+}
+
+function summarizeCandidatePackages(candidatePackageIds, packageById) {
+    return candidatePackageIds
+        .map((packageId) => summarizePackage(packageById.get(packageId)))
+        .filter(Boolean);
+}
+
+function getBlockingMissingSlots(questions) {
+    return questions
+        .filter((question) => question.blocking)
+        .map((question) => question.slotId);
+}
+
+function buildUserSafeSummary(collectedSlots) {
+    const parts = [];
+
+    if (collectedSlots.recommendation_goal) {
+        parts.push(`goal=${collectedSlots.recommendation_goal}`);
+    }
+
+    if (collectedSlots.age) {
+        parts.push(`age=${collectedSlots.age}`);
+    }
+
+    if (collectedSlots.sex) {
+        parts.push(`sex=${collectedSlots.sex}`);
+    }
+
+    if (collectedSlots.symptom_duration) {
+        parts.push(
+            `duration=${collectedSlots.symptom_duration.value}_${collectedSlots.symptom_duration.unit}`
+        );
+    }
+
+    if (collectedSlots.red_flag_screen_result) {
+        parts.push(`red_flags=${collectedSlots.red_flag_screen_result}`);
+    }
+
+    return parts.join("; ") || null;
+}
+
+function getConfidence({ candidatePackageIds, missingSlots, redFlagStatus }) {
+    if (missingSlots.length > 0 || redFlagStatus !== "negative") {
+        return "low";
+    }
+
+    return candidatePackageIds.length > 0 ? "medium" : "low";
 }
 
 function runRecommendationRuntime({ message, intentGroup }) {
@@ -173,6 +261,18 @@ function runRecommendationRuntime({ message, intentGroup }) {
     const recommendationGoal = collectedSlots.recommendation_goal || null;
     const candidatePackageIds =
         GOAL_TO_CANDIDATE_PACKAGES[recommendationGoal] || [];
+    const candidatePackages = summarizeCandidatePackages(
+        candidatePackageIds,
+        packageById
+    );
+    const nextQuestions = getMissingQuestions(collectedSlots);
+    const missingSlots = getBlockingMissingSlots(nextQuestions);
+    const userSafeSummary = buildUserSafeSummary(collectedSlots);
+    const confidence = getConfidence({
+        candidatePackageIds,
+        missingSlots,
+        redFlagStatus
+    });
 
     const commonDebug = {
         intentGroup,
@@ -191,8 +291,15 @@ function runRecommendationRuntime({ message, intentGroup }) {
             escalationReason: "active_red_flags",
             catalogVersion,
             catalogRuntimeEnabled,
+            candidatePackages,
             candidatePackageIds,
             blockedPackageIds: candidatePackageIds,
+            missingSlots,
+            extractedSlots: collectedSlots,
+            decisionType: "safety_escalation",
+            confidence: "high",
+            userSafeSummary,
+            blockedReason: "active_red_flags",
             reasons: [
                 "Active red flags take priority over package recommendation."
             ],
@@ -209,8 +316,15 @@ function runRecommendationRuntime({ message, intentGroup }) {
             escalationReason: "medical_review_boundary",
             catalogVersion,
             catalogRuntimeEnabled,
+            candidatePackages,
             candidatePackageIds,
             blockedPackageIds: candidatePackageIds,
+            missingSlots,
+            extractedSlots: collectedSlots,
+            decisionType: "medical_review_boundary",
+            confidence,
+            userSafeSummary,
+            blockedReason: "medical_review_boundary",
             reasons: [
                 "Result interpretation or diagnosis requests are outside package recommendation scope."
             ],
@@ -218,8 +332,7 @@ function runRecommendationRuntime({ message, intentGroup }) {
         });
     }
 
-    const nextQuestions = getMissingQuestions(collectedSlots);
-    if (nextQuestions.length > 0) {
+    if (missingSlots.length > 0) {
         return baseDecision({
             status: "ask_more",
             replyMode: "recommendation_context",
@@ -228,8 +341,15 @@ function runRecommendationRuntime({ message, intentGroup }) {
             activeRedFlags,
             catalogVersion,
             catalogRuntimeEnabled,
+            candidatePackages,
             candidatePackageIds,
             blockedPackageIds: buildBlockedIds(candidatePackageIds, packageById),
+            missingSlots,
+            extractedSlots: collectedSlots,
+            decisionType: "needs_more_context",
+            confidence,
+            userSafeSummary,
+            blockedReason: "missing_required_slots",
             reasons: ["More context is required before package matching."],
             debug: commonDebug
         });
@@ -243,8 +363,15 @@ function runRecommendationRuntime({ message, intentGroup }) {
             activeRedFlags,
             catalogVersion,
             catalogRuntimeEnabled,
+            candidatePackages,
             candidatePackageIds,
             blockedPackageIds: candidatePackageIds,
+            missingSlots,
+            extractedSlots: collectedSlots,
+            decisionType: "ready_but_catalog_disabled",
+            confidence,
+            userSafeSummary,
+            blockedReason: "catalog_runtime_disabled",
             reasons: [
                 "Package catalog runtime_enabled is false, so runtime package recommendation is blocked."
             ],
@@ -270,9 +397,16 @@ function runRecommendationRuntime({ message, intentGroup }) {
             activeRedFlags,
             catalogVersion,
             catalogRuntimeEnabled,
+            candidatePackages,
             candidatePackageIds,
             eligiblePackageIds,
             blockedPackageIds: buildBlockedIds(candidatePackageIds, packageById),
+            missingSlots,
+            extractedSlots: collectedSlots,
+            decisionType: "no_eligible_package",
+            confidence,
+            userSafeSummary,
+            blockedReason: "no_eligible_package",
             reasons: ["No eligible package is allowed by package-level gates."],
             debug: commonDebug
         });
@@ -286,9 +420,15 @@ function runRecommendationRuntime({ message, intentGroup }) {
         activeRedFlags,
         catalogVersion,
         catalogRuntimeEnabled,
+        candidatePackages,
         candidatePackageIds,
         eligiblePackageIds,
         blockedPackageIds: buildBlockedIds(candidatePackageIds, packageById),
+        missingSlots,
+        extractedSlots: collectedSlots,
+        decisionType: "recommend_package",
+        confidence: "medium",
+        userSafeSummary,
         reasons: ["A package matched all runtime gates."],
         debug: commonDebug
     });
