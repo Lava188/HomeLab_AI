@@ -17,6 +17,13 @@
 | Runtime semantic activation audit | `ai_lab/reports/runtime_semantic_activation_audit_v1_3.md` | Historical audit: semantic runtime inactive at that point; default switch was BLOCKED. |
 | Controlled semantic retrieval + intentGroup routing | `ai_lab/reports/semantic_retrieval_controlled_hybrid_report.md` | 8/8 PASS; `selectedRetrievalMode="semantic_faiss"` verified for semantic health RAG cases and booking/test-advice split verified. |
 | Frontend manual smoke | manual frontend/runtime verification | 8/8 PASS for urgent health, test advice, normal booking, and mixed booking + urgent health priority. |
+| Recommendation Runtime 3B | `node backend/scripts/smoke_recommendation_runtime_3b.js` | 10/10 PASS; 3A regression `node backend/scripts/smoke_recommendation_runtime_3a.js` remains 8/8 PASS. |
+| Recommendation API Metadata Contract 3C | `node backend/scripts/smoke_recommendation_api_3c.js` | 9/9 PASS; `{"total":9,"passed":9,"failed":0,"testAdviceHasRecommendation":true,"bookingUrgentNoRecommendation":true,"catalogDisabledKeepsPackageNull":true}`. |
+| Recommendation Answer UX 3D | `node backend/scripts/smoke_recommendation_answer_ux_3d.js` | 7/7 PASS; `{"total":7,"passed":7,"failed":0}`. |
+| Recommendation Flag-off Regression 3E | `node backend/scripts/smoke_recommendation_flag_off_3e.js` | 6/6 PASS after backend restart with `HOMELAB_RECOMMENDATION_RUNTIME_ENABLED=false`; no recommendation meta/UX/package IDs. |
+| Recommendation Frontend Manual Smoke 3F | manual UI + Network verification | 7/7 PASS; UI stable, no raw package IDs, booking/urgent not interrupted, `recommendedPackage=null` when live disabled. Minor non-blocker: newline/bullet formatting can appear flattened. |
+| Recommendation Catalog + Source Contract 3G | `node backend/scripts/smoke_recommendation_catalog_contract_3g.js` | 6/6 PASS; general/kidney answers no longer inherit mismatched chest pain/D-dimer sources, CBC boundary uses CBC source, urgent keeps suitable NHS source. |
+| Controlled Live Package Recommendation 3H | `node backend/scripts/smoke_recommendation_live_package_3h.js` | 7/7 PASS with runtime gate and live package gate enabled; live gate off returns `recommendedPackage=null`. |
 
 ## Key Metrics Found In Repo
 
@@ -46,6 +53,22 @@
 | Recommendation before/after | Package accuracy | 0.84 -> 1.0 |
 | Recommendation before/after | Unsafe recommendation count | 0 -> 0 |
 
+## Recommendation Runtime Prototype Milestones
+
+| Milestone | Meaning | Result |
+| --- | --- | --- |
+| 3B Recommendation Runtime Quality | `test_advice` can run controlled slot extraction, missing-context detection, red-flag screening, and `candidatePackageIds` metadata. It only runs when `HOMELAB_RECOMMENDATION_RUNTIME_ENABLED=true` and `intentGroup === "test_advice"`. | 10/10 PASS; 3A regression 8/8 PASS. |
+| 3C API Metadata Contract | Real `/api/chat` responses expose recommendation metadata for `test_advice`; booking and `urgent_health` do not get `meta.recommendation`; mixed booking + urgent keeps urgent priority. | 9/9 PASS. |
+| 3D Recommendation Answer UX | User-facing answer text uses recommendation metadata for natural Vietnamese ask-more, ready-but-catalog-disabled, and medical-review-boundary responses without exposing raw package IDs. | 7/7 PASS. |
+| 3E Flag-off Regression | Recommendation runtime off means no recommendation meta, UX, package IDs, candidate IDs, or `recommendedPackage`, while routing still works. | 6/6 PASS. |
+| 3F Frontend Manual Smoke | Browser UI and Network behavior match controlled recommendation expectations without exposing raw package IDs or interrupting booking/urgent flows. | 7/7 PASS; newline/bullet flattening is non-blocking UX polish. |
+| 3G Catalog + Source Contract | Recommendation answer provenance is aligned to the answer; recommendation UX no longer shows unrelated RAG sources such as chest pain/D-dimer for general/kidney advice. | 6/6 PASS. |
+| 3H Controlled Live Package | With `HOMELAB_RECOMMENDATION_RUNTIME_ENABLED=true` and `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`, safe, sufficiently contextual `test_advice` can return a catalog-derived `recommendedPackage`. | 7/7 PASS; not default/global behavior. |
+
+Catalog/live-gate note: with live package gate off or catalog runtime disabled, `recommendedPackage=null` is expected behavior, not a failure. Candidate package IDs may appear in metadata for debug/evaluation. With `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true` and enough safe context, 3H allows a catalog-derived `recommendedPackage` in controlled mode only.
+
+Non-blocker tracking note: some `test_advice` rows can still use `selectedRetrievalMode="lexical_fallback"`. This does not block 3C because 3C validates the recommendation metadata contract through the real API, but it should remain visible if future work tightens semantic runtime coverage.
+
 ## Retriever v1_2 / v1_3 Comparison
 
 | Version | Eval scope | Main numbers | Notes |
@@ -73,6 +96,13 @@ Important distinction: the older semantic activation audit remains useful histor
 | Real backend API smoke | PASS | `6/6 PASS`, no missing meta in `retriever_v1_3_api_smoke_report.md`. |
 | Frontend manual smoke | PASS | Latest manual frontend/runtime check passed 8/8 for semantic retrieval and intent priority cases. |
 | Semantic activation audit | Historical FAIL | Older audit found lexical-only runtime; later controlled semantic bridge/retrieval milestone resolved this for gated runtime use. |
+| Recommendation Runtime 3B | PASS | 10/10 PASS with 3A regression 8/8 PASS; catalog disabled keeps live recommendation off. |
+| Recommendation API Metadata Contract 3C | PASS | 9/9 PASS; `test_advice` gets `meta.recommendation`, booking/urgent do not. |
+| Recommendation Answer UX 3D | PASS | 7/7 PASS; answer text no longer exposes raw package IDs and does not chốt live packages. |
+| Recommendation Flag-off Regression 3E | PASS | 6/6 PASS after backend restart with runtime flag off; no recommendation meta/UX/package IDs. |
+| Recommendation Frontend Manual Smoke 3F | PASS | 7/7 PASS; UI/Network behavior matches expectations, with minor non-blocker newline/bullet flattening. |
+| Recommendation Catalog + Source Contract 3G | PASS | 6/6 PASS; recommendation answers no longer show mismatched visible sources. |
+| Controlled Live Package Recommendation 3H | PASS | 7/7 PASS behind `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`; live gate off keeps `recommendedPackage=null`. |
 
 ## Controlled Semantic Retrieval + IntentGroup Manual Smoke
 
@@ -131,11 +161,13 @@ These findings describe the older pre-bridge runtime audit. Current controlled m
 | Semantic runtime active | PASS in controlled mode |
 | IntentGroup routing priority | PASS, 8/8 manual smoke |
 | Frontend manual smoke | PASS, 8/8 |
-| Recommendation/package runtime validated in full app | Not yet; prototype needed |
+| Recommendation/package runtime prototype | PASS through 3B/3C/3D/3E/3F/3G/3H controlled smokes |
+| Controlled live package recommendation | PASS behind separate live gate; off by default, live gate off keeps `recommendedPackage=null` |
 | Default switch | Not switched; controlled/opt-in |
 
 ## Missing Or Needs Verification
 
-- Recommendation/test package runtime is not yet a full engine; current `test_advice` is a business-intent gate.
+- Recommendation/test package runtime is a controlled slot-based prototype, not a full recommendation engine.
+- 3H proves controlled live package return only when both runtime and live package gates are enabled.
+- Production/default rollout still needs product review, catalog governance, and monitoring decisions.
 - Broader default/runtime promotion remains a future decision after product review.
-- End-to-end package recommendation runtime through frontend/backend still needs design and verification.

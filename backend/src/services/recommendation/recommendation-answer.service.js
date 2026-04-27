@@ -37,15 +37,7 @@ function composeRecommendationAnswer(recommendationDecision, fallbackReply) {
         recommendationDecision.status === "recommend" &&
         recommendationDecision.recommendedPackage
     ) {
-        const packageName =
-            recommendationDecision.recommendedPackage.displayNameVi ||
-            recommendationDecision.recommendedPackage.displayName ||
-            "gói xét nghiệm phù hợp";
-
-        return [
-            `Dựa trên thông tin hiện có, HomeLab có thể gợi ý ${packageName} để bạn trao đổi thêm với nhân viên y tế.`,
-            "Gợi ý này không thay thế tư vấn y tế và không dùng để chẩn đoán bệnh."
-        ].join(" ");
+        return composeLivePackageAnswer(recommendationDecision);
     }
 
     return [
@@ -62,6 +54,31 @@ function composeAskMoreAnswer(recommendationDecision) {
         ...questions.map((question) => `- ${question}`),
         "Nếu bạn đang đau ngực, khó thở, ngất/lú lẫn, sốt cao rét run hoặc tình trạng xấu đi nhanh, hãy ưu tiên liên hệ cơ sở y tế khẩn cấp."
     ].join("\n");
+}
+
+function composeLivePackageAnswer(recommendationDecision) {
+    const packageItem = recommendationDecision.recommendedPackage;
+    const packageName =
+        packageItem.displayNameVi ||
+        packageItem.displayName ||
+        "gói xét nghiệm phù hợp";
+    const includedTests = Array.isArray(packageItem.includedTests)
+        ? packageItem.includedTests
+        : [];
+    const testsText = includedTests.length
+        ? `Nhóm xét nghiệm chính: ${includedTests.join(", ")}.`
+        : "HomeLab sẽ cần xác nhận thêm nhóm xét nghiệm chính với nhân viên y tế.";
+    const reason = packageItem.reason || packageItem.rationale;
+
+    return [
+        `HomeLab có thể gợi ý ${packageName} để bạn trao đổi thêm với nhân viên y tế.`,
+        testsText,
+        reason ? `Lý do: ${reason}` : null,
+        "Gợi ý này không phải chẩn đoán, không thay thế tư vấn y tế và không dùng để xử trí tình huống khẩn cấp.",
+        "Nếu có đau ngực, khó thở, ngất/lú lẫn, vã mồ hôi hoặc tình trạng xấu đi nhanh, hãy ưu tiên liên hệ cơ sở y tế khẩn cấp."
+    ]
+        .filter(Boolean)
+        .join(" ");
 }
 
 function buildNaturalQuestions(recommendationDecision) {
@@ -138,19 +155,29 @@ function getCandidateDirections(recommendationDecision) {
         const tests = Array.isArray(packageItem?.includedTests)
             ? packageItem.includedTests
             : [];
+        const normalizedTests = tests.map((test) => normalizeVietnamese(test));
 
-        if (tests.some((test) => String(test).toLowerCase().includes("cbc"))) {
+        if (normalizedTests.some((test) => test.includes("cbc"))) {
             names.push("công thức máu/CBC");
         } else if (
-            tests.some((test) => String(test).toLowerCase().includes("metabolic"))
+            normalizedTests.some((test) =>
+                test.includes("metabolic") ||
+                test.includes("bmp") ||
+                test.includes("chuyen hoa") ||
+                test.includes("than")
+            )
         ) {
             names.push("chức năng thận/chuyển hóa cơ bản");
         } else if (
-            tests.some((test) => String(test).toLowerCase().includes("glucose"))
+            normalizedTests.some((test) =>
+                test.includes("glucose") || test.includes("duong huyet")
+            )
         ) {
             names.push("đường huyết");
         } else if (
-            tests.some((test) => String(test).toLowerCase().includes("lipid"))
+            normalizedTests.some((test) =>
+                test.includes("lipid") || test.includes("mo mau")
+            )
         ) {
             names.push("mỡ máu");
         }
@@ -165,6 +192,15 @@ function joinVietnameseList(items) {
     }
 
     return `${items.slice(0, -1).join(", ")} và ${items[items.length - 1]}`;
+}
+
+function normalizeVietnamese(value) {
+    return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .toLowerCase();
 }
 
 module.exports = {

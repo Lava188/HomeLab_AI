@@ -325,6 +325,61 @@ function attachRecommendationMeta(meta, recommendationDecision) {
     };
 }
 
+function applyRecommendationSourceContract(meta, recommendationDecision) {
+    if (!recommendationDecision) {
+        return meta;
+    }
+
+    if (recommendationDecision.decisionType === "medical_review_boundary") {
+        return keepSourcesById(meta, ["medlineplus_cbc_test"]);
+    }
+
+    return {
+        ...meta,
+        topChunks: [],
+        citations: [],
+        knowledgeItem: null,
+        recommendationSourceContract: {
+            mode: "recommendation_answer_no_visible_rag_source",
+            reason: "recommendation_answer_not_grounded_to_current_rag_top_chunk"
+        }
+    };
+}
+
+function keepSourcesById(meta, allowedSourceIds) {
+    const allowed = new Set(allowedSourceIds);
+    const topChunks = (meta.topChunks || []).filter((chunk) =>
+        allowed.has(chunk.sourceId)
+    );
+    const citations = (meta.citations || []).filter((citation) =>
+        allowed.has(citation.sourceId)
+    );
+    const primaryChunk = topChunks[0] || null;
+
+    return {
+        ...meta,
+        topChunks,
+        citations,
+        knowledgeItem: primaryChunk
+            ? {
+                id: primaryChunk.chunkId || null,
+                title: primaryChunk.title || null,
+                source: primaryChunk.sourceUrl
+                    ? `${primaryChunk.sourceName} - ${primaryChunk.sourceUrl}`
+                    : primaryChunk.sourceName || primaryChunk.sourceId || null,
+                tags: [],
+                test_types: []
+            }
+            : null,
+        recommendationSourceContract: {
+            mode: primaryChunk
+                ? "recommendation_answer_filtered_rag_source"
+                : "recommendation_answer_no_visible_rag_source",
+            allowedSourceIds
+        }
+    };
+}
+
 async function answerHealthQuery({ message, sessionId }) {
     try {
         const retrievalResult = retrieveTopChunks({
@@ -371,7 +426,7 @@ async function answerHealthQuery({ message, sessionId }) {
                 action: ACTIONS.ANSWER_HEALTH_QUERY,
                 reply,
                 booking: null,
-                meta: attachRecommendationMeta({
+                meta: applyRecommendationSourceContract(attachRecommendationMeta({
                     answeredBy: "rag.service",
                     retrievalMode: "artifact_json_top3_versioned",
                     found: false,
@@ -406,7 +461,7 @@ async function answerHealthQuery({ message, sessionId }) {
                         semanticBridge: semanticBridgeResult
                     },
                     topChunks: []
-                }, recommendationDecision)
+                }, recommendationDecision), recommendationDecision)
             });
         }
 
@@ -426,7 +481,7 @@ async function answerHealthQuery({ message, sessionId }) {
             action: ACTIONS.ANSWER_HEALTH_QUERY,
             reply,
             booking: null,
-            meta: attachRecommendationMeta({
+            meta: applyRecommendationSourceContract(attachRecommendationMeta({
                 answeredBy: "rag.service",
                 retrievalMode: "artifact_json_top3_versioned",
                 found: true,
@@ -485,7 +540,7 @@ async function answerHealthQuery({ message, sessionId }) {
                         ? primaryChunk.test_types
                         : []
                 }
-            }, recommendationDecision)
+            }, recommendationDecision), recommendationDecision)
         });
     } catch (error) {
         console.error("RAG service error:", error);

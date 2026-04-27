@@ -33,6 +33,12 @@ function isRecommendationRuntimeEnabled() {
         .toLowerCase() === "true";
 }
 
+function isLivePackageRecommendationEnabled() {
+    return String(process.env.HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED || "")
+        .trim()
+        .toLowerCase() === "true";
+}
+
 function baseDecision({
     status,
     replyMode,
@@ -43,6 +49,8 @@ function baseDecision({
     escalationReason = null,
     catalogVersion = null,
     catalogRuntimeEnabled = false,
+    livePackageEnabled = false,
+    effectiveRuntimeEnabled = false,
     candidatePackageIds = [],
     eligiblePackageIds = [],
     blockedPackageIds = [],
@@ -66,6 +74,7 @@ function baseDecision({
         decisionType,
         confidence,
         userSafeSummary,
+        livePackageEnabled,
         safety: {
             redFlagStatus,
             activeRedFlags,
@@ -74,6 +83,8 @@ function baseDecision({
         packageDecision: {
             catalogVersion,
             catalogRuntimeEnabled,
+            livePackageEnabled,
+            effectiveRuntimeEnabled,
             candidatePackages,
             candidatePackageIds,
             eligiblePackageIds,
@@ -92,7 +103,7 @@ function getMissingQuestions(collectedSlots) {
         questions.push({
             slotId: "recommendation_goal",
             question:
-                "Ban muon xet nghiem theo muc tieu nao: tong quat, met/thieu mau, duong huyet/chuyen hoa, hay chuc nang than?",
+                "Bạn muốn xét nghiệm theo mục tiêu nào: tổng quát, mệt/thiếu máu, đường huyết/chuyển hóa hay chức năng thận?",
             priority: 1,
             blocking: true
         });
@@ -101,7 +112,7 @@ function getMissingQuestions(collectedSlots) {
     if (!collectedSlots.age) {
         questions.push({
             slotId: "age",
-            question: "Ban bao nhieu tuoi?",
+            question: "Bạn bao nhiêu tuổi?",
             priority: 2,
             blocking: false
         });
@@ -110,7 +121,7 @@ function getMissingQuestions(collectedSlots) {
     if (!collectedSlots.sex) {
         questions.push({
             slotId: "sex",
-            question: "Gioi tinh sinh hoc cua ban la nam hay nu?",
+            question: "Giới tính sinh học của bạn là nam hay nữ?",
             priority: 2,
             blocking: false
         });
@@ -122,7 +133,7 @@ function getMissingQuestions(collectedSlots) {
     ) {
         questions.push({
             slotId: "symptom_duration",
-            question: "Tinh trang met moi da keo dai bao lau?",
+            question: "Tình trạng mệt mỏi đã kéo dài bao lâu?",
             priority: 1,
             blocking: true
         });
@@ -146,14 +157,14 @@ function getMissingQuestions(collectedSlots) {
 
 function getRedFlagQuestion(slotId) {
     if (slotId === "chest_pain_present") {
-        return "Hien tai ban co dau nguc khong?";
+        return "Hiện tại bạn có đau ngực không?";
     }
 
     if (slotId === "shortness_of_breath_present") {
-        return "Hien tai ban co kho tho khong?";
+        return "Hiện tại bạn có khó thở không?";
     }
 
-    return "Ban co ngat, xiu, lu lan, hoac thay doi y thuc khong?";
+    return "Bạn có ngất, xỉu, lú lẫn hoặc thay đổi ý thức không?";
 }
 
 function hasDiagnosisOrResultInterpretationRequest(normalizedMessage) {
@@ -182,6 +193,37 @@ function summarizeCandidatePackages(candidatePackageIds, packageById) {
     return candidatePackageIds
         .map((packageId) => summarizePackage(packageById.get(packageId)))
         .filter(Boolean);
+}
+
+function buildRecommendedPackage(packageItem, collectedSlots) {
+    const summary = summarizePackage(packageItem);
+    if (!summary) {
+        return null;
+    }
+
+    return {
+        ...summary,
+        reason: buildRecommendationReason(summary, collectedSlots),
+        rationale: buildRecommendationReason(summary, collectedSlots),
+        safetyNote:
+            "Gợi ý này chỉ để trao đổi thêm với nhân viên y tế, không dùng để chẩn đoán bệnh. Nếu có đau ngực, khó thở, ngất/lú lẫn, vã mồ hôi hoặc tình trạng xấu đi nhanh, hãy ưu tiên liên hệ cơ sở y tế khẩn cấp."
+    };
+}
+
+function buildRecommendationReason(packageSummary, collectedSlots) {
+    if (collectedSlots.recommendation_goal === "kidney_function_screening") {
+        return "Bạn đang hỏi rõ về kiểm tra chức năng thận và đã phủ định các dấu hiệu cần xử trí khẩn cấp trong thông tin đã cung cấp.";
+    }
+
+    if (collectedSlots.recommendation_goal === "anemia_infection_screening") {
+        return "Bạn đang hỏi về thiếu máu/CBC và thông tin hiện có không ghi nhận dấu hiệu cần xử trí khẩn cấp.";
+    }
+
+    if (collectedSlots.recommendation_goal === "basic_blood_package") {
+        return "Bạn đang muốn kiểm tra tổng quát và thông tin hiện có đã có sàng lọc dấu hiệu cần xử trí khẩn cấp.";
+    }
+
+    return `Hướng xét nghiệm này phù hợp để trao đổi thêm theo mục tiêu ${packageSummary.displayNameVi || packageSummary.displayName || "kiểm tra máu"} đã nêu.`;
 }
 
 function getBlockingMissingSlots(questions) {
@@ -228,6 +270,7 @@ function getConfidence({ candidatePackageIds, missingSlots, redFlagStatus }) {
 
 function runRecommendationRuntime({ message, intentGroup }) {
     const enabled = isRecommendationRuntimeEnabled();
+    const livePackageEnabled = isLivePackageRecommendationEnabled();
 
     if (!enabled) {
         return baseDecision({
@@ -236,7 +279,8 @@ function runRecommendationRuntime({ message, intentGroup }) {
             reasons: ["Recommendation runtime flag is disabled."],
             debug: {
                 intentGroup,
-                featureFlagEnabled: false
+                featureFlagEnabled: false,
+                livePackageEnabled
             }
         });
     }
@@ -248,13 +292,16 @@ function runRecommendationRuntime({ message, intentGroup }) {
             reasons: ["Recommendation runtime only runs for test_advice intent."],
             debug: {
                 intentGroup,
-                featureFlagEnabled: true
+                featureFlagEnabled: true,
+                livePackageEnabled
             }
         });
     }
 
     const catalogState = loadPackageCatalog();
     const { catalogVersion, catalogRuntimeEnabled, packageById } = catalogState;
+    const effectiveRuntimeEnabled =
+        Boolean(catalogRuntimeEnabled) || livePackageEnabled;
     const slotResult = extractRecommendationSlots({ message });
     const { collectedSlots, normalizedMessage, redFlagStatus } = slotResult;
     const activeRedFlags = getActiveRedFlags(collectedSlots);
@@ -277,6 +324,8 @@ function runRecommendationRuntime({ message, intentGroup }) {
     const commonDebug = {
         intentGroup,
         featureFlagEnabled: true,
+        livePackageEnabled,
+        effectiveRuntimeEnabled,
         normalizedMessage,
         collectedSlots,
         explicitSignals: slotResult.explicitSignals
@@ -291,6 +340,8 @@ function runRecommendationRuntime({ message, intentGroup }) {
             escalationReason: "active_red_flags",
             catalogVersion,
             catalogRuntimeEnabled,
+            livePackageEnabled,
+            effectiveRuntimeEnabled,
             candidatePackages,
             candidatePackageIds,
             blockedPackageIds: candidatePackageIds,
@@ -316,6 +367,8 @@ function runRecommendationRuntime({ message, intentGroup }) {
             escalationReason: "medical_review_boundary",
             catalogVersion,
             catalogRuntimeEnabled,
+            livePackageEnabled,
+            effectiveRuntimeEnabled,
             candidatePackages,
             candidatePackageIds,
             blockedPackageIds: candidatePackageIds,
@@ -341,6 +394,8 @@ function runRecommendationRuntime({ message, intentGroup }) {
             activeRedFlags,
             catalogVersion,
             catalogRuntimeEnabled,
+            livePackageEnabled,
+            effectiveRuntimeEnabled,
             candidatePackages,
             candidatePackageIds,
             blockedPackageIds: buildBlockedIds(candidatePackageIds, packageById),
@@ -355,7 +410,7 @@ function runRecommendationRuntime({ message, intentGroup }) {
         });
     }
 
-    if (!catalogRuntimeEnabled) {
+    if (!effectiveRuntimeEnabled) {
         return baseDecision({
             status: "do_not_recommend",
             replyMode: "recommendation_blocked",
@@ -363,6 +418,8 @@ function runRecommendationRuntime({ message, intentGroup }) {
             activeRedFlags,
             catalogVersion,
             catalogRuntimeEnabled,
+            livePackageEnabled,
+            effectiveRuntimeEnabled,
             candidatePackages,
             candidatePackageIds,
             blockedPackageIds: candidatePackageIds,
@@ -373,7 +430,7 @@ function runRecommendationRuntime({ message, intentGroup }) {
             userSafeSummary,
             blockedReason: "catalog_runtime_disabled",
             reasons: [
-                "Package catalog runtime_enabled is false, so runtime package recommendation is blocked."
+                "Package catalog runtime_enabled is false and live package gate is disabled, so runtime package recommendation is blocked."
             ],
             debug: commonDebug
         });
@@ -397,6 +454,8 @@ function runRecommendationRuntime({ message, intentGroup }) {
             activeRedFlags,
             catalogVersion,
             catalogRuntimeEnabled,
+            livePackageEnabled,
+            effectiveRuntimeEnabled,
             candidatePackages,
             candidatePackageIds,
             eligiblePackageIds,
@@ -415,11 +474,16 @@ function runRecommendationRuntime({ message, intentGroup }) {
     return baseDecision({
         status: "recommend",
         replyMode: "recommendation_context",
-        recommendedPackage: summarizePackage(packageById.get(recommendedPackageId)),
+        recommendedPackage: buildRecommendedPackage(
+            packageById.get(recommendedPackageId),
+            collectedSlots
+        ),
         redFlagStatus,
         activeRedFlags,
         catalogVersion,
         catalogRuntimeEnabled,
+        livePackageEnabled,
+        effectiveRuntimeEnabled,
         candidatePackages,
         candidatePackageIds,
         eligiblePackageIds,
@@ -436,5 +500,6 @@ function runRecommendationRuntime({ message, intentGroup }) {
 
 module.exports = {
     isRecommendationRuntimeEnabled,
+    isLivePackageRecommendationEnabled,
     runRecommendationRuntime
 };
