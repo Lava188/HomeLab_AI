@@ -10,6 +10,9 @@ const {
     isRecommendationRuntimeEnabled,
     runRecommendationRuntime
 } = require("./recommendation/recommendation-runtime.service");
+const {
+    composeRecommendationAnswer
+} = require("./recommendation/recommendation-answer.service");
 
 function isSemanticRetrievalEnabled() {
     return String(process.env.HOMELAB_SEMANTIC_RETRIEVAL_ENABLED || "")
@@ -311,58 +314,6 @@ function shouldRunRecommendationRuntime(intentGroup) {
     );
 }
 
-function buildRecommendationReply(recommendationDecision, fallbackReply) {
-    if (!recommendationDecision || recommendationDecision.status === "disabled") {
-        return fallbackReply;
-    }
-
-    if (recommendationDecision.status === "escalate") {
-        return (
-            "Voi cac dau hieu ban vua nhac toi, HomeLab uu tien an toan truoc viec chon goi xet nghiem. " +
-            "Neu ban co dau nguc, kho tho, ngat, lu lan hoac tinh trang xau di nhanh, hay lien he co so y te khan cap. " +
-            "HomeLab khong dung goi xet nghiem de chan doan benh."
-        );
-    }
-
-    if (recommendationDecision.status === "do_not_recommend") {
-        return [
-            "HomeLab chua de xuat goi xet nghiem trong buoc nay.",
-            "HomeLab can giu goi y o muc an toan va khong dung goi xet nghiem de ket luan benh.",
-            "Neu ban muon, hay mo ta muc tieu kiem tra, trieu chung hien tai va cac dau hieu can kham gap neu co."
-        ].join(" ");
-    }
-
-    if (recommendationDecision.status === "ask_more") {
-        const questions = (recommendationDecision.nextQuestions || [])
-            .slice(0, 4)
-            .map((item) => item.question)
-            .filter(Boolean);
-
-        return [
-            "De tu van goi xet nghiem an toan hon, HomeLab can them vai thong tin.",
-            ...questions,
-            "HomeLab khong chan doan benh va se khong de xuat goi neu co dau hieu can kham khan cap."
-        ].join(" ");
-    }
-
-    if (
-        recommendationDecision.status === "recommend" &&
-        recommendationDecision.recommendedPackage
-    ) {
-        const packageName =
-            recommendationDecision.recommendedPackage.displayNameVi ||
-            recommendationDecision.recommendedPackage.displayName ||
-            "goi xet nghiem phu hop";
-
-        return [
-            `HomeLab co the goi y ${packageName} dua tren thong tin da co.`,
-            "Goi y nay khong thay the tu van y te va khong dung de chan doan benh."
-        ].join(" ");
-    }
-
-    return fallbackReply;
-}
-
 function attachRecommendationMeta(meta, recommendationDecision) {
     if (!recommendationDecision) {
         return meta;
@@ -407,7 +358,7 @@ async function answerHealthQuery({ message, sessionId }) {
                 intentGroup
             })
             : null;
-        const reply = buildRecommendationReply(
+        const reply = composeRecommendationAnswer(
             recommendationDecision,
             groundedReply
         );
