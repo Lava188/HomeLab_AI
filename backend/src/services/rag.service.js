@@ -6,6 +6,10 @@ const { loadArtifacts } = require("./health-rag/artifact-loader.service");
 const { choosePolicyMode } = require("./health-rag/policy.service");
 const { composeGroundedAnswer } = require("./health-rag/answer.service");
 const { runSemanticBridge } = require("./health-rag/semantic-bridge.service");
+const {
+    isRecommendationRuntimeEnabled,
+    runRecommendationRuntime
+} = require("./recommendation/recommendation-runtime.service");
 
 function isSemanticRetrievalEnabled() {
     return String(process.env.HOMELAB_SEMANTIC_RETRIEVAL_ENABLED || "")
@@ -33,11 +37,31 @@ function includesAny(text, signals) {
     return signals.some((signal) => text.includes(signal));
 }
 
+function hasExplicitNegativeSignal(text, signal) {
+    return (
+        text.includes(`khong ${signal}`) ||
+        text.includes(`khong bi ${signal}`) ||
+        text.includes(`khong co ${signal}`) ||
+        text.includes(`khong thay ${signal}`)
+    );
+}
+
+function includesAnyNonNegated(text, signals) {
+    return signals.some(
+        (signal) =>
+            text.includes(signal) &&
+            !hasExplicitNegativeSignal(text, signal)
+    );
+}
+
 function getIntentGroup(message) {
     const normalizedMessage = normalizeText(message);
-    const urgentSignals = [
+    const redFlagSignals = [
         "dau nguc",
         "kho tho",
+        "ngat"
+    ];
+    const urgentSignals = [
         "va mo hoi",
         "sot cao",
         "ret run",
@@ -45,7 +69,6 @@ function getIntentGroup(message) {
         "nhiem trung",
         "xau di nhanh",
         "sepsis",
-        "ngat",
         "lu lan",
         "ho ra mau",
         "non ra mau",
@@ -58,10 +81,15 @@ function getIntentGroup(message) {
         "goi xet nghiem nao",
         "xet nghiem tong quat",
         "kiem tra suc khoe tong quat",
-        "goi nao phu hop"
+        "goi nao phu hop",
+        "kiem tra than",
+        "chuc nang than"
     ];
 
-    if (includesAny(normalizedMessage, urgentSignals)) {
+    if (
+        includesAnyNonNegated(normalizedMessage, redFlagSignals) ||
+        includesAny(normalizedMessage, urgentSignals)
+    ) {
         return "urgent_health";
     }
 
@@ -272,6 +300,80 @@ function applyIntentGroupPolicy(policyDecision, intentGroup) {
     };
 }
 
+function shouldRunRecommendationRuntime(intentGroup) {
+    return (
+        intentGroup === "test_advice" &&
+        isRecommendationRuntimeEnabled()
+    );
+}
+
+function buildRecommendationReply(recommendationDecision, fallbackReply) {
+    if (!recommendationDecision || recommendationDecision.status === "disabled") {
+        return fallbackReply;
+    }
+
+    if (recommendationDecision.status === "escalate") {
+        return (
+            "Voi cac dau hieu ban vua nhac toi, HomeLab uu tien an toan truoc viec chon goi xet nghiem. " +
+            "Neu ban co dau nguc, kho tho, ngat, lu lan hoac tinh trang xau di nhanh, hay lien he co so y te khan cap. " +
+            "HomeLab khong dung goi xet nghiem de chan doan benh."
+        );
+    }
+
+    if (recommendationDecision.status === "do_not_recommend") {
+        const reason =
+            recommendationDecision.packageDecision?.reasons?.[0] ||
+            "Recommendation runtime is currently blocked.";
+
+        return [
+            "HomeLab chua de xuat goi xet nghiem trong buoc nay.",
+            reason,
+            "Neu ban muon, hay mo ta muc tieu kiem tra va trieu chung hien tai; HomeLab van se uu tien sang loc dau hieu can kham khan cap truoc."
+        ].join(" ");
+    }
+
+    if (recommendationDecision.status === "ask_more") {
+        const questions = (recommendationDecision.nextQuestions || [])
+            .slice(0, 4)
+            .map((item) => item.question)
+            .filter(Boolean);
+
+        return [
+            "De tu van goi xet nghiem an toan hon, HomeLab can them vai thong tin.",
+            ...questions,
+            "HomeLab khong chan doan benh va se khong de xuat goi neu co dau hieu can kham khan cap."
+        ].join(" ");
+    }
+
+    if (
+        recommendationDecision.status === "recommend" &&
+        recommendationDecision.recommendedPackage
+    ) {
+        const packageName =
+            recommendationDecision.recommendedPackage.displayNameVi ||
+            recommendationDecision.recommendedPackage.displayName ||
+            "goi xet nghiem phu hop";
+
+        return [
+            `HomeLab co the goi y ${packageName} dua tren thong tin da co.`,
+            "Goi y nay khong thay the tu van y te va khong dung de chan doan benh."
+        ].join(" ");
+    }
+
+    return fallbackReply;
+}
+
+function attachRecommendationMeta(meta, recommendationDecision) {
+    if (!recommendationDecision) {
+        return meta;
+    }
+
+    return {
+        ...meta,
+        recommendation: recommendationDecision
+    };
+}
+
 async function answerHealthQuery({ message, sessionId }) {
     try {
         const retrievalResult = retrieveTopChunks({
@@ -295,10 +397,20 @@ async function answerHealthQuery({ message, sessionId }) {
             message,
             retrievedChunks: topChunks
         }), intentGroup);
-        const reply = composeGroundedAnswer({
+        const groundedReply = composeGroundedAnswer({
             policyDecision,
             topChunks
         });
+        const recommendationDecision = shouldRunRecommendationRuntime(intentGroup)
+            ? runRecommendationRuntime({
+                message,
+                intentGroup
+            })
+            : null;
+        const reply = buildRecommendationReply(
+            recommendationDecision,
+            groundedReply
+        );
 
         if (!topChunks.length) {
             return createChatResult({
@@ -308,7 +420,7 @@ async function answerHealthQuery({ message, sessionId }) {
                 action: ACTIONS.ANSWER_HEALTH_QUERY,
                 reply,
                 booking: null,
-                meta: {
+                meta: attachRecommendationMeta({
                     answeredBy: "rag.service",
                     retrievalMode: "artifact_json_top3_versioned",
                     found: false,
@@ -343,7 +455,7 @@ async function answerHealthQuery({ message, sessionId }) {
                         semanticBridge: semanticBridgeResult
                     },
                     topChunks: []
-                }
+                }, recommendationDecision)
             });
         }
 
@@ -363,7 +475,7 @@ async function answerHealthQuery({ message, sessionId }) {
             action: ACTIONS.ANSWER_HEALTH_QUERY,
             reply,
             booking: null,
-            meta: {
+            meta: attachRecommendationMeta({
                 answeredBy: "rag.service",
                 retrievalMode: "artifact_json_top3_versioned",
                 found: true,
@@ -422,7 +534,7 @@ async function answerHealthQuery({ message, sessionId }) {
                         ? primaryChunk.test_types
                         : []
                 }
-            }
+            }, recommendationDecision)
         });
     } catch (error) {
         console.error("RAG service error:", error);
