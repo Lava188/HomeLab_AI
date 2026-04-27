@@ -24,6 +24,14 @@
 | Recommendation Frontend Manual Smoke 3F | manual UI + Network verification | 7/7 PASS; UI stable, no raw package IDs, booking/urgent not interrupted, `recommendedPackage=null` when live disabled. Minor non-blocker: newline/bullet formatting can appear flattened. |
 | Recommendation Catalog + Source Contract 3G | `node backend/scripts/smoke_recommendation_catalog_contract_3g.js` | 6/6 PASS; general/kidney answers no longer inherit mismatched chest pain/D-dimer sources, CBC boundary uses CBC source, urgent keeps suitable NHS source. |
 | Controlled Live Package Recommendation 3H | `node backend/scripts/smoke_recommendation_live_package_3h.js` | 7/7 PASS with runtime gate and live package gate enabled; live gate off returns `recommendedPackage=null`. |
+| KB/Retriever v1.4 Batch 4A source-backed pipeline | source registry / reviewed dataset / approved QA reports | 26 official sources; 55 approved, 58 revise, 15 reject, 0 pending; approved QA 55/55 PASS with warning/error 0. |
+| Retriever v1.4 merged corpus + FAISS artifact | `ai_lab/artifacts/retriever_v1_4/retriever_manifest.json` | 97 records = 42 legacy v1_3 + 55 Batch 4A; `intfloat/multilingual-e5-small`, dim 384, `IndexFlatIP`; artifact validation warning/error 0. |
+| Retriever v1.4 baseline eval v2 | `ai_lab/reports/retriever_v1_4_offline_eval_report_v2.json` | Hit@1 0.1500, Hit@3 0.2167, Hit@5 0.3000, MRR@5 0.1961. |
+| Retriever v1.4 rerank 4A-14 | `ai_lab/reports/retriever_v1_4_rerank_eval_report.json` | Hit@1 0.2667, Hit@3 0.3500, Hit@5 0.3833, MRR@5 0.3103. |
+| Retriever v1.4 topic-aware rerank 4A-15 | `ai_lab/reports/retriever_v1_4_topic_rerank_eval_report.json` | Hit@1 0.3500, Hit@3 0.3833, Hit@5 0.4000, MRR@5 0.3700. |
+| Retriever v1.4 alias-expanded single search 4A-17 | `ai_lab/reports/retriever_v1_4_alias_expansion_eval_report.json` | Hit@1 0.3500, Hit@3 0.6500, Hit@5 0.7333, Hit@20 0.8833, MRR@5 0.4950. |
+| Retriever v1.4 expanded-query + topic-aware rerank 4A-18 | `ai_lab/reports/retriever_v1_4_expanded_topic_rerank_eval_report.json` | Hit@1 0.6833, Hit@3 0.8333, Hit@5 0.8500, Hit@10/20 0.8833, MRR@5 0.7589, warning/error 0. |
+| Retriever v1.4 held-out eval v3 4A-19 | `ai_lab/reports/retriever_v1_4_expanded_topic_rerank_eval_report_heldout_v3.json` | 40 rows; Hit@1 0.4750, Hit@3 0.8500, Hit@5 0.9000, Hit@10 0.9250, Hit@20 0.9250, MRR@5 0.6667, warning/error 0. |
 
 ## Key Metrics Found In Repo
 
@@ -52,6 +60,32 @@
 | Recommendation before/after | Outcome accuracy | 0.44 -> 1.0 |
 | Recommendation before/after | Package accuracy | 0.84 -> 1.0 |
 | Recommendation before/after | Unsafe recommendation count | 0 -> 0 |
+| KB v1.4 Batch 4A | Official sources | 26 |
+| KB v1.4 Batch 4A | Human review approved/revise/reject/pending | 55 / 58 / 15 / 0 |
+| KB v1.4 Batch 4A | Approved QA pass | 55/55 |
+| Retriever v1.4 | Merged corpus records | 97 |
+| Retriever v1.4 | Legacy v1_3 chunks retained | 42 |
+| Retriever v1.4 | Approved Batch 4A items added | 55 |
+| Retriever v1.4 | Embedding model | `intfloat/multilingual-e5-small` |
+| Retriever v1.4 | Embedding dimension / index | 384 / `IndexFlatIP` |
+| Retriever v1.4 artifact validation | Chunks / vectors / FAISS ntotal | 97 / 97 / 97 |
+
+## Retriever v1.4 Batch 4A Offline Evidence
+
+The v1.4 Batch 4A retrieval work is an offline, controlled evidence package only. It does not change backend runtime defaults.
+
+| Step | Hit@1 | Hit@3 | Hit@5 | Hit@10 | Hit@20 | MRR@5 | Notes |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Baseline eval v2 | 0.1500 | 0.2167 | 0.3000 | n/a | n/a | 0.1961 | Initial eval after label alignment. |
+| 4A-14 rerank | 0.2667 | 0.3500 | 0.3833 | n/a | n/a | 0.3103 | Generic rerank reduced result-boundary dominance. |
+| 4A-15 topic-aware rerank | 0.3500 | 0.3833 | 0.4000 | n/a | n/a | 0.3700 | Topic-aware boosts improved ranking slightly. |
+| 4A-17 alias-expanded single search | 0.3500 | 0.6500 | 0.7333 | 0.8167 | 0.8833 | 0.4950 | Candidate generation improved strongly; top20 missing dropped to 7. |
+| 4A-18 expanded-query + topic-aware rerank | 0.6833 | 0.8333 | 0.8500 | 0.8833 | 0.8833 | 0.7589 | Best eval v2 strategy; warning/error 0. |
+| 4A-19 held-out v3 | 0.4750 | 0.8500 | 0.9000 | 0.9250 | 0.9250 | 0.6667 | 40 new natural Vietnamese queries; warning/error 0. |
+
+Held-out v3 failure audit: `failed_at_3_count=6`, with `alias_gap_remaining=2`, `topic_missing_from_candidates=1`, and `acceptable_broad_domain_but_wrong_topic=3`.
+
+Interpretation: 4A offline retrieval evidence is strong enough to proceed to a 4B controlled runtime candidate. It is not evidence for default/global promotion yet.
 
 ## Recommendation Runtime Prototype Milestones
 
@@ -85,6 +119,8 @@ Non-blocker tracking note: some `test_advice` rows can still use `selectedRetrie
 | Offline v1_3 retrieval quality | PASS with integration caveats | Eval v2 has strong metrics and 2 triaged failures. |
 | Controlled runtime wiring | PASS for service/API smoke | Six controlled cases pass in reports. |
 | Runtime semantic retrieval | PASS in controlled mode | Persistent semantic bridge can provide semantic FAISS retrieval for health RAG with `selectedRetrievalMode="semantic_faiss"` and lexical fallback. |
+| Offline v1.4 artifact | PASS | 97 chunks/vectors/FAISS ntotal, provenance retained, warning/error 0. |
+| Offline v1.4 retrieval strategy | PASS for controlled candidate | Expanded-query + topic-aware rerank passes eval v2 and held-out v3, but is not runtime-wired yet. |
 
 Important distinction: the older semantic activation audit remains useful historical evidence, but the current milestone verifies controlled semantic retrieval through the persistent bridge rather than Node loading `.npy`/FAISS directly.
 
@@ -103,6 +139,9 @@ Important distinction: the older semantic activation audit remains useful histor
 | Recommendation Frontend Manual Smoke 3F | PASS | 7/7 PASS; UI/Network behavior matches expectations, with minor non-blocker newline/bullet flattening. |
 | Recommendation Catalog + Source Contract 3G | PASS | 6/6 PASS; recommendation answers no longer show mismatched visible sources. |
 | Controlled Live Package Recommendation 3H | PASS | 7/7 PASS behind `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`; live gate off keeps `recommendedPackage=null`. |
+| Retriever v1.4 Batch 4A offline artifact | PASS | Source-backed KB, human-reviewed approved items, merged corpus, embeddings/FAISS validation all pass offline. |
+| Retriever v1.4 4A-18 eval v2 | PASS offline | Hit@3 0.8333, Hit@5 0.8500, MRR@5 0.7589. |
+| Retriever v1.4 4A-19 held-out v3 | PASS offline | Hit@3 0.8500, Hit@5 0.9000, MRR@5 0.6667. |
 
 ## Controlled Semantic Retrieval + IntentGroup Manual Smoke
 
@@ -149,6 +188,7 @@ These findings describe the older pre-bridge runtime audit. Current controlled m
 | Frontend manual smoke | PASS | Latest controlled semantic retrieval + intentGroup manual check passed 8/8. |
 | Semantic runtime active | PASS in controlled mode | Persistent bridge path returns `selectedRetrievalMode="semantic_faiss"` when enabled and healthy. |
 | Default switch | NOT SWITCHED | Runtime remains controlled/opt-in; no global default promotion yet. |
+| Retriever v1.4 runtime promotion | NOT SWITCHED | Offline evidence supports 4B controlled runtime candidate only. |
 
 ## Current Truth Table
 
@@ -163,6 +203,7 @@ These findings describe the older pre-bridge runtime audit. Current controlled m
 | Frontend manual smoke | PASS, 8/8 |
 | Recommendation/package runtime prototype | PASS through 3B/3C/3D/3E/3F/3G/3H controlled smokes |
 | Controlled live package recommendation | PASS behind separate live gate; off by default, live gate off keeps `recommendedPackage=null` |
+| KB/Retriever v1.4 Batch 4A offline pipeline | PASS through held-out v3; not runtime-promoted |
 | Default switch | Not switched; controlled/opt-in |
 
 ## Missing Or Needs Verification
@@ -171,3 +212,5 @@ These findings describe the older pre-bridge runtime audit. Current controlled m
 - 3H proves controlled live package return only when both runtime and live package gates are enabled.
 - Production/default rollout still needs product review, catalog governance, and monitoring decisions.
 - Broader default/runtime promotion remains a future decision after product review.
+- Retriever v1.4 expanded-query + topic-aware rerank still needs controlled runtime integration behind explicit flags and smokes before any runtime claim.
+- Held-out v3 is evidence and should be frozen; do not repeatedly tune against it.

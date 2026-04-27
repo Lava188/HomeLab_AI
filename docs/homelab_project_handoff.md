@@ -37,6 +37,21 @@ HomeLab has completed the current stage of the controlled slot-based recommendat
 
 Live package return is controlled by a separate gate, `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`. With runtime on and live gate off, `recommendedPackage` remains `null`. With both gates on and enough safe context, `recommendedPackage` can be non-null. This is still controlled mode, not default/global production behavior.
 
+## KB/Retriever v1.4 Batch 4A Offline Status
+
+KB/Retriever v1.4 Batch 4A has completed the offline RAG-first pipeline through held-out evaluation, without runtime promotion.
+
+- Source registry: 26 authoritative patient-facing sources from `medlineplus.gov`, `nhs.uk`, and `niddk.nih.gov`.
+- Human review outcome: 55 approved KB items, 58 revise, 15 reject, 0 pending.
+- Final approved QA: 55/55 pass; `warning_count=0`, `error_count=0`, `duplicate_like_count=0`, `suspected_noise_count=0`, `missing_provenance_count=0`.
+- Offline merged corpus: 97 total records = 42 legacy v1_3 chunks + 55 approved Batch 4A items.
+- Offline embeddings/FAISS: `intfloat/multilingual-e5-small`, dimension 384, normalized embeddings, `IndexFlatIP`.
+- Artifact validation: `total_chunks=97`, `embedding_vector_count=97`, `faiss_ntotal=97`, `warning_count=0`, `error_count=0`.
+- Best offline strategy so far: expanded-query + topic-aware rerank, not yet ported to runtime.
+- Held-out v3 should be frozen as evidence and not repeatedly tuned against.
+
+Decision: offline retrieval evidence is strong enough to proceed to a **4B controlled runtime candidate**, but retriever v1.4 must not become the default/global runtime yet.
+
 ## Current Status
 
 - KB/retriever v1_3 artifact has been built successfully.
@@ -54,6 +69,9 @@ Live package return is controlled by a separate gate, `HOMELAB_RECOMMENDATION_LI
 - Catalog Contract + Recommendation Source Contract 3G passed **6/6**; general/kidney recommendation answers no longer inherit mismatched visible sources such as chest pain or D-dimer, CBC boundary uses CBC source, and urgent answers keep suitable urgent/NHS source behavior.
 - Controlled Live Package Recommendation 3H passed **7/7** with `HOMELAB_RECOMMENDATION_RUNTIME_ENABLED=true` and `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`; when live gate is off, 3C/3D/3G still pass and `recommendedPackage` returns to `null`.
 - Default/global live package recommendation is not enabled. Safety gates remain: `urgent_health`, booking, `medical_review_boundary`, and missing required context do not return live packages.
+- KB/Retriever v1.4 Batch 4A offline pipeline is complete through 4A-19. Runtime is unchanged; v1_4 is not promoted as default.
+- 4A-18 expanded-query + topic-aware rerank on eval v2 reached Hit@1 0.6833, Hit@3 0.8333, Hit@5 0.8500, Hit@10 0.8833, Hit@20 0.8833, MRR@5 0.7589.
+- 4A-19 held-out v3 reached total 40, Hit@1 0.4750, Hit@3 0.8500, Hit@5 0.9000, Hit@10 0.9250, Hit@20 0.9250, MRR@5 0.6667, warning/error 0.
 
 ## What Is Already Done
 
@@ -75,6 +93,8 @@ Live package return is controlled by a separate gate, `HOMELAB_RECOMMENDATION_LI
 - Recommendation frontend manual smoke 3F verified through UI + Network checks, 7/7 PASS.
 - Catalog Contract + Recommendation Source Contract 3G verified through real `/api/chat` smoke, 6/6 PASS.
 - Controlled Live Package Recommendation 3H verified through real `/api/chat` smoke, 7/7 PASS behind the separate live package gate.
+- KB/Retriever v1.4 Batch 4A source-backed pipeline completed offline: registry, raw capture, normalization, cleaning, human review, approved dataset, merged corpus, embeddings/FAISS, evals, rerank experiments, and held-out validation.
+- v1.4 Batch 4A approved dataset lives at `ai_lab/datasets/kb_v1_4_batch4a_approved_items.jsonl`; offline retriever artifacts live at `ai_lab/artifacts/retriever_v1_4/`.
 
 ## What Is Blocked
 
@@ -83,10 +103,19 @@ Live package return is controlled by a separate gate, `HOMELAB_RECOMMENDATION_LI
 | Default live package recommendation | Controlled live package recommendation exists behind `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`, but it is not default/global behavior. |
 | Default runtime switch | Still intentionally avoided until controlled behavior is reviewed in product context. |
 | Production readiness | 3H proves controlled live behavior only. Broader production rollout still needs product review, catalog governance, and monitoring decisions. |
+| Retriever v1.4 default promotion | Offline evidence is strong, but runtime integration has not been implemented or smoke-tested. v1.4 must remain offline/controlled until 4B flags, runtime metadata, and regression smokes pass. |
 
 ## Immediate Next Step
 
-Commit the final stage-3 handoff/docs update, then keep the regression matrix explicit:
+Proceed to 4B controlled runtime candidate for retriever v1.4:
+
+- Port expanded-query + topic-aware rerank into runtime behind explicit flags only.
+- Keep existing v1_3/default behavior safe and unchanged unless controlled flags are enabled.
+- Expose truthful runtime metadata for query expansion, reranking, selected retriever version, and fallback.
+- Run regression matrix for urgent health, booking, test advice, recommendation gating, and existing semantic v1_3 behavior.
+- Do not promote retriever v1.4 as default/global runtime yet.
+
+Keep the stage-3 recommendation regression matrix explicit:
 
 - Runtime on + live off: run 3C/3D/3G (`HOMELAB_RECOMMENDATION_RUNTIME_ENABLED=true`, `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=false` or unset).
 - Runtime off: run 3E (`HOMELAB_RECOMMENDATION_RUNTIME_ENABLED=false`).
@@ -109,11 +138,14 @@ Commit the final stage-3 handoff/docs update, then keep the regression matrix ex
 | 9 | Frontend manual smoke 3F. Done, 7/7 PASS. |
 | 10 | Catalog/source contract readiness 3G. Done, 6/6 PASS. |
 | 11 | Controlled live package recommendation 3H. Done, 7/7 PASS behind `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`. |
-| 12 | Broader default/global production promotion. Future decision only. |
+| 12 | KB/Retriever v1.4 Batch 4A offline source-backed expansion. Done through 4A-19; held-out v3 PASS; no runtime promotion. |
+| 13 | 4B controlled retriever v1.4 runtime candidate behind explicit flags. Next. |
+| 14 | Broader default/global production promotion. Future decision only. |
 
 ## Rules For Future Work
 
 - RAG-first before early fine-tuning.
+- Medical/lab KB must remain source-backed with provenance; mock/simulated/demo data is not allowed as runtime medical knowledge.
 - Do not fix semantic/reasoning failures by adding more keyword rules.
 - Keep rules for safety/guardrails, not as the main intelligence engine.
 - Keep package recommendations gated until safety and recommendation runtime are explicitly validated.
@@ -135,18 +167,23 @@ New chat/developer should read these first:
 7. `ai_lab/reports/retriever_v1_3_api_smoke_report.md`
 8. `ai_lab/reports/retriever_v1_3_eval_v2_report.md`
 9. `ai_lab/reports/retriever_v1_3_build_report.md`
-10. `backend/src/services/rag.service.js`
-11. `backend/src/services/health-rag/answer.service.js`
-12. `backend/src/services/health-rag/semantic-bridge.service.js`
-13. `backend/src/services/health-rag/artifact-loader.service.js`
-14. `backend/src/services/health-rag/retriever.service.js`
-15. `backend/src/services/router-intent.service.js`
-16. `backend/src/services/router.service.js`
-17. `ai_lab/scripts/semantic_retriever_bridge_v1_3.py`
-18. `backend/scripts/smoke_semantic_bridge_v1_3.js`
+10. `ai_lab/reports/retriever_v1_4_expanded_topic_rerank_eval_report_heldout_v3.json`
+11. `ai_lab/reports/retriever_v1_4_expanded_topic_rerank_failure_audit_report_heldout_v3.json`
+12. `ai_lab/artifacts/retriever_v1_4/retriever_manifest.json`
+13. `backend/src/services/rag.service.js`
+14. `backend/src/services/health-rag/answer.service.js`
+15. `backend/src/services/health-rag/semantic-bridge.service.js`
+16. `backend/src/services/health-rag/artifact-loader.service.js`
+17. `backend/src/services/health-rag/retriever.service.js`
+18. `backend/src/services/router-intent.service.js`
+19. `backend/src/services/router.service.js`
+20. `ai_lab/scripts/semantic_retriever_bridge_v1_3.py`
+21. `backend/scripts/smoke_semantic_bridge_v1_3.js`
 
 ## How To Continue From Here
 
 Start from the controlled semantic retrieval and intent grouping state, not the older semantic-inactive audit. The current backend can expose `selectedRetrievalMode="semantic_faiss"` and `intentGroup` when controlled flags/server are enabled. The next implementation should focus on a recommendation/test package runtime prototype, while preserving the current safety priority: urgent health beats booking and test/package advice.
 
 As of 3H, the recommendation/test package path is a controlled slot-based prototype with API metadata, answer UX, source contract, flag-off regression, frontend smoke, and controlled live package return behind a separate live gate. It is not a default/global production recommendation engine. When `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED` is unset or false, `recommendedPackage` stays `null`; when recommendation runtime is false, there is no recommendation meta/UX/package ID output.
+
+As of 4A-19, retriever v1.4 has strong offline evidence and held-out validation for expanded-query + topic-aware reranking, but it is not wired into backend runtime. The correct continuation is 4B controlled runtime integration behind explicit flags, with v1_3/default behavior preserved unless those flags are enabled. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.

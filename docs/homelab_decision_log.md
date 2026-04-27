@@ -20,18 +20,35 @@
 | Keep controlled live package recommendation behind a separate env gate | 3E flag-off regression passed 6/6, 3F frontend manual smoke passed 7/7, 3G catalog/source contract passed 6/6, and 3H controlled live package smoke passed 7/7. | Live package return should be possible only in controlled mode after runtime, safety, source, and catalog checks pass. It must not become default/global behavior by accident. | Use `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true` as the explicit live package gate. With the gate off, 3C/3D/3G behavior remains `recommendedPackage=null`; with runtime off, 3E behavior has no recommendation meta/UX/package IDs. | Active |
 | Align recommendation sources with recommendation answer | 3F found source/provenance mismatch risk where recommendation answers could inherit unrelated RAG source chips. 3G fixed this for general/kidney recommendation answers, CBC boundary, and urgent health. | Source chips must support the answer the user sees; mismatched sources can make safe recommendation UX look medically inconsistent. | Recommendation/test-advice UX should hide or replace unrelated visible sources; CBC boundary can use CBC source; urgent health can keep suitable urgent/NHS sources. | Active |
 | Treat package recommendation as controlled prototype only | 3H allows `recommendedPackage` to become non-null when runtime and live package gates are both enabled and enough safe context exists. | This validates controlled catalog-derived recommendation, not a complete intelligent recommendation engine or production default. | Do not hard-code package-first answers, do not weaken urgent/booking/medical-review/missing-context gates, and do not promote live recommendation without a future release decision. | Active |
+| Accept KB/Retriever v1.4 Batch 4A as offline evidence for 4B controlled runtime candidate | Batch 4A completed source registry, raw capture, normalized/cleaned extraction, human review, approved KB dataset, merged corpus, embeddings/FAISS, eval v2, rerank experiments, and held-out v3. | Evidence is source-backed, human-reviewed, provenance-preserving, and held-out metrics are strong: held-out v3 Hit@3 0.8500, Hit@5 0.9000, MRR@5 0.6667 with warning/error 0. | Proceed to 4B controlled runtime integration of expanded-query + topic-aware rerank behind explicit flags. Do not promote v1.4 as default/global runtime yet. Freeze held-out v3 as evidence and avoid repeated tuning against it. | Active |
+| Keep Retriever v1.4 offline until controlled runtime flags and smokes pass | v1.4 artifact validation passes with 97 chunks/vectors/FAISS ntotal and the best offline strategy is strong, but backend runtime does not yet use that strategy. | Offline artifact/eval success can still overstate real product behavior if runtime wiring, metadata, fallback, and safety regressions are not checked. | Existing v1_3/default behavior remains safe and unchanged unless controlled v1.4 flags are enabled. Runtime promotion requires future 4B smokes. | Active |
 | Commit GitHub only after meaningful functional behavior changes | Project has many small reports, scripts, and handoff docs. | Committing every small file churn makes history noisy. | Prefer commits after clear product/eval/runtime improvements or requested handoff milestones. | Active |
 | Aim for professional prototype, not simple demo | Product goal is semantic healthcare chatbot with safety, retrieval, clarification, and recommendations. | Demo-like keyword responses will not meet the intended standard. | Technical work should improve real behavior, observability, and safety gates. | Active |
 
 ## Current Release Decision
 
-HomeLab has completed stage 3 for the controlled slot-based recommendation/test package runtime prototype through 3H. The current milestone remains **Recommendation/Test Package Runtime Prototype**, not a full default-runtime switch and not default/global live package recommendation.
+HomeLab has completed stage 3 for the controlled slot-based recommendation/test package runtime prototype through 3H, and KB/Retriever v1.4 Batch 4A through offline held-out validation in 4A-19. The current state is **controlled recommendation prototype + offline retriever v1.4 evidence**, not a full default-runtime switch and not default/global live package recommendation.
 
 The backend can use the persistent semantic bridge in health RAG with `selectedRetrievalMode="semantic_faiss"` when enabled, and manual frontend/runtime testing passed 8/8 for urgent health, test advice, normal booking, and mixed booking + urgent health priority. Safety remains the priority: urgent health red flags beat booking actions, and test advice does not become booking unless the user clearly asks to book or collect a sample.
 
 Recommendation Runtime 3B is accepted with 10/10 PASS and 3A regression 8/8 PASS. Recommendation API Metadata Contract 3C passed 9/9 with `testAdviceHasRecommendation=true`, `bookingUrgentNoRecommendation=true`, and `catalogDisabledKeepsPackageNull=true`. Recommendation Answer UX 3D passed 7/7. Flag-off regression 3E passed 6/6 after backend restart with recommendation runtime off. Frontend manual smoke 3F passed 7/7 with no raw package IDs and no booking/urgent interruption; newline/bullet flattening is a minor non-blocker. Catalog Contract + Recommendation Source Contract 3G passed 6/6 and fixed mismatched recommendation-visible sources. Controlled Live Package Recommendation 3H passed 7/7 with `HOMELAB_RECOMMENDATION_RUNTIME_ENABLED=true` and `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`.
 
 The next release decision should focus on whether and how to promote controlled package recommendation beyond explicit env-gated mode. Until then, live package recommendation remains controlled only: live gate off keeps `recommendedPackage=null`, runtime off removes recommendation meta/UX/package IDs, and safety gates still block live package return for `urgent_health`, booking, `medical_review_boundary`, and missing required context.
+
+For retriever v1.4, the offline decision is positive for moving to 4B controlled runtime candidate:
+
+- Batch 4A used 26 authoritative sources from `medlineplus.gov`, `nhs.uk`, and `niddk.nih.gov`.
+- Human review produced 55 approved KB items, 58 revise, 15 reject, 0 pending.
+- Approved QA passed 55/55 with warning/error 0, duplicate-like 0, suspected noise 0, and missing provenance 0.
+- Merged corpus has 97 records: 42 legacy v1_3 chunks + 55 approved Batch 4A items.
+- Embeddings/FAISS were built offline with `intfloat/multilingual-e5-small`, dimension 384, normalized embeddings, and `IndexFlatIP`; artifact validation has chunks/vectors/FAISS ntotal 97/97/97 with warning/error 0.
+- 4A-18 expanded-query + topic-aware rerank reached Hit@1 0.6833, Hit@3 0.8333, Hit@5 0.8500, Hit@10 0.8833, Hit@20 0.8833, MRR@5 0.7589.
+- 4A-19 held-out v3 reached total 40, Hit@1 0.4750, Hit@3 0.8500, Hit@5 0.9000, Hit@10 0.9250, Hit@20 0.9250, MRR@5 0.6667, warning/error 0.
+- Held-out v3 failures are limited and categorized: `alias_gap_remaining=2`, `topic_missing_from_candidates=1`, `acceptable_broad_domain_but_wrong_topic=3`.
+
+This supports the product thesis: natural Vietnamese question -> semantic understanding -> safety/urgent handling -> RAG retrieval -> grounded answer -> test/package recommendation path. It also reinforces the RAG-first decision: use provenance/auditability and human-reviewed medical knowledge before considering fine-tuning. Fine-tuning, if any, remains later and only after the RAG baseline is proven.
+
+Do not promote retriever v1.4 as default/global runtime yet. The next step is 4B: port expanded-query + topic-aware rerank into runtime behind explicit flags only, preserve v1_3/default behavior unless flags are enabled, and verify metadata/fallback/safety regressions before any runtime promotion decision.
 
 ## Decision Criteria Before Revisiting Default Switch
 
@@ -44,6 +61,8 @@ The next release decision should focus on whether and how to promote controlled 
 | API smoke | PASS after semantic activation, not only lexical/rule wiring. |
 | Frontend manual smoke | Completed and PASS. |
 | Safety behavior | Emergency/urgent signals beat package/test suggestions. |
+| Retriever v1.4 runtime candidate | Expanded-query + topic-aware rerank available behind explicit flags only; default remains unchanged. |
+| Held-out eval discipline | Held-out v3 frozen and not repeatedly tuned against. |
 
 ## Remaining Risks After Current Milestone
 
@@ -51,6 +70,7 @@ The next release decision should focus on whether and how to promote controlled 
 | --- | --- | --- |
 | `test_advice` is a business-intent gate, not a full recommendation engine. | It can route and answer safely, but it does not yet choose personalized packages end to end. | Build a recommendation/test package runtime prototype. |
 | Default/global runtime has not been switched. | Current semantic retrieval is controlled/opt-in rather than a broad production default. | Keep rollout gated until product review and additional smoke coverage. |
+| Retriever v1.4 is offline-only today. | Strong 4A evidence does not yet prove backend runtime behavior. | Build 4B controlled runtime candidate behind flags, then run API/frontend/safety regression smokes. |
 | Package recommendation UX is not complete. | Users may still need guided follow-up before package selection. | Design missing-context questions and package recommendation safety gates. |
 | Controlled recommendation prototype is not default production recommendation. | 3H validates env-gated live package return, but only in controlled mode. | Do not promote default/global runtime or live package behavior without a future release decision. |
 | Some test_advice rows may use lexical fallback. | 3C metadata contract is still valid, but semantic runtime coverage may need tightening later. | Track as non-blocker before stricter semantic coverage goals. |
@@ -62,6 +82,7 @@ The next release decision should focus on whether and how to promote controlled 
 | --- | --- |
 | Semantic architecture | Should the persistent Python bridge remain the long-term architecture, or be replaced by a more integrated vector service? |
 | Runtime promotion | When should controlled semantic retrieval become the broader default? |
+| Retriever v1.4 controlled integration | How should expanded-query + topic-aware rerank be exposed in runtime metadata and flags without disturbing v1_3/default behavior? |
 | Recommendation integration | How and when should package recommendation become live in full frontend/backend runtime? |
 | Metadata UX | How much debug/citation metadata should be visible to users versus developers? |
 | Live package recommendation promotion | Should controlled live package recommendation remain env-gated only, or be promoted after product/catalog/monitoring review? |
