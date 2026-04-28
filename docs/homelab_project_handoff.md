@@ -94,8 +94,9 @@ Fallback and gates:
 - `urgent_health` remains higher priority than test advice, booking, and recommendation.
 - Booking/reschedule/cancel and recommendation gates remain preserved.
 - Provenance/source metadata was checked through API smoke; revise/rejected/pending items are not surfaced.
-- 4B-2H tightened urgent and booking UX: `urgent_health` now forces emergency/urgent answer policy for strong red flags, and generic "lay mau tai nha" booking no longer infers a test type without user confirmation.
-- 4B-2I polished answer text: lab explanations no longer inject raw source titles/headings into the answer body, while source/provenance metadata remains available for source chips.
+- 4B-2H tightened urgent and booking UX: `urgent_health` now forces `primaryMode="emergency_or_urgent"` and `urgencyLevel="emergency"` for strong red flags, even when v1.4 chunks use `topic`/`intended_use="emergency_warning"` instead of older `section`/`faq_type` metadata. Generic "lay mau tai nha" booking no longer infers a test type without user confirmation.
+- 4B-2I polished answer text: lab explanations no longer inject raw source titles/headings into the answer body, while source/provenance metadata remains available for source chips in `meta`/citations/topChunks.
+- Manual frontend observation after the polish covered CBC abnormal boundary, urgent chest pain/shortness of breath/sweating, generic booking, reschedule, HbA1c explanation, and HbA1c sample questions; behavior now matches current API/UX expectations, but broader frontend/manual observation is still required before promotion.
 
 Next status: controlled v1.4 runtime is ready for broader manual UX/frontend review and longer regression observation, but **not** for default/global promotion yet.
 
@@ -116,13 +117,14 @@ Next status: controlled v1.4 runtime is ready for broader manual UX/frontend rev
 - Catalog Contract + Recommendation Source Contract 3G passed **6/6**; general/kidney recommendation answers no longer inherit mismatched visible sources such as chest pain or D-dimer, CBC boundary uses CBC source, and urgent answers keep suitable urgent/NHS source behavior.
 - Controlled Live Package Recommendation 3H passed **7/7** with `HOMELAB_RECOMMENDATION_RUNTIME_ENABLED=true` and `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`; when live gate is off, 3C/3D/3G still pass and `recommendedPackage` returns to `null`.
 - Default/global live package recommendation is not enabled. Safety gates remain: `urgent_health`, booking, `medical_review_boundary`, and missing required context do not return live packages.
-- KB/Retriever v1.4 Batch 4A offline pipeline is complete through 4A-19. Runtime is unchanged; v1_4 is not promoted as default.
+- KB/Retriever v1.4 Batch 4A offline pipeline is complete through 4A-19. At 4A close, runtime was unchanged; in 4B, v1_4 is available only as a controlled runtime path and is still not promoted as default/global.
 - 4A-18 expanded-query + topic-aware rerank on eval v2 reached Hit@1 0.6833, Hit@3 0.8333, Hit@5 0.8500, Hit@10 0.8833, Hit@20 0.8833, MRR@5 0.7589.
 - 4A-19 held-out v3 reached total 40, Hit@1 0.4750, Hit@3 0.8500, Hit@5 0.9000, Hit@10 0.9250, Hit@20 0.9250, MRR@5 0.6667, warning/error 0.
 - KB/Retriever v1.4 Batch 4B controlled runtime path is now wired through Python bridge v1.4, Node semantic bridge service, and real `/api/chat` health RAG.
 - 4B smokes/regressions passed: Python bridge controlled 10/10, server contract 10/10 + health OK, Node controlled 10/10, router lab explanation 11/11, API controlled 9/9 normal + 2/2 gate, regression 14/14, flag-off 8/8, fallback 6/6, provenance 11/11.
-- 4B-2H urgent/booking UX smoke passed **2/2**: chest pain + dyspnea + sweating gets emergency/care-facility guidance, and generic home sampling asks for the test type instead of inventing one.
-- 4B-2I answer text polish smoke passed **5/5**: HbA1c/ALT/AST-style explanations stay in clean Vietnamese answer text without raw English source heading leakage; source/provenance still lives in metadata/source chips.
+- 4B-2H urgent/booking UX smoke passed **2/2**: chest pain + dyspnea + sweating gets emergency/care-facility guidance, and generic home sampling asks for the test type instead of inventing one (`booking.draft.testType=null`, `missingFields` still includes `testType`).
+- 4B-2I answer text polish smoke passed **5/5**: HbA1c/ALT/AST-style explanations stay in clean Vietnamese answer text without raw English source heading leakage such as "Is there anything else..." or "What are they used for?"; source/provenance still lives in metadata/source chips.
+- Manual frontend checks after 4B-2H/2I found CBC abnormal boundary, urgent red flags, generic booking, reschedule, HbA1c explanation, and HbA1c sample questions aligned with the current API/UX contract.
 - v1.4 still is not default/global. Broader runtime/default promotion should wait for frontend/manual UX checks and more stable regression evidence.
 
 ## What Is Already Done
@@ -149,6 +151,7 @@ Next status: controlled v1.4 runtime is ready for broader manual UX/frontend rev
 - v1.4 Batch 4A approved dataset lives at `ai_lab/datasets/kb_v1_4_batch4a_approved_items.jsonl`; offline retriever artifacts live at `ai_lab/artifacts/retriever_v1_4/`.
 - 4B-2H urgent/booking UX fix verified through `backend/scripts/smoke_urgent_booking_ux_4b2h.js`, 2/2 PASS, with 4B-2B, 4B-2D, and 4B-2G regressions still passing.
 - 4B-2I answer text polish verified through `backend/scripts/smoke_answer_text_polish_4b2i.js`, 5/5 PASS, with 4B-2H, 4B-2B, 4B-2D, and 4B-2G regressions still passing.
+- Manual frontend follow-up after polish checked CBC abnormal, urgent chest pain/shortness of breath/sweating, generic booking, reschedule, HbA1c explanation, and HbA1c sample question paths; the observed API/UX behavior is reasonable, but not yet enough for default/global promotion.
 
 ## What Is Blocked
 
@@ -249,4 +252,4 @@ Start from the controlled semantic retrieval and intent grouping state, not the 
 
 As of 3H, the recommendation/test package path is a controlled slot-based prototype with API metadata, answer UX, source contract, flag-off regression, frontend smoke, and controlled live package return behind a separate live gate. It is not a default/global production recommendation engine. When `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED` is unset or false, `recommendedPackage` stays `null`; when recommendation runtime is false, there is no recommendation meta/UX/package ID output.
 
-As of 4B-2I, retriever v1.4 is wired into backend runtime as a controlled-only path behind explicit semantic flags. Python bridge, server contract, Node service, real `/api/chat`, router, flag-off, fallback, regression, provenance, urgent/booking UX, and answer text polish smokes pass. v1_3/default behavior remains the safe baseline when flags are off, and v1.4 is still not promoted as default/global. Frontend manual observation now shows answer UX is more reasonable, but the correct continuation is broader frontend/manual UX review plus longer controlled regression before any broader promotion decision. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.
+As of 4B-2I, retriever v1.4 is wired into backend runtime as a controlled-only path behind explicit semantic flags. Python bridge, server contract, Node service, real `/api/chat`, router, flag-off, fallback, regression, provenance, urgent/booking UX, and answer text polish smokes pass. v1_3/default behavior remains the safe baseline when flags are off, and v1.4 is still not promoted as default/global. Frontend manual observation now shows answer UX is more reasonable for CBC boundary, urgent red flags, generic booking, reschedule, and HbA1c explanation/sample questions, but the correct continuation is broader frontend/manual UX review plus longer controlled regression before any broader promotion decision. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.
