@@ -41,6 +41,8 @@
 | Retriever v1.4 flag-off regression 4B-2E | `node backend/scripts/smoke_api_retriever_v1_4_flag_off_4b2e.js` | 8/8 PASS; flag-off behavior does not expose v1.4 version/strategy/artifact/query-expansion metadata. |
 | Retriever v1.4 fallback regression 4B-2F | `node backend/scripts/smoke_api_retriever_v1_4_fallback_4b2f.js` | 6/6 PASS; bad bridge URL/timeout falls back without crash and reports fallback metadata. |
 | Retriever v1.4 provenance smoke 4B-2G | `node backend/scripts/smoke_api_retriever_v1_4_provenance_4b2g.js` | 11/11 PASS; API sources/provenance are allowlisted and do not surface revise/rejected/pending items. |
+| Retriever v1.4 urgent/booking UX 4B-2H | `node backend/scripts/smoke_urgent_booking_ux_4b2h.js` | 2/2 PASS; urgent red flags get emergency/care-facility guidance, and generic home sampling does not infer `testType`. |
+| Retriever v1.4 answer text polish 4B-2I | `node backend/scripts/smoke_answer_text_polish_4b2i.js` | 5/5 PASS; lab explanations avoid raw source title/heading leakage while source metadata remains available. |
 
 ## Key Metrics Found In Repo
 
@@ -111,13 +113,15 @@ The v1.4 Batch 4B runtime work is a controlled-only runtime path. It ports the 4
 | `smoke_api_retriever_v1_4_flag_off_4b2e.js` | Default/flag-off behavior. | 8/8 PASS; no v1.4 metadata when flags are off. |
 | `smoke_api_retriever_v1_4_fallback_4b2f.js` | Bridge error/timeout fallback. | 6/6 PASS; no crash and fallback metadata is reported. |
 | `smoke_api_retriever_v1_4_provenance_4b2g.js` | Runtime provenance, source allowlist, approved-only behavior, urgent and booking gates. | 11/11 PASS. |
+| `smoke_urgent_booking_ux_4b2h.js` | Urgent-health answer policy and generic booking slot inference. | 2/2 PASS; 4B-2B, 4B-2D, and 4B-2G regressions still pass. |
+| `smoke_answer_text_polish_4b2i.js` | Lab explanation answer body polish and source metadata preservation. | 5/5 PASS; 4B-2H, 4B-2B, 4B-2D, and 4B-2G regressions still pass. |
 
 4B runtime metadata checked through smoke includes `retrieverVersion="v1_4"`, `retrievalStrategy="expanded_query_topic_aware_rerank"`, `candidateTopK=20`, `finalTopK=5`, bridge status, fallback state, query-expansion details, `runtimePromoted=false`, and `runtimeDefaultChanged=false`.
 
 Offline vs runtime distinction:
 
 - 4A metrics measure retrieval quality over eval datasets and held-out queries.
-- 4B smokes measure controlled runtime contract, routing, fallback, provenance, and safety gates through the bridge and `/api/chat`.
+- 4B smokes measure controlled runtime contract, routing, fallback, provenance, safety gates, booking slot behavior, and answer text UX through the bridge and `/api/chat`.
 - Passing 4B smokes supports controlled runtime readiness, not default/global promotion.
 
 ## Recommendation Runtime Prototype Milestones
@@ -177,6 +181,8 @@ Important distinction: the older semantic activation audit remains useful histor
 | Retriever v1.4 4A-18 eval v2 | PASS offline | Hit@3 0.8333, Hit@5 0.8500, MRR@5 0.7589. |
 | Retriever v1.4 4A-19 held-out v3 | PASS offline | Hit@3 0.8500, Hit@5 0.9000, MRR@5 0.6667. |
 | Retriever v1.4 4B controlled runtime smoke | PASS controlled runtime | Full bridge/API/router/flag-off/fallback/provenance smoke matrix passes; no default promotion. |
+| Retriever v1.4 4B-2H urgent/booking UX smoke | PASS controlled runtime | 2/2 PASS; urgent red flags escalate in answer text and generic booking keeps `testType` missing. |
+| Retriever v1.4 4B-2I answer text polish smoke | PASS controlled runtime | 5/5 PASS; answer body stays clean while source metadata/source chips remain available. |
 
 ## Controlled Semantic Retrieval + IntentGroup Manual Smoke
 
@@ -224,7 +230,7 @@ These findings describe the older pre-bridge runtime audit. Current controlled m
 | Semantic runtime active | PASS in controlled mode | Persistent bridge path returns `selectedRetrievalMode="semantic_faiss"` when enabled and healthy. |
 | Default switch | NOT SWITCHED | Runtime remains controlled/opt-in; no global default promotion yet. |
 | Retriever v1.4 runtime promotion | NOT SWITCHED | Offline evidence supports 4B controlled runtime candidate only. |
-| Retriever v1.4 controlled runtime path | PASS | v1.4 runs through explicit flags only; flag-off and fallback regressions pass. |
+| Retriever v1.4 controlled runtime path | PASS | v1.4 runs through explicit flags only; flag-off, fallback, urgent/booking UX, and answer polish regressions pass. |
 
 ## Current Truth Table
 
@@ -240,7 +246,7 @@ These findings describe the older pre-bridge runtime audit. Current controlled m
 | Recommendation/package runtime prototype | PASS through 3B/3C/3D/3E/3F/3G/3H controlled smokes |
 | Controlled live package recommendation | PASS behind separate live gate; off by default, live gate off keeps `recommendedPackage=null` |
 | KB/Retriever v1.4 Batch 4A offline pipeline | PASS through held-out v3; not runtime-promoted |
-| KB/Retriever v1.4 Batch 4B controlled runtime | PASS controlled smokes; not default/global |
+| KB/Retriever v1.4 Batch 4B controlled runtime | PASS controlled smokes through 4B-2I; not default/global |
 | Default switch | Not switched; controlled/opt-in |
 
 ## Missing Or Needs Verification
@@ -249,5 +255,5 @@ These findings describe the older pre-bridge runtime audit. Current controlled m
 - 3H proves controlled live package return only when both runtime and live package gates are enabled.
 - Production/default rollout still needs product review, catalog governance, and monitoring decisions.
 - Broader default/runtime promotion remains a future decision after product review.
-- Retriever v1.4 expanded-query + topic-aware rerank now has controlled runtime integration and smoke coverage, but broader frontend/manual UX and longer regression evidence are still needed before any default/global promotion.
+- Retriever v1.4 expanded-query + topic-aware rerank now has controlled runtime integration plus urgent/booking UX and answer text polish smoke coverage, but broader frontend/manual UX and longer regression evidence are still needed before any default/global promotion.
 - Held-out v3 is evidence and should be frozen; do not repeatedly tune against it.

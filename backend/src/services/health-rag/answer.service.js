@@ -1,3 +1,5 @@
+const { normalizeText } = require("../../utils/text.util");
+
 function getLeadSentence(text) {
     const cleanText = String(text || "").replace(/\s+/g, " ").trim();
 
@@ -38,6 +40,82 @@ function buildInformationalReply(topChunks) {
         support ? getLeadSentence(support.content) : "",
         "HomeLab chỉ hỗ trợ thông tin sức khỏe cơ bản và không thay thế tư vấn y tế trực tiếp."
     ]).join(" ");
+}
+
+function findBestLabExplanationChunk(topChunks, normalizedMessage) {
+    if (normalizedMessage.includes("hba1c")) {
+        const hba1cChunk = topChunks.find((chunk) => {
+            const haystack = normalizeText(
+                [
+                    chunk.title,
+                    chunk.content
+                ].filter(Boolean).join(" ")
+            );
+
+            return haystack.includes("hba1c") || haystack.includes("a1c");
+        }) || topChunks.find((chunk) => {
+            const haystack = normalizeText(
+                [
+                    chunk.topic,
+                    chunk.medical_scope,
+                    chunk.intended_use
+                ].filter(Boolean).join(" ")
+            );
+
+            return haystack.includes("hba1c") || haystack.includes("a1c");
+        });
+
+        if (hba1cChunk) {
+            return hba1cChunk;
+        }
+    }
+
+    return topChunks.find((chunk) => chunk.section !== "red_flags") || topChunks[0];
+}
+
+function buildLabExplanationReply(message, topChunks) {
+    const normalizedMessage = normalizeText(message);
+    const primary = findBestLabExplanationChunk(topChunks, normalizedMessage);
+    const asksBloodDraw =
+        normalizedMessage.includes("lay mau") ||
+        normalizedMessage.includes("mau khong") ||
+        normalizedMessage.includes("mau hay");
+
+    if (normalizedMessage.includes("hba1c")) {
+        const direct = asksBloodDraw
+            ? "Xét nghiệm HbA1c thường là xét nghiệm máu, nên cần lấy mẫu máu."
+            : "HbA1c, còn gọi là A1C, là xét nghiệm máu cho biết mức đường huyết trung bình trong khoảng hai đến ba tháng gần đây.";
+
+        return dedupeTexts([
+            direct,
+            asksBloodDraw
+                ? "Xét nghiệm này thường được dùng để đánh giá đường huyết trung bình trong thời gian gần đây, không phải để tự kết luận chẩn đoán chỉ từ một chỉ số."
+                : "",
+            "HomeLab chỉ giải thích ý nghĩa xét nghiệm ở mức thông tin chung, không chẩn đoán bệnh. Nếu bạn đã có kết quả cụ thể, nên đọc cùng bác sĩ hoặc nhân viên y tế trong bối cảnh triệu chứng và tiền sử của bạn."
+        ]).join(" ");
+    }
+
+    return dedupeTexts([
+        buildGenericLabExplanation(message, primary),
+        "HomeLab chỉ giải thích ý nghĩa xét nghiệm ở mức thông tin chung, không chẩn đoán bệnh. Nếu bạn muốn đặt lịch, bạn có thể cung cấp thêm loại xét nghiệm, thời gian và thông tin lấy mẫu."
+    ]).join(" ");
+}
+
+function buildGenericLabExplanation(message, primary) {
+    const cleanQuestion = String(message || "")
+        .replace(/[?!.]+$/g, "")
+        .trim();
+    const scope = String(primary.medical_scope || primary.topic || "")
+        .replace(/[_/]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    const target = cleanQuestion || "xét nghiệm bạn hỏi";
+
+    if (scope) {
+        return `Với câu hỏi "${target}", nguồn truy xuất liên quan đến nhóm ${scope}. Bạn có thể hiểu đây là thông tin giúp giải thích mục đích và ý nghĩa chung của xét nghiệm, không phải kết luận chẩn đoán.`;
+    }
+
+    return `Với câu hỏi "${target}", HomeLab có thể giải thích mục đích và ý nghĩa chung của xét nghiệm, nhưng không dùng thông tin này để chẩn đoán bệnh.`;
 }
 
 function buildEmergencyReply(topChunks, urgencyLevel) {
@@ -116,13 +194,17 @@ function buildFallbackReply() {
     );
 }
 
-function composeGroundedAnswer({ policyDecision, topChunks }) {
+function composeGroundedAnswer({ message, policyDecision, topChunks }) {
     if (!topChunks.length) {
         return buildFallbackReply();
     }
 
     if (policyDecision.primaryMode === "informational_test") {
         return buildInformationalReply(topChunks);
+    }
+
+    if (policyDecision.primaryMode === "lab_explanation") {
+        return buildLabExplanationReply(message, topChunks);
     }
 
     if (policyDecision.primaryMode === "emergency_or_urgent") {

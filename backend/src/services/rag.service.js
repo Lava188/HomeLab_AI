@@ -185,6 +185,30 @@ function isLabTestExplanationQuery(normalizedMessage) {
     return hasLabTerm && (hasExplanationQuestion || hasTestWord);
 }
 
+const MEDICAL_REVIEW_BOUNDARY_SIGNALS = [
+    "bi benh gi",
+    "co benh gi",
+    "mac benh gi",
+    "chac bi",
+    "co phai bi",
+    "ket luan benh",
+    "chan doan",
+    "bat thuong"
+];
+
+function isMedicalReviewBoundaryQuery(normalizedMessage) {
+    return includesAny(normalizedMessage, MEDICAL_REVIEW_BOUNDARY_SIGNALS);
+}
+
+function isLabTestExplanationAnswerQuery(message) {
+    const normalizedMessage = normalizeText(message);
+
+    return (
+        isLabTestExplanationQuery(normalizedMessage) &&
+        !isMedicalReviewBoundaryQuery(normalizedMessage)
+    );
+}
+
 function getIntentGroup(message) {
     const normalizedMessage = normalizeText(message);
     const redFlagSignals = [
@@ -572,7 +596,25 @@ function buildRetrievalMeta({
     };
 }
 
-function applyIntentGroupPolicy(policyDecision, intentGroup) {
+function applyIntentGroupPolicy(policyDecision, intentGroup, message) {
+    if (intentGroup === "urgent_health") {
+        return {
+            ...policyDecision,
+            primaryMode: "emergency_or_urgent",
+            urgencyLevel: "emergency",
+            reason: "urgent_health_business_intent"
+        };
+    }
+
+    if (isLabTestExplanationAnswerQuery(message)) {
+        return {
+            ...policyDecision,
+            primaryMode: "lab_explanation",
+            urgencyLevel: "none",
+            reason: "lab_test_explanation_query"
+        };
+    }
+
     if (intentGroup !== "test_advice") {
         return policyDecision;
     }
@@ -589,6 +631,14 @@ function shouldRunRecommendationRuntime(intentGroup) {
     return (
         intentGroup === "test_advice" &&
         isRecommendationRuntimeEnabled()
+    );
+}
+
+function shouldSkipRecommendationForAnswer({ message, intentGroup, policyDecision }) {
+    return (
+        intentGroup === "test_advice" &&
+        policyDecision?.primaryMode === "lab_explanation" &&
+        isLabTestExplanationAnswerQuery(message)
     );
 }
 
@@ -685,12 +735,19 @@ async function answerHealthQuery({ message, sessionId }) {
         const policyDecision = applyIntentGroupPolicy(choosePolicyMode({
             message,
             retrievedChunks: topChunks
-        }), intentGroup);
+        }), intentGroup, message);
         const groundedReply = composeGroundedAnswer({
+            message,
             policyDecision,
             topChunks
         });
-        const recommendationDecision = shouldRunRecommendationRuntime(intentGroup)
+        const skipRecommendation = shouldSkipRecommendationForAnswer({
+            message,
+            intentGroup,
+            policyDecision
+        });
+        const recommendationDecision =
+            !skipRecommendation && shouldRunRecommendationRuntime(intentGroup)
             ? runRecommendationRuntime({
                 message,
                 intentGroup

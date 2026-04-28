@@ -94,6 +94,8 @@ Fallback and gates:
 - `urgent_health` remains higher priority than test advice, booking, and recommendation.
 - Booking/reschedule/cancel and recommendation gates remain preserved.
 - Provenance/source metadata was checked through API smoke; revise/rejected/pending items are not surfaced.
+- 4B-2H tightened urgent and booking UX: `urgent_health` now forces emergency/urgent answer policy for strong red flags, and generic "lay mau tai nha" booking no longer infers a test type without user confirmation.
+- 4B-2I polished answer text: lab explanations no longer inject raw source titles/headings into the answer body, while source/provenance metadata remains available for source chips.
 
 Next status: controlled v1.4 runtime is ready for broader manual UX/frontend review and longer regression observation, but **not** for default/global promotion yet.
 
@@ -119,6 +121,8 @@ Next status: controlled v1.4 runtime is ready for broader manual UX/frontend rev
 - 4A-19 held-out v3 reached total 40, Hit@1 0.4750, Hit@3 0.8500, Hit@5 0.9000, Hit@10 0.9250, Hit@20 0.9250, MRR@5 0.6667, warning/error 0.
 - KB/Retriever v1.4 Batch 4B controlled runtime path is now wired through Python bridge v1.4, Node semantic bridge service, and real `/api/chat` health RAG.
 - 4B smokes/regressions passed: Python bridge controlled 10/10, server contract 10/10 + health OK, Node controlled 10/10, router lab explanation 11/11, API controlled 9/9 normal + 2/2 gate, regression 14/14, flag-off 8/8, fallback 6/6, provenance 11/11.
+- 4B-2H urgent/booking UX smoke passed **2/2**: chest pain + dyspnea + sweating gets emergency/care-facility guidance, and generic home sampling asks for the test type instead of inventing one.
+- 4B-2I answer text polish smoke passed **5/5**: HbA1c/ALT/AST-style explanations stay in clean Vietnamese answer text without raw English source heading leakage; source/provenance still lives in metadata/source chips.
 - v1.4 still is not default/global. Broader runtime/default promotion should wait for frontend/manual UX checks and more stable regression evidence.
 
 ## What Is Already Done
@@ -143,6 +147,8 @@ Next status: controlled v1.4 runtime is ready for broader manual UX/frontend rev
 - Controlled Live Package Recommendation 3H verified through real `/api/chat` smoke, 7/7 PASS behind the separate live package gate.
 - KB/Retriever v1.4 Batch 4A source-backed pipeline completed offline: registry, raw capture, normalization, cleaning, human review, approved dataset, merged corpus, embeddings/FAISS, evals, rerank experiments, and held-out validation.
 - v1.4 Batch 4A approved dataset lives at `ai_lab/datasets/kb_v1_4_batch4a_approved_items.jsonl`; offline retriever artifacts live at `ai_lab/artifacts/retriever_v1_4/`.
+- 4B-2H urgent/booking UX fix verified through `backend/scripts/smoke_urgent_booking_ux_4b2h.js`, 2/2 PASS, with 4B-2B, 4B-2D, and 4B-2G regressions still passing.
+- 4B-2I answer text polish verified through `backend/scripts/smoke_answer_text_polish_4b2i.js`, 5/5 PASS, with 4B-2H, 4B-2B, 4B-2D, and 4B-2G regressions still passing.
 
 ## What Is Blocked
 
@@ -188,8 +194,10 @@ Keep the stage-3 recommendation regression matrix explicit:
 | 11 | Controlled live package recommendation 3H. Done, 7/7 PASS behind `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`. |
 | 12 | KB/Retriever v1.4 Batch 4A offline source-backed expansion. Done through 4A-19; held-out v3 PASS; no runtime promotion. |
 | 13 | 4B controlled retriever v1.4 runtime candidate behind explicit flags. Done; runtime smokes/regressions pass, no default promotion. |
-| 14 | Frontend/manual UX and longer controlled runtime regression for v1.4. Next. |
-| 15 | Broader default/global production promotion. Future decision only. |
+| 14 | 4B-2H urgent/booking UX safety polish. Done, 2/2 PASS; urgent red flags answer as emergency/urgent, generic booking does not infer test type. |
+| 15 | 4B-2I answer text polish. Done, 5/5 PASS; answer body no longer leaks raw source title/heading while source metadata remains available. |
+| 16 | Frontend/manual UX and longer controlled runtime regression for v1.4. Next. |
+| 17 | Broader default/global production promotion. Future decision only. |
 
 ## Rules For Future Work
 
@@ -231,7 +239,9 @@ New chat/developer should read these first:
 22. `backend/scripts/smoke_api_retriever_v1_4_controlled_4b2b.js`
 23. `backend/scripts/smoke_api_retriever_v1_4_regression_4b2d.js`
 24. `backend/scripts/smoke_api_retriever_v1_4_provenance_4b2g.js`
-25. `backend/scripts/smoke_semantic_bridge_v1_3.js`
+25. `backend/scripts/smoke_urgent_booking_ux_4b2h.js`
+26. `backend/scripts/smoke_answer_text_polish_4b2i.js`
+27. `backend/scripts/smoke_semantic_bridge_v1_3.js`
 
 ## How To Continue From Here
 
@@ -239,4 +249,4 @@ Start from the controlled semantic retrieval and intent grouping state, not the 
 
 As of 3H, the recommendation/test package path is a controlled slot-based prototype with API metadata, answer UX, source contract, flag-off regression, frontend smoke, and controlled live package return behind a separate live gate. It is not a default/global production recommendation engine. When `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED` is unset or false, `recommendedPackage` stays `null`; when recommendation runtime is false, there is no recommendation meta/UX/package ID output.
 
-As of 4B-2G, retriever v1.4 is wired into backend runtime as a controlled-only path behind explicit semantic flags. Python bridge, server contract, Node service, real `/api/chat`, router, flag-off, fallback, regression, and provenance smokes pass. v1_3/default behavior remains the safe baseline when flags are off, and v1.4 is still not promoted as default/global. The correct continuation is frontend/manual UX review plus longer controlled regression before any broader promotion decision. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.
+As of 4B-2I, retriever v1.4 is wired into backend runtime as a controlled-only path behind explicit semantic flags. Python bridge, server contract, Node service, real `/api/chat`, router, flag-off, fallback, regression, provenance, urgent/booking UX, and answer text polish smokes pass. v1_3/default behavior remains the safe baseline when flags are off, and v1.4 is still not promoted as default/global. Frontend manual observation now shows answer UX is more reasonable, but the correct continuation is broader frontend/manual UX review plus longer controlled regression before any broader promotion decision. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.

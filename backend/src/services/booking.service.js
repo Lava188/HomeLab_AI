@@ -90,7 +90,7 @@ function detectTestType(message) {
         },
         {
             value: "Xét nghiệm máu tổng quát",
-            keywords: ["xet nghiem mau", "lay mau", "xet nghiem tong quat"]
+            keywords: ["xet nghiem mau", "xet nghiem tong quat"]
         }
     ];
 
