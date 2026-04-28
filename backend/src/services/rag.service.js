@@ -20,6 +20,12 @@ function isSemanticRetrievalEnabled() {
         .toLowerCase() === "true";
 }
 
+function isSemanticRetrieverV14Requested() {
+    return String(process.env.HOMELAB_SEMANTIC_RETRIEVER_VERSION || "")
+        .trim()
+        .toLowerCase() === "v1_4";
+}
+
 function summarizeSemanticTopChunk(semanticBridgeResult) {
     const chunk = semanticBridgeResult?.topChunks?.[0];
 
@@ -33,6 +39,56 @@ function summarizeSemanticTopChunk(semanticBridgeResult) {
         score: Number.isFinite(Number(chunk.semanticScore))
             ? Number(chunk.semanticScore)
             : null
+    };
+}
+
+function isV14ControlledSemanticResult(semanticBridgeResult) {
+    return (
+        semanticBridgeResult?.retrieverVersion === "v1_4" ||
+        semanticBridgeResult?.retrievalStrategy ===
+            "expanded_query_topic_aware_rerank" ||
+        isSemanticRetrieverV14Requested()
+    );
+}
+
+function normalizeBridgeChunkForRuntime(chunk) {
+    const semanticScore = Number(chunk.semanticScore);
+    const rerankScore = Number(chunk.rerankScore);
+    const score = Number.isFinite(rerankScore)
+        ? rerankScore
+        : Number.isFinite(semanticScore)
+            ? semanticScore
+            : 0;
+    const sourceUrl = chunk.source_url || chunk.final_url || null;
+    const sourceName =
+        chunk.source_name ||
+        chunk.sourceName ||
+        chunk.domain ||
+        chunk.source_id ||
+        null;
+
+    return {
+        ...chunk,
+        chunk_id: chunk.chunk_id || chunk.id || chunk.kb_id || null,
+        kb_id: chunk.kb_id || chunk.id || chunk.chunk_id || null,
+        source_id: chunk.source_id || chunk.domain || chunk.source_url || null,
+        source_name: sourceName,
+        source_url: sourceUrl,
+        final_url: chunk.final_url || sourceUrl,
+        content:
+            chunk.content ||
+            chunk.chunk_text ||
+            chunk.contentPreview ||
+            chunk.title ||
+            "",
+        semanticScore: Number.isFinite(semanticScore) ? semanticScore : score,
+        rerankScore: Number.isFinite(rerankScore) ? rerankScore : score,
+        score,
+        matchedTerms: chunk.matchedTerms || [],
+        tags: Array.isArray(chunk.tags) ? chunk.tags : [],
+        test_types: Array.isArray(chunk.test_types) ? chunk.test_types : [],
+        retrievalSource: "semantic_faiss",
+        provenance: chunk.provenance || null
     };
 }
 
@@ -55,6 +111,78 @@ function includesAnyNonNegated(text, signals) {
             text.includes(signal) &&
             !hasExplicitNegativeSignal(text, signal)
     );
+}
+
+const LAB_TEST_EXPLANATION_TERMS = [
+    "hba1c",
+    "glucose",
+    "duong huyet",
+    "duong mau",
+    "tieu duong",
+    "dai thao duong",
+    "alt",
+    "ast",
+    "men gan",
+    "chuc nang gan",
+    "bilirubin",
+    "tsh",
+    "t4",
+    "t3",
+    "tuyen giap",
+    "cholesterol",
+    "triglyceride",
+    "triglycerides",
+    "mo mau",
+    "creatinine",
+    "creatinin",
+    "egfr",
+    "gfr",
+    "chuc nang than",
+    "kidney function",
+    "than",
+    "albumin nieu",
+    "protein nieu",
+    "nuoc tieu",
+    "cbc",
+    "cong thuc mau",
+    "hong cau",
+    "bach cau",
+    "tieu cau"
+];
+
+const LAB_TEST_EXPLANATION_QUESTION_SIGNALS = [
+    "la gi",
+    "nhu the nao",
+    "the nao",
+    "khac nhau the nao",
+    "khac gi",
+    "de lam gi",
+    "kiem tra duoc gi",
+    "co can",
+    "can khong",
+    "phai khong",
+    "lay mau hay nuoc tieu",
+    "lay mau khong",
+    "nhin an khong",
+    "y nghia",
+    "doc giup",
+    "giai thich",
+    "chi so",
+    "ket qua"
+];
+
+function isLabTestExplanationQuery(normalizedMessage) {
+    const hasLabTerm = includesAny(
+        normalizedMessage,
+        LAB_TEST_EXPLANATION_TERMS
+    );
+    const hasExplanationQuestion = includesAny(
+        normalizedMessage,
+        LAB_TEST_EXPLANATION_QUESTION_SIGNALS
+    );
+    const hasTestWord = normalizedMessage.includes("xet nghiem");
+
+    return hasLabTerm && (hasExplanationQuestion || hasTestWord);
 }
 
 function getIntentGroup(message) {
@@ -104,6 +232,10 @@ function getIntentGroup(message) {
         return "test_advice";
     }
 
+    if (isLabTestExplanationQuery(normalizedMessage)) {
+        return "test_advice";
+    }
+
     return "general_health";
 }
 
@@ -116,7 +248,10 @@ function hydrateSemanticChunks(semanticBridgeResult) {
         return [];
     }
 
-    const { chunks } = loadArtifacts();
+    const artifactOptions = semanticBridgeResult?.retrieverVersion
+        ? { version: semanticBridgeResult.retrieverVersion }
+        : {};
+    const { chunks } = loadArtifacts(artifactOptions);
     const chunksById = new Map(chunks.map((chunk) => [chunk.chunk_id, chunk]));
 
     return semanticChunks
@@ -237,6 +372,61 @@ function selectRetrieval({ lexicalResult, semanticBridgeResult, intentGroup }) {
         } else if (!semanticBridgeResult.topChunks?.length) {
             semanticRetrievalStatus = "empty";
             fallbackReason = "semantic_bridge_no_top_chunks";
+        } else if (isV14ControlledSemanticResult(semanticBridgeResult)) {
+            const semanticChunks = semanticBridgeResult.topChunks.map(
+                normalizeBridgeChunkForRuntime
+            );
+
+            if (
+                intentGroup === "test_advice" &&
+                semanticChunks[0]?.section === "red_flags"
+            ) {
+                fallbackReason =
+                    "semantic_red_flag_top_suppressed_for_test_advice";
+                return {
+                    topChunks: lexicalChunks,
+                    debug: {
+                        semanticRetrievalEnabled,
+                        status: semanticRetrievalStatus,
+                        semanticRetrievalStatus,
+                        runtimeMode: selectedRetrievalMode,
+                        selectedRetrievalMode,
+                        semanticTopChunk,
+                        coherenceFilter,
+                        fallbackReason,
+                        fallbackUsed: true,
+                        retrieverVersion:
+                            semanticBridgeResult.retrieverVersion || null,
+                        retrievalStrategy:
+                            semanticBridgeResult.retrievalStrategy || null,
+                        artifactDir: semanticBridgeResult.artifactDir || null,
+                        candidateTopK:
+                            semanticBridgeResult.candidateTopK || null,
+                        finalTopK: semanticBridgeResult.finalTopK || null,
+                        queryExpansionApplied:
+                            semanticBridgeResult.queryExpansionApplied === true,
+                        detectedAliasGroups:
+                            semanticBridgeResult.detectedAliasGroups || [],
+                        queryExpansionTerms:
+                            semanticBridgeResult.queryExpansionTerms || [],
+                        expandedQuery:
+                            semanticBridgeResult.expandedQuery || null,
+                        runtimePromoted:
+                            semanticBridgeResult.runtimePromoted === true,
+                        runtimeDefaultChanged:
+                            semanticBridgeResult.runtimeDefaultChanged === true
+                    }
+                };
+            }
+
+            selectedChunks = semanticChunks;
+            selectedRetrievalMode = "semantic_faiss";
+            fallbackReason = null;
+            coherenceFilter = {
+                applied: false,
+                removedChunks: [],
+                reason: "v1_4_bridge_results_preserved_without_artifact_hydration"
+            };
         } else {
             const hydratedSemanticChunks = hydrateSemanticChunks(semanticBridgeResult);
 
@@ -289,8 +479,96 @@ function selectRetrieval({ lexicalResult, semanticBridgeResult, intentGroup }) {
             selectedRetrievalMode,
             semanticTopChunk,
             coherenceFilter,
-            fallbackReason
+            fallbackReason,
+            fallbackUsed: Boolean(fallbackReason),
+            retrieverVersion: semanticBridgeResult?.retrieverVersion || null,
+            retrievalStrategy: semanticBridgeResult?.retrievalStrategy || null,
+            artifactDir: semanticBridgeResult?.artifactDir || null,
+            candidateTopK: semanticBridgeResult?.candidateTopK || null,
+            finalTopK: semanticBridgeResult?.finalTopK || null,
+            queryExpansionApplied:
+                semanticBridgeResult?.queryExpansionApplied === true,
+            detectedAliasGroups:
+                semanticBridgeResult?.detectedAliasGroups || [],
+            queryExpansionTerms:
+                semanticBridgeResult?.queryExpansionTerms || [],
+            expandedQuery: semanticBridgeResult?.expandedQuery || null,
+            runtimePromoted: semanticBridgeResult?.runtimePromoted === true,
+            runtimeDefaultChanged:
+                semanticBridgeResult?.runtimeDefaultChanged === true
         }
+    };
+}
+
+function buildRetrievalMeta({
+    retrievalResult,
+    selectedRetrieval,
+    semanticBridgeResult
+}) {
+    const semanticDebug = selectedRetrieval.debug || {};
+    const selectedSemantic =
+        semanticDebug.selectedRetrievalMode === "semantic_faiss" &&
+        semanticBridgeResult?.semanticBridgeStatus === "ok";
+
+    return {
+        retrieverVersion: selectedSemantic
+            ? semanticBridgeResult.retrieverVersion || retrievalResult.retrieverVersion
+            : retrievalResult.retrieverVersion,
+        retrievalStrategy: selectedSemantic
+            ? semanticBridgeResult.retrievalStrategy || null
+            : null,
+        artifactDir: selectedSemantic
+            ? semanticBridgeResult.artifactDir || null
+            : null,
+        candidateTopK: selectedSemantic
+            ? semanticBridgeResult.candidateTopK || null
+            : null,
+        finalTopK: selectedSemantic
+            ? semanticBridgeResult.finalTopK || null
+            : null,
+        queryExpansionApplied: selectedSemantic
+            ? semanticBridgeResult.queryExpansionApplied === true
+            : false,
+        detectedAliasGroups: selectedSemantic
+            ? semanticBridgeResult.detectedAliasGroups || []
+            : [],
+        queryExpansionTerms: selectedSemantic
+            ? semanticBridgeResult.queryExpansionTerms || []
+            : [],
+        expandedQuery: selectedSemantic
+            ? semanticBridgeResult.expandedQuery || null
+            : null,
+        semanticBridgeStatus:
+            semanticBridgeResult?.semanticBridgeStatus || "missing",
+        runtimePromoted: selectedSemantic
+            ? semanticBridgeResult.runtimePromoted === true
+            : false,
+        runtimeDefaultChanged: selectedSemantic
+            ? semanticBridgeResult.runtimeDefaultChanged === true
+            : false,
+        fallbackUsed: selectedSemantic
+            ? false
+            : Boolean(
+                retrievalResult.fallbackUsed ||
+                    semanticDebug.fallbackReason ||
+                    semanticBridgeResult?.fallbackUsed
+            ),
+        fallbackReason: selectedSemantic
+            ? null
+            : semanticDebug.fallbackReason ||
+                semanticBridgeResult?.fallbackReason ||
+                retrievalResult.fallbackReason ||
+                null,
+        modelName: selectedSemantic
+            ? semanticBridgeResult.modelName || retrievalResult.modelName
+            : retrievalResult.modelName,
+        requestedRetrieverVersion:
+            retrievalResult.requestedRetrieverVersion || null,
+        loadedRetrieverVersion: selectedSemantic
+            ? semanticBridgeResult.retrieverVersion || null
+            : retrievalResult.loadedRetrieverVersion ||
+                retrievalResult.retrieverVersion ||
+                null
     };
 }
 
@@ -398,6 +676,11 @@ async function answerHealthQuery({ message, sessionId }) {
             semanticBridgeResult,
             intentGroup
         });
+        const retrievalMeta = buildRetrievalMeta({
+            retrievalResult,
+            selectedRetrieval,
+            semanticBridgeResult
+        });
         const topChunks = selectedRetrieval.topChunks;
         const policyDecision = applyIntentGroupPolicy(choosePolicyMode({
             message,
@@ -436,19 +719,31 @@ async function answerHealthQuery({ message, sessionId }) {
                     overlapFlag: policyDecision.overlapFlag,
                     reason: policyDecision.reason,
                     policyVersion: policyDecision.policyVersion,
-                    retrieverVersion: retrievalResult.retrieverVersion,
+                    retrieverVersion: retrievalMeta.retrieverVersion,
+                    retrievalStrategy: retrievalMeta.retrievalStrategy,
+                    artifactDir: retrievalMeta.artifactDir,
+                    candidateTopK: retrievalMeta.candidateTopK,
+                    finalTopK: retrievalMeta.finalTopK,
+                    queryExpansionApplied:
+                        retrievalMeta.queryExpansionApplied,
+                    detectedAliasGroups: retrievalMeta.detectedAliasGroups,
+                    queryExpansionTerms: retrievalMeta.queryExpansionTerms,
+                    expandedQuery: retrievalMeta.expandedQuery,
+                    semanticBridgeStatus:
+                        retrievalMeta.semanticBridgeStatus,
+                    runtimePromoted: retrievalMeta.runtimePromoted,
+                    runtimeDefaultChanged:
+                        retrievalMeta.runtimeDefaultChanged,
                     intentGroup,
                     selectedRetrievalMode:
                         selectedRetrieval.debug.selectedRetrievalMode,
                     requestedRetrieverVersion:
-                        retrievalResult.requestedRetrieverVersion || null,
+                        retrievalMeta.requestedRetrieverVersion,
                     loadedRetrieverVersion:
-                        retrievalResult.loadedRetrieverVersion ||
-                        retrievalResult.retrieverVersion ||
-                        null,
-                    fallbackUsed: Boolean(retrievalResult.fallbackUsed),
-                    fallbackReason: retrievalResult.fallbackReason || null,
-                    modelName: retrievalResult.modelName,
+                        retrievalMeta.loadedRetrieverVersion,
+                    fallbackUsed: retrievalMeta.fallbackUsed,
+                    fallbackReason: retrievalMeta.fallbackReason,
+                    modelName: retrievalMeta.modelName,
                     debug: {
                         legacyLexicalRuntimeMode:
                             retrievalResult.runtimeMode || null,
@@ -471,6 +766,7 @@ async function answerHealthQuery({ message, sessionId }) {
             sourceId: chunk.source_id,
             sourceName: chunk.source_name,
             sourceUrl: chunk.source_url || null,
+            finalUrl: chunk.final_url || chunk.source_url || null,
             title: chunk.title
         }));
 
@@ -491,19 +787,28 @@ async function answerHealthQuery({ message, sessionId }) {
                 overlapFlag: policyDecision.overlapFlag,
                 reason: policyDecision.reason,
                 policyVersion: policyDecision.policyVersion,
-                retrieverVersion: retrievalResult.retrieverVersion,
+                retrieverVersion: retrievalMeta.retrieverVersion,
+                retrievalStrategy: retrievalMeta.retrievalStrategy,
+                artifactDir: retrievalMeta.artifactDir,
+                candidateTopK: retrievalMeta.candidateTopK,
+                finalTopK: retrievalMeta.finalTopK,
+                queryExpansionApplied: retrievalMeta.queryExpansionApplied,
+                detectedAliasGroups: retrievalMeta.detectedAliasGroups,
+                queryExpansionTerms: retrievalMeta.queryExpansionTerms,
+                expandedQuery: retrievalMeta.expandedQuery,
+                semanticBridgeStatus: retrievalMeta.semanticBridgeStatus,
+                runtimePromoted: retrievalMeta.runtimePromoted,
+                runtimeDefaultChanged: retrievalMeta.runtimeDefaultChanged,
                 intentGroup,
                 selectedRetrievalMode:
                     selectedRetrieval.debug.selectedRetrievalMode,
                 requestedRetrieverVersion:
-                    retrievalResult.requestedRetrieverVersion || null,
+                    retrievalMeta.requestedRetrieverVersion,
                 loadedRetrieverVersion:
-                    retrievalResult.loadedRetrieverVersion ||
-                    retrievalResult.retrieverVersion ||
-                    null,
-                fallbackUsed: Boolean(retrievalResult.fallbackUsed),
-                fallbackReason: retrievalResult.fallbackReason || null,
-                modelName: retrievalResult.modelName,
+                    retrievalMeta.loadedRetrieverVersion,
+                fallbackUsed: retrievalMeta.fallbackUsed,
+                fallbackReason: retrievalMeta.fallbackReason,
+                modelName: retrievalMeta.modelName,
                 debug: {
                     legacyLexicalRuntimeMode:
                         retrievalResult.runtimeMode || null,
@@ -521,10 +826,20 @@ async function answerHealthQuery({ message, sessionId }) {
                     sourceId: chunk.source_id,
                     sourceName: chunk.source_name,
                     sourceUrl: chunk.source_url || null,
+                    finalUrl: chunk.final_url || chunk.source_url || null,
                     section: chunk.section,
                     faqType: chunk.faq_type,
                     riskLevel: chunk.risk_level,
                     score: chunk.score,
+                    semanticScore: chunk.semanticScore,
+                    rerankScore: chunk.rerankScore,
+                    rankBeforeRerank: chunk.rankBeforeRerank,
+                    rankAfterRerank: chunk.rankAfterRerank,
+                    topic: chunk.topic || null,
+                    domain: chunk.domain || null,
+                    medicalScope: chunk.medical_scope || null,
+                    intendedUse: chunk.intended_use || null,
+                    provenance: chunk.provenance || null,
                     retrievalSource: chunk.retrievalSource || null,
                     matchedTerms: chunk.matchedTerms
                 })),

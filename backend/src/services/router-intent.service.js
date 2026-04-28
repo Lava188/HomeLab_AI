@@ -162,13 +162,80 @@ const HIGH_RISK_SHORT_QUERY_SIGNALS = [
     "ho ra mau"
 ];
 
-const BOOKING_ACTION_SIGNALS = [
+const STRONG_BOOKING_ACTION_SIGNALS = [
     "dat lich",
     "dang ky lich",
+    "book lich",
+    "book",
+    "hen lay mau",
+    "dat lich lay mau",
+    "dat lich lay mau tai nha"
+];
+
+const BOOKING_SERVICE_ACTION_SIGNALS = [
     "hen lay mau",
     "lay mau",
     "lay mau tai nha",
-    "xet nghiem tai nha"
+    "xet nghiem tai nha",
+    "den lay mau"
+];
+
+const LAB_TEST_EXPLANATION_TERMS = [
+    "hba1c",
+    "glucose",
+    "duong huyet",
+    "duong mau",
+    "tieu duong",
+    "dai thao duong",
+    "alt",
+    "ast",
+    "men gan",
+    "chuc nang gan",
+    "bilirubin",
+    "tsh",
+    "t4",
+    "t3",
+    "tuyen giap",
+    "cholesterol",
+    "triglyceride",
+    "triglycerides",
+    "mo mau",
+    "creatinine",
+    "creatinin",
+    "egfr",
+    "gfr",
+    "chuc nang than",
+    "kidney function",
+    "than",
+    "albumin nieu",
+    "protein nieu",
+    "nuoc tieu",
+    "cbc",
+    "cong thuc mau",
+    "hong cau",
+    "bach cau",
+    "tieu cau"
+];
+
+const LAB_TEST_EXPLANATION_QUESTION_SIGNALS = [
+    "la gi",
+    "nhu the nao",
+    "the nao",
+    "khac nhau the nao",
+    "khac gi",
+    "de lam gi",
+    "kiem tra duoc gi",
+    "co can",
+    "can khong",
+    "phai khong",
+    "lay mau hay nuoc tieu",
+    "lay mau khong",
+    "nhin an khong",
+    "y nghia",
+    "doc giup",
+    "giai thich",
+    "chi so",
+    "ket qua"
 ];
 
 const TEST_ADVICE_SIGNALS = [
@@ -178,7 +245,13 @@ const TEST_ADVICE_SIGNALS = [
     "goi xet nghiem nao",
     "xet nghiem tong quat",
     "kiem tra suc khoe tong quat",
-    "goi nao phu hop"
+    "goi nao phu hop",
+    "xet nghiem mau",
+    "nhin an truoc khi xet nghiem",
+    "truoc khi xet nghiem",
+    "ket qua xet nghiem",
+    "doc ket qua",
+    "giai thich ket qua"
 ];
 
 const URGENT_HEALTH_INTENT_SIGNALS = [
@@ -226,12 +299,35 @@ function includesAny(text, signals) {
     return signals.some((signal) => text.includes(signal));
 }
 
+function isEducationalLabQuestion(expandedMessage) {
+    const hasLabTerm = includesAny(expandedMessage, LAB_TEST_EXPLANATION_TERMS);
+    const hasExplanationQuestion = includesAny(
+        expandedMessage,
+        LAB_TEST_EXPLANATION_QUESTION_SIGNALS
+    );
+    const hasTestWord = expandedMessage.includes("xet nghiem");
+
+    return hasLabTerm && (hasExplanationQuestion || hasTestWord);
+}
+
 function hasExplicitBookingActionText(expandedMessage) {
-    return includesAny(expandedMessage, BOOKING_ACTION_SIGNALS);
+    if (includesAny(expandedMessage, STRONG_BOOKING_ACTION_SIGNALS)) {
+        return true;
+    }
+
+    if (!includesAny(expandedMessage, BOOKING_SERVICE_ACTION_SIGNALS)) {
+        return false;
+    }
+
+    return !isEducationalLabQuestion(expandedMessage);
 }
 
 function isTestAdviceQuery(expandedMessage) {
-    return includesAny(expandedMessage, TEST_ADVICE_SIGNALS);
+    if (includesAny(expandedMessage, TEST_ADVICE_SIGNALS)) {
+        return true;
+    }
+
+    return isEducationalLabQuestion(expandedMessage);
 }
 
 function getIntentGroup(expandedMessage) {

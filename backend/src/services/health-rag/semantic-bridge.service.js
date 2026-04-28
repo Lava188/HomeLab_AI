@@ -6,6 +6,10 @@ const path = require("path");
 const DEFAULT_TIMEOUT_MS = 3000;
 const DEFAULT_TOP_K = 3;
 const DEFAULT_SERVER_URL = "http://127.0.0.1:8765";
+const V1_4_RETRIEVER_VERSION = "v1_4";
+const V1_4_RETRIEVAL_STRATEGY = "expanded_query_topic_aware_rerank";
+const V1_4_CANDIDATE_TOP_K = 20;
+const V1_4_FINAL_TOP_K = 5;
 
 function isShadowEnabled() {
     return String(process.env.HOMELAB_SEMANTIC_BRIDGE_SHADOW || "")
@@ -36,6 +40,25 @@ function getBridgeServerUrl() {
     return process.env.HOMELAB_SEMANTIC_BRIDGE_URL || DEFAULT_SERVER_URL;
 }
 
+function getSemanticRetrieverVersion() {
+    return String(process.env.HOMELAB_SEMANTIC_RETRIEVER_VERSION || "")
+        .trim()
+        .toLowerCase();
+}
+
+function getSemanticRetrievalStrategy() {
+    return String(process.env.HOMELAB_SEMANTIC_RETRIEVAL_STRATEGY || "")
+        .trim()
+        .toLowerCase();
+}
+
+function isV14ControlledBridgeEnabled() {
+    return (
+        getSemanticRetrieverVersion() === V1_4_RETRIEVER_VERSION &&
+        getSemanticRetrievalStrategy() === V1_4_RETRIEVAL_STRATEGY
+    );
+}
+
 function getBridgeScriptPath() {
     return path.join(
         __dirname,
@@ -51,6 +74,17 @@ function disabledResult() {
         modelName: null,
         topChunks: [],
         bridgeMode: getBridgeMode(),
+        retrievalStrategy: null,
+        artifactDir: null,
+        candidateTopK: null,
+        finalTopK: null,
+        queryExpansionApplied: false,
+        detectedAliasGroups: [],
+        queryExpansionTerms: [],
+        runtimePromoted: false,
+        runtimeDefaultChanged: false,
+        fallbackUsed: false,
+        fallbackReason: null,
         latencyMs: null,
         error: null
     };
@@ -64,6 +98,17 @@ function errorResult(errorMessage, details = {}) {
         modelName: null,
         topChunks: [],
         bridgeMode: getBridgeMode(),
+        retrievalStrategy: null,
+        artifactDir: null,
+        candidateTopK: null,
+        finalTopK: null,
+        queryExpansionApplied: false,
+        detectedAliasGroups: [],
+        queryExpansionTerms: [],
+        runtimePromoted: false,
+        runtimeDefaultChanged: false,
+        fallbackUsed: true,
+        fallbackReason: "semantic_bridge_error",
         latencyMs: null,
         error: errorMessage,
         ...details
@@ -76,20 +121,55 @@ function normalizePayload(payload) {
             query: payload.query || null,
             runtimeMode: payload.runtimeMode || null,
             retrieverVersion: payload.retrieverVersion || null,
-            modelName: payload.modelName || null
+            modelName: payload.modelName || null,
+            retrievalStrategy: payload.retrievalStrategy || null,
+            artifactDir: payload.artifactDir || null,
+            runtimePromoted: payload.runtimePromoted === true,
+            runtimeDefaultChanged: payload.runtimeDefaultChanged === true,
+            fallbackReason: payload.fallbackReason || "semantic_bridge_payload_error"
         });
     }
+
+    const topChunks = Array.isArray(payload.topChunks)
+        ? payload.topChunks
+        : Array.isArray(payload.results)
+            ? payload.results
+            : [];
 
     return {
         semanticBridgeStatus: "ok",
         query: payload.query || null,
         runtimeMode: payload.runtimeMode || null,
         retrieverVersion: payload.retrieverVersion || null,
+        retrievalStrategy: payload.retrievalStrategy || null,
+        artifactDir: payload.artifactDir || null,
         modelName: payload.modelName || null,
-        topChunks: Array.isArray(payload.topChunks) ? payload.topChunks : [],
+        topChunks,
+        results: topChunks,
         bridgeMode: payload.bridgeMode || getBridgeMode(),
+        candidateTopK: Number.isFinite(Number(payload.candidateTopK))
+            ? Number(payload.candidateTopK)
+            : null,
+        finalTopK: Number.isFinite(Number(payload.finalTopK))
+            ? Number(payload.finalTopK)
+            : null,
+        queryExpansionApplied: payload.queryExpansionApplied === true,
+        expandedQuery: payload.expandedQuery || null,
+        detectedAliasGroups: Array.isArray(payload.detectedAliasGroups)
+            ? payload.detectedAliasGroups
+            : [],
+        queryExpansionTerms: Array.isArray(payload.queryExpansionTerms)
+            ? payload.queryExpansionTerms
+            : [],
+        runtimePromoted: payload.runtimePromoted === true,
+        runtimeDefaultChanged: payload.runtimeDefaultChanged === true,
+        fallbackUsed: payload.fallbackUsed === true,
+        fallbackReason: payload.fallbackReason || null,
         latencyMs: Number.isFinite(Number(payload.latencyMs))
             ? Number(payload.latencyMs)
+            : null,
+        clientLatencyMs: Number.isFinite(Number(payload.clientLatencyMs))
+            ? Number(payload.clientLatencyMs)
             : null,
         error: null
     };
@@ -161,15 +241,24 @@ function requestJson({ url, method = "GET", body = null, timeoutMs }) {
 async function runSemanticBridgeServer({ message, topK }) {
     const serverUrl = getBridgeServerUrl().replace(/\/+$/, "");
     const started = Date.now();
+    const useV14ControlledBridge = isV14ControlledBridgeEnabled();
+    const requestTopK = useV14ControlledBridge
+        ? V1_4_FINAL_TOP_K
+        : topK || DEFAULT_TOP_K;
+    const requestBody = {
+        query: String(message || ""),
+        topK: requestTopK
+    };
+
+    if (useV14ControlledBridge) {
+        requestBody.candidateTopK = V1_4_CANDIDATE_TOP_K;
+    }
 
     try {
         const payload = await requestJson({
             url: `${serverUrl}/query`,
             method: "POST",
-            body: {
-                query: String(message || ""),
-                topK: topK || DEFAULT_TOP_K
-            },
+            body: requestBody,
             timeoutMs: getTimeoutMs()
         });
 
@@ -182,6 +271,20 @@ async function runSemanticBridgeServer({ message, topK }) {
         return errorResult(error.message, {
             bridgeMode: "server",
             serverUrl,
+            requestedRetrieverVersion: useV14ControlledBridge
+                ? V1_4_RETRIEVER_VERSION
+                : null,
+            requestedRetrievalStrategy: useV14ControlledBridge
+                ? V1_4_RETRIEVAL_STRATEGY
+                : null,
+            candidateTopK: useV14ControlledBridge
+                ? V1_4_CANDIDATE_TOP_K
+                : null,
+            finalTopK: requestTopK,
+            fallbackUsed: true,
+            fallbackReason: useV14ControlledBridge
+                ? "semantic_bridge_v1_4_server_error_fallback_to_existing_path"
+                : "semantic_bridge_server_error_fallback_to_existing_path",
             clientLatencyMs: Date.now() - started
         });
     }

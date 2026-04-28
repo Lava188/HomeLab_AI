@@ -47,10 +47,55 @@ KB/Retriever v1.4 Batch 4A has completed the offline RAG-first pipeline through 
 - Offline merged corpus: 97 total records = 42 legacy v1_3 chunks + 55 approved Batch 4A items.
 - Offline embeddings/FAISS: `intfloat/multilingual-e5-small`, dimension 384, normalized embeddings, `IndexFlatIP`.
 - Artifact validation: `total_chunks=97`, `embedding_vector_count=97`, `faiss_ntotal=97`, `warning_count=0`, `error_count=0`.
-- Best offline strategy so far: expanded-query + topic-aware rerank, not yet ported to runtime.
+- Best offline strategy at the end of 4A: expanded-query + topic-aware rerank. This was offline-only at 4A close, and has since been ported in 4B as a controlled-only runtime path.
 - Held-out v3 should be frozen as evidence and not repeatedly tuned against.
 
 Decision: offline retrieval evidence is strong enough to proceed to a **4B controlled runtime candidate**, but retriever v1.4 must not become the default/global runtime yet.
+
+## KB/Retriever v1.4 Batch 4B Controlled Runtime Status
+
+KB/Retriever v1.4 Batch 4B has ported the v1.4 retrieval strategy into backend runtime as a controlled-only path. It has **not** been promoted as the default/global retriever.
+
+- Python bridge: `ai_lab/scripts/semantic_retriever_bridge_v1_4.py`.
+- Strategy: `expanded_query_topic_aware_rerank`.
+- Artifact directory: `ai_lab/artifacts/retriever_v1_4`.
+- Corpus/chunk count: 97.
+- Default candidate retrieval: `candidateTopK=20`.
+- Default final retrieval: `finalTopK=5`.
+- Runtime flags remain explicit: `runtimePromoted=false`, `runtimeDefaultChanged=false`.
+- Backend integration is wired through the semantic bridge service and the real `/api/chat` `health_rag` path.
+
+Controlled v1.4 runtime only runs when all explicit flags are enabled:
+
+```text
+HOMELAB_SEMANTIC_RETRIEVAL_ENABLED=true
+HOMELAB_SEMANTIC_BRIDGE_MODE=server
+HOMELAB_SEMANTIC_BRIDGE_URL=http://127.0.0.1:8766
+HOMELAB_SEMANTIC_RETRIEVER_VERSION=v1_4
+HOMELAB_SEMANTIC_RETRIEVAL_STRATEGY=expanded_query_topic_aware_rerank
+```
+
+Runtime flow when enabled:
+
+1. `/api/chat` routes lab/test education and advice cases to `health_rag`.
+2. Node semantic bridge service calls the v1.4 bridge server.
+3. Bridge applies alias-aware expanded query.
+4. Bridge retrieves FAISS semantic candidates from `retriever_v1_4` with top20.
+5. Bridge applies topic-aware rerank.
+6. Final topK results return to `rag.service.js` with v1.4 provenance and metadata.
+7. API response exposes controlled metadata such as `retrieverVersion`, `retrievalStrategy`, `candidateTopK`, `finalTopK`, query-expansion details, bridge status, fallback state, and runtime promotion flags.
+
+Fallback and gates:
+
+- When v1.4 flags are off, default behavior remains v1_3/lexical fallback and v1.4 metadata is not exposed.
+- If the v1.4 bridge errors or times out, runtime falls back to the existing path without crashing and reports fallback metadata.
+- Router/business intent was minimally updated so lab explanation questions such as HbA1c, ALT/AST, TSH/T4, creatinine/eGFR, and kidney function route to `health_rag` + `test_advice`.
+- Booking still requires a clear booking/sample-collection action.
+- `urgent_health` remains higher priority than test advice, booking, and recommendation.
+- Booking/reschedule/cancel and recommendation gates remain preserved.
+- Provenance/source metadata was checked through API smoke; revise/rejected/pending items are not surfaced.
+
+Next status: controlled v1.4 runtime is ready for broader manual UX/frontend review and longer regression observation, but **not** for default/global promotion yet.
 
 ## Current Status
 
@@ -59,7 +104,7 @@ Decision: offline retrieval evidence is strong enough to proceed to a **4B contr
 - Persistent Python semantic bridge is available and verified with `runtimeMode=semantic_faiss`.
 - Controlled semantic retrieval is available behind runtime flags and returns `selectedRetrievalMode="semantic_faiss"` for health RAG when enabled.
 - Intent grouping is active in backend metadata: `urgent_health`, `test_advice`, `booking`, and `general_health`.
-- Frontend manual test for the latest routing and controlled semantic retrieval milestone passed **8/8**.
+- Earlier frontend manual test for the controlled semantic retrieval and routing milestone passed **8/8**. This was not a dedicated v1.4 4B frontend manual smoke.
 - Default runtime/env has **not** been switched globally; semantic retrieval remains controlled/opt-in.
 - Recommendation Runtime 3B is accepted: `test_advice` -> slot extraction -> `candidatePackageIds`, with smoke **10/10 PASS** and 3A regression **8/8 PASS**.
 - Recommendation API Metadata Contract 3C passed **9/9** via `node backend/scripts/smoke_recommendation_api_3c.js`; API metadata includes `intentGroup`, `selectedRetrievalMode`, `meta.recommendation`, slots/missing slots, candidate package IDs, and `decisionType` when applicable.
@@ -72,6 +117,9 @@ Decision: offline retrieval evidence is strong enough to proceed to a **4B contr
 - KB/Retriever v1.4 Batch 4A offline pipeline is complete through 4A-19. Runtime is unchanged; v1_4 is not promoted as default.
 - 4A-18 expanded-query + topic-aware rerank on eval v2 reached Hit@1 0.6833, Hit@3 0.8333, Hit@5 0.8500, Hit@10 0.8833, Hit@20 0.8833, MRR@5 0.7589.
 - 4A-19 held-out v3 reached total 40, Hit@1 0.4750, Hit@3 0.8500, Hit@5 0.9000, Hit@10 0.9250, Hit@20 0.9250, MRR@5 0.6667, warning/error 0.
+- KB/Retriever v1.4 Batch 4B controlled runtime path is now wired through Python bridge v1.4, Node semantic bridge service, and real `/api/chat` health RAG.
+- 4B smokes/regressions passed: Python bridge controlled 10/10, server contract 10/10 + health OK, Node controlled 10/10, router lab explanation 11/11, API controlled 9/9 normal + 2/2 gate, regression 14/14, flag-off 8/8, fallback 6/6, provenance 11/11.
+- v1.4 still is not default/global. Broader runtime/default promotion should wait for frontend/manual UX checks and more stable regression evidence.
 
 ## What Is Already Done
 
@@ -82,10 +130,10 @@ Decision: offline retrieval evidence is strong enough to proceed to a **4B contr
 - Offline eval v1_3 and eval v2 completed.
 - Controlled runtime flags added/reported: `HOMELAB_RETRIEVER_VERSION`, `HOMELAB_RETRIEVER_FALLBACK_VERSION`, legacy `HOMELAB_HEALTH_RAG_VERSION`.
 - Fallback and safety gates were reported as passing controlled smoke/API smoke.
-- Frontend manual/runtime smoke passed 8/8 for controlled semantic retrieval and intentGroup routing.
+- Earlier frontend manual/runtime smoke passed 8/8 for controlled semantic retrieval and intentGroup routing; this predates the dedicated v1.4 4B controlled runtime path.
 - Controlled semantic retrieval with persistent bridge verified in runtime.
 - `intentGroup` routing added so urgent health, test advice, and booking are easier to inspect in Network/debug metadata.
-- Manual frontend/runtime test passed 8/8 for urgent health, test advice, normal booking, and mixed booking + urgent health cases.
+- Earlier manual frontend/runtime test passed 8/8 for urgent health, test advice, normal booking, and mixed booking + urgent health cases; v1.4 4B still needs broader frontend/manual UX review before promotion.
 - Recommendation Runtime 3B implemented and accepted as a controlled slot-based prototype, not a live package recommendation engine.
 - Recommendation API Metadata Contract 3C verified through real `/api/chat` smoke, 9/9 PASS.
 - Recommendation Answer UX 3D verified through real `/api/chat` smoke, 7/7 PASS.
@@ -103,17 +151,17 @@ Decision: offline retrieval evidence is strong enough to proceed to a **4B contr
 | Default live package recommendation | Controlled live package recommendation exists behind `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`, but it is not default/global behavior. |
 | Default runtime switch | Still intentionally avoided until controlled behavior is reviewed in product context. |
 | Production readiness | 3H proves controlled live behavior only. Broader production rollout still needs product review, catalog governance, and monitoring decisions. |
-| Retriever v1.4 default promotion | Offline evidence is strong, but runtime integration has not been implemented or smoke-tested. v1.4 must remain offline/controlled until 4B flags, runtime metadata, and regression smokes pass. |
+| Retriever v1.4 default promotion | Controlled runtime integration and smokes now pass, but broader default/global promotion still needs frontend/manual UX review, product review, and longer regression stability. |
 
 ## Immediate Next Step
 
-Proceed to 4B controlled runtime candidate for retriever v1.4:
+Proceed from 4B controlled runtime candidate to controlled UX/runtime review:
 
-- Port expanded-query + topic-aware rerank into runtime behind explicit flags only.
-- Keep existing v1_3/default behavior safe and unchanged unless controlled flags are enabled.
-- Expose truthful runtime metadata for query expansion, reranking, selected retriever version, and fallback.
-- Run regression matrix for urgent health, booking, test advice, recommendation gating, and existing semantic v1_3 behavior.
+- Keep v1.4 behind explicit flags only.
 - Do not promote retriever v1.4 as default/global runtime yet.
+- Run frontend/manual UX checks against the controlled `/api/chat` path.
+- Continue regression coverage for urgent health, booking/reschedule/cancel, test advice, recommendation gating, flag-off behavior, fallback behavior, and provenance.
+- Consider broader runtime/default promotion only after UX and regression evidence remains stable.
 
 Keep the stage-3 recommendation regression matrix explicit:
 
@@ -130,7 +178,7 @@ Keep the stage-3 recommendation regression matrix explicit:
 | 1 | Controlled semantic bridge/retrieval for v1_3 runtime. Done. |
 | 2 | Expose runtime debug metadata including `selectedRetrievalMode` and `intentGroup`. Done. |
 | 3 | Validate urgent/test-advice/booking routing priority. Done, 8/8 PASS. |
-| 4 | Complete frontend manual smoke for latest behavior. Done, 8/8 PASS. |
+| 4 | Complete earlier frontend manual smoke for controlled semantic/routing behavior. Done, 8/8 PASS; not a dedicated v1.4 4B frontend smoke. |
 | 5 | Controlled recommendation/test package runtime 3B. Done, 10/10 PASS; 3A regression 8/8 PASS. |
 | 6 | API metadata contract 3C. Done, 9/9 PASS. |
 | 7 | Recommendation Answer UX 3D. Done, 7/7 PASS. |
@@ -139,8 +187,9 @@ Keep the stage-3 recommendation regression matrix explicit:
 | 10 | Catalog/source contract readiness 3G. Done, 6/6 PASS. |
 | 11 | Controlled live package recommendation 3H. Done, 7/7 PASS behind `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`. |
 | 12 | KB/Retriever v1.4 Batch 4A offline source-backed expansion. Done through 4A-19; held-out v3 PASS; no runtime promotion. |
-| 13 | 4B controlled retriever v1.4 runtime candidate behind explicit flags. Next. |
-| 14 | Broader default/global production promotion. Future decision only. |
+| 13 | 4B controlled retriever v1.4 runtime candidate behind explicit flags. Done; runtime smokes/regressions pass, no default promotion. |
+| 14 | Frontend/manual UX and longer controlled runtime regression for v1.4. Next. |
+| 15 | Broader default/global production promotion. Future decision only. |
 
 ## Rules For Future Work
 
@@ -178,7 +227,11 @@ New chat/developer should read these first:
 18. `backend/src/services/router-intent.service.js`
 19. `backend/src/services/router.service.js`
 20. `ai_lab/scripts/semantic_retriever_bridge_v1_3.py`
-21. `backend/scripts/smoke_semantic_bridge_v1_3.js`
+21. `ai_lab/scripts/semantic_retriever_bridge_v1_4.py`
+22. `backend/scripts/smoke_api_retriever_v1_4_controlled_4b2b.js`
+23. `backend/scripts/smoke_api_retriever_v1_4_regression_4b2d.js`
+24. `backend/scripts/smoke_api_retriever_v1_4_provenance_4b2g.js`
+25. `backend/scripts/smoke_semantic_bridge_v1_3.js`
 
 ## How To Continue From Here
 
@@ -186,4 +239,4 @@ Start from the controlled semantic retrieval and intent grouping state, not the 
 
 As of 3H, the recommendation/test package path is a controlled slot-based prototype with API metadata, answer UX, source contract, flag-off regression, frontend smoke, and controlled live package return behind a separate live gate. It is not a default/global production recommendation engine. When `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED` is unset or false, `recommendedPackage` stays `null`; when recommendation runtime is false, there is no recommendation meta/UX/package ID output.
 
-As of 4A-19, retriever v1.4 has strong offline evidence and held-out validation for expanded-query + topic-aware reranking, but it is not wired into backend runtime. The correct continuation is 4B controlled runtime integration behind explicit flags, with v1_3/default behavior preserved unless those flags are enabled. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.
+As of 4B-2G, retriever v1.4 is wired into backend runtime as a controlled-only path behind explicit semantic flags. Python bridge, server contract, Node service, real `/api/chat`, router, flag-off, fallback, regression, and provenance smokes pass. v1_3/default behavior remains the safe baseline when flags are off, and v1.4 is still not promoted as default/global. The correct continuation is frontend/manual UX review plus longer controlled regression before any broader promotion decision. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.
