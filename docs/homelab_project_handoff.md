@@ -97,6 +97,7 @@ Fallback and gates:
 - 4B-2H tightened urgent and booking UX: `urgent_health` now forces `primaryMode="emergency_or_urgent"` and `urgencyLevel="emergency"` for strong red flags, even when v1.4 chunks use `topic`/`intended_use="emergency_warning"` instead of older `section`/`faq_type` metadata. Generic "lay mau tai nha" booking no longer infers a test type without user confirmation.
 - 4B-2I polished answer text: lab explanations no longer inject raw source titles/headings into the answer body, while source/provenance metadata remains available for source chips in `meta`/citations/topChunks.
 - Manual frontend observation after the polish covered CBC abnormal boundary, urgent chest pain/shortness of breath/sweating, generic booking, reschedule, HbA1c explanation, and HbA1c sample questions; behavior now matches current API/UX expectations, but broader frontend/manual observation is still required before promotion.
+- 4B-2J controlled frontend/manual UX follow-up checked UI + Network after 4B-2H/2I. Network/API behavior matched expectations, while answer text needed small polish for creatinine/eGFR and lab explanation wording. The observed UI answers are now more natural for HbA1c, HbA1c blood draw, ALT/AST, creatinine/eGFR, cholesterol/triglyceride, CBC boundary, urgent red flags, and generic booking, without raw source headings in the answer body and without weakening safety boundaries.
 
 Next status: controlled v1.4 runtime is ready for broader manual UX/frontend review and longer regression observation, but **not** for default/global promotion yet.
 
@@ -125,6 +126,7 @@ Next status: controlled v1.4 runtime is ready for broader manual UX/frontend rev
 - 4B-2H urgent/booking UX smoke passed **2/2**: chest pain + dyspnea + sweating gets emergency/care-facility guidance, and generic home sampling asks for the test type instead of inventing one (`booking.draft.testType=null`, `missingFields` still includes `testType`).
 - 4B-2I answer text polish smoke passed **5/5**: HbA1c/ALT/AST-style explanations stay in clean Vietnamese answer text without raw English source heading leakage such as "Is there anything else..." or "What are they used for?"; source/provenance still lives in metadata/source chips.
 - Manual frontend checks after 4B-2H/2I found CBC abnormal boundary, urgent red flags, generic booking, reschedule, HbA1c explanation, and HbA1c sample questions aligned with the current API/UX contract.
+- 4B-2J frontend/API answer UX alignment was handled as controlled manual UI + Network review and minimal answer-text polish. Lab explanation answers are more natural for ALT/AST, creatinine/eGFR, and cholesterol/triglyceride; CBC abnormal remains non-diagnostic, urgent chest pain/shortness of breath/sweating remains emergency-oriented, and generic booking still does not infer `testType`.
 - v1.4 still is not default/global. Broader runtime/default promotion should wait for frontend/manual UX checks and more stable regression evidence.
 
 ## What Is Already Done
@@ -152,6 +154,7 @@ Next status: controlled v1.4 runtime is ready for broader manual UX/frontend rev
 - 4B-2H urgent/booking UX fix verified through `backend/scripts/smoke_urgent_booking_ux_4b2h.js`, 2/2 PASS, with 4B-2B, 4B-2D, and 4B-2G regressions still passing.
 - 4B-2I answer text polish verified through `backend/scripts/smoke_answer_text_polish_4b2i.js`, 5/5 PASS, with 4B-2H, 4B-2B, 4B-2D, and 4B-2G regressions still passing.
 - Manual frontend follow-up after polish checked CBC abnormal, urgent chest pain/shortness of breath/sweating, generic booking, reschedule, HbA1c explanation, and HbA1c sample question paths; the observed API/UX behavior is reasonable, but not yet enough for default/global promotion.
+- 4B-2J controlled frontend/manual UX review extended the manual cases to creatinine/eGFR and cholesterol/triglyceride. The follow-up confirmed the UI answer text is more natural and aligned with Network JSON after minimal polish; this remains controlled-only observation, not a default/global promotion signal.
 
 ## What Is Blocked
 

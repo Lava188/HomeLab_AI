@@ -105,14 +105,33 @@ function buildGenericLabExplanation(message, primary) {
     const cleanQuestion = String(message || "")
         .replace(/[?!.]+$/g, "")
         .trim();
-    const scope = String(primary.medical_scope || primary.topic || "")
-        .replace(/[_/]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+    const normalizedMessage = normalizeText(message);
     const target = cleanQuestion || "xét nghiệm bạn hỏi";
 
-    if (scope) {
-        return `Với câu hỏi "${target}", nguồn truy xuất liên quan đến nhóm ${scope}. Bạn có thể hiểu đây là thông tin giúp giải thích mục đích và ý nghĩa chung của xét nghiệm, không phải kết luận chẩn đoán.`;
+    if (
+        normalizedMessage.includes("alt") ||
+        normalizedMessage.includes("ast") ||
+        normalizedMessage.includes("men gan")
+    ) {
+        return "ALT và AST là các men gan thường được dùng để đánh giá tình trạng tổn thương hoặc viêm tế bào gan, và đôi khi theo dõi bệnh gan hoặc tác động của thuốc. Kết quả cần đọc cùng triệu chứng, tiền sử, thuốc đang dùng và các xét nghiệm gan khác, không tự kết luận chẩn đoán chỉ từ ALT/AST.";
+    }
+
+    if (
+        normalizedMessage.includes("creatinine") ||
+        normalizedMessage.includes("creatinin") ||
+        normalizedMessage.includes("egfr") ||
+        normalizedMessage.includes("gfr")
+    ) {
+        return "Creatinine và eGFR là các chỉ số thường dùng để ước tính chức năng lọc của thận. Creatinine phản ánh một chất thải trong máu, còn eGFR ước tính mức lọc cầu thận; khi đọc kết quả cần xét thêm tuổi, giới, tiền sử bệnh, thuốc đang dùng và các chỉ số khác.";
+    }
+
+    if (
+        normalizedMessage.includes("cholesterol") ||
+        normalizedMessage.includes("triglyceride") ||
+        normalizedMessage.includes("triglycerides") ||
+        normalizedMessage.includes("mo mau")
+    ) {
+        return "Cholesterol và triglyceride đều thuộc nhóm mỡ máu nhưng phản ánh những phần khác nhau của chuyển hóa lipid. Cholesterol liên quan nhiều đến các thành phần như LDL, HDL và nguy cơ tim mạch, còn triglyceride thường chịu ảnh hưởng bởi năng lượng dư thừa, rượu, đường bột và một số bệnh lý chuyển hóa.";
     }
 
     return `Với câu hỏi "${target}", HomeLab có thể giải thích mục đích và ý nghĩa chung của xét nghiệm, nhưng không dùng thông tin này để chẩn đoán bệnh.`;

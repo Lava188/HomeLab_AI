@@ -44,6 +44,7 @@
 | Retriever v1.4 urgent/booking UX 4B-2H | `node backend/scripts/smoke_urgent_booking_ux_4b2h.js` | 2/2 PASS; urgent red flags get emergency/care-facility guidance, and generic home sampling does not infer `testType`. |
 | Retriever v1.4 answer text polish 4B-2I | `node backend/scripts/smoke_answer_text_polish_4b2i.js` | 5/5 PASS; lab explanations avoid raw source title/heading leakage while source metadata remains available. |
 | Retriever v1.4 post-2H/2I regression snapshot | 4B-2B / 4B-2D / 4B-2G smokes | 4B-2B remains 9/9 normal + 2/2 gate PASS; 4B-2D remains 14/14 PASS; 4B-2G remains 11/11 PASS. |
+| Retriever v1.4 frontend/API answer UX observation 4B-2J | manual UI + Network observation, not a scripted benchmark | Checked HbA1c, HbA1c blood draw, ALT/AST, creatinine/eGFR, cholesterol/triglyceride, CBC boundary, urgent red flags, and generic booking after minimal answer-text polish. UI/Network answers are more natural and remain safety-bounded; no new benchmark number is introduced. |
 
 ## Key Metrics Found In Repo
 
@@ -127,6 +128,8 @@ Post-2H/2I regression snapshot:
 
 Manual frontend observation after answer polish: CBC abnormal boundary, urgent chest pain/shortness of breath/sweating, generic booking, reschedule, HbA1c explanation, and HbA1c sample questions match current API/UX expectations. This supports controlled readiness only, not default/global promotion.
 
+4B-2J manual frontend/API observation extended the same controlled review to creatinine/eGFR and cholesterol/triglyceride lab explanations. It recorded UX alignment and answer-text naturalness only; it is not a new scripted benchmark and does not change the existing smoke counts.
+
 4B runtime metadata checked through smoke includes `retrieverVersion="v1_4"`, `retrievalStrategy="expanded_query_topic_aware_rerank"`, `candidateTopK=20`, `finalTopK=5`, bridge status, fallback state, query-expansion details, `runtimePromoted=false`, and `runtimeDefaultChanged=false`.
 
 Offline vs runtime distinction:
@@ -195,6 +198,7 @@ Important distinction: the older semantic activation audit remains useful histor
 | Retriever v1.4 4B-2H urgent/booking UX smoke | PASS controlled runtime | 2/2 PASS; urgent red flags escalate in answer text and generic booking keeps `testType` missing. |
 | Retriever v1.4 4B-2I answer text polish smoke | PASS controlled runtime | 5/5 PASS; answer body stays clean while source metadata/source chips remain available. |
 | Retriever v1.4 post-polish manual frontend observation | PASS controlled observation | CBC abnormal, urgent red flags, generic booking, reschedule, HbA1c explanation, and HbA1c sample question paths match current API/UX expectations; broader observation still needed before promotion. |
+| Retriever v1.4 4B-2J frontend/API answer UX observation | PASS controlled observation | Manual UI + Network review found API behavior aligned and answer text more natural for HbA1c, HbA1c blood draw, ALT/AST, creatinine/eGFR, cholesterol/triglyceride, CBC boundary, urgent red flags, and generic booking. This is observation, not a scripted benchmark. |
 
 ## Controlled Semantic Retrieval + IntentGroup Manual Smoke
 
