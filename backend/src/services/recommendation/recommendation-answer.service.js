@@ -26,11 +26,7 @@ function composeRecommendationAnswer(recommendationDecision, fallbackReply) {
     }
 
     if (recommendationDecision.decisionType === "medical_review_boundary") {
-        return [
-            "Mình chưa thể kết luận bệnh chỉ từ kết quả xét nghiệm.",
-            "Kết quả CBC cần được bác sĩ hoặc nhân viên y tế đọc cùng triệu chứng, tiền sử, thuốc đang dùng và khoảng tham chiếu của phòng xét nghiệm.",
-            "Bạn có thể gửi các chỉ số cụ thể nếu muốn HomeLab giải thích ý nghĩa chung của từng chỉ số, nhưng HomeLab sẽ không chẩn đoán chắc chắn."
-        ].join(" ");
+        return composeMedicalReviewBoundaryAnswer(recommendationDecision);
     }
 
     if (
@@ -43,6 +39,56 @@ function composeRecommendationAnswer(recommendationDecision, fallbackReply) {
     return [
         "HomeLab chưa đưa ra gợi ý xét nghiệm ở bước này.",
         "Bạn có thể mô tả thêm mục tiêu kiểm tra, triệu chứng chính, thời gian kéo dài và các dấu hiệu cần khám gấp nếu có."
+    ].join(" ");
+}
+
+function composeMedicalReviewBoundaryAnswer(recommendationDecision) {
+    const normalizedMessage =
+        recommendationDecision.debug?.normalizedMessage || "";
+
+    if (
+        normalizedMessage.includes("cbc") ||
+        normalizedMessage.includes("cong thuc mau") ||
+        normalizedMessage.includes("bach cau") ||
+        normalizedMessage.includes("ung thu mau")
+    ) {
+        return [
+            "Mình chưa thể kết luận ung thư máu hay bệnh cụ thể chỉ từ câu mô tả CBC/bạch cầu bất thường.",
+            "CBC bất thường có nhiều nguyên nhân như nhiễm trùng hoặc viêm, thiếu máu, mất nước, thuốc đang dùng, bệnh lý mạn tính hoặc rối loạn huyết học; cần xem dòng nào bất thường, mức độ lệch, khoảng tham chiếu và triệu chứng đi kèm.",
+            "Bạn nên đọc kết quả cùng bác sĩ hoặc nhân viên y tế, và có thể gửi các chỉ số cụ thể để HomeLab giải thích ý nghĩa chung từng chỉ số, nhưng HomeLab sẽ không chẩn đoán chắc chắn."
+        ].join(" ");
+    }
+
+    if (
+        normalizedMessage.includes("alt") ||
+        normalizedMessage.includes("ast") ||
+        normalizedMessage.includes("men gan")
+    ) {
+        return [
+            "ALT/AST cao không tự động có nghĩa là bệnh gan nặng.",
+            "Men gan có thể tăng vì nhiều lý do như viêm hoặc tổn thương tế bào gan, rượu, thuốc, gan nhiễm mỡ, vận động nặng hoặc bệnh lý khác; cần đọc cùng mức tăng cụ thể, triệu chứng và các xét nghiệm gan liên quan.",
+            "Bạn nên trao đổi với bác sĩ hoặc nhân viên y tế để đánh giá nguyên nhân và mức độ, HomeLab không chẩn đoán bệnh chỉ từ ALT/AST."
+        ].join(" ");
+    }
+
+    if (
+        normalizedMessage.includes("creatinine") ||
+        normalizedMessage.includes("creatinin") ||
+        normalizedMessage.includes("egfr") ||
+        normalizedMessage.includes("gfr") ||
+        normalizedMessage.includes("suy than")
+    ) {
+        return [
+            "Creatinine cao không đủ để tự kết luận suy thận.",
+            "Chỉ số này cần đọc cùng eGFR, tuổi, giới, tình trạng mất nước, thuốc đang dùng, bệnh nền, nước tiểu và xu hướng qua nhiều lần xét nghiệm.",
+            "Bạn nên đọc kết quả cùng bác sĩ hoặc nhân viên y tế, đặc biệt nếu có phù, tiểu ít, mệt nhiều, khó thở hoặc chỉ số tăng nhanh."
+        ].join(" ");
+    }
+
+    return [
+        "Mình chưa thể kết luận bệnh chỉ từ kết quả xét nghiệm.",
+        "Kết quả cần được đọc cùng chỉ số cụ thể, khoảng tham chiếu của phòng xét nghiệm, triệu chứng, tiền sử, thuốc đang dùng và bối cảnh lâm sàng.",
+        "Bạn có thể gửi các chỉ số cụ thể nếu muốn HomeLab giải thích ý nghĩa chung của từng chỉ số, nhưng HomeLab sẽ không chẩn đoán chắc chắn."
     ].join(" ");
 }
 

@@ -178,6 +178,32 @@ const LAB_TEST_EXPLANATION_QUESTION_SIGNALS = [
     "ket qua"
 ];
 
+const LAB_RESULT_BOUNDARY_TERMS = [
+    "cbc",
+    "cong thuc mau",
+    "tong phan tich te bao mau",
+    "tong phan tich mau",
+    "bach cau",
+    "hong cau",
+    "tieu cau",
+    "alt",
+    "ast",
+    "men gan",
+    "creatinine",
+    "creatinin",
+    "egfr",
+    "gfr"
+];
+
+const LAB_RESULT_BOUNDARY_SIGNALS = [
+    "cao co nguy hiem",
+    "co phai",
+    "bat thuong co phai",
+    "suy than",
+    "benh gan nang",
+    "ung thu mau"
+];
+
 function isLabTestExplanationQuery(normalizedMessage) {
     const hasLabTerm = includesAny(
         normalizedMessage,
@@ -198,13 +224,24 @@ const MEDICAL_REVIEW_BOUNDARY_SIGNALS = [
     "mac benh gi",
     "chac bi",
     "co phai bi",
+    "co phai",
     "ket luan benh",
     "chan doan",
-    "bat thuong"
+    "bat thuong",
+    "cao co nguy hiem",
+    "suy than",
+    "benh gan nang",
+    "ung thu mau"
 ];
 
 function isMedicalReviewBoundaryQuery(normalizedMessage) {
-    return includesAny(normalizedMessage, MEDICAL_REVIEW_BOUNDARY_SIGNALS);
+    return (
+        includesAny(normalizedMessage, MEDICAL_REVIEW_BOUNDARY_SIGNALS) ||
+        (
+            includesAny(normalizedMessage, LAB_RESULT_BOUNDARY_TERMS) &&
+            includesAny(normalizedMessage, LAB_RESULT_BOUNDARY_SIGNALS)
+        )
+    );
 }
 
 function isLabTestExplanationAnswerQuery(message) {
@@ -228,6 +265,9 @@ function getIntentGroup(message) {
         "sot cao",
         "ret run",
         "la di",
+        "lo mo",
+        "tho nhanh",
+        "moi tim",
         "nhiem trung",
         "xau di nhanh",
         "sepsis",
@@ -245,6 +285,8 @@ function getIntentGroup(message) {
         "kiem tra tong quat",
         "kiem tra suc khoe tong quat",
         "goi nao phu hop",
+        "kiem tra than",
+        "xet nghiem than",
         "kiem tra chuc nang than",
         "xet nghiem chuc nang than",
         "chuc nang than",
@@ -262,6 +304,10 @@ function getIntentGroup(message) {
         includesAny(normalizedMessage, urgentSignals)
     ) {
         return "urgent_health";
+    }
+
+    if (isMedicalReviewBoundaryQuery(normalizedMessage)) {
+        return "test_advice";
     }
 
     if (includesAny(normalizedMessage, testAdviceSignals)) {
@@ -618,6 +664,15 @@ function applyIntentGroupPolicy(policyDecision, intentGroup, message) {
         };
     }
 
+    if (isMedicalReviewBoundaryQuery(normalizeText(message))) {
+        return {
+            ...policyDecision,
+            primaryMode: "medical_review_boundary",
+            urgencyLevel: "none",
+            reason: "medical_review_boundary_query"
+        };
+    }
+
     if (isLabTestExplanationAnswerQuery(message)) {
         return {
             ...policyDecision,
@@ -654,6 +709,62 @@ function shouldSkipRecommendationForAnswer({ message, intentGroup, policyDecisio
     );
 }
 
+function shouldSuppressDdimersForUrgentCase(message, intentGroup) {
+    const normalizedMessage = normalizeText(message);
+    const asksAboutDdimers =
+        normalizedMessage.includes("d-dimer") ||
+        normalizedMessage.includes("ddimer") ||
+        normalizedMessage.includes("huyet khoi") ||
+        normalizedMessage.includes("thuyen tac phoi");
+    const hasSepsisLikeUrgentSignals =
+        normalizedMessage.includes("sot cao") ||
+        normalizedMessage.includes("lo mo") ||
+        normalizedMessage.includes("lu lan") ||
+        normalizedMessage.includes("tho nhanh");
+
+    return intentGroup === "urgent_health" && hasSepsisLikeUrgentSignals && !asksAboutDdimers;
+}
+
+function filterUrgentSourceAlignment({ message, intentGroup, topChunks }) {
+    if (!shouldSuppressDdimersForUrgentCase(message, intentGroup)) {
+        return {
+            topChunks,
+            sourceAlignment: {
+                applied: false,
+                removedChunks: []
+            }
+        };
+    }
+
+    const filteredChunks = topChunks.filter((chunk) => {
+        const sourceId = normalizeText(chunk.source_id || "");
+        const title = normalizeText(chunk.title || "");
+        const content = normalizeText(chunk.content || "");
+
+        return !(
+            sourceId.includes("ddimer") ||
+            title.includes("d-dimer") ||
+            title.includes("ddimer") ||
+            content.includes("d-dimer") ||
+            content.includes("ddimer")
+        );
+    });
+
+    return {
+        topChunks: filteredChunks.length ? filteredChunks : topChunks,
+        sourceAlignment: {
+            applied: true,
+            removedChunks: topChunks
+                .filter((chunk) => !filteredChunks.includes(chunk))
+                .map((chunk) => ({
+                    chunkId: chunk.chunk_id || null,
+                    sourceId: chunk.source_id || null,
+                    reason: "urgent_fever_confusion_rapid_breathing_not_ddimer_query"
+                }))
+        }
+    };
+}
+
 function attachRecommendationMeta(meta, recommendationDecision) {
     if (!recommendationDecision) {
         return meta;
@@ -671,7 +782,7 @@ function applyRecommendationSourceContract(meta, recommendationDecision) {
     }
 
     if (recommendationDecision.decisionType === "medical_review_boundary") {
-        return keepSourcesById(meta, ["medlineplus_cbc_test"]);
+        return meta;
     }
 
     return {
@@ -743,7 +854,12 @@ async function answerHealthQuery({ message, sessionId }) {
             selectedRetrieval,
             semanticBridgeResult
         });
-        const topChunks = selectedRetrieval.topChunks;
+        const sourceAligned = filterUrgentSourceAlignment({
+            message,
+            intentGroup,
+            topChunks: selectedRetrieval.topChunks
+        });
+        const topChunks = sourceAligned.topChunks;
         const policyDecision = applyIntentGroupPolicy(choosePolicyMode({
             message,
             retrievedChunks: topChunks
@@ -822,7 +938,8 @@ async function answerHealthQuery({ message, sessionId }) {
                         queryRewriteRules: retrievalResult.queryRewriteRules || [],
                         topicIntent: retrievalResult.topicIntent || null,
                         rewrittenQuery: retrievalResult.rewrittenQuery || retrievalResult.normalizedQuery,
-                        semanticBridge: semanticBridgeResult
+                        semanticBridge: semanticBridgeResult,
+                        sourceAlignment: sourceAligned.sourceAlignment
                     },
                     topChunks: []
                 }, recommendationDecision), recommendationDecision)
@@ -887,7 +1004,8 @@ async function answerHealthQuery({ message, sessionId }) {
                     queryRewriteRules: retrievalResult.queryRewriteRules || [],
                     topicIntent: retrievalResult.topicIntent || null,
                     rewrittenQuery: retrievalResult.rewrittenQuery || retrievalResult.normalizedQuery,
-                    semanticBridge: semanticBridgeResult
+                    semanticBridge: semanticBridgeResult,
+                    sourceAlignment: sourceAligned.sourceAlignment
                 },
                 topChunks: topChunks.map((chunk) => ({
                     chunkId: chunk.chunk_id,

@@ -172,6 +172,12 @@ function hasDiagnosisOrResultInterpretationRequest(normalizedMessage) {
         normalizedMessage.includes("doc giup") ||
         normalizedMessage.includes("doc ket qua") ||
         normalizedMessage.includes("ket qua") ||
+        normalizedMessage.includes("co phai") ||
+        normalizedMessage.includes("cao co nguy hiem") ||
+        normalizedMessage.includes("bat thuong") ||
+        normalizedMessage.includes("suy than") ||
+        normalizedMessage.includes("benh gan nang") ||
+        normalizedMessage.includes("ung thu mau") ||
         normalizedMessage.includes("bi benh gi") ||
         normalizedMessage.includes("chan doan") ||
         normalizedMessage.includes("diagnos")

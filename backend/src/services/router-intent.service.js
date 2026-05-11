@@ -206,7 +206,8 @@ const LAB_TEST_EXPLANATION_TERMS = [
     "gfr",
     "chuc nang than",
     "kidney function",
-    "than",
+    "loc cau than",
+    "muc loc cau than",
     "albumin nieu",
     "protein nieu",
     "nuoc tieu",
@@ -223,11 +224,17 @@ const LAB_TEST_EXPLANATION_QUESTION_SIGNALS = [
     "the nao",
     "khac nhau the nao",
     "khac gi",
+    "dung de kiem tra gi",
+    "dung kiem tra gi",
+    "kiem tra gi",
     "de lam gi",
     "kiem tra duoc gi",
     "co can",
     "can khong",
+    "can chuan bi gi",
     "phai khong",
+    "noi len dieu gi",
+    "noi len gi",
     "lay mau hay nuoc tieu",
     "lay mau khong",
     "nhin an khong",
@@ -236,6 +243,32 @@ const LAB_TEST_EXPLANATION_QUESTION_SIGNALS = [
     "giai thich",
     "chi so",
     "ket qua"
+];
+
+const LAB_RESULT_BOUNDARY_TERMS = [
+    "cbc",
+    "cong thuc mau",
+    "tong phan tich te bao mau",
+    "tong phan tich mau",
+    "bach cau",
+    "hong cau",
+    "tieu cau",
+    "alt",
+    "ast",
+    "men gan",
+    "creatinine",
+    "creatinin",
+    "egfr",
+    "gfr"
+];
+
+const LAB_RESULT_BOUNDARY_SIGNALS = [
+    "cao co nguy hiem",
+    "co phai",
+    "bat thuong co phai",
+    "suy than",
+    "benh gan nang",
+    "ung thu mau"
 ];
 
 const TEST_ADVICE_SIGNALS = [
@@ -247,6 +280,10 @@ const TEST_ADVICE_SIGNALS = [
     "kiem tra suc khoe tong quat",
     "goi nao phu hop",
     "xet nghiem mau",
+    "kiem tra than",
+    "xet nghiem than",
+    "kiem tra chuc nang than",
+    "xet nghiem chuc nang than",
     "nhin an truoc khi xet nghiem",
     "truoc khi xet nghiem",
     "ket qua xet nghiem",
@@ -264,7 +301,10 @@ const URGENT_HEALTH_INTENT_SIGNALS = [
     "nhiem trung",
     "xau di nhanh",
     "sepsis",
-    "lu lan"
+    "lu lan",
+    "lo mo",
+    "tho nhanh",
+    "moi tim"
 ];
 
 function tokenize(text) {
@@ -310,6 +350,13 @@ function isEducationalLabQuestion(expandedMessage) {
     return hasLabTerm && (hasExplanationQuestion || hasTestWord);
 }
 
+function isLabResultBoundaryQuery(expandedMessage) {
+    return (
+        includesAny(expandedMessage, LAB_RESULT_BOUNDARY_TERMS) &&
+        includesAny(expandedMessage, LAB_RESULT_BOUNDARY_SIGNALS)
+    );
+}
+
 function hasExplicitBookingActionText(expandedMessage) {
     if (includesAny(expandedMessage, STRONG_BOOKING_ACTION_SIGNALS)) {
         return true;
@@ -333,6 +380,10 @@ function isTestAdviceQuery(expandedMessage) {
 function getIntentGroup(expandedMessage) {
     if (includesAny(expandedMessage, URGENT_HEALTH_INTENT_SIGNALS)) {
         return "urgent_health";
+    }
+
+    if (isLabResultBoundaryQuery(expandedMessage)) {
+        return "test_advice";
     }
 
     if (hasExplicitBookingActionText(expandedMessage)) {
