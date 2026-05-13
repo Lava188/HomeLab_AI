@@ -45,17 +45,30 @@ function composeRecommendationAnswer(recommendationDecision, fallbackReply) {
 function composeMedicalReviewBoundaryAnswer(recommendationDecision) {
     const normalizedMessage =
         recommendationDecision.debug?.normalizedMessage || "";
-
-    if (
+    const hasBloodCancerConcern =
+        normalizedMessage.includes("ung thu mau") ||
+        normalizedMessage.includes("leukemia");
+    const hasCbcOrWbcConcern =
         normalizedMessage.includes("cbc") ||
         normalizedMessage.includes("cong thuc mau") ||
-        normalizedMessage.includes("bach cau") ||
-        normalizedMessage.includes("ung thu mau")
+        normalizedMessage.includes("bach cau");
+
+    if (
+        hasCbcOrWbcConcern &&
+        hasBloodCancerConcern
     ) {
         return [
             "Mình chưa thể kết luận ung thư máu hay bệnh cụ thể chỉ từ câu mô tả CBC/bạch cầu bất thường.",
             "CBC bất thường có nhiều nguyên nhân như nhiễm trùng hoặc viêm, thiếu máu, mất nước, thuốc đang dùng, bệnh lý mạn tính hoặc rối loạn huyết học; cần xem dòng nào bất thường, mức độ lệch, khoảng tham chiếu và triệu chứng đi kèm.",
             "Bạn nên đọc kết quả cùng bác sĩ hoặc nhân viên y tế, và có thể gửi các chỉ số cụ thể để HomeLab giải thích ý nghĩa chung từng chỉ số, nhưng HomeLab sẽ không chẩn đoán chắc chắn."
+        ].join(" ");
+    }
+
+    if (hasCbcOrWbcConcern) {
+        return [
+            "Bạch cầu cao hoặc CBC bất thường có thể gặp trong nhiều tình huống như nhiễm trùng, viêm, stress cơ thể, một số thuốc hoặc các bệnh lý khác.",
+            "Chỉ từ thông tin này chưa đủ kết luận có nguy hiểm hay là bệnh cụ thể; cần xem mức tăng, loại bạch cầu tăng, các chỉ số CBC khác, triệu chứng và khoảng tham chiếu của phòng xét nghiệm.",
+            "Bạn nên đọc kết quả cùng bác sĩ hoặc nhân viên y tế; HomeLab chỉ giải thích ý nghĩa chung và không chẩn đoán."
         ].join(" ");
     }
 

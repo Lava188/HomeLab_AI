@@ -42,6 +42,58 @@ function summarizeSemanticTopChunk(semanticBridgeResult) {
     };
 }
 
+function isUsableSourceValue(value) {
+    const text = String(value || "").trim();
+
+    return Boolean(text) && text.toLowerCase() !== "undefined" && text.toLowerCase() !== "null";
+}
+
+function deriveSourceDomain(url) {
+    if (!isUsableSourceValue(url)) {
+        return null;
+    }
+
+    try {
+        return new URL(url).hostname.replace(/^www\./, "") || null;
+    } catch (error) {
+        return null;
+    }
+}
+
+function normalizeSourceNameForUrl(sourceName, sourceUrl) {
+    if (isUsableSourceValue(sourceUrl) && String(sourceUrl).includes("nice.org.uk")) {
+        return isUsableSourceValue(sourceName) ? sourceName : "NICE";
+    }
+
+    return isUsableSourceValue(sourceName) ? sourceName : null;
+}
+
+function normalizeChunkSourceMetadata(chunk) {
+    const rawSourceUrl = chunk.source_url || chunk.sourceUrl || chunk.url || chunk.final_url || chunk.finalUrl || null;
+    const sourceUrl = isUsableSourceValue(rawSourceUrl) ? rawSourceUrl : null;
+    const rawFinalUrl = chunk.final_url || chunk.finalUrl || sourceUrl;
+    const finalUrl = isUsableSourceValue(rawFinalUrl) ? rawFinalUrl : sourceUrl;
+    const domain = chunk.domain || deriveSourceDomain(sourceUrl);
+    const sourceNameCandidate =
+        chunk.source_name || chunk.sourceName || domain || chunk.source_id || chunk.sourceId || null;
+    const sourceName =
+        normalizeSourceNameForUrl(sourceNameCandidate, sourceUrl) || "unknown source";
+    const sourceId = chunk.source_id || chunk.sourceId || domain || sourceUrl || null;
+
+    return {
+        ...chunk,
+        source_id: sourceId,
+        sourceId,
+        source_name: sourceName,
+        sourceName,
+        source_url: sourceUrl,
+        sourceUrl,
+        final_url: finalUrl,
+        finalUrl,
+        domain: domain || chunk.domain || null
+    };
+}
+
 function isV14ControlledSemanticResult(semanticBridgeResult) {
     return (
         semanticBridgeResult?.retrieverVersion === "v1_4" ||
@@ -59,22 +111,10 @@ function normalizeBridgeChunkForRuntime(chunk) {
         : Number.isFinite(semanticScore)
             ? semanticScore
             : 0;
-    const sourceUrl = chunk.source_url || chunk.final_url || null;
-    const sourceName =
-        chunk.source_name ||
-        chunk.sourceName ||
-        chunk.domain ||
-        chunk.source_id ||
-        null;
-
-    return {
+    return normalizeChunkSourceMetadata({
         ...chunk,
         chunk_id: chunk.chunk_id || chunk.id || chunk.kb_id || null,
         kb_id: chunk.kb_id || chunk.id || chunk.chunk_id || null,
-        source_id: chunk.source_id || chunk.domain || chunk.source_url || null,
-        source_name: sourceName,
-        source_url: sourceUrl,
-        final_url: chunk.final_url || sourceUrl,
         content:
             chunk.content ||
             chunk.chunk_text ||
@@ -89,7 +129,7 @@ function normalizeBridgeChunkForRuntime(chunk) {
         test_types: Array.isArray(chunk.test_types) ? chunk.test_types : [],
         retrievalSource: "semantic_faiss",
         provenance: chunk.provenance || null
-    };
+    });
 }
 
 function includesAny(text, signals) {
@@ -346,7 +386,7 @@ function hydrateSemanticChunks(semanticBridgeResult) {
 
             const semanticScore = Number(semanticChunk.semanticScore);
 
-            return {
+            return normalizeChunkSourceMetadata({
                 ...artifactChunk,
                 semanticScore: Number.isFinite(semanticScore)
                     ? semanticScore
@@ -356,7 +396,7 @@ function hydrateSemanticChunks(semanticBridgeResult) {
                     : artifactChunk.score || 0,
                 matchedTerms: artifactChunk.matchedTerms || [],
                 retrievalSource: "semantic_faiss"
-            };
+            });
         })
         .filter(Boolean);
 }
@@ -725,6 +765,78 @@ function shouldSuppressDdimersForUrgentCase(message, intentGroup) {
     return intentGroup === "urgent_health" && hasSepsisLikeUrgentSignals && !asksAboutDdimers;
 }
 
+function isFeverConfusionRapidBreathingUrgentCase(message, intentGroup) {
+    const normalizedMessage = normalizeText(message);
+
+    return (
+        intentGroup === "urgent_health" &&
+        normalizedMessage.includes("sot cao") &&
+        (
+            normalizedMessage.includes("lo mo") ||
+            normalizedMessage.includes("lu lan")
+        ) &&
+        normalizedMessage.includes("tho nhanh")
+    );
+}
+
+function isSevereInfectionSource(chunk) {
+    const sourceId = normalizeText(chunk.source_id || "");
+    const title = normalizeText(chunk.title || "");
+    const content = normalizeText(chunk.content || "");
+
+    return (
+        sourceId.includes("sepsis") ||
+        title.includes("sepsis") ||
+        title.includes("nhiem trung") ||
+        content.includes("sepsis") ||
+        content.includes("nhiem trung nang")
+    );
+}
+
+function isGenericUrgentSourceDrift(chunk) {
+    const sourceId = normalizeText(chunk.source_id || "");
+    const title = normalizeText(chunk.title || "");
+    const content = normalizeText(chunk.content || "");
+
+    return (
+        sourceId.includes("blood_tests") ||
+        sourceId.includes("pulse_oximetry") ||
+        title.includes("pulse oximetry") ||
+        content.includes("pulse oximetry")
+    );
+}
+
+function getSevereInfectionFallbackChunks(limit = 3) {
+    try {
+        const artifactOptions = isSemanticRetrieverV14Requested()
+            ? { version: "v1_4" }
+            : undefined;
+        const { chunks } = loadArtifacts(artifactOptions);
+
+        return chunks
+            .filter(isSevereInfectionSource)
+            .sort((left, right) => {
+                const leftEmergency = left.faq_type === "emergency_warning" ? 1 : 0;
+                const rightEmergency = right.faq_type === "emergency_warning" ? 1 : 0;
+                const leftRedFlag = left.section === "red_flags" ? 1 : 0;
+                const rightRedFlag = right.section === "red_flags" ? 1 : 0;
+
+                return (
+                    rightEmergency - leftEmergency ||
+                    rightRedFlag - leftRedFlag ||
+                    String(left.chunk_id || "").localeCompare(String(right.chunk_id || ""))
+                );
+            })
+            .slice(0, limit)
+            .map((chunk) => normalizeChunkSourceMetadata({
+                ...chunk,
+                retrievalSource: chunk.retrievalSource || "urgent_source_alignment_fallback"
+            }));
+    } catch (error) {
+        return [];
+    }
+}
+
 function filterUrgentSourceAlignment({ message, intentGroup, topChunks }) {
     if (!shouldSuppressDdimersForUrgentCase(message, intentGroup)) {
         return {
@@ -736,7 +848,7 @@ function filterUrgentSourceAlignment({ message, intentGroup, topChunks }) {
         };
     }
 
-    const filteredChunks = topChunks.filter((chunk) => {
+    const withoutDdimers = topChunks.filter((chunk) => {
         const sourceId = normalizeText(chunk.source_id || "");
         const title = normalizeText(chunk.title || "");
         const content = normalizeText(chunk.content || "");
@@ -749,17 +861,56 @@ function filterUrgentSourceAlignment({ message, intentGroup, topChunks }) {
             content.includes("ddimer")
         );
     });
+    const removedDdimers = topChunks.filter((chunk) => !withoutDdimers.includes(chunk));
+    const shouldPreferSevereInfectionSources =
+        isFeverConfusionRapidBreathingUrgentCase(message, intentGroup);
+    const severeInfectionChunks = withoutDdimers.filter(isSevereInfectionSource);
+    const alignedSevereInfectionChunks =
+        severeInfectionChunks.length > 0
+            ? severeInfectionChunks
+            : shouldPreferSevereInfectionSources
+                ? getSevereInfectionFallbackChunks(topChunks.length)
+                : [];
+    let alignedChunks = withoutDdimers.length ? withoutDdimers : topChunks;
+    const removedSourceDrift = [];
+
+    if (shouldPreferSevereInfectionSources && alignedSevereInfectionChunks.length > 0) {
+        const supportingChunks = withoutDdimers.filter((chunk) => {
+            if (alignedSevereInfectionChunks.includes(chunk)) {
+                return false;
+            }
+
+            if (isGenericUrgentSourceDrift(chunk)) {
+                removedSourceDrift.push(chunk);
+                return false;
+            }
+
+            return true;
+        });
+
+        alignedChunks = [
+            ...alignedSevereInfectionChunks,
+            ...supportingChunks
+        ].slice(0, topChunks.length);
+    }
 
     return {
-        topChunks: filteredChunks.length ? filteredChunks : topChunks,
+        topChunks: alignedChunks.length ? alignedChunks : topChunks,
         sourceAlignment: {
             applied: true,
-            removedChunks: topChunks
-                .filter((chunk) => !filteredChunks.includes(chunk))
+            mode: shouldPreferSevereInfectionSources && alignedSevereInfectionChunks.length > 0
+                ? "urgent_severe_infection_preferred"
+                : "urgent_ddimer_suppressed",
+            removedChunks: [
+                ...removedDdimers,
+                ...removedSourceDrift
+            ]
                 .map((chunk) => ({
                     chunkId: chunk.chunk_id || null,
                     sourceId: chunk.source_id || null,
-                    reason: "urgent_fever_confusion_rapid_breathing_not_ddimer_query"
+                    reason: isGenericUrgentSourceDrift(chunk)
+                        ? "urgent_fever_confusion_rapid_breathing_prefer_severe_infection_source"
+                        : "urgent_fever_confusion_rapid_breathing_not_ddimer_query"
                 }))
         }
     };
@@ -801,10 +952,10 @@ function keepSourcesById(meta, allowedSourceIds) {
     const allowed = new Set(allowedSourceIds);
     const topChunks = (meta.topChunks || []).filter((chunk) =>
         allowed.has(chunk.sourceId)
-    );
+    ).map(normalizeChunkSourceMetadata);
     const citations = (meta.citations || []).filter((citation) =>
         allowed.has(citation.sourceId)
-    );
+    ).map(normalizeChunkSourceMetadata);
     const primaryChunk = topChunks[0] || null;
 
     return {
@@ -859,7 +1010,7 @@ async function answerHealthQuery({ message, sessionId }) {
             intentGroup,
             topChunks: selectedRetrieval.topChunks
         });
-        const topChunks = sourceAligned.topChunks;
+        const topChunks = sourceAligned.topChunks.map(normalizeChunkSourceMetadata);
         const policyDecision = applyIntentGroupPolicy(choosePolicyMode({
             message,
             retrievedChunks: topChunks
@@ -947,14 +1098,18 @@ async function answerHealthQuery({ message, sessionId }) {
         }
 
         const primaryChunk = topChunks[0];
-        const citations = topChunks.map((chunk) => ({
-            chunkId: chunk.chunk_id,
-            sourceId: chunk.source_id,
-            sourceName: chunk.source_name,
-            sourceUrl: chunk.source_url || null,
-            finalUrl: chunk.final_url || chunk.source_url || null,
-            title: chunk.title
-        }));
+        const citations = topChunks.map((chunk) => {
+            const normalizedChunk = normalizeChunkSourceMetadata(chunk);
+
+            return {
+                chunkId: normalizedChunk.chunk_id,
+                sourceId: normalizedChunk.source_id,
+                sourceName: normalizedChunk.source_name,
+                sourceUrl: normalizedChunk.source_url || null,
+                finalUrl: normalizedChunk.final_url || normalizedChunk.source_url || null,
+                title: normalizedChunk.title
+            };
+        });
 
         return createChatResult({
             sessionId,

@@ -80,14 +80,25 @@ function buildLabExplanationReply(message, topChunks) {
         normalizedMessage.includes("lay mau") ||
         normalizedMessage.includes("mau khong") ||
         normalizedMessage.includes("mau hay");
+    const asksPreparation =
+        normalizedMessage.includes("nhin an") ||
+        normalizedMessage.includes("chuan bi") ||
+        normalizedMessage.includes("truoc khi xet nghiem");
 
     if (normalizedMessage.includes("hba1c")) {
-        const direct = asksBloodDraw
-            ? "Xét nghiệm HbA1c thường là xét nghiệm máu, nên cần lấy mẫu máu."
-            : "HbA1c, còn gọi là A1C, là xét nghiệm máu cho biết mức đường huyết trung bình trong khoảng hai đến ba tháng gần đây.";
+        let direct = "HbA1c, còn gọi là A1C, là xét nghiệm máu cho biết mức đường huyết trung bình trong khoảng hai đến ba tháng gần đây.";
+
+        if (asksPreparation) {
+            direct = "Riêng xét nghiệm HbA1c thường không cần nhịn ăn trước khi lấy máu.";
+        } else if (asksBloodDraw) {
+            direct = "Xét nghiệm HbA1c thường là xét nghiệm máu, nên cần lấy mẫu máu.";
+        }
 
         return dedupeTexts([
             direct,
+            asksPreparation
+                ? "Tuy vậy, nếu bạn làm HbA1c cùng các xét nghiệm khác như đường huyết lúc đói hoặc mỡ máu, phòng xét nghiệm có thể yêu cầu nhịn ăn theo gói xét nghiệm đi kèm."
+                : "",
             asksBloodDraw
                 ? "Xét nghiệm này thường được dùng để đánh giá đường huyết trung bình trong thời gian gần đây, không phải để tự kết luận chẩn đoán chỉ từ một chỉ số."
                 : "",
@@ -97,7 +108,7 @@ function buildLabExplanationReply(message, topChunks) {
 
     return dedupeTexts([
         buildGenericLabExplanation(message, primary),
-        "HomeLab chỉ giải thích ý nghĩa xét nghiệm ở mức thông tin chung, không chẩn đoán bệnh. Nếu bạn muốn đặt lịch, bạn có thể cung cấp thêm loại xét nghiệm, thời gian và thông tin lấy mẫu."
+        "HomeLab chỉ giải thích ý nghĩa xét nghiệm ở mức thông tin chung, không chẩn đoán bệnh."
     ]).join(" ");
 }
 
@@ -107,6 +118,15 @@ function buildGenericLabExplanation(message, primary) {
         .trim();
     const normalizedMessage = normalizeText(message);
     const target = cleanQuestion || "xét nghiệm bạn hỏi";
+
+    if (
+        normalizedMessage.includes("cbc") ||
+        normalizedMessage.includes("cong thuc mau") ||
+        normalizedMessage.includes("tong phan tich te bao mau") ||
+        normalizedMessage.includes("tong phan tich mau")
+    ) {
+        return "CBC, hay tổng phân tích tế bào máu/công thức máu, là xét nghiệm đo các nhóm tế bào máu chính gồm hồng cầu, bạch cầu và tiểu cầu. Xét nghiệm này thường hỗ trợ đánh giá thiếu máu, nhiễm trùng hoặc viêm, và rối loạn số lượng tiểu cầu, nhưng không tự chẩn đoán bệnh chỉ từ một kết quả.";
+    }
 
     if (
         normalizedMessage.includes("alt") ||
@@ -137,7 +157,106 @@ function buildGenericLabExplanation(message, primary) {
     return `Với câu hỏi "${target}", HomeLab có thể giải thích mục đích và ý nghĩa chung của xét nghiệm, nhưng không dùng thông tin này để chẩn đoán bệnh.`;
 }
 
-function buildEmergencyReply(topChunks, urgencyLevel) {
+function buildMedicalReviewBoundaryReply(message) {
+    const normalizedMessage = normalizeText(message);
+    const hasBloodCancerConcern =
+        normalizedMessage.includes("ung thu mau") ||
+        normalizedMessage.includes("leukemia");
+    const hasCbcOrWbcConcern =
+        normalizedMessage.includes("cbc") ||
+        normalizedMessage.includes("cong thuc mau") ||
+        normalizedMessage.includes("bach cau");
+
+    if (
+        hasCbcOrWbcConcern &&
+        hasBloodCancerConcern
+    ) {
+        return [
+            "Mình chưa thể kết luận ung thư máu hay bệnh cụ thể chỉ từ câu mô tả CBC/bạch cầu bất thường.",
+            "CBC bất thường có nhiều nguyên nhân như nhiễm trùng hoặc viêm, thiếu máu, mất nước, thuốc đang dùng, bệnh lý mạn tính hoặc rối loạn huyết học; cần xem dòng nào bất thường, mức độ lệch, khoảng tham chiếu và triệu chứng đi kèm.",
+            "Bạn nên đọc kết quả cùng bác sĩ hoặc nhân viên y tế, và có thể gửi các chỉ số cụ thể để HomeLab giải thích ý nghĩa chung từng chỉ số, không chẩn đoán."
+        ].join(" ");
+    }
+
+    if (hasCbcOrWbcConcern) {
+        return [
+            "Bạch cầu cao hoặc CBC bất thường có thể gặp trong nhiều tình huống như nhiễm trùng, viêm, stress cơ thể, một số thuốc hoặc các bệnh lý khác.",
+            "Chỉ từ thông tin này chưa đủ kết luận có nguy hiểm hay là bệnh cụ thể; cần xem mức tăng, loại bạch cầu tăng, các chỉ số CBC khác, triệu chứng và khoảng tham chiếu của phòng xét nghiệm.",
+            "Bạn nên đọc kết quả cùng bác sĩ hoặc nhân viên y tế; HomeLab chỉ giải thích ý nghĩa chung và không chẩn đoán."
+        ].join(" ");
+    }
+
+    if (
+        normalizedMessage.includes("alt") ||
+        normalizedMessage.includes("ast") ||
+        normalizedMessage.includes("men gan")
+    ) {
+        return [
+            "ALT/AST cao không tự động có nghĩa là bệnh gan nặng.",
+            "Men gan có thể tăng vì nhiều lý do như viêm hoặc tổn thương tế bào gan, rượu, thuốc, gan nhiễm mỡ, vận động nặng hoặc bệnh lý khác; cần đọc cùng mức tăng cụ thể, triệu chứng và các xét nghiệm gan liên quan.",
+            "Bạn nên trao đổi với bác sĩ hoặc nhân viên y tế để đánh giá nguyên nhân và mức độ, HomeLab không chẩn đoán bệnh chỉ từ ALT/AST."
+        ].join(" ");
+    }
+
+    if (
+        normalizedMessage.includes("creatinine") ||
+        normalizedMessage.includes("creatinin") ||
+        normalizedMessage.includes("egfr") ||
+        normalizedMessage.includes("gfr") ||
+        normalizedMessage.includes("suy than")
+    ) {
+        return [
+            "Creatinine cao không đủ để tự kết luận suy thận.",
+            "Chỉ số này cần đọc cùng eGFR, tuổi, giới, tình trạng mất nước, thuốc đang dùng, bệnh nền, nước tiểu và xu hướng qua nhiều lần xét nghiệm.",
+            "Bạn nên đọc kết quả cùng bác sĩ hoặc nhân viên y tế, đặc biệt nếu có phù, tiểu ít, mệt nhiều, khó thở hoặc chỉ số tăng nhanh."
+        ].join(" ");
+    }
+
+    return [
+        "Mình chưa thể kết luận bệnh chỉ từ một mô tả kết quả xét nghiệm.",
+        "Kết quả cần được đọc cùng chỉ số cụ thể, khoảng tham chiếu của phòng xét nghiệm, triệu chứng, tiền sử và thuốc đang dùng.",
+        "HomeLab có thể giải thích ý nghĩa chung từng chỉ số, nhưng không chẩn đoán chắc chắn."
+    ].join(" ");
+}
+
+function isFeverConfusionRapidBreathing(message) {
+    const normalizedMessage = normalizeText(message);
+
+    return (
+        normalizedMessage.includes("sot cao") &&
+        (
+            normalizedMessage.includes("lo mo") ||
+            normalizedMessage.includes("lu lan")
+        ) &&
+        normalizedMessage.includes("tho nhanh")
+    );
+}
+
+function isSevereBreathlessnessCyanosis(message) {
+    const normalizedMessage = normalizeText(message);
+
+    return (
+        (
+            normalizedMessage.includes("kho tho") ||
+            normalizedMessage.includes("ngop tho")
+        ) &&
+        (
+            normalizedMessage.includes("moi tim") ||
+            normalizedMessage.includes("tim tai") ||
+            normalizedMessage.includes("tim moi")
+        )
+    );
+}
+
+function buildEmergencyReply(message, topChunks, urgencyLevel) {
+    if (isFeverConfusionRapidBreathing(message)) {
+        return "Sốt cao kèm lơ mơ và thở nhanh là tình huống cần xử trí khẩn cấp. Bạn nên gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay, không chờ theo dõi tại nhà. Nếu có người ở cạnh, hãy nhờ họ hỗ trợ di chuyển an toàn và chuẩn bị thông tin thuốc, bệnh nền, thời điểm bắt đầu triệu chứng.";
+    }
+
+    if (isSevereBreathlessnessCyanosis(message)) {
+        return "Khó thở kèm môi tím và rất mệt là dấu hiệu cấp cứu. Bạn nên gọi cấp cứu hoặc đến cơ sở y tế khẩn cấp ngay, không tự lái xe và không chờ đặt lịch xét nghiệm. Hãy ngồi tư thế dễ thở hơn trong lúc chờ hỗ trợ nếu có thể.";
+    }
+
     const primary = topChunks[0];
     const support = topChunks[1];
     const supportText =
@@ -226,8 +345,12 @@ function composeGroundedAnswer({ message, policyDecision, topChunks }) {
         return buildLabExplanationReply(message, topChunks);
     }
 
+    if (policyDecision.primaryMode === "medical_review_boundary") {
+        return buildMedicalReviewBoundaryReply(message);
+    }
+
     if (policyDecision.primaryMode === "emergency_or_urgent") {
-        return buildEmergencyReply(topChunks, policyDecision.urgencyLevel);
+        return buildEmergencyReply(message, topChunks, policyDecision.urgencyLevel);
     }
 
     if (policyDecision.primaryMode === "urgent_advice") {
