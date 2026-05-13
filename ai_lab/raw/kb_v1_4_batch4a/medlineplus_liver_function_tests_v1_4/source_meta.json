@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_liver_function_tests_v1_4",
+  "title": "Liver Function Tests",
+  "url": "https://medlineplus.gov/liverfunctiontests.html",
+  "final_url": "https://medlineplus.gov/lab-tests/liver-function-tests/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "liver_function_alt_ast_bilirubin",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:37.815Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 39147,
+  "sha256": "11896167299af37ee72b52a3a8f374043d387a4350f1e3708e8202786779f63a"
+}

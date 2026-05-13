@@ -1,0 +1,17 @@
+{
+  "source_id": "niddk_albuminuria_v1_4",
+  "title": "Albuminuria: Albumin in the Urine",
+  "url": "https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/tests-diagnosis/albuminuria-albumin-urine",
+  "final_url": "https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/tests-diagnosis/albuminuria-albumin-urine",
+  "source_family": "NIDDK",
+  "allowed_domain": "niddk.nih.gov",
+  "topic": "urine_albumin_ckd_screening_context",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:41.102Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html; charset=utf-8",
+  "content_length_bytes": 44532,
+  "sha256": "6afe302523e11b2b0769fc4ff64282c3d89b008b9ff5865c14440dba5ca51eae"
+}

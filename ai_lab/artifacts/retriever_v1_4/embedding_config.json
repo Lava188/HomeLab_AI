@@ -1,0 +1,9 @@
+{
+  "model_name": "intfloat/multilingual-e5-small",
+  "embedding_dimension": 384,
+  "normalized": true,
+  "index_type": "IndexFlatIP",
+  "text_field": "chunk_text",
+  "passage_prefix": "passage: ",
+  "query_prefix": "query: "
+}

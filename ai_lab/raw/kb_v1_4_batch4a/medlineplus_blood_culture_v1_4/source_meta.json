@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_blood_culture_v1_4",
+  "title": "Blood culture",
+  "url": "https://medlineplus.gov/ency/article/003744.htm",
+  "final_url": "https://medlineplus.gov/ency/article/003744.htm",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "infection_testing_blood_culture",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:33.934Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 30159,
+  "sha256": "664810a2700d560d49fbc3217f52f1c6955cba396ae7c2eaf81193d2f0171132"
+}

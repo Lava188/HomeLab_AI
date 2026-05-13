@@ -1,0 +1,19 @@
+{
+  "total_candidates": 128,
+  "approved": 55,
+  "revise": 58,
+  "reject": 15,
+  "pending": 0,
+  "runtime_promoted_count": 0,
+  "generated_at": "2026-04-27T17:53:14.518Z",
+  "inputs": {
+    "candidate_items": "ai_lab/kb_candidates/kb_v1_4_batch4a_candidate_items.jsonl",
+    "review_csv": "ai_lab/reports/kb_v1_4_batch4a_candidate_review.csv"
+  },
+  "outputs": {
+    "approved_items": "ai_lab/kb_reviewed/kb_v1_4_batch4a_approved_items.jsonl",
+    "revise_items": "ai_lab/kb_reviewed/kb_v1_4_batch4a_revise_items.jsonl",
+    "rejected_items": "ai_lab/kb_reviewed/kb_v1_4_batch4a_rejected_items.jsonl",
+    "pending_items": "ai_lab/kb_reviewed/kb_v1_4_batch4a_pending_items.jsonl"
+  }
+}

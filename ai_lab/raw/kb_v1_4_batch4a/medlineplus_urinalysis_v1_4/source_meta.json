@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_urinalysis_v1_4",
+  "title": "Urinalysis",
+  "url": "https://medlineplus.gov/urinalysis.html",
+  "final_url": "https://medlineplus.gov/urinalysis.html",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "urinalysis_urine_protein_glucose_uti_kidney_context",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:40.403Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 98387,
+  "sha256": "1ade2ac7001ffcd7ac9ce3ec03b5062b0d7db4979ad526f941b0daf2a810297c"
+}

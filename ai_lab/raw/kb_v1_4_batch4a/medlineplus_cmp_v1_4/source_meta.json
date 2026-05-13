@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_cmp_v1_4",
+  "title": "Comprehensive Metabolic Panel (CMP)",
+  "url": "https://medlineplus.gov/lab-tests/comprehensive-metabolic-panel-cmp/",
+  "final_url": "https://medlineplus.gov/lab-tests/comprehensive-metabolic-panel-cmp/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "cmp_liver_kidney_glucose_context",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:38.433Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 39234,
+  "sha256": "efec32b4efe19174c01e03686e8579ab492ab5e2d54744d0fdb06e5748d39e02"
+}

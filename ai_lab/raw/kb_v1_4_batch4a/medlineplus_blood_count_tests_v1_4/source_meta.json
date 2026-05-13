@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_blood_count_tests_v1_4",
+  "title": "Blood Count Tests",
+  "url": "https://medlineplus.gov/bloodcounttests.html",
+  "final_url": "https://medlineplus.gov/bloodcounttests.html",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "cbc_blood_count_overview",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:33.097Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 102571,
+  "sha256": "693b71a2e7859a0e8d2b494a4ab572889d97e609ec472d9a29ff53332a9a5197"
+}

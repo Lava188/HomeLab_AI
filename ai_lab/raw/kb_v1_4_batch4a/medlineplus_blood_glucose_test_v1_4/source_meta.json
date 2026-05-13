@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_blood_glucose_test_v1_4",
+  "title": "Blood Glucose Test",
+  "url": "https://medlineplus.gov/lab-tests/blood-glucose-test/",
+  "final_url": "https://medlineplus.gov/lab-tests/blood-glucose-test/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "glucose_fasting_blood_glucose_diabetes_screening",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:34.478Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 53425,
+  "sha256": "52114605d7277be688d7f9852f39de5cdf671ffcb2a7f3e3ea83d10058ac4c58"
+}

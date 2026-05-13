@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_hba1c_test_v1_4",
+  "title": "Hemoglobin A1C (HbA1c) Test",
+  "url": "https://medlineplus.gov/lab-tests/hemoglobin-a1c-hba1c-test",
+  "final_url": "https://medlineplus.gov/lab-tests/hemoglobin-a1c-hba1c-test/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "hba1c_diabetes_monitoring_screening",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:35.543Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 40302,
+  "sha256": "14290441f8f8529d11dc9357d99a586951d659eabe2baeb0de2276b638e8c718"
+}

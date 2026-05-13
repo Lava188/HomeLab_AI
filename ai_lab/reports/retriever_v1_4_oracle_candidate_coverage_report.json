@@ -1,0 +1,28 @@
+{
+  "report_name": "retriever_v1_4_oracle_candidate_coverage_report",
+  "summary": {
+    "total": 60,
+    "oracle_hit_at_1": 0.15,
+    "oracle_hit_at_3": 0.1833,
+    "oracle_hit_at_5": 0.25,
+    "oracle_hit_at_10": 0.3,
+    "oracle_hit_at_20": 0.4,
+    "topic_present_top20_but_missed_top3_count": 13,
+    "topic_missing_top20_count": 36,
+    "eval_label_ambiguous_count": 3,
+    "likely_alias_gap_count": 25,
+    "warning_count": 3,
+    "error_count": 0,
+    "latency_ms": 25569.45
+  },
+  "inputs": {
+    "eval_v2": "ai_lab/datasets/eval/retriever_v1_4_batch4a_vi_eval_v2.jsonl",
+    "artifact_dir": "ai_lab/artifacts/retriever_v1_4"
+  },
+  "warnings": [
+    "b4a_vi_057: ambiguous or missing eval labels",
+    "b4a_vi_059: ambiguous or missing eval labels",
+    "b4a_vi_060: ambiguous or missing eval labels"
+  ],
+  "errors": []
+}

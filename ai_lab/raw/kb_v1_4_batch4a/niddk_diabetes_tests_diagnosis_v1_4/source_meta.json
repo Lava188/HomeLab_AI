@@ -1,0 +1,17 @@
+{
+  "source_id": "niddk_diabetes_tests_diagnosis_v1_4",
+  "title": "Diabetes Tests & Diagnosis",
+  "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+  "final_url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+  "source_family": "NIDDK",
+  "allowed_domain": "niddk.nih.gov",
+  "topic": "glucose_hba1c_diabetes_screening",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:36.003Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html; charset=utf-8",
+  "content_length_bytes": 56890,
+  "sha256": "d9c6a8561c934f9bd1b8653490b18ed71b558c6f08c6accee14ece506ac7c3af"
+}

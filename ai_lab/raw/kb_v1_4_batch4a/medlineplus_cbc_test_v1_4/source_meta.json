@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_cbc_test_v1_4",
+  "title": "Complete Blood Count (CBC)",
+  "url": "https://medlineplus.gov/lab-tests/complete-blood-count-cbc/",
+  "final_url": "https://medlineplus.gov/lab-tests/complete-blood-count-cbc/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "cbc_anemia_infection_basics",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:32.482Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 34892,
+  "sha256": "14d527f405b50aace87ba8f47a6146b13e75eb3c804d96bfbdb1bd8c51b8d209"
+}

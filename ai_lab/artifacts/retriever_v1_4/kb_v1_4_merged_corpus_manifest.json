@@ -1,0 +1,25 @@
+{
+  "manifest_name": "kb_v1_4_merged_corpus_manifest",
+  "generated_at": "2026-04-27T18:09:37.584Z",
+  "mode": "offline_controlled_only",
+  "source_legacy_v1_3_chunks": "ai_lab/artifacts/retriever_v1_3/kb_chunks_v1_3.json",
+  "source_batch4a_corpus": "ai_lab/artifacts/retriever_v1_4/kb_v1_4_corpus.jsonl",
+  "merged_corpus_path": "ai_lab/artifacts/retriever_v1_4/kb_v1_4_merged_corpus.jsonl",
+  "legacy_v1_3_count": 42,
+  "batch4a_added_count": 55,
+  "total_merged_count": 97,
+  "embeddings_built": false,
+  "faiss_built": false,
+  "runtime_default_changed": false,
+  "runtime_promoted": false,
+  "domain_counts": {
+    "nice.org.uk": 5,
+    "nhs.uk": 27,
+    "medlineplus.gov": 61,
+    "niddk.nih.gov": 4
+  },
+  "record_type_counts": {
+    "legacy_retriever_v1_3_chunk": 42,
+    "kb_v1_4_batch4a_approved_item": 55
+  }
+}

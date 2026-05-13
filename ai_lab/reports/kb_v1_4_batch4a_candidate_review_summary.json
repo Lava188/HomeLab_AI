@@ -1,0 +1,33 @@
+{
+  "total_candidates": 128,
+  "source_count": 26,
+  "domain_counts": {
+    "nhs.uk": 4,
+    "medlineplus.gov": 103,
+    "niddk.nih.gov": 21
+  },
+  "intended_use_counts": {
+    "screening_context": 29,
+    "preparation_guidance": 9,
+    "result_boundary": 85,
+    "general_lab_education": 3,
+    "test_explanation": 1,
+    "symptom_to_test_context": 1
+  },
+  "medical_scope_counts": {
+    "general blood tests": 8,
+    "liver function": 8,
+    "medical result interpretation boundary": 8,
+    "CBC / anemia / infection": 13,
+    "glucose / HbA1c / diabetes screening": 30,
+    "lipid / cholesterol / triglycerides": 13,
+    "kidney function / creatinine / eGFR": 20,
+    "urinalysis / urine albumin": 4,
+    "thyroid testing": 24
+  },
+  "runtime_promoted_count": 0,
+  "review_status_counts": {
+    "candidate_needs_review": 128
+  },
+  "generated_at": "2026-04-27T17:39:39.587Z"
+}

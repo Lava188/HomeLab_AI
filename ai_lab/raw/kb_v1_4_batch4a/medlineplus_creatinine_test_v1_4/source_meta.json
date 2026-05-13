@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_creatinine_test_v1_4",
+  "title": "Creatinine Test",
+  "url": "https://medlineplus.gov/lab-tests/creatinine-test",
+  "final_url": "https://medlineplus.gov/lab-tests/creatinine-test/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "kidney_function_creatinine_egfr",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:38.963Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 43570,
+  "sha256": "cecb126d8252a89fb3ae792382392e8328c7ca07b80663ab0b08e7d9451086f5"
+}

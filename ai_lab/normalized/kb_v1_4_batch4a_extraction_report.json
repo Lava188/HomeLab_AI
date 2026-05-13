@@ -1,0 +1,11 @@
+{
+  "batch": "kb_v1_4_batch4a",
+  "source_count": 26,
+  "normalized_count": 26,
+  "error_count": 0,
+  "warning_count": 0,
+  "output_path": "ai_lab/normalized/kb_v1_4_batch4a_normalized.jsonl",
+  "generated_at": "2026-04-27T17:19:45.269Z",
+  "warnings": [],
+  "errors": []
+}

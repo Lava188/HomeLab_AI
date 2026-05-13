@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_crp_test_v1_4",
+  "title": "C-Reactive Protein (CRP) Test",
+  "url": "https://medlineplus.gov/lab-tests/c-reactive-protein-crp-test/",
+  "final_url": "https://medlineplus.gov/lab-tests/c-reactive-protein-crp-test/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "inflammation_infection_context",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:33.664Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 36083,
+  "sha256": "5820f1d77ac0afba55cc3a43fba523ffde9a98a8ec0b063b847d951eaf9cca9f"
+}

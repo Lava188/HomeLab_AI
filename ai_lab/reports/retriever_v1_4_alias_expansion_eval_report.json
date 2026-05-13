@@ -1,0 +1,86 @@
+{
+  "report_name": "retriever_v1_4_alias_expansion_eval_report",
+  "mode": "offline_alias_expansion_experiment_only",
+  "baseline_v2": {
+    "count": 60,
+    "hit_at_1": 0.15,
+    "hit_at_3": 0.2167,
+    "hit_at_5": 0.3,
+    "mrr_at_5": 0.1961,
+    "expected_topic_match_at_1": 0.15,
+    "expected_topic_match_at_3": 0.2167,
+    "expected_domain_match_at_3": 0.8421,
+    "keyword_coverage_at_3": null,
+    "eval_path": "ai_lab/datasets/eval/retriever_v1_4_batch4a_vi_eval_v2.jsonl",
+    "artifact_dir": "ai_lab/artifacts/retriever_v1_4",
+    "retriever_version": "v1_4",
+    "model_name": "intfloat/multilingual-e5-small",
+    "top_k": 5,
+    "warning_count": 0,
+    "error_count": 0,
+    "latency_ms": 31261.12
+  },
+  "rerank_4a14": {
+    "count": 60,
+    "hit_at_1": 0.2667,
+    "hit_at_3": 0.35,
+    "hit_at_5": 0.3833,
+    "mrr_at_5": 0.3103
+  },
+  "topic_rerank_4a15": {
+    "count": 60,
+    "hit_at_1": 0.35,
+    "hit_at_3": 0.3833,
+    "hit_at_5": 0.4,
+    "mrr_at_5": 0.37
+  },
+  "expanded_query_single_search": {
+    "count": 60,
+    "hit_at_1": 0.35,
+    "hit_at_3": 0.65,
+    "hit_at_5": 0.7333,
+    "hit_at_10": 0.8167,
+    "hit_at_20": 0.8833,
+    "mrr_at_5": 0.495,
+    "topic_missing_top20_count": 7,
+    "topic_present_top20_but_missed_top3_count": 14,
+    "likely_alias_gap_remaining_count": 0
+  },
+  "multi_query_fusion": {
+    "count": 60,
+    "hit_at_1": 0.1667,
+    "hit_at_3": 0.2333,
+    "hit_at_5": 0.3333,
+    "hit_at_10": 0.4333,
+    "hit_at_20": 0.8667,
+    "mrr_at_5": 0.2142,
+    "topic_missing_top20_count": 8,
+    "topic_present_top20_but_missed_top3_count": 38,
+    "likely_alias_gap_remaining_count": 1
+  },
+  "delta_expanded_vs_baseline_v2": {
+    "hit_at_1": 0.2,
+    "hit_at_3": 0.4333,
+    "hit_at_5": 0.4333,
+    "mrr_at_5": 0.2989
+  },
+  "delta_fusion_vs_baseline_v2": {
+    "hit_at_1": 0.0167,
+    "hit_at_3": 0.0166,
+    "hit_at_5": 0.0333,
+    "mrr_at_5": 0.0181
+  },
+  "delta_fusion_vs_topic_rerank_4a15": {
+    "hit_at_1": -0.1833,
+    "hit_at_3": -0.15,
+    "hit_at_5": -0.0667,
+    "mrr_at_5": -0.1558
+  },
+  "warning_count": 0,
+  "error_count": 0,
+  "interpretation": {
+    "candidate_generation_improved": true,
+    "note": "If hit_at_20 improves, alias expansion is helping candidate generation; if not, inspect corpus/topic metadata/eval labels."
+  },
+  "latency_ms": 23424.41
+}

@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_laboratory_tests_topic_v1_4",
+  "title": "Laboratory Tests",
+  "url": "https://medlineplus.gov/laboratorytests.html",
+  "final_url": "https://medlineplus.gov/laboratorytests.html",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "medical_result_boundary_general_labs",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:32.176Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 89397,
+  "sha256": "7217b30d6322e9ab7c32cacec173551d247464026f21e85fb6f0520a7be89510"
+}

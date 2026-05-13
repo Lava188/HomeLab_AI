@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_triglycerides_test_v1_4",
+  "title": "Triglycerides Test",
+  "url": "https://medlineplus.gov/lab-tests/triglycerides-test/",
+  "final_url": "https://medlineplus.gov/lab-tests/triglycerides-test/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "lipid_panel_triglycerides",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:36.981Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 41918,
+  "sha256": "b342250ff831eb46800122ee5c4f87727df9cf907696f50c8fef8e83db65f59b"
+}

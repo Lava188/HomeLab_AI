@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_cholesterol_levels_v1_4",
+  "title": "Cholesterol Levels",
+  "url": "https://medlineplus.gov/lab-tests/cholesterol-levels/",
+  "final_url": "https://medlineplus.gov/lab-tests/cholesterol-levels/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "lipid_panel_cholesterol",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:36.650Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 47032,
+  "sha256": "301bc81d0702d16c0a5a8a6014fe416249de660ac0d4ed9ddc412f74274287ad"
+}

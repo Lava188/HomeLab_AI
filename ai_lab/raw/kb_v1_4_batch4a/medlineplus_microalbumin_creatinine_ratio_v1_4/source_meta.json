@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_microalbumin_creatinine_ratio_v1_4",
+  "title": "Microalbumin Creatinine Ratio",
+  "url": "https://medlineplus.gov/lab-tests/microalbumin-creatinine-ratio/",
+  "final_url": "https://medlineplus.gov/lab-tests/microalbumin-creatinine-ratio/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "urine_albumin_kidney_monitoring",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:40.960Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 40949,
+  "sha256": "4fd5719b77b344e305ceaadc20e56c568e57ad921b65f532dce71f25d0f61ee7"
+}

@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_kidney_tests_v1_4",
+  "title": "Kidney Tests",
+  "url": "https://medlineplus.gov/kidneytests.html",
+  "final_url": "https://medlineplus.gov/kidneytests.html",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "kidney_function_creatinine_egfr_urine_albumin",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:39.805Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 106500,
+  "sha256": "d8d909449019730f0eb096f81b0e11eeb1ea0b1bc4b39326079e44e1d3ce36c4"
+}

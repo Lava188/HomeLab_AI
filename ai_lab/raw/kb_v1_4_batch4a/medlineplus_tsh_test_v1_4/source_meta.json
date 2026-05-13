@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_tsh_test_v1_4",
+  "title": "TSH (Thyroid-stimulating hormone) Test",
+  "url": "https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test",
+  "final_url": "https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "tsh_thyroid_screening",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:42.213Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 40556,
+  "sha256": "16d1809fa278f648934a65600bb4d5c8874dae8dcac70dbb67ae3c1f450b85f3"
+}

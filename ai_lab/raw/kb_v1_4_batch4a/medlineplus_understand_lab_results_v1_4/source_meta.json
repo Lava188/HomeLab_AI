@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_understand_lab_results_v1_4",
+  "title": "How to Understand Your Lab Results",
+  "url": "https://medlineplus.gov/lab-tests/how-to-understand-your-lab-results/",
+  "final_url": "https://medlineplus.gov/lab-tests/how-to-understand-your-lab-results/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "medical_result_explanation_boundary",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:31.412Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 40685,
+  "sha256": "83bae42b9575020f58978d6b0976d4670f9cbe69c3822d99b8444122aed44dc7"
+}

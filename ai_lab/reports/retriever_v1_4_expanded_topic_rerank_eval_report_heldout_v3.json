@@ -1,0 +1,87 @@
+{
+  "report_name": "retriever_v1_4_expanded_topic_rerank_eval_report",
+  "mode": "offline_expanded_query_plus_topic_rerank_experiment_only",
+  "baseline_v2": {
+    "count": 60,
+    "hit_at_1": 0.15,
+    "hit_at_3": 0.2167,
+    "hit_at_5": 0.3,
+    "mrr_at_5": 0.1961,
+    "expected_topic_match_at_1": 0.15,
+    "expected_topic_match_at_3": 0.2167,
+    "expected_domain_match_at_3": 0.8421,
+    "keyword_coverage_at_3": null,
+    "eval_path": "ai_lab/datasets/eval/retriever_v1_4_batch4a_vi_eval_v2.jsonl",
+    "artifact_dir": "ai_lab/artifacts/retriever_v1_4",
+    "retriever_version": "v1_4",
+    "model_name": "intfloat/multilingual-e5-small",
+    "top_k": 5,
+    "warning_count": 0,
+    "error_count": 0,
+    "latency_ms": 31261.12
+  },
+  "topic_rerank_4a15": {
+    "count": 60,
+    "hit_at_1": 0.35,
+    "hit_at_3": 0.3833,
+    "hit_at_5": 0.4,
+    "mrr_at_5": 0.37
+  },
+  "alias_expanded_single_search_4a17": {
+    "count": 60,
+    "hit_at_1": 0.35,
+    "hit_at_3": 0.65,
+    "hit_at_5": 0.7333,
+    "hit_at_10": 0.8167,
+    "hit_at_20": 0.8833,
+    "mrr_at_5": 0.495,
+    "topic_missing_top20_count": 7,
+    "topic_present_top20_but_missed_top3_count": 14,
+    "likely_alias_gap_remaining_count": 0
+  },
+  "expanded_topic_rerank_4a18": {
+    "count": 40,
+    "hit_at_1": 0.475,
+    "hit_at_3": 0.85,
+    "hit_at_5": 0.9,
+    "hit_at_10": 0.925,
+    "hit_at_20": 0.925,
+    "mrr_at_5": 0.6667,
+    "topic_missing_top20_count": 3,
+    "topic_present_top20_but_missed_top3_count": 3
+  },
+  "delta_vs_baseline_v2": {
+    "hit_at_1": 0.325,
+    "hit_at_3": 0.6333,
+    "hit_at_5": 0.6,
+    "mrr_at_5": 0.4706
+  },
+  "delta_vs_topic_rerank_4a15": {
+    "hit_at_1": 0.125,
+    "hit_at_3": 0.4667,
+    "hit_at_5": 0.5,
+    "mrr_at_5": 0.2967
+  },
+  "delta_vs_alias_expanded_single_search_4a17": {
+    "hit_at_1": 0.125,
+    "hit_at_3": 0.2,
+    "hit_at_5": 0.1667,
+    "mrr_at_5": 0.1717
+  },
+  "case_comparison_hit_at_3_vs_4a17": {
+    "improved": 34,
+    "unchanged": 6,
+    "regressed": 0
+  },
+  "case_comparison_hit_at_3_vs_4a15": {
+    "improved": 34,
+    "unchanged": 6,
+    "regressed": 0
+  },
+  "warning_count": 0,
+  "error_count": 0,
+  "top_k_retrieve": 20,
+  "top_k_output": 20,
+  "eval_path": "ai_lab/datasets/eval/retriever_v1_4_batch4a_vi_eval_heldout_v3.jsonl",
+  "latency_ms": 28077.34
+}

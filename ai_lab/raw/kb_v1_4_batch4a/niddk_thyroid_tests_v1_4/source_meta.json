@@ -1,0 +1,17 @@
+{
+  "source_id": "niddk_thyroid_tests_v1_4",
+  "title": "Thyroid Tests",
+  "url": "https://www.niddk.nih.gov/health-information/diagnostic-tests/thyroid",
+  "final_url": "https://www.niddk.nih.gov/health-information/diagnostic-tests/thyroid",
+  "source_family": "NIDDK",
+  "allowed_domain": "niddk.nih.gov",
+  "topic": "thyroid_tests_tsh_t4_t3",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:42.974Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html; charset=utf-8",
+  "content_length_bytes": 49862,
+  "sha256": "185a6cd27cb1b553dc6721324b28836e8aa7d9fc470a0f4bd0762e24dc589b73"
+}

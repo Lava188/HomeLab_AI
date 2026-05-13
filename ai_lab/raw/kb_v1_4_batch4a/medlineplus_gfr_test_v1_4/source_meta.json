@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_gfr_test_v1_4",
+  "title": "Glomerular Filtration Rate (GFR) Test",
+  "url": "https://medlineplus.gov/lab-tests/glomerular-filtration-rate-gfr-test/",
+  "final_url": "https://medlineplus.gov/lab-tests/glomerular-filtration-rate-gfr-test/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "kidney_function_egfr",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:39.472Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 39608,
+  "sha256": "3469a57b13e4408f9ad0c58536a37a1b1650580099e2d6b639509d646fca2970"
+}

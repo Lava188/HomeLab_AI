@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_t4_test_v1_4",
+  "title": "Thyroxine (T4) Test",
+  "url": "https://medlineplus.gov/lab-tests/thyroxine-t4-test/",
+  "final_url": "https://medlineplus.gov/lab-tests/thyroxine-t4-test/",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "t4_thyroid_testing",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:42.833Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 42669,
+  "sha256": "f2e893c75013aca9e95571117284144abe98537e347d8fd33704bbf48a1d351f"
+}

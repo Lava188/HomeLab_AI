@@ -1,0 +1,364 @@
+{
+  "report_name": "kb_v1_4_batch4a_cleaning_report",
+  "generated_at": "2026-04-27T17:30:30.770Z",
+  "input_path": "ai_lab/normalized/kb_v1_4_batch4a_normalized.jsonl",
+  "output_path": "ai_lab/normalized/kb_v1_4_batch4a_cleaned.jsonl",
+  "summary": {
+    "total": 26,
+    "cleaned_count": 26,
+    "strong_reduction_warning_count": 0,
+    "strong_reduction_sources": [],
+    "action_counts": {
+      "removed_nhs_page_review_footer": 1,
+      "removed_next_review_due_line": 1,
+      "removed_clear_reference_or_related_tail_section": 17,
+      "removed_exact_noise_lines:19": 1,
+      "removed_exact_noise_lines:31": 1,
+      "removed_exact_noise_lines:4": 3,
+      "removed_exact_noise_lines:32": 1,
+      "removed_exact_noise_lines:28": 1,
+      "removed_exact_noise_lines:22": 1
+    }
+  },
+  "records": [
+    {
+      "source_id": "nhs_blood_tests_overview_v1_4",
+      "topic": "general_lab_tests_blood_tests",
+      "domain": "nhs.uk",
+      "title": "Blood tests",
+      "original_char_count": 4168,
+      "cleaned_char_count": 4112,
+      "removed_char_count": 56,
+      "reduction_ratio": 0.0134,
+      "cleaning_actions": [
+        "removed_nhs_page_review_footer",
+        "removed_next_review_due_line"
+      ]
+    },
+    {
+      "source_id": "medlineplus_blood_testing_overview_v1_4",
+      "topic": "general_lab_tests_routine_blood_testing",
+      "domain": "medlineplus.gov",
+      "title": "What You Need to Know About Blood Testing",
+      "original_char_count": 8337,
+      "cleaned_char_count": 5040,
+      "removed_char_count": 3297,
+      "reduction_ratio": 0.3955,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_prepare_lab_test_v1_4",
+      "topic": "lab_preparation_fasting",
+      "domain": "medlineplus.gov",
+      "title": "How to Prepare for a Lab Test",
+      "original_char_count": 6790,
+      "cleaned_char_count": 4037,
+      "removed_char_count": 2753,
+      "reduction_ratio": 0.4054,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_understand_lab_results_v1_4",
+      "topic": "medical_result_explanation_boundary",
+      "domain": "medlineplus.gov",
+      "title": "How to Understand Your Lab Results",
+      "original_char_count": 11581,
+      "cleaned_char_count": 8742,
+      "removed_char_count": 2839,
+      "reduction_ratio": 0.2451,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_laboratory_tests_topic_v1_4",
+      "topic": "medical_result_boundary_general_labs",
+      "domain": "medlineplus.gov",
+      "title": "Laboratory Tests",
+      "original_char_count": 3601,
+      "cleaned_char_count": 3281,
+      "removed_char_count": 320,
+      "reduction_ratio": 0.0889,
+      "cleaning_actions": [
+        "removed_exact_noise_lines:19"
+      ]
+    },
+    {
+      "source_id": "medlineplus_cbc_test_v1_4",
+      "topic": "cbc_anemia_infection_basics",
+      "domain": "medlineplus.gov",
+      "title": "Complete Blood Count (CBC)",
+      "original_char_count": 7022,
+      "cleaned_char_count": 3616,
+      "removed_char_count": 3406,
+      "reduction_ratio": 0.485,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_blood_count_tests_v1_4",
+      "topic": "cbc_blood_count_overview",
+      "domain": "medlineplus.gov",
+      "title": "Blood Count Tests",
+      "original_char_count": 4137,
+      "cleaned_char_count": 3613,
+      "removed_char_count": 524,
+      "reduction_ratio": 0.1267,
+      "cleaning_actions": [
+        "removed_exact_noise_lines:31"
+      ]
+    },
+    {
+      "source_id": "medlineplus_crp_test_v1_4",
+      "topic": "inflammation_infection_context",
+      "domain": "medlineplus.gov",
+      "title": "C-Reactive Protein (CRP) Test",
+      "original_char_count": 7869,
+      "cleaned_char_count": 4489,
+      "removed_char_count": 3380,
+      "reduction_ratio": 0.4295,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_blood_culture_v1_4",
+      "topic": "infection_testing_blood_culture",
+      "domain": "medlineplus.gov",
+      "title": "Blood culture",
+      "original_char_count": 3989,
+      "cleaned_char_count": 2847,
+      "removed_char_count": 1142,
+      "reduction_ratio": 0.2863,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_blood_glucose_test_v1_4",
+      "topic": "glucose_fasting_blood_glucose_diabetes_screening",
+      "domain": "medlineplus.gov",
+      "title": "Blood Glucose Test",
+      "original_char_count": 18723,
+      "cleaned_char_count": 10038,
+      "removed_char_count": 8685,
+      "reduction_ratio": 0.4639,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_hba1c_test_v1_4",
+      "topic": "hba1c_diabetes_monitoring_screening",
+      "domain": "medlineplus.gov",
+      "title": "Hemoglobin A1C (HbA1c) Test",
+      "original_char_count": 10572,
+      "cleaned_char_count": 6268,
+      "removed_char_count": 4304,
+      "reduction_ratio": 0.4071,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "niddk_diabetes_tests_diagnosis_v1_4",
+      "topic": "glucose_hba1c_diabetes_screening",
+      "domain": "niddk.nih.gov",
+      "title": "Diabetes Tests & Diagnosis",
+      "original_char_count": 9865,
+      "cleaned_char_count": 9821,
+      "removed_char_count": 44,
+      "reduction_ratio": 0.0045,
+      "cleaning_actions": [
+        "removed_exact_noise_lines:4"
+      ]
+    },
+    {
+      "source_id": "medlineplus_cholesterol_levels_v1_4",
+      "topic": "lipid_panel_cholesterol",
+      "domain": "medlineplus.gov",
+      "title": "Cholesterol Levels",
+      "original_char_count": 14515,
+      "cleaned_char_count": 7743,
+      "removed_char_count": 6772,
+      "reduction_ratio": 0.4666,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_triglycerides_test_v1_4",
+      "topic": "lipid_panel_triglycerides",
+      "domain": "medlineplus.gov",
+      "title": "Triglycerides Test",
+      "original_char_count": 11123,
+      "cleaned_char_count": 6827,
+      "removed_char_count": 4296,
+      "reduction_ratio": 0.3862,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_liver_function_tests_v1_4",
+      "topic": "liver_function_alt_ast_bilirubin",
+      "domain": "medlineplus.gov",
+      "title": "Liver Function Tests",
+      "original_char_count": 8718,
+      "cleaned_char_count": 5529,
+      "removed_char_count": 3189,
+      "reduction_ratio": 0.3658,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_cmp_v1_4",
+      "topic": "cmp_liver_kidney_glucose_context",
+      "domain": "medlineplus.gov",
+      "title": "Comprehensive Metabolic Panel (CMP)",
+      "original_char_count": 8110,
+      "cleaned_char_count": 4754,
+      "removed_char_count": 3356,
+      "reduction_ratio": 0.4138,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_creatinine_test_v1_4",
+      "topic": "kidney_function_creatinine_egfr",
+      "domain": "medlineplus.gov",
+      "title": "Creatinine Test",
+      "original_char_count": 14024,
+      "cleaned_char_count": 8570,
+      "removed_char_count": 5454,
+      "reduction_ratio": 0.3889,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_gfr_test_v1_4",
+      "topic": "kidney_function_egfr",
+      "domain": "medlineplus.gov",
+      "title": "Glomerular Filtration Rate (GFR) Test",
+      "original_char_count": 10024,
+      "cleaned_char_count": 5683,
+      "removed_char_count": 4341,
+      "reduction_ratio": 0.4331,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_kidney_tests_v1_4",
+      "topic": "kidney_function_creatinine_egfr_urine_albumin",
+      "domain": "medlineplus.gov",
+      "title": "Kidney Tests",
+      "original_char_count": 4878,
+      "cleaned_char_count": 4337,
+      "removed_char_count": 541,
+      "reduction_ratio": 0.1109,
+      "cleaning_actions": [
+        "removed_exact_noise_lines:32"
+      ]
+    },
+    {
+      "source_id": "medlineplus_urinalysis_v1_4",
+      "topic": "urinalysis_urine_protein_glucose_uti_kidney_context",
+      "domain": "medlineplus.gov",
+      "title": "Urinalysis",
+      "original_char_count": 3655,
+      "cleaned_char_count": 3182,
+      "removed_char_count": 473,
+      "reduction_ratio": 0.1294,
+      "cleaning_actions": [
+        "removed_exact_noise_lines:28"
+      ]
+    },
+    {
+      "source_id": "medlineplus_microalbumin_creatinine_ratio_v1_4",
+      "topic": "urine_albumin_kidney_monitoring",
+      "domain": "medlineplus.gov",
+      "title": "Microalbumin Creatinine Ratio",
+      "original_char_count": 12823,
+      "cleaned_char_count": 8027,
+      "removed_char_count": 4796,
+      "reduction_ratio": 0.374,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "niddk_albuminuria_v1_4",
+      "topic": "urine_albumin_ckd_screening_context",
+      "domain": "niddk.nih.gov",
+      "title": "Albuminuria: Albumin in the Urine",
+      "original_char_count": 4856,
+      "cleaned_char_count": 4812,
+      "removed_char_count": 44,
+      "reduction_ratio": 0.0091,
+      "cleaning_actions": [
+        "removed_exact_noise_lines:4"
+      ]
+    },
+    {
+      "source_id": "medlineplus_thyroid_tests_v1_4",
+      "topic": "thyroid_tests_tsh_t4",
+      "domain": "medlineplus.gov",
+      "title": "Thyroid Tests",
+      "original_char_count": 3605,
+      "cleaned_char_count": 3231,
+      "removed_char_count": 374,
+      "reduction_ratio": 0.1037,
+      "cleaning_actions": [
+        "removed_exact_noise_lines:22"
+      ]
+    },
+    {
+      "source_id": "medlineplus_tsh_test_v1_4",
+      "topic": "tsh_thyroid_screening",
+      "domain": "medlineplus.gov",
+      "title": "TSH (Thyroid-stimulating hormone) Test",
+      "original_char_count": 11573,
+      "cleaned_char_count": 6565,
+      "removed_char_count": 5008,
+      "reduction_ratio": 0.4327,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "medlineplus_t4_test_v1_4",
+      "topic": "t4_thyroid_testing",
+      "domain": "medlineplus.gov",
+      "title": "Thyroxine (T4) Test",
+      "original_char_count": 12764,
+      "cleaned_char_count": 8049,
+      "removed_char_count": 4715,
+      "reduction_ratio": 0.3694,
+      "cleaning_actions": [
+        "removed_clear_reference_or_related_tail_section"
+      ]
+    },
+    {
+      "source_id": "niddk_thyroid_tests_v1_4",
+      "topic": "thyroid_tests_tsh_t4_t3",
+      "domain": "niddk.nih.gov",
+      "title": "Thyroid Tests",
+      "original_char_count": 8882,
+      "cleaned_char_count": 8838,
+      "removed_char_count": 44,
+      "reduction_ratio": 0.005,
+      "cleaning_actions": [
+        "removed_exact_noise_lines:4"
+      ]
+    }
+  ]
+}

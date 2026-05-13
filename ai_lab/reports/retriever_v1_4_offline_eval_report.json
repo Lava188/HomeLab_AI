@@ -1,0 +1,138 @@
+{
+  "report_name": "retriever_v1_4_offline_eval_report",
+  "summary": {
+    "count": 60,
+    "hit_at_1": 0.0833,
+    "hit_at_3": 0.1333,
+    "hit_at_5": 0.2,
+    "mrr_at_5": 0.115,
+    "expected_topic_match_at_1": 0.0833,
+    "expected_topic_match_at_3": 0.1333,
+    "expected_domain_match_at_3": null,
+    "keyword_coverage_at_3": null,
+    "eval_path": "ai_lab/evals/retriever_v1_4_batch4a_vi_eval.jsonl",
+    "artifact_dir": "ai_lab/artifacts/retriever_v1_4",
+    "retriever_version": "v1_4",
+    "model_name": "intfloat/multilingual-e5-small",
+    "top_k": 5,
+    "warning_count": 0,
+    "error_count": 0,
+    "latency_ms": 58295.88
+  },
+  "by_group": {},
+  "by_split": {},
+  "by_category": {
+    "test_advice_general_checkup": {
+      "count": 6,
+      "hit_at_1": 0.1667,
+      "hit_at_3": 0.1667,
+      "hit_at_5": 0.1667,
+      "mrr_at_5": 0.1667,
+      "expected_topic_match_at_1": 0.1667,
+      "expected_topic_match_at_3": 0.1667,
+      "expected_domain_match_at_3": null,
+      "keyword_coverage_at_3": null
+    },
+    "cbc_anemia_infection": {
+      "count": 6,
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.1667,
+      "hit_at_5": 0.1667,
+      "mrr_at_5": 0.0555,
+      "expected_topic_match_at_1": 0.0,
+      "expected_topic_match_at_3": 0.1667,
+      "expected_domain_match_at_3": null,
+      "keyword_coverage_at_3": null
+    },
+    "glucose_hba1c": {
+      "count": 6,
+      "hit_at_1": 0.1667,
+      "hit_at_3": 0.1667,
+      "hit_at_5": 0.3333,
+      "mrr_at_5": 0.2083,
+      "expected_topic_match_at_1": 0.1667,
+      "expected_topic_match_at_3": 0.1667,
+      "expected_domain_match_at_3": null,
+      "keyword_coverage_at_3": null
+    },
+    "lipid_cardiometabolic": {
+      "count": 6,
+      "hit_at_1": 0.1667,
+      "hit_at_3": 0.3333,
+      "hit_at_5": 0.5,
+      "mrr_at_5": 0.2555,
+      "expected_topic_match_at_1": 0.1667,
+      "expected_topic_match_at_3": 0.3333,
+      "expected_domain_match_at_3": null,
+      "keyword_coverage_at_3": null
+    },
+    "liver_function": {
+      "count": 6,
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.1667,
+      "hit_at_5": 0.1667,
+      "mrr_at_5": 0.0555,
+      "expected_topic_match_at_1": 0.0,
+      "expected_topic_match_at_3": 0.1667,
+      "expected_domain_match_at_3": null,
+      "keyword_coverage_at_3": null
+    },
+    "kidney_function_urine": {
+      "count": 6,
+      "hit_at_1": 0.1667,
+      "hit_at_3": 0.1667,
+      "hit_at_5": 0.3333,
+      "mrr_at_5": 0.2083,
+      "expected_topic_match_at_1": 0.1667,
+      "expected_topic_match_at_3": 0.1667,
+      "expected_domain_match_at_3": null,
+      "keyword_coverage_at_3": null
+    },
+    "thyroid_fatigue_tsh": {
+      "count": 5,
+      "hit_at_1": 0.2,
+      "hit_at_3": 0.2,
+      "hit_at_5": 0.4,
+      "mrr_at_5": 0.24,
+      "expected_topic_match_at_1": 0.2,
+      "expected_topic_match_at_3": 0.2,
+      "expected_domain_match_at_3": null,
+      "keyword_coverage_at_3": null
+    },
+    "clarification_needed": {
+      "count": 5,
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.0,
+      "hit_at_5": 0.0,
+      "mrr_at_5": 0.0,
+      "expected_topic_match_at_1": 0.0,
+      "expected_topic_match_at_3": 0.0,
+      "expected_domain_match_at_3": null,
+      "keyword_coverage_at_3": null
+    },
+    "urgent_override": {
+      "count": 8,
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.0,
+      "hit_at_5": 0.0,
+      "mrr_at_5": 0.0,
+      "expected_topic_match_at_1": 0.0,
+      "expected_topic_match_at_3": 0.0,
+      "expected_domain_match_at_3": null,
+      "keyword_coverage_at_3": null
+    },
+    "booking_separation": {
+      "count": 6,
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.0,
+      "hit_at_5": 0.0,
+      "mrr_at_5": 0.0,
+      "expected_topic_match_at_1": 0.0,
+      "expected_topic_match_at_3": 0.0,
+      "expected_domain_match_at_3": null,
+      "keyword_coverage_at_3": null
+    }
+  },
+  "warnings": [],
+  "details_csv_path": "ai_lab/reports/retriever_v1_4_offline_eval_details.csv"
+}

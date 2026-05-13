@@ -112,19 +112,58 @@ function postJson(url, body, timeoutMs = 30000) {
     });
 }
 
-function hasValidSource(topChunks, citations) {
-    const chunkOk = (topChunks || []).some(
-        (chunk) =>
-            (chunk.sourceUrl || chunk.finalUrl) &&
-            chunk.provenance !== undefined &&
-            chunk.topic &&
-            chunk.domain
-    );
-    const citationOk = (citations || []).some(
-        (citation) => citation.sourceUrl || citation.finalUrl
-    );
+function collectSourceEntries(meta) {
+    const entries = [];
 
-    return chunkOk || citationOk;
+    for (const chunk of Array.isArray(meta.topChunks) ? meta.topChunks : []) {
+        entries.push({
+            kind: "topChunk",
+            sourceUrl: chunk.sourceUrl || chunk.finalUrl || null,
+            provenance: chunk.provenance,
+            topic: chunk.topic || null,
+            domain: chunk.domain || null
+        });
+    }
+
+    for (const citation of Array.isArray(meta.citations) ? meta.citations : []) {
+        entries.push({
+            kind: "citation",
+            sourceUrl: citation.sourceUrl || citation.finalUrl || null,
+            provenance: citation.provenance,
+            topic: citation.topic || null,
+            domain: citation.domain || null
+        });
+    }
+
+    const semanticBridge = meta.debug?.semanticBridge || {};
+    const bridgeChunks = Array.isArray(semanticBridge.topChunks)
+        ? semanticBridge.topChunks
+        : Array.isArray(semanticBridge.results)
+            ? semanticBridge.results
+            : [];
+
+    for (const chunk of bridgeChunks) {
+        entries.push({
+            kind: "semanticBridgeTopChunk",
+            sourceUrl: chunk.source_url || chunk.final_url || null,
+            provenance: chunk.provenance,
+            topic: chunk.topic || null,
+            domain: chunk.domain || null
+        });
+    }
+
+    return entries;
+}
+
+function hasValidSource(meta) {
+    return collectSourceEntries(meta).some(
+        (entry) =>
+            entry.sourceUrl &&
+            entry.provenance !== undefined &&
+            entry.provenance !== null &&
+            entry.topic &&
+            entry.domain
+    );
 }
 
 function hasReviewLeak(value) {
@@ -151,8 +190,6 @@ function checkCase(testCase, payload) {
     const failures = [];
     const data = payload.data || {};
     const meta = data.meta || {};
-    const topChunks = Array.isArray(meta.topChunks) ? meta.topChunks : [];
-    const citations = Array.isArray(meta.citations) ? meta.citations : [];
 
     if (payload.success !== true) {
         failures.push("API success is not true");
@@ -194,7 +231,7 @@ function checkCase(testCase, payload) {
     if (meta.fallbackReason) {
         failures.push(`expected no fallbackReason for normal lab query, got ${meta.fallbackReason}`);
     }
-    if (!hasValidSource(topChunks, citations)) {
+    if (!hasValidSource(meta)) {
         failures.push("missing valid source/provenance metadata");
     }
     if (hasRecommendedPackage(meta)) {
@@ -259,6 +296,7 @@ async function main() {
             const data = payload.data || {};
             const meta = data.meta || {};
             const topChunks = Array.isArray(meta.topChunks) ? meta.topChunks : [];
+            const sourceEntries = collectSourceEntries(meta);
 
             rows.push({
                 id: testCase.id,
@@ -274,8 +312,10 @@ async function main() {
                 finalTopK: meta.finalTopK || null,
                 queryExpansionApplied: meta.queryExpansionApplied,
                 detectedAliasGroups: meta.detectedAliasGroups || [],
-                topTopic: topChunks[0]?.topic || null,
-                topDomain: topChunks[0]?.domain || null,
+                topTopic: topChunks[0]?.topic || sourceEntries[0]?.topic || null,
+                topDomain: topChunks[0]?.domain || sourceEntries[0]?.domain || null,
+                sourceEntryKind: sourceEntries[0]?.kind || null,
+                sourceEntryCount: sourceEntries.length,
                 fallbackUsed: meta.fallbackUsed,
                 fallbackReason: meta.fallbackReason || null
             });

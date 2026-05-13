@@ -1,0 +1,52 @@
+{
+  "report_name": "retriever_v1_4_rerank_eval_report",
+  "mode": "offline_rerank_experiment_only",
+  "baseline_v2": {
+    "count": 60,
+    "hit_at_1": 0.15,
+    "hit_at_3": 0.2167,
+    "hit_at_5": 0.3,
+    "mrr_at_5": 0.1961,
+    "expected_topic_match_at_1": 0.15,
+    "expected_topic_match_at_3": 0.2167,
+    "expected_domain_match_at_3": 0.8421,
+    "keyword_coverage_at_3": null,
+    "eval_path": "ai_lab/datasets/eval/retriever_v1_4_batch4a_vi_eval_v2.jsonl",
+    "artifact_dir": "ai_lab/artifacts/retriever_v1_4",
+    "retriever_version": "v1_4",
+    "model_name": "intfloat/multilingual-e5-small",
+    "top_k": 5,
+    "warning_count": 0,
+    "error_count": 0,
+    "latency_ms": 31261.12
+  },
+  "rerank": {
+    "count": 60,
+    "hit_at_1": 0.2667,
+    "hit_at_3": 0.35,
+    "hit_at_5": 0.3833,
+    "mrr_at_5": 0.3103
+  },
+  "delta": {
+    "hit_at_1": 0.1167,
+    "hit_at_3": 0.1333,
+    "hit_at_5": 0.0833,
+    "mrr_at_5": 0.1142
+  },
+  "case_comparison_hit_at_3": {
+    "improved": 9,
+    "unchanged": 50,
+    "regressed": 1
+  },
+  "warning_count": 0,
+  "error_count": 0,
+  "artifact_dir": "ai_lab/artifacts/retriever_v1_4",
+  "eval_path": "ai_lab/datasets/eval/retriever_v1_4_batch4a_vi_eval_v2.jsonl",
+  "top_k_retrieve": 20,
+  "top_k_output": 5,
+  "latency_ms": 23304.64,
+  "embeddings_shape": [
+    97,
+    384
+  ]
+}

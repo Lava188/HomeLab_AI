@@ -1,0 +1,17 @@
+{
+  "source_id": "medlineplus_thyroid_tests_v1_4",
+  "title": "Thyroid Tests",
+  "url": "https://medlineplus.gov/thyroidtests.html",
+  "final_url": "https://medlineplus.gov/thyroidtests.html",
+  "source_family": "MedlinePlus",
+  "allowed_domain": "medlineplus.gov",
+  "topic": "thyroid_tests_tsh_t4",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:41.715Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html",
+  "content_length_bytes": 70994,
+  "sha256": "3a9c0b60065969c71b4e7eb581b7f7dc14519cedd5f6ed04630022f130cd4db5"
+}

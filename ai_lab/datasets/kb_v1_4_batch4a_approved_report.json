@@ -1,0 +1,57 @@
+{
+  "report_name": "kb_v1_4_batch4a_approved_report",
+  "generated_at": "2026-04-27T17:56:59.213Z",
+  "input_path": "ai_lab/kb_reviewed/kb_v1_4_batch4a_approved_items.jsonl",
+  "output_path": "ai_lab/datasets/kb_v1_4_batch4a_approved_items.jsonl",
+  "total_input_approved_items": 55,
+  "total_output_kb_items": 55,
+  "version": "v1.4-batch4a",
+  "runtime_promoted": false,
+  "domain_counts": {
+    "nhs.uk": 3,
+    "medlineplus.gov": 48,
+    "niddk.nih.gov": 4
+  },
+  "topic_counts": {
+    "general_lab_tests_blood_tests": 3,
+    "general_lab_tests_routine_blood_testing": 3,
+    "lab_preparation_fasting": 3,
+    "medical_result_explanation_boundary": 4,
+    "cbc_anemia_infection_basics": 3,
+    "inflammation_infection_context": 4,
+    "infection_testing_blood_culture": 3,
+    "glucose_fasting_blood_glucose_diabetes_screening": 2,
+    "hba1c_diabetes_monitoring_screening": 4,
+    "glucose_hba1c_diabetes_screening": 1,
+    "lipid_panel_cholesterol": 3,
+    "lipid_panel_triglycerides": 1,
+    "liver_function_alt_ast_bilirubin": 1,
+    "cmp_liver_kidney_glucose_context": 3,
+    "kidney_function_creatinine_egfr": 4,
+    "kidney_function_egfr": 3,
+    "urine_albumin_kidney_monitoring": 2,
+    "urine_albumin_ckd_screening_context": 2,
+    "tsh_thyroid_screening": 2,
+    "t4_thyroid_testing": 3,
+    "thyroid_tests_tsh_t4_t3": 1
+  },
+  "intended_use_counts": {
+    "screening_context": 12,
+    "result_boundary": 37,
+    "preparation_guidance": 3,
+    "general_lab_education": 1,
+    "test_explanation": 1,
+    "symptom_to_test_context": 1
+  },
+  "medical_scope_counts": {
+    "general blood tests": 6,
+    "liver function": 4,
+    "medical result interpretation boundary": 4,
+    "CBC / anemia / infection": 10,
+    "glucose / HbA1c / diabetes screening": 10,
+    "lipid / cholesterol / triglycerides": 4,
+    "kidney function / creatinine / eGFR": 9,
+    "urinalysis / urine albumin": 2,
+    "thyroid testing": 6
+  }
+}

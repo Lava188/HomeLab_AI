@@ -1,0 +1,86 @@
+{
+  "report_name": "retriever_v1_4_expanded_topic_rerank_eval_report",
+  "mode": "offline_expanded_query_plus_topic_rerank_experiment_only",
+  "baseline_v2": {
+    "count": 60,
+    "hit_at_1": 0.15,
+    "hit_at_3": 0.2167,
+    "hit_at_5": 0.3,
+    "mrr_at_5": 0.1961,
+    "expected_topic_match_at_1": 0.15,
+    "expected_topic_match_at_3": 0.2167,
+    "expected_domain_match_at_3": 0.8421,
+    "keyword_coverage_at_3": null,
+    "eval_path": "ai_lab/datasets/eval/retriever_v1_4_batch4a_vi_eval_v2.jsonl",
+    "artifact_dir": "ai_lab/artifacts/retriever_v1_4",
+    "retriever_version": "v1_4",
+    "model_name": "intfloat/multilingual-e5-small",
+    "top_k": 5,
+    "warning_count": 0,
+    "error_count": 0,
+    "latency_ms": 31261.12
+  },
+  "topic_rerank_4a15": {
+    "count": 60,
+    "hit_at_1": 0.35,
+    "hit_at_3": 0.3833,
+    "hit_at_5": 0.4,
+    "mrr_at_5": 0.37
+  },
+  "alias_expanded_single_search_4a17": {
+    "count": 60,
+    "hit_at_1": 0.35,
+    "hit_at_3": 0.65,
+    "hit_at_5": 0.7333,
+    "hit_at_10": 0.8167,
+    "hit_at_20": 0.8833,
+    "mrr_at_5": 0.495,
+    "topic_missing_top20_count": 7,
+    "topic_present_top20_but_missed_top3_count": 14,
+    "likely_alias_gap_remaining_count": 0
+  },
+  "expanded_topic_rerank_4a18": {
+    "count": 60,
+    "hit_at_1": 0.6833,
+    "hit_at_3": 0.8333,
+    "hit_at_5": 0.85,
+    "hit_at_10": 0.8833,
+    "hit_at_20": 0.8833,
+    "mrr_at_5": 0.7589,
+    "topic_missing_top20_count": 7,
+    "topic_present_top20_but_missed_top3_count": 3
+  },
+  "delta_vs_baseline_v2": {
+    "hit_at_1": 0.5333,
+    "hit_at_3": 0.6166,
+    "hit_at_5": 0.55,
+    "mrr_at_5": 0.5628
+  },
+  "delta_vs_topic_rerank_4a15": {
+    "hit_at_1": 0.3333,
+    "hit_at_3": 0.45,
+    "hit_at_5": 0.45,
+    "mrr_at_5": 0.3889
+  },
+  "delta_vs_alias_expanded_single_search_4a17": {
+    "hit_at_1": 0.3333,
+    "hit_at_3": 0.1833,
+    "hit_at_5": 0.1167,
+    "mrr_at_5": 0.2639
+  },
+  "case_comparison_hit_at_3_vs_4a17": {
+    "improved": 13,
+    "unchanged": 45,
+    "regressed": 2
+  },
+  "case_comparison_hit_at_3_vs_4a15": {
+    "improved": 28,
+    "unchanged": 31,
+    "regressed": 1
+  },
+  "warning_count": 0,
+  "error_count": 0,
+  "top_k_retrieve": 20,
+  "top_k_output": 20,
+  "latency_ms": 22743.36
+}

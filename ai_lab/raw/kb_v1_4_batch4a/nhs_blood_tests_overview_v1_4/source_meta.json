@@ -1,0 +1,17 @@
+{
+  "source_id": "nhs_blood_tests_overview_v1_4",
+  "title": "Blood tests",
+  "url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+  "final_url": "https://www.nhs.uk/tests-and-treatments/blood-tests/",
+  "source_family": "NHS",
+  "allowed_domain": "nhs.uk",
+  "topic": "general_lab_tests_blood_tests",
+  "batch": "kb_v1_4_batch4a",
+  "captured_at": "2026-04-27T17:13:28.700Z",
+  "review_status": "raw_captured",
+  "runtime_promoted": false,
+  "status_code": 200,
+  "content_type": "text/html; charset=utf-8",
+  "content_length_bytes": 34639,
+  "sha256": "97ff6e003c8df1a69aed52303bf33de4d819e9e9d0bb87a3f4a7b7bde26f07ef"
+}
