@@ -98,8 +98,10 @@ Fallback and gates:
 - 4B-2I polished answer text: lab explanations no longer inject raw source titles/headings into the answer body, while source/provenance metadata remains available for source chips in `meta`/citations/topChunks.
 - Manual frontend observation after the polish covered CBC abnormal boundary, urgent chest pain/shortness of breath/sweating, generic booking, reschedule, HbA1c explanation, and HbA1c sample questions; behavior now matches current API/UX expectations, but broader frontend/manual observation is still required before promotion.
 - 4B-2J controlled frontend/manual UX follow-up checked UI + Network after 4B-2H/2I. Network/API behavior matched expectations, while answer text needed small polish for creatinine/eGFR and lab explanation wording. The observed UI answers are now more natural for HbA1c, HbA1c blood draw, ALT/AST, creatinine/eGFR, cholesterol/triglyceride, CBC boundary, urgent red flags, and generic booking, without raw source headings in the answer body and without weakening safety boundaries.
+- 4C product UX polish completed after controlled observation hardening: pure lab explanations no longer append soft booking CTAs, WBC-high answers avoid leukemia/blood-cancer mention unless asked, urgent fever/confusion/rapid-breathing remains emergency-oriented, source alignment avoids D-dimer/generic blood-test drift, and the NICE urgent-fever source chip no longer displays `undefined - https://www.nice.org.uk/guidance/ng253`.
+- 4D longer controlled runtime regression/product review passed **29/29** via `backend/scripts/smoke_controlled_runtime_regression_4d.js`, covering lab explanations, medical review/result boundaries, urgent red flags, mixed urgent + booking/test advice, booking/reschedule/cancel, and controlled recommendation/test advice.
 
-Next status: controlled v1.4 runtime is ready for broader manual UX/frontend review and longer regression observation, but **not** for default/global promotion yet.
+Next status: controlled v1.4 runtime has completed targeted 4C UX/source polish and broader 4D controlled regression, but **not** default/global promotion. The recommended next step is thesis technical narrative packaging / khóa luận write-up, not adding large features unless specifically needed.
 
 ## Current Status
 
@@ -127,7 +129,9 @@ Next status: controlled v1.4 runtime is ready for broader manual UX/frontend rev
 - 4B-2I answer text polish smoke passed **5/5**: HbA1c/ALT/AST-style explanations stay in clean Vietnamese answer text without raw English source heading leakage such as "Is there anything else..." or "What are they used for?"; source/provenance still lives in metadata/source chips.
 - Manual frontend checks after 4B-2H/2I found CBC abnormal boundary, urgent red flags, generic booking, reschedule, HbA1c explanation, and HbA1c sample questions aligned with the current API/UX contract.
 - 4B-2J frontend/API answer UX alignment was handled as controlled manual UI + Network review and minimal answer-text polish. Lab explanation answers are more natural for ALT/AST, creatinine/eGFR, and cholesterol/triglyceride; CBC abnormal remains non-diagnostic, urgent chest pain/shortness of breath/sweating remains emergency-oriented, and generic booking still does not infer `testType`.
-- v1.4 still is not default/global. Broader runtime/default promotion should wait for frontend/manual UX checks and more stable regression evidence.
+- 4C Product UX polish and source alignment hardening passed: `smoke_product_ux_polish_4c.js`, `smoke_frontend_ux_regression_4b2k.js`, `smoke_urgent_booking_ux_4b2h.js`, and `smoke_answer_text_polish_4b2i.js` all pass. Manual UI retest of 7 priority cases passed: CBC explanation, ALT/AST explanation, creatinine/eGFR explanation, WBC-high boundary, CBC abnormal/leukemia boundary, urgent fever/confusion/rapid-breathing, and mixed general-test request with urgent fever/confusion/rapid-breathing.
+- 4D Longer Controlled Runtime Regression/Product Review passed **29/29** with `backend/scripts/smoke_controlled_runtime_regression_4d.js`. It checks lab explanation polish, medical review/result-boundary behavior, urgent red-flag escalation, mixed urgent + booking/test-advice priority, booking/reschedule/cancel routing, controlled recommendation behavior, source-name validity, D-dimer drift prevention for urgent fever, raw package ID hiding, and raw English source-heading leakage prevention.
+- v1.4 still is not default/global. Live package recommendation remains controlled/not promoted. Current evidence is suitable for controlled thesis demo/evaluation, not production healthcare deployment.
 
 ## What Is Already Done
 
@@ -155,6 +159,8 @@ Next status: controlled v1.4 runtime is ready for broader manual UX/frontend rev
 - 4B-2I answer text polish verified through `backend/scripts/smoke_answer_text_polish_4b2i.js`, 5/5 PASS, with 4B-2H, 4B-2B, 4B-2D, and 4B-2G regressions still passing.
 - Manual frontend follow-up after polish checked CBC abnormal, urgent chest pain/shortness of breath/sweating, generic booking, reschedule, HbA1c explanation, and HbA1c sample question paths; the observed API/UX behavior is reasonable, but not yet enough for default/global promotion.
 - 4B-2J controlled frontend/manual UX review extended the manual cases to creatinine/eGFR and cholesterol/triglyceride. The follow-up confirmed the UI answer text is more natural and aligned with Network JSON after minimal polish; this remains controlled-only observation, not a default/global promotion signal.
+- 4C completed targeted product UX and source metadata hardening after 4B-2M: pure educational lab answers avoid soft booking CTA, WBC-high stays neutral unless leukemia/blood cancer is asked, urgent fever/confusion/rapid-breathing keeps emergency guidance with NICE/sepsis-aligned sources, and source display names are no longer `undefined`.
+- 4D completed broader controlled runtime regression after 4C: `backend/scripts/smoke_controlled_runtime_regression_4d.js` passed 29/29 across lab explanation, result boundary, urgent, mixed urgent/booking, booking/reschedule/cancel, and recommendation-controlled scenarios.
 
 ## What Is Blocked
 
@@ -163,17 +169,17 @@ Next status: controlled v1.4 runtime is ready for broader manual UX/frontend rev
 | Default live package recommendation | Controlled live package recommendation exists behind `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`, but it is not default/global behavior. |
 | Default runtime switch | Still intentionally avoided until controlled behavior is reviewed in product context. |
 | Production readiness | 3H proves controlled live behavior only. Broader production rollout still needs product review, catalog governance, and monitoring decisions. |
-| Retriever v1.4 default promotion | Controlled runtime integration and smokes now pass, but broader default/global promotion still needs frontend/manual UX review, product review, and longer regression stability. |
+| Retriever v1.4 default promotion | Controlled runtime integration, 4C UX polish, targeted manual retest, and 4D 29/29 regression pass, but default/global promotion remains intentionally blocked. |
 
 ## Immediate Next Step
 
-Proceed from 4B controlled runtime candidate to controlled UX/runtime review:
+Proceed from 4D controlled regression evidence to thesis technical narrative packaging / khóa luận:
 
 - Keep v1.4 behind explicit flags only.
 - Do not promote retriever v1.4 as default/global runtime yet.
-- Run frontend/manual UX checks against the controlled `/api/chat` path.
-- Continue regression coverage for urgent health, booking/reschedule/cancel, test advice, recommendation gating, flag-off behavior, fallback behavior, and provenance.
-- Consider broader runtime/default promotion only after UX and regression evidence remains stable.
+- Do not promote live package recommendation as default/global behavior.
+- Package the technical narrative: architecture, RAG-first decision, controlled v1.4 runtime, safety gates, recommendation gating, smoke evidence, and limitations.
+- Avoid adding large new features unless the thesis/demo narrative exposes a specific gap.
 
 Keep the stage-3 recommendation regression matrix explicit:
 
@@ -202,8 +208,10 @@ Keep the stage-3 recommendation regression matrix explicit:
 | 13 | 4B controlled retriever v1.4 runtime candidate behind explicit flags. Done; runtime smokes/regressions pass, no default promotion. |
 | 14 | 4B-2H urgent/booking UX safety polish. Done, 2/2 PASS; urgent red flags answer as emergency/urgent, generic booking does not infer test type. |
 | 15 | 4B-2I answer text polish. Done, 5/5 PASS; answer body no longer leaks raw source title/heading while source metadata remains available. |
-| 16 | Frontend/manual UX and longer controlled runtime regression for v1.4. Next. |
-| 17 | Broader default/global production promotion. Future decision only. |
+| 16 | 4C product UX polish and source alignment hardening. Done; targeted smokes and 7-case manual UI retest pass, no default promotion. |
+| 17 | 4D longer controlled runtime regression/product review. Done, 29/29 PASS; no default/global promotion. |
+| 18 | Thesis technical narrative packaging / khóa luận. Next. |
+| 19 | Broader default/global production promotion. Future decision only. |
 
 ## Rules For Future Work
 
@@ -255,4 +263,4 @@ Start from the controlled semantic retrieval and intent grouping state, not the 
 
 As of 3H, the recommendation/test package path is a controlled slot-based prototype with API metadata, answer UX, source contract, flag-off regression, frontend smoke, and controlled live package return behind a separate live gate. It is not a default/global production recommendation engine. When `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED` is unset or false, `recommendedPackage` stays `null`; when recommendation runtime is false, there is no recommendation meta/UX/package ID output.
 
-As of 4B-2I, retriever v1.4 is wired into backend runtime as a controlled-only path behind explicit semantic flags. Python bridge, server contract, Node service, real `/api/chat`, router, flag-off, fallback, regression, provenance, urgent/booking UX, and answer text polish smokes pass. v1_3/default behavior remains the safe baseline when flags are off, and v1.4 is still not promoted as default/global. Frontend manual observation now shows answer UX is more reasonable for CBC boundary, urgent red flags, generic booking, reschedule, and HbA1c explanation/sample questions, but the correct continuation is broader frontend/manual UX review plus longer controlled regression before any broader promotion decision. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.
+As of 4D, retriever v1.4 is wired into backend runtime as a controlled-only path behind explicit semantic flags and has completed targeted product UX/source alignment polish plus broader controlled regression. `smoke_controlled_runtime_regression_4d.js` passed 29/29 across lab explanation, result boundary, urgent, mixed urgent/booking, booking/reschedule/cancel, and recommendation-controlled scenarios. v1_3/default behavior remains the safe baseline when flags are off, and v1.4 is still not promoted as default/global. The correct continuation is thesis technical narrative packaging / khóa luận and future controlled observation as needed, not immediate production/default release. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.

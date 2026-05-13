@@ -45,6 +45,8 @@
 | Retriever v1.4 answer text polish 4B-2I | `node backend/scripts/smoke_answer_text_polish_4b2i.js` | 5/5 PASS; lab explanations avoid raw source title/heading leakage while source metadata remains available. |
 | Retriever v1.4 post-2H/2I regression snapshot | 4B-2B / 4B-2D / 4B-2G smokes | 4B-2B remains 9/9 normal + 2/2 gate PASS; 4B-2D remains 14/14 PASS; 4B-2G remains 11/11 PASS. |
 | Retriever v1.4 frontend/API answer UX observation 4B-2J | manual UI + Network observation, not a scripted benchmark | Checked HbA1c, HbA1c blood draw, ALT/AST, creatinine/eGFR, cholesterol/triglyceride, CBC boundary, urgent red flags, and generic booking after minimal answer-text polish. UI/Network answers are more natural and remain safety-bounded; no new benchmark number is introduced. |
+| Product UX polish and source alignment hardening 4C | `node backend/scripts/smoke_product_ux_polish_4c.js` plus regression smokes/manual UI retest | 4C smoke PASS; frontend regression 4B-2K PASS; urgent booking 4B-2H PASS; answer text polish 4B-2I PASS. Manual 7-case UI retest PASS. No default/global promotion. |
+| Longer Controlled Runtime Regression/Product Review 4D | `node backend/scripts/smoke_controlled_runtime_regression_4d.js` | 29/29 PASS; broader controlled regression after 4C across lab explanation, result boundary, urgent red flags, mixed urgent + booking/test advice, booking/reschedule/cancel, and recommendation-controlled scenarios. |
 
 ## Key Metrics Found In Repo
 
@@ -117,6 +119,8 @@ The v1.4 Batch 4B runtime work is a controlled-only runtime path. It ports the 4
 | `smoke_api_retriever_v1_4_provenance_4b2g.js` | Runtime provenance, source allowlist, approved-only behavior, urgent and booking gates. | 11/11 PASS. |
 | `smoke_urgent_booking_ux_4b2h.js` | Urgent-health answer policy and generic booking slot inference. | 2/2 PASS; 4B-2B, 4B-2D, and 4B-2G regressions still pass. |
 | `smoke_answer_text_polish_4b2i.js` | Lab explanation answer body polish and source metadata preservation. | 5/5 PASS; 4B-2H, 4B-2B, 4B-2D, and 4B-2G regressions still pass. |
+| `smoke_product_ux_polish_4c.js` | Product UX polish for pure lab explanations, WBC-high boundary, urgent fever source alignment, and source-name metadata. | PASS; urgent fever source chips have valid source names and avoid D-dimer drift. |
+| `smoke_controlled_runtime_regression_4d.js` | Longer controlled runtime regression/product review across lab explanation, medical review/result boundary, urgent, mixed urgent/booking, booking/reschedule/cancel, and recommendation-controlled groups. | 29/29 PASS; broader controlled evidence after 4C, with no default/global promotion. |
 
 Post-2H/2I regression snapshot:
 
@@ -129,6 +133,26 @@ Post-2H/2I regression snapshot:
 Manual frontend observation after answer polish: CBC abnormal boundary, urgent chest pain/shortness of breath/sweating, generic booking, reschedule, HbA1c explanation, and HbA1c sample questions match current API/UX expectations. This supports controlled readiness only, not default/global promotion.
 
 4B-2J manual frontend/API observation extended the same controlled review to creatinine/eGFR and cholesterol/triglyceride lab explanations. It recorded UX alignment and answer-text naturalness only; it is not a new scripted benchmark and does not change the existing smoke counts.
+
+4C product UX/source alignment evidence:
+
+| Check | Result |
+| --- | --- |
+| `node backend/scripts/smoke_product_ux_polish_4c.js` | PASS; pure educational lab answers avoid soft booking CTA, WBC-high avoids leukemia/blood-cancer mention unless asked, urgent fever cases avoid D-dimer/source-name regressions. |
+| `node backend/scripts/smoke_frontend_ux_regression_4b2k.js` | PASS. |
+| `node backend/scripts/smoke_urgent_booking_ux_4b2h.js` | PASS. |
+| `node backend/scripts/smoke_answer_text_polish_4b2i.js` | PASS. |
+| `node backend/scripts/smoke_recommendation_api_3c.js` | PASS; recommendation metadata contract remains stable. |
+| `node backend/scripts/smoke_recommendation_answer_ux_3d.js` | PASS; recommendation answer UX remains stable. |
+| Manual UI retest | PASS for 7 priority cases: CBC explanation, ALT/AST explanation, creatinine/eGFR explanation, WBC-high boundary, CBC abnormal/leukemia boundary, urgent fever/confusion/rapid-breathing, and mixed general-test request with urgent fever/confusion/rapid-breathing. |
+
+4D longer controlled runtime regression/product review evidence:
+
+| Check | Result |
+| --- | --- |
+| `node backend/scripts/smoke_controlled_runtime_regression_4d.js` | 29/29 PASS. |
+| Coverage A-F | Lab explanation; medical review/result boundary; urgent red flags; mixed urgent + booking/test advice; booking/reschedule/cancel; recommendation/test advice controlled. |
+| Regression themes | No unnecessary soft booking CTA in lab explanations; no booking hijack for result-boundary cases; no diagnosis overclaim for CBC/WBC/ALT-AST/creatinine; urgent red flags stay emergency/urgent; mixed urgent cases do not become booking/recommendation; generic home sampling does not infer `testType`; reschedule/cancel still work; live gate off keeps `recommendedPackage=null`; raw package IDs are hidden; source names are not undefined/null; urgent fever avoids D-dimer source drift; raw English source headings do not leak into answer body. |
 
 4B runtime metadata checked through smoke includes `retrieverVersion="v1_4"`, `retrievalStrategy="expanded_query_topic_aware_rerank"`, `candidateTopK=20`, `finalTopK=5`, bridge status, fallback state, query-expansion details, `runtimePromoted=false`, and `runtimeDefaultChanged=false`.
 
@@ -199,6 +223,8 @@ Important distinction: the older semantic activation audit remains useful histor
 | Retriever v1.4 4B-2I answer text polish smoke | PASS controlled runtime | 5/5 PASS; answer body stays clean while source metadata/source chips remain available. |
 | Retriever v1.4 post-polish manual frontend observation | PASS controlled observation | CBC abnormal, urgent red flags, generic booking, reschedule, HbA1c explanation, and HbA1c sample question paths match current API/UX expectations; broader observation still needed before promotion. |
 | Retriever v1.4 4B-2J frontend/API answer UX observation | PASS controlled observation | Manual UI + Network review found API behavior aligned and answer text more natural for HbA1c, HbA1c blood draw, ALT/AST, creatinine/eGFR, cholesterol/triglyceride, CBC boundary, urgent red flags, and generic booking. This is observation, not a scripted benchmark. |
+| Product UX polish and source alignment 4C | PASS controlled observation | Scripted 4C/regression smokes pass and manual 7-case UI retest passes. NICE urgent-fever source display no longer shows `undefined`; no default/global promotion. |
+| Longer controlled runtime regression 4D | PASS controlled regression | `smoke_controlled_runtime_regression_4d.js` passes 29/29 across A-F groups after 4C; suitable for controlled thesis demo/evaluation evidence, not production deployment. |
 
 ## Controlled Semantic Retrieval + IntentGroup Manual Smoke
 
@@ -263,6 +289,8 @@ These findings describe the older pre-bridge runtime audit. Current controlled m
 | Controlled live package recommendation | PASS behind separate live gate; off by default, live gate off keeps `recommendedPackage=null` |
 | KB/Retriever v1.4 Batch 4A offline pipeline | PASS through held-out v3; not runtime-promoted |
 | KB/Retriever v1.4 Batch 4B controlled runtime | PASS controlled smokes through 4B-2I; not default/global |
+| Product UX/source alignment 4C | PASS targeted smokes/manual retest; controlled-only |
+| Longer controlled regression 4D | PASS 29/29; controlled-only |
 | Default switch | Not switched; controlled/opt-in |
 
 ## Missing Or Needs Verification
@@ -271,5 +299,5 @@ These findings describe the older pre-bridge runtime audit. Current controlled m
 - 3H proves controlled live package return only when both runtime and live package gates are enabled.
 - Production/default rollout still needs product review, catalog governance, and monitoring decisions.
 - Broader default/runtime promotion remains a future decision after product review.
-- Retriever v1.4 expanded-query + topic-aware rerank now has controlled runtime integration plus urgent/booking UX and answer text polish smoke coverage, but broader frontend/manual UX and longer regression evidence are still needed before any default/global promotion.
+- Retriever v1.4 expanded-query + topic-aware rerank now has controlled runtime integration plus urgent/booking UX, answer text polish, 4C source alignment, and 4D 29/29 broader controlled regression evidence, but default/global promotion remains intentionally out of scope.
 - Held-out v3 is evidence and should be frozen; do not repeatedly tune against it.
