@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  DRAFT
+  PENDING_CONFIRMATION
+  CONFIRMED
+  RESCHEDULED
+  ASSIGNED
+  SAMPLE_COLLECTED
+  IN_LAB_PROCESSING
+  RESULT_READY
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum StaffRole {
+  ADMIN
+  STAFF
+  SAMPLE_COLLECTOR
+  LAB_TECHNICIAN
+}
+
+enum CreatedSource {
+  CHAT
+  ADMIN
+  STAFF
+}
+
+model Patient {
+  id             String         @id @default(cuid())
+  fullName       String
+  phone          String         @unique
+  email          String?
+  dateOfBirth    DateTime?
+  gender         String?
+  defaultAddress String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  bookings       Booking[]
+  bookingDrafts  BookingDraft[]
+}
+
+model TestCatalogItem {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  name        String
+  description String?
+  category    String?
+  sampleType  String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookings    Booking[]
+}
+
+model StaffProfile {
+  id               String    @id @default(cuid())
+  fullName         String
+  phone            String?
+  role             StaffRole
+  serviceArea      String?
+  active           Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  assignedBookings Booking[]
+}
+
+model AvailabilitySlot {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date
+  startTime   DateTime @db.Time(0)
+  endTime     DateTime @db.Time(0)
+  capacity    Int
+  bookedCount Int      @default(0)
+  area        String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date, area])
+}
+
+model Booking {
+  id                   String                 @id @default(cuid())
+  bookingCode          String                 @unique
+  patientId            String?
+  testCatalogItemId    String?
+  testTypeText         String?
+  sampleDate           DateTime               @db.Date
+  sampleTimeStart      DateTime?              @db.Time(0)
+  sampleTimeEnd        DateTime?              @db.Time(0)
+  address              String
+  phone                String
+  patientName          String?
+  status               BookingStatus          @default(DRAFT)
+  note                 String?
+  internalNote         String?
+  assignedStaffId      String?
+  createdFromSessionId String?
+  createdSource        CreatedSource          @default(CHAT)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  cancelledAt          DateTime?
+  completedAt          DateTime?
+  patient              Patient?               @relation(fields: [patientId], references: [id])
+  testCatalogItem      TestCatalogItem?       @relation(fields: [testCatalogItemId], references: [id])
+  assignedStaff        StaffProfile?          @relation(fields: [assignedStaffId], references: [id])
+  statusHistory        BookingStatusHistory[]
+
+  @@index([patientId])
+  @@index([testCatalogItemId])
+  @@index([assignedStaffId])
+  @@index([status])
+  @@index([sampleDate])
+  @@index([createdFromSessionId])
+}
+
+model BookingDraft {
+  id            String        @id @default(cuid())
+  sessionId     String
+  patientId     String?
+  slotsJson     Json
+  missingFields Json
+  status        BookingStatus @default(DRAFT)
+  expiresAt     DateTime
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  patient       Patient?      @relation(fields: [patientId], references: [id])
+
+  @@index([sessionId])
+  @@index([patientId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model BookingStatusHistory {
+  id            String         @id @default(cuid())
+  bookingId     String
+  fromStatus    BookingStatus?
+  toStatus      BookingStatus
+  reason        String?
+  changedByType String
+  changedById   String?
+  metadata      Json?
+  createdAt     DateTime       @default(now())
+  booking       Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([toStatus])
+  @@index([createdAt])
+}
