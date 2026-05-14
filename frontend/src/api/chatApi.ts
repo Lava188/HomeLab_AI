@@ -1,9 +1,24 @@
+export type SourceCitation =
+  | string
+  | {
+      name?: string | null;
+      source_name?: string | null;
+      sourceName?: string | null;
+      domain?: string | null;
+      url?: string | null;
+      source_url?: string | null;
+      sourceUrl?: string | null;
+      finalUrl?: string | null;
+      final_url?: string | null;
+      title?: string | null;
+    };
+
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
   text: string;
   timestamp: string;
-  citations?: string[];
+  citations?: SourceCitation[];
   variant?: 'default' | 'clarify';
   meta?: {
     flow?: string;
@@ -48,6 +63,7 @@ type BackendChatData = {
     knowledgeItem?: {
       source?: string | null;
     };
+    citations?: SourceCitation[];
   };
 };
 
@@ -127,7 +143,9 @@ export const mockSendMessage = async (text: string): Promise<Message> => {
 
     const citations = result.data.meta?.knowledgeItem?.source
       ? [result.data.meta.knowledgeItem.source]
-      : undefined;
+      : result.data.meta?.citations && result.data.meta.citations.length > 0
+        ? result.data.meta.citations
+        : undefined;
     const isClarifyingResponse =
       result.data.action === 'FALLBACK_RESPONSE' &&
       result.data.meta?.routing?.lowConfidenceGuard?.triggered === true;

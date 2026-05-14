@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { mockSendMessage, Message, clearChatSession } from '../api/chatApi';
+import { mockSendMessage, Message, SourceCitation, clearChatSession } from '../api/chatApi';
 import {
   Menu,
   Plus,
@@ -27,6 +27,130 @@ import {
 } from 'lucide-react';
 
 const STORAGE_KEY = 'homelab_chat_history';
+
+type DisplaySource = {
+  name: string;
+  url?: string;
+};
+
+const FRIENDLY_SOURCE_NAMES: Record<string, string> = {
+  'medlineplus.gov': 'MedlinePlus',
+  'nhs.uk': 'NHS',
+  'nice.org.uk': 'NICE',
+  'niddk.nih.gov': 'NIDDK',
+};
+
+function cleanSourceValue(value: unknown) {
+  const text = String(value ?? '').trim();
+
+  if (!text || text.toLowerCase() === 'undefined' || text.toLowerCase() === 'null') {
+    return '';
+  }
+
+  return text;
+}
+
+function getValidSourceUrl(value: unknown) {
+  const text = cleanSourceValue(value);
+
+  if (!text) return '';
+
+  try {
+    const url = new URL(text);
+
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return '';
+    }
+
+    return url.toString();
+  } catch {
+    return '';
+  }
+}
+
+function getDomainFromUrl(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+}
+
+function friendlySourceName(name: string, domain: string) {
+  const normalizedDomain = domain.toLowerCase();
+  const normalizedName = name.toLowerCase().replace(/^www\./, '');
+
+  return (
+    FRIENDLY_SOURCE_NAMES[normalizedDomain] ||
+    FRIENDLY_SOURCE_NAMES[normalizedName] ||
+    name
+  );
+}
+
+function parseStringCitation(citation: string) {
+  const raw = cleanSourceValue(citation);
+  const urlMatch = raw.match(/https?:\/\/\S+/);
+  const url = getValidSourceUrl(urlMatch?.[0]);
+  const name = cleanSourceValue(url ? raw.replace(urlMatch?.[0] || '', '').replace(/\s*-\s*$/, '') : raw);
+
+  return { name, url };
+}
+
+function normalizeSourceDisplay(citation: SourceCitation): DisplaySource | null {
+  const parsed = typeof citation === 'string' ? parseStringCitation(citation) : null;
+  const url = typeof citation === 'string'
+    ? parsed?.url || ''
+    : getValidSourceUrl(
+        citation.url ||
+        citation.source_url ||
+        citation.sourceUrl ||
+        citation.finalUrl ||
+        citation.final_url
+      );
+  const domain = typeof citation === 'string'
+    ? getDomainFromUrl(url)
+    : cleanSourceValue(citation.domain) || getDomainFromUrl(url);
+  const rawName = typeof citation === 'string'
+    ? parsed?.name || domain
+    : cleanSourceValue(
+        citation.name ||
+        citation.source_name ||
+        citation.sourceName ||
+        citation.domain ||
+        citation.title ||
+        domain
+      );
+  const name = cleanSourceValue(friendlySourceName(rawName || domain, domain));
+
+  if (!name) return null;
+
+  return {
+    name,
+    url: url || undefined,
+  };
+}
+
+function normalizeMessageSources(citations: SourceCitation[] = []) {
+  const seen = new Set<string>();
+  const sources: DisplaySource[] = [];
+
+  citations.forEach((citation) => {
+    const source = normalizeSourceDisplay(citation);
+
+    if (!source) return;
+
+    const key = source.url
+      ? `url:${source.url.toLowerCase()}`
+      : `name:${source.name.toLowerCase()}`;
+
+    if (seen.has(key)) return;
+
+    seen.add(key);
+    sources.push(source);
+  });
+
+  return sources;
+}
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -350,6 +474,8 @@ export default function ChatPage() {
                     const nextMsg = messages[index + 1];
                     const isLastInGroup = !nextMsg || nextMsg.role !== msg.role;
 
+                    const sources = !isUser ? normalizeMessageSources(msg.citations) : [];
+
                     return (
                       <div
                         key={msg.id}
@@ -397,18 +523,30 @@ export default function ChatPage() {
                               )}
 
                               {/* Citations */}
-                              {!isUser && msg.citations && msg.citations.length > 0 && (
+                              {sources.length > 0 && (
                                 <div className="mt-3 pt-3 border-t border-slate-100">
-                                  <div className="text-[11px] font-medium text-slate-400 mb-1.5">Nguồn:</div>
+                                  <div className="text-[11px] font-medium text-slate-400 mb-1.5">Nguồn tham khảo:</div>
                                   <div className="flex flex-wrap gap-1.5">
-                                    {msg.citations.map((cite, i) => (
-                                      <button
-                                        key={i}
-                                        title={cite}
-                                        className="text-[11px] font-medium px-2 py-1 bg-slate-50 text-slate-500 rounded-md hover:bg-slate-100 hover:text-slate-700 transition-colors border border-slate-200"
-                                      >
-                                        {cite}
-                                      </button>
+                                    {sources.map((source) => (
+                                      source.url ? (
+                                        <a
+                                          key={`${source.name}-${source.url}`}
+                                          href={source.url}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          title={source.url}
+                                          className="text-[11px] font-medium px-2 py-1 bg-slate-50 text-slate-600 rounded-md hover:bg-slate-100 hover:text-slate-800 transition-colors border border-slate-200"
+                                        >
+                                          {source.name}
+                                        </a>
+                                      ) : (
+                                        <span
+                                          key={source.name}
+                                          className="text-[11px] font-medium px-2 py-1 bg-slate-50 text-slate-500 rounded-md border border-slate-200"
+                                        >
+                                          {source.name}
+                                        </span>
+                                      )
                                     ))}
                                   </div>
                                 </div>
