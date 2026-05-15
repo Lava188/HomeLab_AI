@@ -90,7 +90,7 @@ function detectTimeFromMessage(message) {
 }
 
 function extractBookingId(message) {
-    const match = String(message || "").match(/\bBK\d{8,}\b/i);
+    const match = String(message || "").match(/\bHLB-\d{8}-[A-Z0-9]{4,}\b/i);
 
     if (!match) {
         return null;

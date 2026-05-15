@@ -5,6 +5,7 @@ const rescheduleService = require("./reschedule.service");
 const cancelService = require("./cancel.service");
 const { detectFlow } = require("./router-intent.service");
 const { runSemanticBridge } = require("./health-rag/semantic-bridge.service");
+const { normalizeText } = require("../utils/text.util");
 
 const {
     CHAT_ENGINE_VERSION,
@@ -146,6 +147,25 @@ function attachSemanticRouterGateDebug(result, gateDebug) {
             }
         }
     };
+}
+
+function isBookingConfirmationContinuation(message, sessionId) {
+    if (!bookingService.hasActiveBookingSession(sessionId)) {
+        return false;
+    }
+
+    const normalizedMessage = normalizeText(message);
+    const confirmationSignals = [
+        "xac nhan",
+        "dong y",
+        "ok",
+        "ok dat lich",
+        "dat lich"
+    ];
+
+    return confirmationSignals.some((signal) =>
+        normalizedMessage.includes(signal)
+    );
 }
 
 function shouldAttemptSemanticRouterGate({ routeResult, sessionId }) {
@@ -373,6 +393,26 @@ async function routeMessage({ message, sessionId }) {
             ...ragResult,
             meta: mergeRouterMeta(
                 attachSemanticRouterGateDebug(ragResult, gateDebug),
+                safetyResult.meta,
+                routeResult
+            )
+        };
+    }
+
+    if (isBookingConfirmationContinuation(message, sessionId)) {
+        const bookingContinuationResult =
+            await bookingService.handleBookingMessage({
+                message,
+                sessionId
+            });
+
+        return {
+            ...bookingContinuationResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(
+                    bookingContinuationResult,
+                    gateDebug
+                ),
                 safetyResult.meta,
                 routeResult
             )

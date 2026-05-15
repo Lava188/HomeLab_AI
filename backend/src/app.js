@@ -5,6 +5,7 @@ const path = require("path");
 
 const chatRoute = require("./routes/chat.route");
 const debugRoute = require("./routes/debug.route");
+const adminBookingRoute = require("./routes/admin-booking.route");
 
 dotenv.config({
   path: path.join(__dirname, "../.env")
@@ -29,6 +30,7 @@ app.get("/api/health", (req, res) => {
 // Main API routes
 app.use("/api/chat", chatRoute);
 app.use("/api/debug", debugRoute);
+app.use("/api/admin/bookings", adminBookingRoute);
 
 // 404 handler
 app.use((req, res) => {

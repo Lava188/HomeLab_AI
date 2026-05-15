@@ -1,5 +1,5 @@
 const mockSessions = require("../data/mockSessions");
-const mockBookings = require("../data/mockBookings");
+const bookingRuntime = require("./booking-runtime/booking.service");
 const { FLOWS, ACTIONS } = require("../constants/chat.constants");
 const { createChatResult } = require("../utils/chat-response.util");
 const {
@@ -29,15 +29,15 @@ const FIELD_LABELS = {
 
 const FIELD_PROMPTS = {
     testType:
-        "loại xét nghiệm. Ví dụ: đường huyết, mỡ máu, công thức máu, nước tiểu",
+        "loại xét nghiệm/gói xét nghiệm bạn muốn đặt. Ví dụ: công thức máu, HbA1c, mỡ máu, chức năng gan",
     appointmentDate:
         "ngày lấy mẫu. Ví dụ: ngày mai, hôm nay, hoặc 27/03/2026",
     appointmentTime:
         "giờ lấy mẫu. Ví dụ: 7h30, 8h, 14:00",
     address:
-        "địa chỉ lấy mẫu. Tốt nhất theo format: Địa chỉ: số nhà, đường, phường/xã, quận/huyện, tỉnh/thành",
+        "địa chỉ lấy mẫu. Ví dụ: 12 Nguyễn Trãi, Quận 1",
     patientName:
-        "tên người đặt. Tốt nhất theo format: Tên: Nguyễn Văn A",
+        "tên người đặt. Ví dụ: tên Nguyễn Văn A",
     phoneNumber:
         "số điện thoại liên hệ. Ví dụ: 0912345678"
 };
@@ -73,33 +73,33 @@ function detectTestType(message) {
 
     const testTypeMappings = [
         {
-            value: "Xét nghiệm đường huyết",
-            keywords: ["duong huyet", "glucose", "tieu duong"]
+            value: "Công thức máu",
+            keywords: ["cong thuc mau", "tong phan tich mau", "huyet hoc", "cbc"]
         },
         {
-            value: "Xét nghiệm mỡ máu",
+            value: "HbA1c",
+            keywords: ["hba1c"]
+        },
+        {
+            value: "Mỡ máu",
             keywords: ["mo mau", "lipid", "cholesterol"]
         },
         {
-            value: "Xét nghiệm công thức máu",
-            keywords: ["cong thuc mau", "tong phan tich mau", "huyet hoc"]
+            value: "Chức năng gan",
+            keywords: ["chuc nang gan", "men gan", "alt", "ast"]
         },
         {
-            value: "Xét nghiệm nước tiểu",
-            keywords: ["nuoc tieu", "urine"]
+            value: "Chức năng thận",
+            keywords: ["chuc nang than", "creatinine", "egfr"]
         },
         {
-            value: "Xét nghiệm máu tổng quát",
-            keywords: ["xet nghiem mau", "xet nghiem tong quat"]
+            value: "Xét nghiệm tổng quát",
+            keywords: ["xet nghiem tong quat", "kiem tra tong quat"]
         }
     ];
 
     for (const item of testTypeMappings) {
-        const matched = item.keywords.some((keyword) =>
-            normalizedMessage.includes(keyword)
-        );
-
-        if (matched) {
+        if (item.keywords.some((keyword) => normalizedMessage.includes(keyword))) {
             return item.value;
         }
     }
@@ -118,28 +118,44 @@ function detectPhoneNumber(message) {
 }
 
 function detectPatientName(message) {
-    const nameMatch =
-        String(message || "").match(/tên\s*[:\-]\s*([^\n,;]+)/i) ||
-        String(message || "").match(/ten\s*[:\-]\s*([^\n,;]+)/i);
+    const match = String(message || "").match(
+        /(?:\btên\b|\bten\b)\s*[:\-]?\s*([^,;.]+)/i
+    );
 
-    if (!nameMatch) {
+    if (!match) {
         return null;
     }
 
-    return String(nameMatch[1] || "").trim();
+    return String(match[1] || "").trim();
 }
 
 function detectAddress(message) {
-    const addressMatch =
-        String(message || "").match(/địa chỉ\s*[:\-]\s*(.+)$/i) ||
-        String(message || "").match(/dia chi\s*[:\-]\s*(.+)$/i) ||
-        String(message || "").match(/address\s*[:\-]\s*(.+)$/i);
+    const text = String(message || "");
+    const explicitMatch = text.match(
+        /(?:địa chỉ|dia chi|address)\s*[:\-]\s*([^;.]+)/i
+    );
 
-    if (!addressMatch) {
+    if (explicitMatch) {
+        return String(explicitMatch[1] || "")
+            .replace(/,\s*(tên|ten|số điện thoại|so dien thoai|sdt|phone)\b.*$/i, "")
+            .trim();
+    }
+
+    const atMatch = text.match(
+        /(?:\btại\b|\btai\b|\bở\b|\bo\b)\s+(.+?)(?:,\s*(?:tên|ten|số điện thoại|so dien thoai|sdt|phone)\b|$)/i
+    );
+
+    if (!atMatch) {
         return null;
     }
 
-    return String(addressMatch[1] || "").trim();
+    const candidate = String(atMatch[1] || "").trim();
+
+    if (!/\d/.test(candidate) || candidate.length < 6) {
+        return null;
+    }
+
+    return candidate;
 }
 
 function inferSingleFieldByContext(message, currentDraft) {
@@ -152,11 +168,13 @@ function inferSingleFieldByContext(message, currentDraft) {
     }
 
     if (firstMissingField === "address" && trimmedMessage.length >= 8) {
+        const normalized = normalizeText(trimmedMessage);
+
         if (
-            !trimmedMessage.toLowerCase().startsWith("tên") &&
-            !trimmedMessage.toLowerCase().startsWith("ten") &&
-            !trimmedMessage.toLowerCase().startsWith("địa chỉ") &&
-            !trimmedMessage.toLowerCase().startsWith("dia chi")
+            !normalized.startsWith("ten") &&
+            !normalized.startsWith("dia chi") &&
+            !normalized.startsWith("sdt") &&
+            !detectPhoneNumber(trimmedMessage)
         ) {
             return { address: trimmedMessage };
         }
@@ -205,28 +223,19 @@ function extractBookingSlots(message, currentDraft) {
 function buildKnownFieldsText(draft) {
     const knownParts = [];
 
-    if (draft.testType) {
-        knownParts.push(`${FIELD_LABELS.testType}: ${draft.testType}`);
-    }
-
+    if (draft.testType) knownParts.push(`${FIELD_LABELS.testType}: ${draft.testType}`);
     if (draft.appointmentDate) {
         knownParts.push(
             `${FIELD_LABELS.appointmentDate}: ${formatDisplayDate(draft.appointmentDate)}`
         );
     }
-
     if (draft.appointmentTime) {
         knownParts.push(`${FIELD_LABELS.appointmentTime}: ${draft.appointmentTime}`);
     }
-
-    if (draft.address) {
-        knownParts.push(`${FIELD_LABELS.address}: ${draft.address}`);
-    }
-
+    if (draft.address) knownParts.push(`${FIELD_LABELS.address}: ${draft.address}`);
     if (draft.patientName) {
         knownParts.push(`${FIELD_LABELS.patientName}: ${draft.patientName}`);
     }
-
     if (draft.phoneNumber) {
         knownParts.push(`${FIELD_LABELS.phoneNumber}: ${draft.phoneNumber}`);
     }
@@ -260,22 +269,22 @@ function buildReadyReply(draft) {
     ];
 
     return (
-        "Mình đã thu thập đủ thông tin booking draft cho bạn: " +
+        "Mình đã có đủ thông tin để đặt lịch. Bạn kiểm tra lại giúp mình: " +
         summary.join("; ") +
-        ". Nếu bạn đồng ý tạo lịch hẹn, hãy trả lời: 'xác nhận'."
+        ". Nếu đúng, hãy trả lời 'Xác nhận' hoặc 'Đồng ý' để mình tạo lịch hẹn."
     );
 }
 
 function buildCreatedReply(booking) {
     return (
-        `Đã tạo lịch hẹn thành công. Mã booking của bạn là ${booking.bookingId}. ` +
+        `Đã tạo lịch hẹn thành công. Mã đặt lịch của bạn là ${booking.bookingCode}. ` +
         `Thông tin đã ghi nhận gồm: ` +
-        `${FIELD_LABELS.testType}: ${booking.testType}; ` +
-        `${FIELD_LABELS.appointmentDate}: ${formatDisplayDate(booking.appointmentDate)}; ` +
-        `${FIELD_LABELS.appointmentTime}: ${booking.appointmentTime}; ` +
+        `${FIELD_LABELS.testType}: ${booking.testName || booking.testTypeText}; ` +
+        `${FIELD_LABELS.appointmentDate}: ${formatDisplayDate(booking.sampleDate)}; ` +
+        `${FIELD_LABELS.appointmentTime}: ${booking.sampleTimeStart}; ` +
         `${FIELD_LABELS.address}: ${booking.address}; ` +
         `${FIELD_LABELS.patientName}: ${booking.patientName}; ` +
-        `${FIELD_LABELS.phoneNumber}: ${booking.phoneNumber}.`
+        `${FIELD_LABELS.phoneNumber}: ${booking.phone}.`
     );
 }
 
@@ -286,8 +295,9 @@ function isConfirmationMessage(message) {
         "xac nhan",
         "ok",
         "dong y",
-        "dat lich di",
-        "xac nhan dat lich"
+        "dat lich",
+        "ok dat lich",
+        "tao lich"
     ];
 
     return confirmationKeywords.some((keyword) =>
@@ -295,16 +305,21 @@ function isConfirmationMessage(message) {
     );
 }
 
-function buildBookingPayloadFromDraft(draft, sessionId) {
+function buildRuntimePayloadFromDraft(draft) {
     return {
-        sessionId,
-        testType: draft.testType,
-        appointmentDate: draft.appointmentDate,
-        appointmentTime: draft.appointmentTime,
+        testTypeText: draft.testType,
+        sampleDate: draft.appointmentDate,
+        sampleTimeStart: draft.appointmentTime,
         address: draft.address,
         patientName: draft.patientName,
-        phoneNumber: draft.phoneNumber
+        phone: draft.phoneNumber
     };
+}
+
+async function persistDraft(sessionId, draft, missingFields) {
+    if (!sessionId) return;
+
+    await bookingRuntime.saveOrUpdateDraft(sessionId, draft, missingFields);
 }
 
 async function handleBookingMessage({ message, sessionId }) {
@@ -319,47 +334,56 @@ async function handleBookingMessage({ message, sessionId }) {
         });
     }
 
-    if (session.status === "booking_created" && session.confirmedBookingId) {
-        const existingBooking = mockBookings.getBookingById(
-            session.confirmedBookingId
-        );
-
-        if (existingBooking) {
-            return createChatResult({
-                sessionId,
-                userMessage: message,
-                flow: FLOWS.BOOKING,
-                action: ACTIONS.BOOKING_ALREADY_CREATED,
-                reply:
-                    `Booking của bạn đã được tạo trước đó với mã ${existingBooking.bookingId}. ` +
-                    "Ở bước tiếp theo, mình sẽ làm thêm flow đổi lịch và hủy lịch thật.",
-                booking: existingBooking,
-                meta: {
-                    handledBy: "booking.service",
-                    sessionState: session.status,
-                    extractedSlots: {},
-                    missingFields: [],
-                    nextExpectedField: null
-                }
-            });
-        }
-    }
-
     const currentDraft = session.bookingDraft || getEmptyBookingDraft();
     const extractedSlots = extractBookingSlots(message, currentDraft);
     const nextDraft = {
         ...currentDraft,
         ...extractedSlots
     };
-
     const missingFields = getMissingFields(nextDraft);
+    const canCreateFromConfirmation =
+        isConfirmationMessage(message) &&
+        getMissingFields(currentDraft).length === 0 &&
+        Object.keys(extractedSlots).length === 0;
+
+    if (canCreateFromConfirmation) {
+        const createdBooking = await bookingRuntime.createConfirmedBooking(
+            buildRuntimePayloadFromDraft(currentDraft),
+            { sessionId, createdSource: "CHAT" }
+        );
+
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: "booking_created",
+            bookingDraft: currentDraft,
+            confirmedBookingId: createdBooking.bookingCode
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.BOOKING_CREATED,
+            reply: buildCreatedReply(createdBooking),
+            booking: createdBooking,
+            meta: {
+                handledBy: "booking.service",
+                sessionState: updatedSession.status,
+                extractedSlots,
+                missingFields: [],
+                nextExpectedField: null,
+                confirmedBookingId: createdBooking.bookingCode
+            }
+        });
+    }
 
     let status = "collecting_info";
     let action = ACTIONS.ASK_BOOKING_INFO;
     let reply = buildCollectingReply(nextDraft, missingFields);
     let booking = {
         status: "draft",
-        draft: nextDraft
+        draft: nextDraft,
+        missingFields
     };
 
     if (missingFields.length === 0) {
@@ -367,45 +391,13 @@ async function handleBookingMessage({ message, sessionId }) {
         action = ACTIONS.BOOKING_READY_TO_CONFIRM;
         reply = buildReadyReply(nextDraft);
         booking = {
-            status: "ready_for_confirmation",
-            draft: nextDraft
+            status: "pending_confirmation",
+            draft: nextDraft,
+            missingFields: []
         };
-
-        if (isConfirmationMessage(message)) {
-            const createdBooking = mockBookings.createBooking(
-                buildBookingPayloadFromDraft(nextDraft, sessionId)
-            );
-
-            status = "booking_created";
-            action = ACTIONS.BOOKING_CREATED;
-            reply = buildCreatedReply(createdBooking);
-            booking = createdBooking;
-
-            const updatedSession = mockSessions.upsertSession(sessionId, {
-                currentFlow: FLOWS.BOOKING,
-                status,
-                bookingDraft: nextDraft,
-                confirmedBookingId: createdBooking.bookingId
-            });
-
-            return createChatResult({
-                sessionId,
-                userMessage: message,
-                flow: FLOWS.BOOKING,
-                action,
-                reply,
-                booking,
-                meta: {
-                    handledBy: "booking.service",
-                    sessionState: updatedSession.status,
-                    extractedSlots,
-                    missingFields: [],
-                    nextExpectedField: null,
-                    confirmedBookingId: createdBooking.bookingId
-                }
-            });
-        }
     }
+
+    await persistDraft(sessionId, nextDraft, missingFields);
 
     const updatedSession = mockSessions.upsertSession(sessionId, {
         currentFlow: FLOWS.BOOKING,

@@ -31,7 +31,45 @@ The project must not stop at a keyword/template chatbot.
 
 ## Current Milestone
 
-**Recommendation/Test Package Runtime Prototype**.
+**5B Professional Booking & Lab Operations Runtime**.
+
+HomeLab now includes a professional product prototype for booking and lab operations, in addition to the RAG-first healthcare chatbot. This is a new product/business module, not a change to the medical RAG architecture.
+
+5B completion summary:
+
+- 5B-0 created `docs/booking_runtime_product_spec_5b.md` for the Professional Booking & Lab Operations Runtime.
+- 5B-1 added Prisma + MySQL/XAMPP database foundation for `homelab_ai` with provider `mysql`.
+- Runtime models: `Patient`, `TestCatalogItem`, `StaffProfile`, `AvailabilitySlot`, `Booking`, `BookingDraft`, and `BookingStatusHistory`.
+- Runtime enums: `BookingStatus`, `StaffRole`, and `CreatedSource`.
+- Seed catalog includes CBC, HBA1C, LIPID_PROFILE, LIVER_FUNCTION, KIDNEY_FUNCTION, and GENERAL_CHECKUP.
+- 5B-2/5B-3 added persistent booking runtime service/repository and chat integration.
+- Chat booking now saves drafts by session, asks for missing required fields, shows a confirmation summary, and creates a real DB booking only after explicit user confirmation.
+- Required confirmed booking fields are patient name, phone, test type or mapped catalog item, sample date, sample time, and address.
+- Generic home sample collection such as "lay mau mau tai nha" does not infer a test type.
+- Confirmed bookings use status `CONFIRMED`, booking codes like `HLB-YYYYMMDD-XXXX`, and `BookingStatusHistory`.
+- Reschedule/cancel through chatbot uses `bookingCode`.
+- `urgent_health` still wins over booking; red-flag booking requests do not create confirmed bookings or new booking drafts.
+- 5B-4 added Admin/Staff Booking API for list/detail/status history/status update/assign staff/internal note.
+- 5B-5 added Admin Booking Dashboard UI at `/admin/bookings`.
+- 5B-6 added end-to-end booking product regression: `backend/scripts/smoke_booking_e2e_product_5b6.js`, passing 12/12.
+
+Important boundary: 5B does not make HomeLab a production lab operations system. It validates a professional prototype/product flow. Payment, SMS/email notification, full auth/RBAC, real payment gateway, real lab result upload, production deployment, and clinical diagnosis remain out of scope.
+
+RAG/retriever/recommendation status is unchanged:
+
+- HomeLab remains RAG-first for medical/lab answers.
+- Retriever v1.4 remains controlled-only behind explicit flags and is not promoted as the default/global runtime.
+- Live package recommendation remains disabled by default and is not promoted as default/global behavior.
+
+Current recommended next work:
+
+- Optional UI polish for the admin booking table, especially horizontal scrolling and dense table ergonomics.
+- Optional auth/RBAC for real admin/staff separation.
+- Optional `AvailabilitySlot` capacity enforcement.
+- Optional notifications, payment, and lab-result upload as future modules.
+- If the priority is the thesis, package the narrative as "AI healthcare chatbot + lab booking operations" rather than adding more features.
+
+Previous milestone context: **Recommendation/Test Package Runtime Prototype**.
 
 HomeLab has completed the current stage of the controlled slot-based recommendation/test package runtime prototype. The runtime only runs when `HOMELAB_RECOMMENDATION_RUNTIME_ENABLED=true` and `intentGroup === "test_advice"`. It does not run for `urgent_health` or booking flows.
 
@@ -105,6 +143,9 @@ Next status: controlled v1.4 runtime has completed targeted 4C UX/source polish 
 
 ## Current Status
 
+- Professional Booking & Lab Operations Runtime 5B is complete as a product prototype: Prisma MySQL booking DB, persistent chat booking, admin/staff API, admin dashboard UI, and E2E product smoke are in place.
+- 5B scripted evidence: persistent booking chat smoke 7/7 PASS; admin booking API smoke PASS; booking E2E product smoke 12/12 PASS.
+- 5B manual evidence: admin dashboard UI manual check OK, with a minor accepted UX note that the booking table can scroll horizontally in the prototype.
 - KB/retriever v1_3 artifact has been built successfully.
 - Offline v1_3 retrieval evals are strong.
 - Persistent Python semantic bridge is available and verified with `runtimeMode=semantic_faiss`.
@@ -135,6 +176,7 @@ Next status: controlled v1.4 runtime has completed targeted 4C UX/source polish 
 
 ## What Is Already Done
 
+- 5B Professional Booking & Lab Operations Runtime is complete as a professional prototype: product spec, Prisma MySQL schema/seed, persistent booking service/repository, chat confirmation-to-create flow, reschedule/cancel by booking code, admin/staff booking API, admin dashboard UI, and E2E regression smoke.
 - KB v1_3 packaged with 42 items.
 - Batch A v1_3 items `kb_v1_3_039` to `kb_v1_3_042` approved in packaging report.
 - Retriever v1_3 artifact built at `ai_lab/artifacts/retriever_v1_3/`.
@@ -173,12 +215,13 @@ Next status: controlled v1.4 runtime has completed targeted 4C UX/source polish 
 
 ## Immediate Next Step
 
-Proceed from 4D controlled regression evidence to thesis technical narrative packaging / khóa luận:
+Proceed from 5B booking runtime completion and 4D controlled regression evidence to thesis technical narrative packaging / khóa luận, unless a specific product gap requires more implementation:
 
 - Keep v1.4 behind explicit flags only.
 - Do not promote retriever v1.4 as default/global runtime yet.
 - Do not promote live package recommendation as default/global behavior.
-- Package the technical narrative: architecture, RAG-first decision, controlled v1.4 runtime, safety gates, recommendation gating, smoke evidence, and limitations.
+- Package the technical narrative: AI healthcare chatbot, RAG-first decision, controlled v1.4 runtime, safety gates, recommendation gating, professional booking/lab operations runtime, smoke evidence, and limitations.
+- Treat 5B as a professional product prototype, not production lab deployment.
 - Avoid adding large new features unless the thesis/demo narrative exposes a specific gap.
 
 Keep the stage-3 recommendation regression matrix explicit:
@@ -212,6 +255,9 @@ Keep the stage-3 recommendation regression matrix explicit:
 | 17 | 4D longer controlled runtime regression/product review. Done, 29/29 PASS; no default/global promotion. |
 | 18 | Thesis technical narrative packaging / khóa luận. Next. |
 | 19 | Broader default/global production promotion. Future decision only. |
+
+| 20 | 5B Professional Booking & Lab Operations Runtime. Done; persistent booking chat smoke 7/7 PASS, admin booking API smoke PASS, admin dashboard manual UI OK, booking E2E product smoke 12/12 PASS. |
+| 21 | Post-5B thesis narrative: AI healthcare chatbot + lab booking operations. Next if thesis is the priority. |
 
 ## Rules For Future Work
 
@@ -264,3 +310,5 @@ Start from the controlled semantic retrieval and intent grouping state, not the 
 As of 3H, the recommendation/test package path is a controlled slot-based prototype with API metadata, answer UX, source contract, flag-off regression, frontend smoke, and controlled live package return behind a separate live gate. It is not a default/global production recommendation engine. When `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED` is unset or false, `recommendedPackage` stays `null`; when recommendation runtime is false, there is no recommendation meta/UX/package ID output.
 
 As of 4D, retriever v1.4 is wired into backend runtime as a controlled-only path behind explicit semantic flags and has completed targeted product UX/source alignment polish plus broader controlled regression. `smoke_controlled_runtime_regression_4d.js` passed 29/29 across lab explanation, result boundary, urgent, mixed urgent/booking, booking/reschedule/cancel, and recommendation-controlled scenarios. v1_3/default behavior remains the safe baseline when flags are off, and v1.4 is still not promoted as default/global. The correct continuation is thesis technical narrative packaging / khóa luận and future controlled observation as needed, not immediate production/default release. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.
+
+As of 5B, HomeLab also has a professional booking and lab-operations product prototype. Chat can collect booking details, require explicit confirmation, create persistent DB bookings, reschedule/cancel by booking code, and expose internal admin/staff operations through `/api/admin/bookings` plus a prototype dashboard at `/admin/bookings`. This business module does not change the RAG-first medical answer path, does not promote retriever v1.4, and does not enable live package recommendation by default.

@@ -47,6 +47,7 @@
 | Retriever v1.4 frontend/API answer UX observation 4B-2J | manual UI + Network observation, not a scripted benchmark | Checked HbA1c, HbA1c blood draw, ALT/AST, creatinine/eGFR, cholesterol/triglyceride, CBC boundary, urgent red flags, and generic booking after minimal answer-text polish. UI/Network answers are more natural and remain safety-bounded; no new benchmark number is introduced. |
 | Product UX polish and source alignment hardening 4C | `node backend/scripts/smoke_product_ux_polish_4c.js` plus regression smokes/manual UI retest | 4C smoke PASS; frontend regression 4B-2K PASS; urgent booking 4B-2H PASS; answer text polish 4B-2I PASS. Manual 7-case UI retest PASS. No default/global promotion. |
 | Longer Controlled Runtime Regression/Product Review 4D | `node backend/scripts/smoke_controlled_runtime_regression_4d.js` | 29/29 PASS; broader controlled regression after 4C across lab explanation, result boundary, urgent red flags, mixed urgent + booking/test advice, booking/reschedule/cancel, and recommendation-controlled scenarios. |
+| Professional Booking & Lab Operations Runtime 5B | 5B booking chat/admin/UI/E2E smokes and manual UI check | Persistent booking chat 7/7 PASS; admin booking API smoke PASS; admin dashboard manual UI OK; booking E2E product smoke 12/12 PASS. Professional prototype/product-flow validation only. |
 
 ## Key Metrics Found In Repo
 
@@ -161,6 +162,27 @@ Offline vs runtime distinction:
 - 4A metrics measure retrieval quality over eval datasets and held-out queries.
 - 4B smokes measure controlled runtime contract, routing, fallback, provenance, safety gates, booking slot behavior, and answer text UX through the bridge and `/api/chat`.
 - Passing 4B smokes supports controlled runtime readiness, not default/global promotion.
+
+## 5B Booking Runtime Metrics
+
+5B validates a professional booking and lab-operations prototype/product flow. It is not a production-readiness claim for real lab operations.
+
+| Check | Result | Coverage |
+| --- | --- | --- |
+| Persistent booking chat smoke 5B3 | 7/7 PASS | Missing-info draft behavior, confirmation-before-create, confirmed DB booking, reschedule, cancel, urgent-over-booking, invalid booking code handling. |
+| Admin/Staff Booking API smoke 5B4 | PASS all scripted cases | Create test booking, list, detail with status history, assign sample collector, update status, internal note, complete booking, controlled 404. |
+| Admin Booking Dashboard UI 5B5 | Manual UI OK | Booking list, filters, refresh/reset/search, detail modal, status history timeline, assign staff, update status, internal note, loading/success/error states. Minor accepted note: table can scroll horizontally in the prototype. |
+| Booking E2E product smoke 5B6 | 12/12 PASS | `/api/chat` booking draft/confirmation/create, DB patient/history checks, `/api/admin/bookings` list/detail/assign/status/note/complete, completed-booking cancel control, urgent booking no-create, invalid admin booking 404. |
+
+5B capability groups covered:
+
+- Chat booking lifecycle: collect required fields, keep generic home sampling from inferring `testType`, require explicit confirmation, create `CONFIRMED` booking, generate `HLB-YYYYMMDD-XXXX`, clear draft, and write status history.
+- Persistent runtime data: `Patient`, `TestCatalogItem`, `StaffProfile`, `AvailabilitySlot`, `Booking`, `BookingDraft`, and `BookingStatusHistory` exist in Prisma/MySQL.
+- Admin/staff operations: list, detail, status history, status update, assign staff/sample collector, and internal note.
+- Safety boundary: `urgent_health` keeps priority over booking and does not create confirmed bookings in red-flag cases.
+- Product UI validation: `/admin/bookings` supports the basic dashboard workflow for demo/internal review.
+
+Interpretation: 5B is suitable evidence for a professional product prototype and thesis/demo narrative. It does not claim payment, notification, full auth/RBAC, result upload, production deployment, or clinical diagnosis readiness.
 
 ## Recommendation Runtime Prototype Milestones
 

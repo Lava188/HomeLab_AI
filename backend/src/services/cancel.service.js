@@ -1,13 +1,13 @@
 const mockSessions = require("../data/mockSessions");
-const mockBookings = require("../data/mockBookings");
+const bookingRuntime = require("./booking-runtime/booking.service");
+const BookingRuntimeError = require("./booking-runtime/booking-runtime-error");
 const { FLOWS, ACTIONS } = require("../constants/chat.constants");
 const { createChatResult } = require("../utils/chat-response.util");
-const { normalizeText, extractBookingId } = require("../utils/text.util");
+const { formatDisplayDate, extractBookingId } = require("../utils/text.util");
 
 function getEmptyCancelDraft(defaultBookingId = null) {
     return {
-        bookingId: defaultBookingId,
-        confirmed: false
+        bookingId: defaultBookingId
     };
 }
 
@@ -22,64 +22,34 @@ function hasActiveCancelSession(sessionId) {
     );
 }
 
-function detectConfirmation(message) {
-    const normalizedMessage = normalizeText(message);
-
-    const confirmKeywords = ["dong y", "xac nhan", "co", "ok", "duoc", "huy"];
-    const rejectKeywords = ["khong", "thoi", "dung", "khong huy"];
-
-    if (rejectKeywords.some((keyword) => normalizedMessage.includes(keyword))) {
-        return false;
-    }
-
-    if (confirmKeywords.some((keyword) => normalizedMessage.includes(keyword))) {
-        return true;
-    }
-
-    return null;
-}
-
-function buildAskBookingIdReply(session) {
-    if (session && session.confirmedBookingId) {
-        return (
-            `Mình đã nhận yêu cầu hủy lịch. Nếu bạn muốn hủy booking gần nhất ` +
-            `${session.confirmedBookingId}, bạn có thể xác nhận luôn. ` +
-            `Hoặc gửi mã booking theo dạng BK... để mình kiểm tra chính xác hơn.`
-        );
-    }
-
+function buildAskBookingIdReply() {
     return (
-        "Mình đã nhận yêu cầu hủy lịch. Bạn vui lòng cung cấp mã booking theo dạng BK... " +
+        "Mình đã nhận yêu cầu hủy lịch. Bạn vui lòng cung cấp mã đặt lịch dạng HLB-YYYYMMDD-XXXX " +
         "để mình xác định lịch hẹn cần hủy."
-    );
-}
-
-function buildConfirmReply(booking) {
-    return (
-        `Mình đã tìm thấy booking ${booking.bookingId} vào ngày ${booking.appointmentDate} ` +
-        `lúc ${booking.appointmentTime}. Bạn có chắc muốn hủy lịch này không?`
     );
 }
 
 function buildInvalidBookingReply(bookingId) {
     return (
-        `Mình không tìm thấy booking ${bookingId}. ` +
-        "Bạn vui lòng kiểm tra lại mã booking hoặc gửi đúng mã BK... đã được tạo trước đó."
+        `Mình không tìm thấy lịch ${bookingId}. ` +
+        "Bạn vui lòng kiểm tra lại và gửi đúng mã dạng HLB-YYYYMMDD-XXXX."
     );
 }
 
 function buildCancelledReply(booking) {
+    if (booking.alreadyCancelled) {
+        return `Lịch ${booking.bookingCode} đã ở trạng thái CANCELLED trước đó.`;
+    }
+
     return (
-        `Đã hủy thành công booking ${booking.bookingId}. ` +
-        `Lịch hẹn ngày ${booking.appointmentDate} lúc ${booking.appointmentTime} đã được chuyển sang trạng thái cancelled.`
+        `Đã hủy thành công lịch ${booking.bookingCode}. ` +
+        `Lịch hẹn ngày ${formatDisplayDate(booking.sampleDate)} lúc ${booking.sampleTimeStart} đã được chuyển sang trạng thái CANCELLED.`
     );
 }
 
 async function handleCancelMessage({ message, sessionId }) {
     const session = mockSessions.getSession(sessionId);
     const extractedBookingId = extractBookingId(message);
-    const confirmation = detectConfirmation(message);
-
     const currentDraft =
         session &&
         session.currentFlow === FLOWS.CANCEL &&
@@ -89,8 +59,7 @@ async function handleCancelMessage({ message, sessionId }) {
 
     const nextDraft = {
         ...currentDraft,
-        bookingId: extractedBookingId || currentDraft.bookingId,
-        confirmed: confirmation === true ? true : currentDraft.confirmed
+        bookingId: extractedBookingId || currentDraft.bookingId
     };
 
     if (!nextDraft.bookingId) {
@@ -106,7 +75,7 @@ async function handleCancelMessage({ message, sessionId }) {
             userMessage: message,
             flow: FLOWS.CANCEL,
             action: ACTIONS.ASK_CANCEL_BOOKING_ID,
-            reply: buildAskBookingIdReply(session),
+            reply: buildAskBookingIdReply(),
             booking: null,
             meta: {
                 handledBy: "cancel.service",
@@ -116,7 +85,7 @@ async function handleCancelMessage({ message, sessionId }) {
         });
     }
 
-    const existingBooking = mockBookings.getBookingById(nextDraft.bookingId);
+    const existingBooking = await bookingRuntime.getBookingByCode(nextDraft.bookingId);
 
     if (!existingBooking) {
         const updatedSession = mockSessions.upsertSession(sessionId, {
@@ -141,95 +110,57 @@ async function handleCancelMessage({ message, sessionId }) {
         });
     }
 
-    if (existingBooking.status === "cancelled") {
-        return createChatResult({
-            sessionId,
-            userMessage: message,
-            flow: FLOWS.CANCEL,
-            action: ACTIONS.CANCEL_ALREADY_CANCELLED,
-            reply: `Booking ${existingBooking.bookingId} hiện đã ở trạng thái cancelled.`,
-            booking: existingBooking,
-            meta: {
-                handledBy: "cancel.service",
-                sessionState: "cancel_completed",
-                nextExpectedField: null
-            }
-        });
-    }
+    try {
+        const cancelledBooking = await bookingRuntime.cancelBooking(
+            nextDraft.bookingId,
+            {},
+            { sessionId }
+        );
 
-    if (confirmation === false) {
-        mockSessions.upsertSession(sessionId, {
-            currentFlow: FLOWS.CANCEL,
-            status: "cancel_aborted",
-            cancelDraft: getEmptyCancelDraft(existingBooking.bookingId),
-            confirmedBookingId: existingBooking.bookingId
-        });
-
-        return createChatResult({
-            sessionId,
-            userMessage: message,
-            flow: FLOWS.CANCEL,
-            action: ACTIONS.ASK_CANCEL_CONFIRMATION,
-            reply: "Mình sẽ giữ nguyên lịch hẹn hiện tại. Nếu bạn muốn hủy lại, cứ gửi mã booking BK... cho mình.",
-            booking: existingBooking,
-            meta: {
-                handledBy: "cancel.service",
-                sessionState: "cancel_aborted",
-                nextExpectedField: null
-            }
-        });
-    }
-
-    if (confirmation !== true) {
         const updatedSession = mockSessions.upsertSession(sessionId, {
             currentFlow: FLOWS.CANCEL,
-            status: "awaiting_confirmation",
-            cancelDraft: nextDraft,
-            confirmedBookingId: existingBooking.bookingId
+            status: "cancel_completed",
+            cancelDraft: {
+                bookingId: cancelledBooking.bookingCode
+            },
+            confirmedBookingId: cancelledBooking.bookingCode
         });
 
         return createChatResult({
             sessionId,
             userMessage: message,
             flow: FLOWS.CANCEL,
-            action: ACTIONS.ASK_CANCEL_CONFIRMATION,
-            reply: buildConfirmReply(existingBooking),
-            booking: existingBooking,
+            action: cancelledBooking.alreadyCancelled
+                ? ACTIONS.CANCEL_ALREADY_CANCELLED
+                : ACTIONS.CANCEL_COMPLETED,
+            reply: buildCancelledReply(cancelledBooking),
+            booking: cancelledBooking,
             meta: {
                 handledBy: "cancel.service",
                 sessionState: updatedSession.status,
-                nextExpectedField: "confirmation"
+                nextExpectedField: null
+            }
+        });
+    } catch (error) {
+        if (!(error instanceof BookingRuntimeError)) {
+            throw error;
+        }
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.CANCEL,
+            action: ACTIONS.ASK_CANCEL_CONFIRMATION,
+            reply: `Lịch ${nextDraft.bookingId} hiện không thể hủy vì trạng thái hiện tại không cho phép.`,
+            booking: existingBooking,
+            meta: {
+                handledBy: "cancel.service",
+                sessionState: "blocked",
+                nextExpectedField: null,
+                errorCode: error.code
             }
         });
     }
-
-    const cancelledBooking = mockBookings.updateBooking(existingBooking.bookingId, {
-        status: "cancelled"
-    });
-
-    const updatedSession = mockSessions.upsertSession(sessionId, {
-        currentFlow: FLOWS.CANCEL,
-        status: "cancel_completed",
-        cancelDraft: {
-            bookingId: cancelledBooking.bookingId,
-            confirmed: true
-        },
-        confirmedBookingId: cancelledBooking.bookingId
-    });
-
-    return createChatResult({
-        sessionId,
-        userMessage: message,
-        flow: FLOWS.CANCEL,
-        action: ACTIONS.CANCEL_COMPLETED,
-        reply: buildCancelledReply(cancelledBooking),
-        booking: cancelledBooking,
-        meta: {
-            handledBy: "cancel.service",
-            sessionState: updatedSession.status,
-            nextExpectedField: null
-        }
-    });
 }
 
 module.exports = {
