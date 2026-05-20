@@ -34,6 +34,29 @@ enum CreatedSource {
   STAFF
 }
 
+enum CollectorAssignmentStatus {
+  PENDING_COLLECTOR_CONFIRMATION
+  ACCEPTED
+  REJECTED_PENDING_ADMIN_REVIEW
+  REJECTION_APPROVED
+  REJECTION_REJECTED
+  CANCELLED
+  EXPIRED
+  SUPERSEDED
+}
+
+enum AssignmentSource {
+  AUTO
+  ADMIN
+}
+
+enum AssignmentReviewStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model Patient {
   id             String         @id @default(cuid())
   fullName       String
@@ -62,15 +85,18 @@ model TestCatalogItem {
 }
 
 model StaffProfile {
-  id               String    @id @default(cuid())
-  fullName         String
-  phone            String?
-  role             StaffRole
-  serviceArea      String?   @db.Text
-  active           Boolean   @default(true)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  assignedBookings Booking[]
+  id                   String                     @id @default(cuid())
+  fullName             String
+  phone                String?
+  role                 StaffRole
+  serviceArea          String?                    @db.Text
+  active               Boolean                    @default(true)
+  createdAt            DateTime                   @default(now())
+  updatedAt            DateTime                   @updatedAt
+  assignedBookings     Booking[]
+  workingAreas         CollectorWorkingArea[]
+  workingSchedules     CollectorWorkingSchedule[]
+  collectorAssignments CollectorAssignment[]
 }
 
 model AvailabilitySlot {
@@ -114,6 +140,7 @@ model Booking {
   testCatalogItem      TestCatalogItem?       @relation(fields: [testCatalogItemId], references: [id])
   assignedStaff        StaffProfile?          @relation(fields: [assignedStaffId], references: [id])
   statusHistory        BookingStatusHistory[]
+  collectorAssignments CollectorAssignment[]
 
   @@index([patientId])
   @@index([testCatalogItemId])
@@ -154,6 +181,83 @@ model BookingStatusHistory {
   booking       Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   @@index([bookingId])
+  @@index([toStatus])
+  @@index([createdAt])
+}
+
+model CollectorWorkingArea {
+  id             String       @id @default(cuid())
+  staffProfileId String
+  staffProfile   StaffProfile @relation(fields: [staffProfileId], references: [id], onDelete: Cascade)
+  province       String
+  district       String?
+  ward           String?
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([staffProfileId])
+  @@index([province, district, ward])
+}
+
+model CollectorWorkingSchedule {
+  id             String       @id @default(cuid())
+  staffProfileId String
+  staffProfile   StaffProfile @relation(fields: [staffProfileId], references: [id], onDelete: Cascade)
+  workDate       DateTime     @db.Date
+  startTime      String
+  endTime        String
+  active         Boolean      @default(true)
+  capacity       Int          @default(8)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([staffProfileId])
+  @@index([workDate])
+  @@index([staffProfileId, workDate])
+}
+
+model CollectorAssignment {
+  id                 String                       @id @default(cuid())
+  bookingId          String
+  booking            Booking                      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  collectorId        String
+  collector          StaffProfile                 @relation(fields: [collectorId], references: [id], onDelete: Cascade)
+  status             CollectorAssignmentStatus    @default(PENDING_COLLECTOR_CONFIRMATION)
+  assignmentSource   AssignmentSource             @default(AUTO)
+  reviewStatus       AssignmentReviewStatus       @default(NONE)
+  assignedAt         DateTime                     @default(now())
+  acceptedAt         DateTime?
+  rejectedAt         DateTime?
+  rejectReason       String?                      @db.Text
+  adminReviewedById  String?
+  adminReviewedAt    DateTime?
+  expiresAt          DateTime?
+  metadata           Json?
+  createdAt          DateTime                     @default(now())
+  updatedAt          DateTime                     @updatedAt
+  assignmentHistory  CollectorAssignmentHistory[]
+
+  @@index([bookingId])
+  @@index([collectorId])
+  @@index([status])
+  @@index([assignmentSource])
+  @@index([createdAt])
+}
+
+model CollectorAssignmentHistory {
+  id           String                     @id @default(cuid())
+  assignmentId String
+  assignment   CollectorAssignment        @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  fromStatus   CollectorAssignmentStatus?
+  toStatus     CollectorAssignmentStatus
+  actorType    String
+  actorId      String?
+  reason       String?                    @db.Text
+  metadata     Json?
+  createdAt    DateTime                   @default(now())
+
+  @@index([assignmentId])
   @@index([toStatus])
   @@index([createdAt])
 }

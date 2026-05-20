@@ -6,6 +6,14 @@ const path = require("path");
 const chatRoute = require("./routes/chat.route");
 const debugRoute = require("./routes/debug.route");
 const adminBookingRoute = require("./routes/admin-booking.route");
+const adminCollectorAssignmentRoute = require("./routes/admin-collector-assignment.route");
+const adminAvailabilitySlotRoute = require("./routes/admin-availability-slot.route");
+const adminStaffRoute = require("./routes/admin-staff.route");
+const userBookingRoute = require("./routes/user-booking.route");
+const collectorBookingRoute = require("./routes/collector-booking.route");
+const collectorWorkingAreaRoute = require("./routes/collector-working-area.route");
+const collectorWorkingScheduleRoute = require("./routes/collector-working-schedule.route");
+const collectorAssignmentRoute = require("./routes/collector-assignment.route");
 
 dotenv.config({
   path: path.join(__dirname, "../.env")
@@ -31,6 +39,14 @@ app.get("/api/health", (req, res) => {
 app.use("/api/chat", chatRoute);
 app.use("/api/debug", debugRoute);
 app.use("/api/admin/bookings", adminBookingRoute);
+app.use("/api/admin/collector-assignments", adminCollectorAssignmentRoute);
+app.use("/api/admin/availability-slots", adminAvailabilitySlotRoute);
+app.use("/api/admin/staff", adminStaffRoute);
+app.use("/api/user/bookings", userBookingRoute);
+app.use("/api/collector/bookings", collectorBookingRoute);
+app.use("/api/collector/working-areas", collectorWorkingAreaRoute);
+app.use("/api/collector/working-schedules", collectorWorkingScheduleRoute);
+app.use("/api/collector/assignments", collectorAssignmentRoute);
 
 // 404 handler
 app.use((req, res) => {

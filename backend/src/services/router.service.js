@@ -3,17 +3,22 @@ const ragService = require("./rag.service");
 const bookingService = require("./booking.service");
 const rescheduleService = require("./reschedule.service");
 const cancelService = require("./cancel.service");
+const packageCatalog = require("./booking-package-catalog.service");
 const { detectFlow } = require("./router-intent.service");
 const { runSemanticBridge } = require("./health-rag/semantic-bridge.service");
 const { normalizeText } = require("../utils/text.util");
 
 const {
     CHAT_ENGINE_VERSION,
-    FLOWS
+    FLOWS,
+    ACTIONS
 } = require("../constants/chat.constants");
 const { createChatResult } = require("../utils/chat-response.util");
+const { isAuthenticatedUserSession } = require("../utils/demo-session.util");
 
 const SEMANTIC_ROUTER_GATE_MIN_SCORE = 0.8;
+const BOOKING_LOGIN_REQUIRED_REPLY =
+    "Để đặt lịch xét nghiệm, bạn vui lòng đăng nhập hoặc tạo tài khoản người dùng trước. Sau khi đăng nhập, HomeLab sẽ tiếp tục hỗ trợ bạn chọn xét nghiệm, khung giờ và địa chỉ lấy mẫu.";
 
 function mergeRouterMeta(result, safetyMeta, routeResult) {
     return {
@@ -161,6 +166,21 @@ function isBookingConfirmationContinuation(message, sessionId) {
         "ok",
         "ok dat lich",
         "dat lich"
+    ];
+
+    return confirmationSignals.some((signal) =>
+        normalizedMessage.includes(signal)
+    );
+}
+
+function isStandaloneBookingConfirmation(message) {
+    const normalizedMessage = normalizeText(message);
+    const confirmationSignals = [
+        "xac nhan",
+        "dung roi xac nhan",
+        "tao lich",
+        "tao lich giup",
+        "tao lich giup toi"
     ];
 
     return confirmationSignals.some((signal) =>
@@ -350,10 +370,119 @@ function applyCustomerTestSafetyGate(result, routeResult) {
     };
 }
 
-async function routeMessage({ message, sessionId }) {
+function buildAuthRequiredResult({ message, sessionId, flow }) {
+    return createChatResult({
+        sessionId,
+        userMessage: message,
+        flow,
+        action: ACTIONS.AUTH_REQUIRED,
+        reply: BOOKING_LOGIN_REQUIRED_REPLY,
+        booking: null,
+        meta: {
+            handledBy: "router.service",
+            authRequired: true,
+            allowedActions: ["login", "register"]
+        }
+    });
+}
+
+function requiresUserAuthForOperationalFlow(flow) {
+    return [FLOWS.BOOKING, FLOWS.RESCHEDULE, FLOWS.CANCEL].includes(flow);
+}
+
+function buildCatalogInfoResult({ message, sessionId, packageIntent }) {
+    const selectedPackage = packageIntent.package || null;
+    const isAmbiguous = packageIntent.type === "ambiguous";
+
+    return createChatResult({
+        sessionId,
+        userMessage: message,
+        flow: FLOWS.HEALTH_RAG,
+        action: ACTIONS.ANSWER_HEALTH_QUERY,
+        reply: isAmbiguous
+            ? packageCatalog.buildAmbiguousPackageReply()
+            : packageCatalog.buildPackageDetailReply(selectedPackage),
+        booking: null,
+        meta: {
+            handledBy: "booking-package-catalog.service",
+            intentGroup: "test_advice",
+            packageIntent: packageIntent.type,
+            packageCandidates: isAmbiguous ? packageIntent.candidates : undefined,
+            selectedPackage
+        }
+    });
+}
+
+function shouldContinueBookingForPackageSelection(message, sessionId, packageIntent) {
+    if (!bookingService.hasActiveBookingSession(sessionId)) {
+        return false;
+    }
+
+    if (packageIntent.type !== "selected") {
+        return false;
+    }
+
+    const normalizedMessage = normalizeText(message);
+    const questionSignals = [
+        "la gi",
+        "nhu the nao",
+        "ket qua",
+        "cao co",
+        "bat thuong",
+        "co phai",
+        "nguy hiem"
+    ];
+
+    return !questionSignals.some((signal) => normalizedMessage.includes(signal));
+}
+
+async function suspendPendingStateForUrgent(sessionId) {
+    const bookingSuspension =
+        await bookingService.suspendActiveBookingSession(sessionId);
+
+    return {
+        booking: bookingSuspension
+    };
+}
+
+async function buildUrgentOverrideResult({
+    message,
+    sessionId,
+    safetyResult,
+    routeResult,
+    gateDebug
+}) {
+    const suspendedState = await suspendPendingStateForUrgent(sessionId);
+    const urgentResult = applyCustomerTestSafetyGate(
+        await ragService.answerHealthQuery({
+            message,
+            sessionId
+        }),
+        routeResult
+    );
+
+    return {
+        ...urgentResult,
+        meta: {
+            ...mergeRouterMeta(
+                attachSemanticRouterGateDebug(urgentResult, gateDebug),
+                safetyResult.meta,
+                routeResult
+            ),
+            urgentOverride: {
+                applied: true,
+                suspendedState
+            }
+        }
+    };
+}
+
+async function routeMessage({ message, sessionId, userSession = {} }) {
     const safetyResult = safetyService.checkSafety({ message });
 
     if (!safetyResult.isSafe) {
+        const suspendedState = await suspendPendingStateForUrgent(sessionId);
+
         return createChatResult({
             sessionId,
             userMessage: message,
@@ -366,12 +495,17 @@ async function routeMessage({ message, sessionId }) {
                 version: CHAT_ENGINE_VERSION,
                 intentGroup: null,
                 safety: safetyResult.meta,
-                routing: null
+                routing: null,
+                urgentOverride: {
+                    applied: true,
+                    suspendedState
+                }
             }
         });
     }
 
     let routeResult = detectFlow(message);
+    const packageIntent = await packageCatalog.resolvePackageIntent(message);
     const semanticGateResult = await applySemanticRouterGate({
         message,
         sessionId,
@@ -379,6 +513,102 @@ async function routeMessage({ message, sessionId }) {
     });
     routeResult = semanticGateResult.routeResult;
     const { gateDebug } = semanticGateResult;
+
+    if (
+        routeResult.flow === FLOWS.HEALTH_RAG &&
+        routeResult.routerDebug?.intentGroup === "urgent_health"
+    ) {
+        return buildUrgentOverrideResult({
+            message,
+            sessionId,
+            safetyResult,
+            routeResult,
+            gateDebug
+        });
+    }
+
+    if (shouldContinueBookingForPackageSelection(message, sessionId, packageIntent)) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
+        const bookingContinuationResult =
+            await bookingService.handleBookingMessage({
+                message,
+                sessionId,
+                userSession
+            });
+
+        return {
+            ...bookingContinuationResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(
+                    bookingContinuationResult,
+                    gateDebug
+                ),
+                safetyResult.meta,
+                routeResult
+            )
+        };
+    }
+
+    if (
+        [FLOWS.HEALTH_RAG, FLOWS.FALLBACK].includes(routeResult.flow) &&
+        routeResult.routerDebug?.intentGroup !== "urgent_health" &&
+        ["ambiguous", "detail_question"].includes(packageIntent.type)
+    ) {
+        const catalogResult = buildCatalogInfoResult({
+            message,
+            sessionId,
+            packageIntent
+        });
+
+        return {
+            ...catalogResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(catalogResult, gateDebug),
+                safetyResult.meta,
+                routeResult
+            )
+        };
+    }
+
+    if (
+        [FLOWS.HEALTH_RAG, FLOWS.FALLBACK].includes(routeResult.flow) &&
+        routeResult.routerDebug?.intentGroup !== "urgent_health" &&
+        packageIntent.type === "selected" &&
+        packageIntent.package?.code === "GENERAL_CHECKUP"
+    ) {
+        const normalizedMessage = normalizeText(message);
+        const explicitPackageName =
+            normalizedMessage.includes("goi tong quat co ban") ||
+            normalizedMessage.includes("goi tong quat");
+
+        if (!explicitPackageName) {
+            const catalogResult = buildCatalogInfoResult({
+                message,
+                sessionId,
+                packageIntent: {
+                    type: "ambiguous",
+                    package: null,
+                    candidates: packageCatalog.getCandidateSummaries()
+                }
+            });
+
+            return {
+                ...catalogResult,
+                meta: mergeRouterMeta(
+                    attachSemanticRouterGateDebug(catalogResult, gateDebug),
+                    safetyResult.meta,
+                    routeResult
+                )
+            };
+        }
+    }
 
     if (routeResult.flow === "health_rag") {
         const ragResult = applyCustomerTestSafetyGate(
@@ -400,10 +630,19 @@ async function routeMessage({ message, sessionId }) {
     }
 
     if (isBookingConfirmationContinuation(message, sessionId)) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
         const bookingContinuationResult =
             await bookingService.handleBookingMessage({
                 message,
-                sessionId
+                sessionId,
+                userSession
             });
 
         return {
@@ -419,10 +658,30 @@ async function routeMessage({ message, sessionId }) {
         };
     }
 
+    if (
+        !isAuthenticatedUserSession(userSession) &&
+        isStandaloneBookingConfirmation(message)
+    ) {
+        return buildAuthRequiredResult({
+            message,
+            sessionId,
+            flow: FLOWS.BOOKING
+        });
+    }
+
     if (routeResult.flow === "booking") {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
         const bookingResult = await bookingService.handleBookingMessage({
             message,
-            sessionId
+            sessionId,
+            userSession
         });
 
         return {
@@ -436,9 +695,18 @@ async function routeMessage({ message, sessionId }) {
     }
 
     if (routeResult.flow === "reschedule") {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.RESCHEDULE
+            });
+        }
+
         const rescheduleResult = await rescheduleService.handleRescheduleMessage({
             message,
-            sessionId
+            sessionId,
+            userSession
         });
 
         return {
@@ -452,9 +720,18 @@ async function routeMessage({ message, sessionId }) {
     }
 
     if (routeResult.flow === "cancel") {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.CANCEL
+            });
+        }
+
         const cancelResult = await cancelService.handleCancelMessage({
             message,
-            sessionId
+            sessionId,
+            userSession
         });
 
         return {
@@ -468,10 +745,19 @@ async function routeMessage({ message, sessionId }) {
     }
 
     if (bookingService.hasActiveBookingSession(sessionId)) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
         const bookingContinuationResult =
             await bookingService.handleBookingMessage({
                 message,
-                sessionId
+                sessionId,
+                userSession
             });
 
         return {
@@ -488,10 +774,19 @@ async function routeMessage({ message, sessionId }) {
     }
 
     if (rescheduleService.hasActiveRescheduleSession(sessionId)) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.RESCHEDULE
+            });
+        }
+
         const rescheduleContinuationResult =
             await rescheduleService.handleRescheduleMessage({
                 message,
-                sessionId
+                sessionId,
+                userSession
             });
 
         return {
@@ -508,10 +803,19 @@ async function routeMessage({ message, sessionId }) {
     }
 
     if (cancelService.hasActiveCancelSession(sessionId)) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.CANCEL
+            });
+        }
+
         const cancelContinuationResult =
             await cancelService.handleCancelMessage({
                 message,
-                sessionId
+                sessionId,
+                userSession
             });
 
         return {

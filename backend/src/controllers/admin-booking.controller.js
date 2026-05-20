@@ -1,5 +1,6 @@
 const bookingRuntime = require("../services/booking-runtime/booking.service");
 const BookingRuntimeError = require("../services/booking-runtime/booking-runtime-error");
+const collectorMatching = require("../services/collector-assignment/collector-matching.service");
 
 function getDemoContext(req) {
     return {
@@ -130,10 +131,33 @@ async function updateInternalNote(req, res, next) {
     }
 }
 
+async function getCollectorCandidates(req, res, next) {
+    try {
+        const includeDebug = req.query.debug === "true";
+
+        const result = await collectorMatching.findCollectorCandidatesForBooking(
+            req.params.bookingCode,
+            { includeDebug }
+        );
+
+        return res.status(200).json({
+            success: true,
+            data: result
+        });
+    } catch (error) {
+        if (error instanceof BookingRuntimeError) {
+            return sendRuntimeError(res, error);
+        }
+
+        next(error);
+    }
+}
+
 module.exports = {
     listBookings,
     getBookingDetail,
     updateBookingStatus,
     assignStaff,
-    updateInternalNote
+    updateInternalNote,
+    getCollectorCandidates
 };

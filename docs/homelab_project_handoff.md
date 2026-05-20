@@ -31,7 +31,198 @@ The project must not stop at a keyword/template chatbot.
 
 ## Current Milestone
 
-**5B Professional Booking & Lab Operations Runtime**.
+**5I-1 Documentation refresh after completed 5G/5H booking and collector assignment flow**.
+
+HomeLab has completed the 5G/5H booking and collector assignment workflow chain as an internal/demo professional prototype. The current booking flow now requires a logged-in user/session phone before booking mutation actions such as create, reschedule, or cancel. Public health/lab questions and urgent red-flag guidance remain available without login. Booking mutations use the session phone, and cross-phone actions are rejected.
+
+Current booking/package state:
+
+- Package catalog has six seeded items: Công thức máu, HbA1c, Mỡ máu, Chức năng gan, Chức năng thận, and Gói tổng quát cơ bản.
+- Confirmed bookings store both structured `testCatalogItemId` when a catalog item is selected and specific `testTypeText`.
+- Vague booking requests such as "xét nghiệm máu" do not create a booking immediately; the user must choose/confirm a package first.
+- Urgent red flags override package selection, pending booking state, and booking creation.
+
+Current collector assignment state:
+
+- Collectors can register working areas and working schedules.
+- Admin staff detail can show collector working area/schedule information.
+- Matching service selects candidates by role, active state, area, schedule, and workload.
+- When an eligible booking becomes `CONFIRMED`, the system auto-creates `CollectorAssignment` with `PENDING_COLLECTOR_CONFIRMATION`.
+- Booking stays `CONFIRMED` while assignment is pending and becomes `ASSIGNED` only when the collector accepts.
+- Collector dashboard shows pending assignment tasks.
+- Collector accept changes assignment to `ACCEPTED`, booking to `ASSIGNED`, sets `assignedStaffId`, and writes history.
+- Collector reject requires a reason, changes assignment to `REJECTED_PENDING_ADMIN_REVIEW`, sets `reviewStatus=PENDING`, saves `rejectReason`, and does not assign the booking.
+- Admin can approve or reject the collector rejection reason.
+- Admin manual reassign creates a new `CollectorAssignment` with source `ADMIN` and preserves the old assignment audit trail.
+- Full role workflow is covered by 5H-7 smoke: user -> auto assignment -> collector reject -> admin review -> manual reassign -> collector accept -> sample collected -> lab/result/completed -> user sees completed.
+
+Current limitations:
+
+- No real SMS/email/realtime push notification.
+- No route optimization or map-based dispatch.
+- No production auth/JWT/RBAC; current role/session behavior is demo/internal scaffolding.
+- No payment.
+- No real lab-system integration or digitally signed result PDF workflow.
+- Retriever v1.4 remains controlled behind explicit flags and is not promoted as the default/global runtime.
+- Live package recommendation remains controlled/not default.
+
+Previous milestone: **5F-1 Staff Management + Collector Workload Rules**.
+
+HomeLab now has admin staff management and collector workload visibility as part of the booking/lab operations prototype. 5F-1 extends the role-based operations layer with a dedicated staff management API/UI and safer collector assignment rules.
+
+5F-1 completion summary:
+
+- Added Admin Staff API for internal/demo operations:
+  - `GET /api/admin/staff`
+  - `POST /api/admin/staff`
+  - `GET /api/admin/staff/:id`
+  - `PATCH /api/admin/staff/:id`
+- Added Admin Staff Management UI at `/admin/staff`.
+- Staff management supports create/list/update flows for `StaffProfile` without changing Prisma schema or migrations.
+- Staff API returns workload visibility fields: `assignedToday`, `pendingToday`, `collectedToday`, `totalActiveAssigned`, and a warning signal when workload is high.
+- Admin booking assignment now rejects inactive staff with controlled `STAFF_INACTIVE_ASSIGNMENT_REJECTED`.
+- Admin booking assignment now rejects non-`SAMPLE_COLLECTOR` staff with controlled `STAFF_ROLE_ASSIGNMENT_REJECTED`.
+- Admin booking assignment rejects terminal bookings (`COMPLETED`, `CANCELLED`, `NO_SHOW`).
+- Assignment lookup prioritizes staff phone when a phone is supplied, reducing the risk of assigning the wrong staff member when names overlap.
+- Frontend build passed after the staff management UI integration.
+- No RAG/retriever/recommendation logic, payment logic, Prisma schema, or migration was changed.
+
+5F-1 validation:
+
+- 5F-1 staff management workload smoke: **9/9 PASS**
+- 5E-3 full slot-role product demo: **13/13 PASS**
+- 5D-2 slot capacity smoke: **10/10 PASS**
+- 5C5 role-based E2E: **15/15 PASS**
+- Frontend `npm run build`: **PASS**
+
+The booking/lab operations stack now includes:
+
+- Role-based booking UI for User/Patient, Admin, and Collector.
+- Centralized booking status transition matrix.
+- Availability slot/capacity enforcement.
+- Admin staff management and collector workload visibility.
+
+At 5D-2 completion, recommended next work was:
+
+- 5G Final operations polish/audit visibility.
+- 5H Final product regression and demo checklist.
+- Then pause large feature work and focus on the thesis / khóa luận write-up.
+
+Previous milestone: **5D-2 Availability Slot + Capacity Enforcement**.
+
+HomeLab now enforces availability slots and capacity in the booking runtime. 5D-2 hardens the 5B/5C/5D-1 professional prototype by ensuring confirmed bookings and reschedules only use opened collection slots with remaining capacity.
+
+5D-2 completion summary:
+
+- Added availability/capacity service: `backend/src/services/booking-runtime/availability-slot.service.js`.
+- Added admin slot API routes for internal/demo operations:
+  - `GET /api/admin/availability-slots`
+  - `POST /api/admin/availability-slots`
+  - `PATCH /api/admin/availability-slots/:id`
+- Booking creation through chatbot/runtime now checks `sampleDate + sampleTimeStart` before creating a confirmed booking.
+- The runtime does not auto-create slots when a user books. If a slot is not opened, booking creation is rejected with controlled `BOOKING_SLOT_NOT_OPEN`.
+- If a slot is opened but full, booking creation is rejected with controlled `BOOKING_SLOT_FULL`.
+- Capacity uses dynamic active booking count as the source of truth. Active statuses that hold capacity are `CONFIRMED`, `RESCHEDULED`, `ASSIGNED`, `SAMPLE_COLLECTED`, `IN_LAB_PROCESSING`, and `RESULT_READY`.
+- Terminal statuses `CANCELLED`, `NO_SHOW`, and `COMPLETED` do not hold capacity.
+- Cancel releases capacity because the booking leaves active status.
+- Reschedule checks the new slot before changing the booking; if the target slot is full or closed, the old booking schedule is preserved.
+- `AvailabilitySlot` already had the needed fields (`date`, `startTime`, `endTime`, `capacity`, `bookedCount`, `area`, `active`), so no Prisma schema or migration was changed.
+- Admin slot API exists, but frontend slot management UI has not been built yet.
+
+5D-2 validation:
+
+- 5D-2 slot capacity smoke: **10/10 PASS**
+- 5D-1 transition smoke: **12/12 PASS**
+- 5C5 role-based E2E: **15/15 PASS**
+- 5C2 user smoke: **6/6 PASS**
+- 5C3 collector smoke: **6/6 PASS**
+- 5B4 admin smoke: **9/9 PASS**
+- 5B6 booking E2E: **12/12 PASS**
+
+The system now has these booking/lab operations hardening layers:
+
+- Role-based booking UI for User/Patient, Admin, and Collector.
+- Centralized booking status transition matrix.
+- Availability slot/capacity enforcement for booking creation and reschedule.
+
+Current recommended next work:
+
+- 5E-1 Admin Availability Slot Management UI.
+- 5E-2 Slot-aware booking UX/manual demo.
+- 5F Staff workload/assignment rules; completed later in 5F-1.
+
+Previous milestone: **5D-1 Booking Status Transition Matrix + Audit Hardening**.
+
+HomeLab now has a centralized booking status workflow for the booking/lab operations backend. 5D-1 hardens the 5B/5C professional prototype by replacing broad/free status updates with a shared transition matrix and consistent controlled rejection behavior.
+
+5D-1 completion summary:
+
+- Added centralized status transition service: `backend/src/services/booking-runtime/booking-status-transition.service.js`.
+- Applied the shared matrix in booking runtime service paths used by Admin, User/Patient, Collector, and chatbot runtime operations.
+- Updated admin status update, admin assign-to-`ASSIGNED`, collector sample-collected, user cancel, chat/runtime cancel, and chat/runtime reschedule to use the shared workflow.
+- Invalid transitions return controlled JSON with `409` and a clear message such as `Không thể chuyển trạng thái từ COMPLETED sang ASSIGNED`.
+- Terminal states are `COMPLETED`, `CANCELLED`, and `NO_SHOW`.
+- Audit/status history continues to use existing `BookingStatusHistory` fields: `bookingId`, `fromStatus`, `toStatus`, `reason`, `changedByType`, `changedById`, and `metadata`.
+- No Prisma schema or migration was changed in 5D-1.
+
+Current transition matrix:
+
+- `CONFIRMED -> ASSIGNED, RESCHEDULED, CANCELLED, NO_SHOW`
+- `RESCHEDULED -> ASSIGNED, CANCELLED, NO_SHOW`
+- `ASSIGNED -> SAMPLE_COLLECTED, RESCHEDULED, CANCELLED, NO_SHOW`
+- `SAMPLE_COLLECTED -> IN_LAB_PROCESSING`
+- `IN_LAB_PROCESSING -> RESULT_READY`
+- `RESULT_READY -> COMPLETED`
+- `COMPLETED`, `CANCELLED`, and `NO_SHOW` are terminal states.
+
+5D-1 validation:
+
+- 5D-1 transition smoke: **12/12 PASS**
+- 5C5 role-based E2E: **15/15 PASS**
+- 5C2 user smoke: **6/6 PASS**
+- 5C3 collector smoke: **6/6 PASS**
+- 5B4 admin smoke: **9/9 PASS**
+- 5B6 booking E2E: **12/12 PASS**
+
+5D-1 follow-up items have moved through 5D-2 and 5F-1: availability slot/capacity enforcement and staff workload/assignment rules are complete. Remaining recommended work is now focused on final operations polish/audit visibility, final regression/demo checklist, and optional audit schema expansion.
+
+Previous milestone: **5C Role-based Booking Operations UI**.
+
+HomeLab now has a role-based booking operations UI layer on top of the 5B Professional Booking & Lab Operations Runtime. This is an internal/demo product workflow for role-specific booking operations, not production authentication/RBAC and not a production lab deployment.
+
+5C completion summary:
+
+- 5C-0 created `docs/role_based_booking_ui_spec_5c.md` for the role-based booking operations UI.
+- The UI has three roles: User/Patient, Admin, and Collector/Sample Collector.
+- There is no shared `/login` route. Each role has its own login route: `/user/login`, `/admin/login`, and `/collector/login`.
+- Each role has its own dashboard/operations route: `/user/dashboard`, `/admin/bookings`, and `/collector/dashboard`.
+- 5C-1 added demo auth, role routing, route guards, and shared role layout.
+- Demo session state uses localStorage keys: `homelab_demo_role`, `homelab_demo_token`, `homelab_demo_user_id`, and `homelab_demo_phone`.
+- 5C-2 added the User/Patient dashboard and user booking API: list own bookings by phone, view detail/timeline, cancel allowed bookings, and return to chatbot for new bookings.
+- User dashboard does not expose `internalNote`.
+- 5C-3 added the Collector dashboard and collector booking API: list assigned bookings by collector phone, view detail/timeline, and mark `SAMPLE_COLLECTED`.
+- Collector access is scoped to bookings assigned to that collector; wrong collector phone returns controlled 404/no data.
+- 5C-4 polished `/admin/bookings` into a professional operations dashboard with summary cards, operations workflow board, filter/table polish, detail modal, assign collector, status update, internal note, and status history.
+- 5C-5 added `backend/scripts/smoke_role_based_booking_operations_5c5.js`, passing **15/15**.
+
+Current 5C operations flow:
+
+1. User/Patient logs in with demo phone, sees own bookings, tracks status, cancels when allowed, and can return to chatbot to book again.
+2. Admin sees all bookings, assigns a collector, updates status, and records internal notes.
+3. Collector sees assigned bookings only, records sample collection, and updates the booking to `SAMPLE_COLLECTED`.
+4. Admin progresses the booking through lab operations to `IN_LAB_PROCESSING`, `RESULT_READY`, and `COMPLETED`.
+5. User/Patient sees the completed status and cannot cancel a completed booking.
+
+Important 5C boundaries:
+
+- Demo/localStorage auth and demo headers are internal prototype scaffolding only.
+- 5C does not implement production auth/RBAC.
+- Payment remains out of scope.
+- 5C does not change `/api/chat`, RAG/retriever/recommendation/router/answer/policy logic, retriever v1.4 promotion status, or live package recommendation defaults.
+
+5C follow-up items have moved through 5D-1, 5D-2, 5E, and 5F-1: status transition/audit hardening, slot capacity enforcement, slot management UX, and staff workload/assignment rules are complete. Remaining recommended work is now focused on final operations polish/audit visibility, final regression/demo checklist, and optional audit/auth/UI hardening.
+
+Previous milestone: **5B Professional Booking & Lab Operations Runtime**.
 
 HomeLab now includes a professional product prototype for booking and lab operations, in addition to the RAG-first healthcare chatbot. This is a new product/business module, not a change to the medical RAG architecture.
 
@@ -61,13 +252,7 @@ RAG/retriever/recommendation status is unchanged:
 - Retriever v1.4 remains controlled-only behind explicit flags and is not promoted as the default/global runtime.
 - Live package recommendation remains disabled by default and is not promoted as default/global behavior.
 
-Current recommended next work:
-
-- Optional UI polish for the admin booking table, especially horizontal scrolling and dense table ergonomics.
-- Optional auth/RBAC for real admin/staff separation.
-- Optional `AvailabilitySlot` capacity enforcement.
-- Optional notifications, payment, and lab-result upload as future modules.
-- If the priority is the thesis, package the narrative as "AI healthcare chatbot + lab booking operations" rather than adding more features.
+5B follow-up items have moved into 5C/5D/5E/5F: admin UI polish, role-separated demo workflows, transition/audit hardening, slot capacity enforcement, slot management UX, and staff management/workload rules are complete. Remaining recommended work is now focused on final operations polish, final regression/demo checklist, and optional auth/RBAC hardening.
 
 Previous milestone context: **Recommendation/Test Package Runtime Prototype**.
 
@@ -143,6 +328,26 @@ Next status: controlled v1.4 runtime has completed targeted 4C UX/source polish 
 
 ## Current Status
 
+- Staff Management + Collector Workload Rules 5F-1 is complete as professional product prototype hardening for booking operations.
+- Admin staff management is available through `/admin/staff` and `/api/admin/staff`.
+- Staff workload visibility now includes `assignedToday`, `pendingToday`, `collectedToday`, `totalActiveAssigned`, and high-workload warning metadata for dispatch decisions.
+- Collector assignment now rejects inactive staff, staff with the wrong role, and terminal bookings with controlled responses.
+- Assignment lookup prioritizes staff phone when available to avoid wrong matches from duplicate names.
+- Current booking operations stack now includes role-based booking UI, availability slot/capacity enforcement, centralized status transition matrix, and staff management/workload visibility.
+- Availability Slot + Capacity Enforcement 5D-2 is complete as backend scheduling hardening for the professional prototype.
+- Booking creation through chatbot/runtime now requires an opened `AvailabilitySlot` for `sampleDate + sampleTimeStart`; closed slots return controlled `BOOKING_SLOT_NOT_OPEN`.
+- Open but full slots return controlled `BOOKING_SLOT_FULL`, and no confirmed booking is created.
+- Cancel and reschedule are now tied to capacity behavior: terminal/cancelled bookings no longer hold capacity, and reschedule checks target slot capacity before changing the booking.
+- Admin slot API exists at `/api/admin/availability-slots`; Admin Availability Slot Management UI was added later in 5E-1.
+- Booking Status Transition Matrix + Audit Hardening 5D-1 is complete as backend workflow hardening for the professional prototype.
+- Booking status changes now use a centralized matrix across admin, user, collector, and chat/runtime service paths.
+- Invalid transitions are rejected with controlled `409` JSON instead of crashing or silently allowing broad jumps.
+- `COMPLETED`, `CANCELLED`, and `NO_SHOW` are terminal states.
+- Audit/status history still uses the existing `BookingStatusHistory` schema; no Prisma schema/migration was added for 5D-1.
+- Role-based Booking Operations UI 5C is complete as a professional product prototype/internal demo workflow: User/Patient, Admin, and Collector have separate login routes, guarded dashboards, and role-specific booking operations.
+- 5C scripted evidence: user booking dashboard API smoke 6/6 PASS; collector booking dashboard API smoke PASS; role-based booking operations E2E smoke 15/15 PASS.
+- 5C manual evidence: admin booking operations dashboard polish/manual check OK.
+- 5C scope remains demo/internal auth only. It is not production auth/RBAC and does not include payment.
 - Professional Booking & Lab Operations Runtime 5B is complete as a product prototype: Prisma MySQL booking DB, persistent chat booking, admin/staff API, admin dashboard UI, and E2E product smoke are in place.
 - 5B scripted evidence: persistent booking chat smoke 7/7 PASS; admin booking API smoke PASS; booking E2E product smoke 12/12 PASS.
 - 5B manual evidence: admin dashboard UI manual check OK, with a minor accepted UX note that the booking table can scroll horizontally in the prototype.
@@ -176,6 +381,15 @@ Next status: controlled v1.4 runtime has completed targeted 4C UX/source polish 
 
 ## What Is Already Done
 
+- 5G/5H booking and collector assignment chain is complete through 5H-7: patient auth gate, package selection/confirmation, urgent override, collector assignment DB foundation, collector working area/schedule, matching/admin preview, auto pending assignment, collector accept/reject, admin rejection review, manual reassign fallback, and full E2E role workflow smoke.
+- Booking mutations require user login/session phone; public health/lab education and urgent red-flag guidance remain public.
+- Package-based booking now requires concrete package selection/confirmation for vague booking requests and stores `testCatalogItemId` plus specific `testTypeText`.
+- Collector assignment lifecycle is separate from `BookingStatus`: pending assignments keep booking `CONFIRMED`; booking becomes `ASSIGNED` only after collector acceptance.
+- Admin rejection review and manual reassign preserve assignment audit by creating a new assignment instead of rewriting the rejected assignment.
+- 5F-1 Staff Management + Collector Workload Rules is complete: admin can manage staff at `/admin/staff`, staff APIs expose workload visibility, inactive/wrong-role/terminal assignment attempts are rejected, and the 5F-1 smoke passed 9/9.
+- 5D-2 Availability Slot + Capacity Enforcement is complete: booking creation/reschedule now require opened slots with capacity, closed/full slots return controlled errors, cancel frees capacity through terminal status, and admin slot APIs exist for internal/demo operations.
+- 5D-1 Booking Status Transition Matrix + Audit Hardening is complete: centralized transition service, shared runtime enforcement, controlled 409 rejection for invalid transitions, terminal state protection, and status-history audit preservation with existing schema.
+- 5C Role-based Booking Operations UI is complete as an internal/demo operations layer on top of 5B: role-specific login routes, guarded dashboards, shared role layout, user booking dashboard/API, collector booking dashboard/API, polished admin operations dashboard, and 15/15 role-based E2E smoke.
 - 5B Professional Booking & Lab Operations Runtime is complete as a professional prototype: product spec, Prisma MySQL schema/seed, persistent booking service/repository, chat confirmation-to-create flow, reschedule/cancel by booking code, admin/staff booking API, admin dashboard UI, and E2E regression smoke.
 - KB v1_3 packaged with 42 items.
 - Batch A v1_3 items `kb_v1_3_039` to `kb_v1_3_042` approved in packaging report.
@@ -215,14 +429,16 @@ Next status: controlled v1.4 runtime has completed targeted 4C UX/source polish 
 
 ## Immediate Next Step
 
-Proceed from 5B booking runtime completion and 4D controlled regression evidence to thesis technical narrative packaging / khóa luận, unless a specific product gap requires more implementation:
+Proceed from 5F-1 staff management/workload hardening and 4D controlled regression evidence to final operations polish or thesis technical narrative packaging / khóa luận, depending on priority:
 
 - Keep v1.4 behind explicit flags only.
 - Do not promote retriever v1.4 as default/global runtime yet.
 - Do not promote live package recommendation as default/global behavior.
-- Package the technical narrative: AI healthcare chatbot, RAG-first decision, controlled v1.4 runtime, safety gates, recommendation gating, professional booking/lab operations runtime, smoke evidence, and limitations.
-- Treat 5B as a professional product prototype, not production lab deployment.
-- Avoid adding large new features unless the thesis/demo narrative exposes a specific gap.
+- Package the technical narrative: AI healthcare chatbot, RAG-first decision, controlled v1.4 runtime, safety gates, recommendation gating, professional booking/lab operations runtime, role-based operations, slot capacity, staff workload rules, smoke evidence, and limitations.
+- Treat 5B/5C as a professional product prototype/internal demo workflow, not production lab deployment.
+- Recommended product hardening next: 5G Final operations polish/audit visibility.
+- Final validation next: 5H Final product regression and demo checklist.
+- After that, avoid large feature work and focus on the thesis / khóa luận unless the final demo exposes a specific gap.
 
 Keep the stage-3 recommendation regression matrix explicit:
 
@@ -231,6 +447,8 @@ Keep the stage-3 recommendation regression matrix explicit:
 - Runtime on + live on: run 3H (`HOMELAB_RECOMMENDATION_RUNTIME_ENABLED=true`, `HOMELAB_RECOMMENDATION_LIVE_PACKAGE_ENABLED=true`).
 - Commit docs/handoff after review; do not commit `.env`.
 - Preserve RAG-first, safety-first behavior; do not move to fine-tuning or package-first answers prematurely.
+
+Updated 5I-1 note: 5G/5H are now complete. The next practical step is documentation packaging, thesis technical narrative / khóa luận, and targeted demo polish. Treat 5H-7 as E2E-style prototype validation, not production load or production workforce validation.
 
 ## Near-Term Roadmap
 
@@ -253,11 +471,17 @@ Keep the stage-3 recommendation regression matrix explicit:
 | 15 | 4B-2I answer text polish. Done, 5/5 PASS; answer body no longer leaks raw source title/heading while source metadata remains available. |
 | 16 | 4C product UX polish and source alignment hardening. Done; targeted smokes and 7-case manual UI retest pass, no default promotion. |
 | 17 | 4D longer controlled runtime regression/product review. Done, 29/29 PASS; no default/global promotion. |
-| 18 | Thesis technical narrative packaging / khóa luận. Next. |
-| 19 | Broader default/global production promotion. Future decision only. |
+| 18 | 5C Role-based Booking Operations UI. Done; User/Admin/Collector role routes and dashboards complete, user API smoke 6/6 PASS, collector API smoke PASS, role-based E2E smoke 15/15 PASS. |
+| 19 | 5D-1 Status Transition Matrix + Audit Hardening. Done; transition smoke 12/12 PASS and 5B/5C regressions remain green. |
+| 20 | 5D-2 Availability Slot/Capacity Enforcement. Done; slot capacity smoke 10/10 PASS and 5D-1/5C/5B regressions remain green. |
+| 21 | 5E-1 Admin Availability Slot Management UI. Done; admin can manage opened sampling slots from UI. |
+| 22 | 5E-2 Slot-aware chatbot booking UX. Done; closed/full slot messages are friendly and do not leak technical codes. |
+| 23 | 5F-1 Staff Management + Collector Workload Rules. Done; staff smoke 9/9 PASS and frontend build PASS. |
+| 24 | Thesis technical narrative packaging / khóa luận. Next if thesis is the priority. |
+| 25 | Broader default/global production promotion. Future decision only. |
 
-| 20 | 5B Professional Booking & Lab Operations Runtime. Done; persistent booking chat smoke 7/7 PASS, admin booking API smoke PASS, admin dashboard manual UI OK, booking E2E product smoke 12/12 PASS. |
-| 21 | Post-5B thesis narrative: AI healthcare chatbot + lab booking operations. Next if thesis is the priority. |
+| 26 | 5B Professional Booking & Lab Operations Runtime. Done; persistent booking chat smoke 7/7 PASS, admin booking API smoke PASS, admin dashboard manual UI OK, booking E2E product smoke 12/12 PASS. |
+| 27 | Post-5D-2 thesis narrative: AI healthcare chatbot + role-based lab booking operations with hardened status workflow and slot capacity enforcement. Next if thesis is the priority. |
 
 ## Rules For Future Work
 
@@ -312,3 +536,13 @@ As of 3H, the recommendation/test package path is a controlled slot-based protot
 As of 4D, retriever v1.4 is wired into backend runtime as a controlled-only path behind explicit semantic flags and has completed targeted product UX/source alignment polish plus broader controlled regression. `smoke_controlled_runtime_regression_4d.js` passed 29/29 across lab explanation, result boundary, urgent, mixed urgent/booking, booking/reschedule/cancel, and recommendation-controlled scenarios. v1_3/default behavior remains the safe baseline when flags are off, and v1.4 is still not promoted as default/global. The correct continuation is thesis technical narrative packaging / khóa luận and future controlled observation as needed, not immediate production/default release. This remains RAG-first work; fine-tuning, if any, stays later and only after the RAG baseline is proven.
 
 As of 5B, HomeLab also has a professional booking and lab-operations product prototype. Chat can collect booking details, require explicit confirmation, create persistent DB bookings, reschedule/cancel by booking code, and expose internal admin/staff operations through `/api/admin/bookings` plus a prototype dashboard at `/admin/bookings`. This business module does not change the RAG-first medical answer path, does not promote retriever v1.4, and does not enable live package recommendation by default.
+
+As of 5C, that booking module has a role-based operations UI for internal/demo workflows. User/Patient, Admin, and Collector have separate login routes and guarded dashboards. The demonstrated flow is: user tracks own booking by phone, admin assigns collector, collector marks sample collected, admin progresses the booking through lab statuses, and user sees the completed state. This remains demo/localStorage auth with demo headers, not production auth/RBAC. Payment remains out of scope.
+
+As of 5D-1, booking status changes are governed by a centralized transition matrix in the backend runtime. Admin, user, collector, and chat/runtime operations share the same workflow rules. Invalid transitions are controlled 409 responses, terminal states are protected, and valid transitions continue writing `BookingStatusHistory` using the existing schema. This is professional prototype hardening, not production operations certification.
+
+As of 5D-2, booking creation and reschedule are constrained by opened availability slots and dynamic capacity count. Chatbot/runtime booking does not create confirmed bookings for closed or full slots, cancel releases capacity through terminal status, and admin slot APIs exist for internal/demo management. This is professional product prototype hardening, not a production scheduling or workforce optimization claim.
+
+As of 5F-1, HomeLab also has admin staff management and collector workload visibility. Admin can manage staff through `/admin/staff`, staff APIs expose workload summaries, inactive or wrong-role staff cannot receive new sample collection assignments, terminal bookings cannot be assigned again, and assignment lookup prefers phone when available.
+
+As of 5G/5H, HomeLab has a complete prototype collector assignment lifecycle layered on top of role-based booking operations. Booking mutation is gated by user/session phone, package booking requires concrete package selection/confirmation, urgent red flags override package/booking state, eligible confirmed bookings auto-create pending collector assignments, collectors can accept/reject, admin can review rejection reasons, manual reassign preserves audit by creating a new assignment, and 5H-7 validates the full user/admin/collector/lab completion flow. The recommended next step is documentation/thesis packaging and final demo polish rather than new large feature work.

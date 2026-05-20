@@ -1,4 +1,5 @@
 const prisma = require("../src/services/booking-runtime/prisma-client");
+const availabilitySlotService = require("../src/services/booking-runtime/availability-slot.service");
 
 const API_BASE_URL = process.env.HOMELAB_API_BASE_URL || "http://localhost:5000";
 const CHAT_URL = process.env.HOMELAB_CHAT_API_URL || `${API_BASE_URL}/api/chat`;
@@ -10,6 +11,27 @@ const ADMIN_HEADERS = {
 
 function uniqueSession(prefix) {
     return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function isoDate(offsetDays = 1) {
+    const date = new Date();
+    date.setDate(date.getDate() + offsetDays);
+
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0")
+    ].join("-");
+}
+
+async function prepareChatBookingSlot() {
+    return availabilitySlotService.createAvailabilitySlot({
+        date: isoDate(1),
+        timeStart: "08:00",
+        timeEnd: "09:00",
+        capacity: 10,
+        area: "default"
+    });
 }
 
 function vi(escapedText) {
@@ -174,6 +196,8 @@ async function main() {
         [
             "chat_confirm_creates_booking",
             async () => {
+                await prepareChatBookingSlot();
+
                 const data = await postChat(CONFIRM_QUERY, state.bookingSession);
                 const bookingCode = data.booking?.bookingCode || extractBookingCode(data.reply);
 
@@ -304,18 +328,24 @@ async function main() {
         [
             "admin_complete_booking",
             async () => {
-                const { response, payload } = await adminRequest(
-                    `/api/admin/bookings/${state.bookingCode}/status`,
-                    {
-                        method: "PATCH",
-                        body: JSON.stringify({
-                            status: "COMPLETED",
-                            reason: "smoke completed"
-                        })
-                    }
-                );
+                let payload = null;
 
-                assert(response.status === 200 && payload.success, "complete endpoint failed");
+                for (const status of ["IN_LAB_PROCESSING", "RESULT_READY", "COMPLETED"]) {
+                    const result = await adminRequest(
+                        `/api/admin/bookings/${state.bookingCode}/status`,
+                        {
+                            method: "PATCH",
+                            body: JSON.stringify({
+                                status,
+                                reason: `smoke ${status.toLowerCase()}`
+                            })
+                        }
+                    );
+
+                    assert(result.response.status === 200 && result.payload.success, `${status} endpoint failed`);
+                    payload = result.payload;
+                }
+
                 assert(payload.data?.status === "COMPLETED", "response status is not COMPLETED");
 
                 const booking = await getBookingRecord(state.bookingCode);

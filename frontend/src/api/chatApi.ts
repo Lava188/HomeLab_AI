@@ -1,3 +1,5 @@
+import { getDemoAuthHeaders } from '../auth/demoAuth';
+
 export type SourceCitation =
   | string
   | {
@@ -20,6 +22,8 @@ export interface Message {
   timestamp: string;
   citations?: SourceCitation[];
   variant?: 'default' | 'clarify';
+  packageCandidates?: PackageSummary[];
+  selectedPackage?: PackageSummary | null;
   meta?: {
     flow?: string;
     action?: string;
@@ -32,6 +36,16 @@ export interface Message {
   };
 }
 
+export type PackageSummary = {
+  id?: string | null;
+  code?: string | null;
+  name?: string | null;
+  description?: string | null;
+  components?: string[];
+  suitableFor?: string | null;
+  preparationNotes?: string[];
+};
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -43,7 +57,7 @@ type BackendChatData = {
   timestamp?: string;
   flow?: string;
   action?: string;
-  meta?: {
+    meta?: {
     debug?: {
       runtimeMode?: string | null;
       queryExpansions?: string[];
@@ -64,6 +78,8 @@ type BackendChatData = {
       source?: string | null;
     };
     citations?: SourceCitation[];
+    packageCandidates?: PackageSummary[];
+    selectedPackage?: PackageSummary | null;
   };
 };
 
@@ -117,6 +133,7 @@ export const mockSendMessage = async (text: string): Promise<Message> => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...getDemoAuthHeaders(),
       },
       body: JSON.stringify({
         message: text,
@@ -159,6 +176,8 @@ export const mockSendMessage = async (text: string): Promise<Message> => {
       timestamp: buildTimestamp(result.data.timestamp),
       citations: isClarifyingResponse ? undefined : citations,
       variant: isClarifyingResponse ? 'clarify' : 'default',
+      packageCandidates: result.data.meta?.packageCandidates,
+      selectedPackage: result.data.meta?.selectedPackage ?? null,
       meta: {
         flow: result.data.flow,
         action: result.data.action,

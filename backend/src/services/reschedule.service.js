@@ -9,6 +9,11 @@ const {
     detectTimeFromMessage,
     extractBookingId
 } = require("../utils/text.util");
+const {
+    formatSlotErrorMessage,
+    isBookingSlotError
+} = require("./booking-response.service");
+const { normalizePhone } = require("./booking-runtime/booking-validation.service");
 
 function getEmptyRescheduleDraft(defaultBookingId = null) {
     return {
@@ -90,7 +95,12 @@ function buildRescheduledReply(updatedBooking) {
     );
 }
 
-async function handleRescheduleMessage({ message, sessionId }) {
+function buildUnauthorizedReply() {
+    return "Bạn không có quyền thao tác lịch hẹn này.";
+}
+
+async function handleRescheduleMessage({ message, sessionId, userSession = {} }) {
+    const sessionPhone = normalizePhone(userSession.phone || "");
     const session = mockSessions.getSession(sessionId);
     const currentDraft =
         session &&
@@ -165,6 +175,24 @@ async function handleRescheduleMessage({ message, sessionId }) {
         });
     }
 
+    if (sessionPhone && existingBooking.phone !== sessionPhone) {
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.RESCHEDULE,
+            action: ACTIONS.RESCHEDULE_NOT_ALLOWED,
+            reply: buildUnauthorizedReply(),
+            booking: null,
+            meta: {
+                handledBy: "reschedule.service",
+                sessionState: "unauthorized",
+                extractedSlots,
+                missingFields: [],
+                nextExpectedField: null
+            }
+        });
+    }
+
     if (!nextDraft.newAppointmentDate || !nextDraft.newAppointmentTime) {
         const updatedSession = mockSessions.upsertSession(sessionId, {
             currentFlow: FLOWS.RESCHEDULE,
@@ -195,8 +223,9 @@ async function handleRescheduleMessage({ message, sessionId }) {
     }
 
     try {
-        const updatedBooking = await bookingRuntime.rescheduleBooking(
+        const updatedBooking = await bookingRuntime.rescheduleBookingForPhone(
             nextDraft.bookingId,
+            sessionPhone,
             {
                 sampleDate: nextDraft.newAppointmentDate,
                 sampleTimeStart: nextDraft.newAppointmentTime
@@ -232,20 +261,33 @@ async function handleRescheduleMessage({ message, sessionId }) {
             throw error;
         }
 
+        const isSlotError = isBookingSlotError(error);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.RESCHEDULE,
+            status: "awaiting_new_schedule",
+            rescheduleDraft: nextDraft,
+            confirmedBookingId: existingBooking.bookingCode
+        });
+
         return createChatResult({
             sessionId,
             userMessage: message,
             flow: FLOWS.RESCHEDULE,
             action: ACTIONS.RESCHEDULE_NOT_ALLOWED,
-            reply: `Lịch ${nextDraft.bookingId} hiện không thể đổi vì trạng thái hiện tại không cho phép.`,
+            reply: isSlotError
+                ? formatSlotErrorMessage(error, {
+                    mode: "reschedule",
+                    draft: nextDraft
+                })
+                : `Lịch ${nextDraft.bookingId} hiện không thể đổi vì trạng thái hiện tại không cho phép.`,
             booking: existingBooking,
             meta: {
                 handledBy: "reschedule.service",
-                sessionState: "blocked",
+                sessionState: updatedSession.status,
                 extractedSlots,
                 missingFields: [],
                 nextExpectedField: null,
-                errorCode: error.code
+                ...(isSlotError ? {} : { errorCode: error.code })
             }
         });
     }

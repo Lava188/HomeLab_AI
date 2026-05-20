@@ -4,6 +4,7 @@ const BookingRuntimeError = require("./booking-runtime/booking-runtime-error");
 const { FLOWS, ACTIONS } = require("../constants/chat.constants");
 const { createChatResult } = require("../utils/chat-response.util");
 const { formatDisplayDate, extractBookingId } = require("../utils/text.util");
+const { normalizePhone } = require("./booking-runtime/booking-validation.service");
 
 function getEmptyCancelDraft(defaultBookingId = null) {
     return {
@@ -47,7 +48,12 @@ function buildCancelledReply(booking) {
     );
 }
 
-async function handleCancelMessage({ message, sessionId }) {
+function buildUnauthorizedReply() {
+    return "Bạn không có quyền thao tác lịch hẹn này.";
+}
+
+async function handleCancelMessage({ message, sessionId, userSession = {} }) {
+    const sessionPhone = normalizePhone(userSession.phone || "");
     const session = mockSessions.getSession(sessionId);
     const extractedBookingId = extractBookingId(message);
     const currentDraft =
@@ -110,9 +116,26 @@ async function handleCancelMessage({ message, sessionId }) {
         });
     }
 
+    if (sessionPhone && existingBooking.phone !== sessionPhone) {
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.CANCEL,
+            action: ACTIONS.CANCEL_BOOKING_NOT_FOUND,
+            reply: buildUnauthorizedReply(),
+            booking: null,
+            meta: {
+                handledBy: "cancel.service",
+                sessionState: "unauthorized",
+                nextExpectedField: null
+            }
+        });
+    }
+
     try {
-        const cancelledBooking = await bookingRuntime.cancelBooking(
+        const cancelledBooking = await bookingRuntime.cancelBookingForPhone(
             nextDraft.bookingId,
+            sessionPhone,
             {},
             { sessionId }
         );

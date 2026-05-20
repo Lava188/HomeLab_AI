@@ -1,10 +1,10 @@
+import { getDemoAuthHeaders } from '../auth/demoAuth';
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
-const DEMO_HEADERS = {
+const DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
-  'x-demo-role': 'ADMIN',
-  'x-demo-user-id': 'admin-demo',
 };
 
 export type BookingStatus =
@@ -36,6 +36,7 @@ export type StatusHistoryItem = {
   reason?: string | null;
   changedByType?: string;
   changedById?: string | null;
+  metadata?: Record<string, unknown> | string | null;
   createdAt?: string;
 };
 
@@ -46,6 +47,26 @@ export type StaffProfile = {
   role?: string;
   serviceArea?: string | null;
   active?: boolean;
+};
+
+export type CollectorAssignment = {
+  id: string;
+  assignmentId?: string;
+  status: string;
+  assignmentSource?: string | null;
+  reviewStatus?: string | null;
+  collectorId?: string | null;
+  collectorName?: string | null;
+  collectorPhone?: string | null;
+  collectorRole?: string | null;
+  collectorActive?: boolean | null;
+  assignedAt?: string | null;
+  acceptedAt?: string | null;
+  rejectedAt?: string | null;
+  rejectReason?: string | null;
+  adminReviewedAt?: string | null;
+  adminReviewedById?: string | null;
+  metadata?: Record<string, unknown> | string | null;
 };
 
 export type AdminBooking = {
@@ -76,6 +97,7 @@ export type AdminBooking = {
     category?: string | null;
   } | null;
   statusHistory?: StatusHistoryItem[];
+  collectorAssignments?: CollectorAssignment[];
 };
 
 type ApiResponse<T> = {
@@ -102,7 +124,8 @@ async function request<T>(path: string, options: RequestInit = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
-      ...DEMO_HEADERS,
+      ...DEFAULT_HEADERS,
+      ...getDemoAuthHeaders(),
       ...(options.headers || {}),
     },
   });
@@ -111,7 +134,7 @@ async function request<T>(path: string, options: RequestInit = {}) {
   if (!response.ok || !payload.success || payload.data === undefined) {
     throw new Error(
       payload.message ||
-        'Không thể tải dữ liệu booking. Vui lòng kiểm tra backend và thử lại.',
+        'Không thể tải dữ liệu lịch hẹn. Vui lòng kiểm tra máy chủ và thử lại.',
     );
   }
 
@@ -174,6 +197,71 @@ export function updateInternalNote(
     `/api/admin/bookings/${encodeURIComponent(bookingCode)}/internal-note`,
     {
       method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  );
+}
+
+export function listPendingCollectorAssignmentRejections() {
+  return request<{ assignments: CollectorAssignment[]; total: number }>(
+    '/api/admin/collector-assignments/rejections',
+  );
+}
+
+export function approveCollectorAssignmentRejection(assignmentId: string) {
+  return request<{
+    assignmentId: string;
+    assignmentStatus: string;
+    reviewStatus: string;
+    adminReviewedAt?: string | null;
+    bookingCode?: string | null;
+    bookingStatus?: string | null;
+  }>(
+    `/api/admin/collector-assignments/${encodeURIComponent(assignmentId)}/approve-rejection`,
+    {
+      method: 'POST',
+      body: JSON.stringify({}),
+    },
+  );
+}
+
+export function rejectCollectorAssignmentRejection(assignmentId: string) {
+  return request<{
+    assignmentId: string;
+    assignmentStatus: string;
+    reviewStatus: string;
+    adminReviewedAt?: string | null;
+    bookingCode?: string | null;
+    bookingStatus?: string | null;
+  }>(
+    `/api/admin/collector-assignments/${encodeURIComponent(assignmentId)}/reject-rejection`,
+    {
+      method: 'POST',
+      body: JSON.stringify({}),
+    },
+  );
+}
+
+export function manualCollectorAssignment(
+  bookingCode: string,
+  payload: {
+    collectorId: string;
+    reason: string;
+  },
+) {
+  return request<{
+    assignmentId: string;
+    assignmentStatus: string;
+    assignmentSource: string;
+    reviewStatus: string;
+    bookingCode?: string | null;
+    bookingStatus?: string | null;
+    collectorId?: string | null;
+    collectorName?: string | null;
+  }>(
+    `/api/admin/bookings/${encodeURIComponent(bookingCode)}/collector-assignments/manual`,
+    {
+      method: 'POST',
       body: JSON.stringify(payload),
     },
   );

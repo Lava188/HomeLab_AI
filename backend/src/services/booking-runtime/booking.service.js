@@ -4,23 +4,16 @@ const { generateBookingCode } = require("./booking-code.service");
 const {
     normalizePhone,
     validateConfirmedBookingInput,
-    assertCanReschedule,
-    assertCanCancel
 } = require("./booking-validation.service");
+const {
+    assertBookingStatusTransition,
+    getAllowedNextStatuses
+} = require("./booking-status-transition.service");
+const availabilitySlotService = require("./availability-slot.service");
+const { buildWorkload } = require("../admin-staff.service");
+const collectorAssignmentService = require("../collector-assignment/collector-assignment.service");
 
 const BOOKING_CODE_MAX_RETRIES = 5;
-const ADMIN_ALLOWED_STATUSES = new Set([
-    "CONFIRMED",
-    "ASSIGNED",
-    "SAMPLE_COLLECTED",
-    "IN_LAB_PROCESSING",
-    "RESULT_READY",
-    "COMPLETED",
-    "CANCELLED",
-    "NO_SHOW"
-]);
-
-const LOCKED_STATUSES = new Set(["COMPLETED", "CANCELLED", "NO_SHOW"]);
 
 function parseDateOnly(value) {
     if (value instanceof Date) {
@@ -114,6 +107,40 @@ function normalizeBooking(booking, extra = {}) {
                 active: booking.assignedStaff.active
             }
             : null,
+        collectorAssignments: Array.isArray(booking.collectorAssignments)
+            ? booking.collectorAssignments.map((assignment) => ({
+                id: assignment.id,
+                assignmentId: assignment.id,
+                status: assignment.status,
+                assignmentSource: assignment.assignmentSource,
+                reviewStatus: assignment.reviewStatus,
+                collectorId: assignment.collectorId,
+                collectorName: assignment.collector?.fullName || null,
+                collectorPhone: assignment.collector?.phone || null,
+                collectorRole: assignment.collector?.role || null,
+                collectorActive: assignment.collector?.active ?? null,
+                assignedAt: assignment.assignedAt || null,
+                acceptedAt: assignment.acceptedAt || null,
+                rejectedAt: assignment.rejectedAt || null,
+                rejectReason: assignment.rejectReason || null,
+                adminReviewedAt: assignment.adminReviewedAt || null,
+                adminReviewedById: assignment.adminReviewedById || null,
+                expiresAt: assignment.expiresAt || null,
+                metadata: assignment.metadata || null,
+                history: Array.isArray(assignment.assignmentHistory)
+                    ? assignment.assignmentHistory.map((item) => ({
+                        id: item.id,
+                        fromStatus: item.fromStatus || null,
+                        toStatus: item.toStatus,
+                        actorType: item.actorType,
+                        actorId: item.actorId || null,
+                        reason: item.reason || null,
+                        metadata: item.metadata || null,
+                        createdAt: item.createdAt
+                    }))
+                    : []
+            }))
+            : undefined,
         statusHistory: Array.isArray(booking.statusHistory)
             ? booking.statusHistory.map((item) => ({
                 id: item.id,
@@ -177,24 +204,23 @@ function buildActorContext(context = {}) {
     };
 }
 
-function validateAdminStatusTransition(currentStatus, nextStatus) {
-    if (!ADMIN_ALLOWED_STATUSES.has(nextStatus)) {
-        throw new BookingRuntimeError("Invalid booking status", {
-            code: "BOOKING_INVALID_STATUS",
-            statusCode: 400,
-            details: { status: nextStatus }
+function assertAssignableCollector(staff) {
+    if (!staff.active) {
+        throw new BookingRuntimeError("Nhân viên này đang tạm khóa, không thể phân công lịch mới.", {
+            code: "STAFF_INACTIVE_ASSIGNMENT_REJECTED",
+            statusCode: 409,
+            details: { staffId: staff.id }
         });
     }
 
-    if (currentStatus === nextStatus) {
-        return;
-    }
-
-    if (LOCKED_STATUSES.has(currentStatus)) {
-        throw new BookingRuntimeError("Booking status transition is not allowed", {
-            code: "BOOKING_STATUS_TRANSITION_REJECTED",
+    if (staff.role !== "SAMPLE_COLLECTOR") {
+        throw new BookingRuntimeError("Chỉ nhân viên lấy mẫu mới có thể nhận lịch lấy mẫu.", {
+            code: "STAFF_ROLE_ASSIGNMENT_REJECTED",
             statusCode: 409,
-            details: { fromStatus: currentStatus, toStatus: nextStatus }
+            details: {
+                staffId: staff.id,
+                role: staff.role
+            }
         });
     }
 }
@@ -246,6 +272,12 @@ async function createConfirmedBooking(input, context = {}) {
 
     validateConfirmedBookingInput(normalizedInput);
 
+    await availabilitySlotService.assertSlotAvailable({
+        sampleDate: normalizedInput.sampleDate,
+        sampleTimeStart: normalizedInput.sampleTimeStart,
+        area: input.area || null
+    });
+
     const patient = await repository.upsertPatient({
         fullName: normalizedInput.patientName,
         phone: normalizedInput.phone,
@@ -288,7 +320,34 @@ async function createConfirmedBooking(input, context = {}) {
         await repository.clearDraftBySessionId(context.sessionId);
     }
 
-    return normalizeBooking(booking);
+    let assignmentResult = null;
+    try {
+        assignmentResult = await collectorAssignmentService.autoCreateCollectorAssignmentForBooking(
+            booking,
+            {
+                source: "AUTO",
+                actorType: context.changedByType || "CHATBOT",
+                actorId: context.sessionId || null,
+                allowNoCandidate: true,
+                metadata: {
+                    createdSource: context.createdSource || "CHAT"
+                }
+            }
+        );
+    } catch (error) {
+        if (!(error instanceof BookingRuntimeError)) {
+            console.error("[5H-4] Auto assignment error (non-fatal):", error);
+        }
+        assignmentResult = {
+            assignmentCreated: false,
+            reason: "AUTO_ASSIGNMENT_ERROR",
+            warnings: [error.message]
+        };
+    }
+
+    return normalizeBooking(booking, {
+        collectorAssignment: assignmentResult
+    });
 }
 
 async function getBookingByCode(bookingCode) {
@@ -304,8 +363,104 @@ async function listBookings(filter = {}) {
     return bookings.map((booking) => normalizeBooking(booking));
 }
 
+async function listBookingsForPhone(phone, filter = {}) {
+    const normalizedPhone = normalizePhone(phone);
+    const where = {
+        phone: normalizedPhone
+    };
+
+    if (filter.status) {
+        where.status = String(filter.status).trim().toUpperCase();
+    }
+
+    if (filter.bookingCode) {
+        where.bookingCode = { contains: String(filter.bookingCode).trim().toUpperCase() };
+    }
+
+    const bookings = await repository.listBookings({
+        where,
+        take: parseLimit(filter.limit)
+    });
+
+    return bookings.map((booking) => normalizeBooking(booking));
+}
+
+async function findCollectorByPhone(phone) {
+    return repository.findStaffByPhone(normalizePhone(phone));
+}
+
+function buildCollectorBookingWhere(staffId, filter = {}) {
+    const where = {
+        assignedStaffId: staffId
+    };
+
+    if (filter.status) {
+        where.status = String(filter.status).trim().toUpperCase();
+    }
+
+    if (filter.bookingCode) {
+        where.bookingCode = { contains: String(filter.bookingCode).trim().toUpperCase() };
+    }
+
+    if (filter.dateFrom || filter.dateTo) {
+        where.sampleDate = {};
+
+        if (filter.dateFrom) {
+            where.sampleDate.gte = parseDateOnly(filter.dateFrom);
+        }
+
+        if (filter.dateTo) {
+            where.sampleDate.lte = parseDateOnly(filter.dateTo);
+        }
+    }
+
+    return where;
+}
+
+async function listBookingsForCollectorPhone(phone, filter = {}) {
+    const staff = await findCollectorByPhone(phone);
+
+    if (!staff) {
+        return [];
+    }
+
+    const bookings = await repository.listCollectorBookings({
+        where: buildCollectorBookingWhere(staff.id, filter),
+        take: parseLimit(filter.limit)
+    });
+
+    return bookings.map((booking) => normalizeBooking(booking));
+}
+
 async function getBookingDetailByCode(bookingCode) {
     return normalizeBooking(await repository.findBookingDetailByCode(bookingCode));
+}
+
+async function getBookingDetailByCodeForPhone(bookingCode, phone) {
+    const normalizedPhone = normalizePhone(phone);
+    const booking = await repository.findBookingDetailByCode(bookingCode);
+
+    if (!booking || booking.phone !== normalizedPhone) {
+        return null;
+    }
+
+    return normalizeBooking(booking);
+}
+
+async function getBookingDetailByCodeForCollectorPhone(bookingCode, phone) {
+    const staff = await findCollectorByPhone(phone);
+
+    if (!staff) {
+        return null;
+    }
+
+    const booking = await repository.findBookingDetailByCode(bookingCode);
+
+    if (!booking || booking.assignedStaffId !== staff.id) {
+        return null;
+    }
+
+    return normalizeBooking(booking);
 }
 
 async function updateBookingStatus(bookingCode, status, context = {}) {
@@ -319,7 +474,10 @@ async function updateBookingStatus(bookingCode, status, context = {}) {
         });
     }
 
-    validateAdminStatusTransition(existingBooking.status, nextStatus);
+    assertBookingStatusTransition(existingBooking.status, nextStatus, {
+        ...context,
+        source: "admin_booking_api"
+    });
 
     const data = { status: nextStatus };
 
@@ -364,6 +522,8 @@ async function findOrCreateStaff(staffInput = {}) {
             });
         }
 
+        assertAssignableCollector(staff);
+
         return staff;
     }
 
@@ -379,35 +539,28 @@ async function findOrCreateStaff(staffInput = {}) {
         });
     }
 
-    const existingStaff = await repository.findStaffByPhoneOrName({
-        phone,
-        fullName
-    });
+    const existingStaff = phone
+        ? await repository.findStaffByPhone(phone)
+        : await repository.findStaffByPhoneOrName({
+            phone,
+            fullName
+        });
 
     if (existingStaff) {
-        const patch = {};
-
-        if (phone && existingStaff.phone !== phone) {
-            patch.phone = phone;
-        }
-
-        if (staffInput.role && existingStaff.role !== staffInput.role) {
-            patch.role = staffInput.role;
-        }
-
-        if (Object.keys(patch).length > 0) {
-            return repository.updateStaffProfile(existingStaff.id, patch);
-        }
-
+        assertAssignableCollector(existingStaff);
         return existingStaff;
     }
 
-    return repository.createStaffProfile({
+    const staff = await repository.createStaffProfile({
         fullName,
         phone,
-        role: staffInput.role || "SAMPLE_COLLECTOR",
+        role: "SAMPLE_COLLECTOR",
         active: true
     });
+
+    assertAssignableCollector(staff);
+
+    return staff;
 }
 
 async function assignStaffToBooking(bookingCode, staffInput = {}, context = {}) {
@@ -420,8 +573,16 @@ async function assignStaffToBooking(bookingCode, staffInput = {}, context = {}) 
         });
     }
 
-    if (LOCKED_STATUSES.has(existingBooking.status)) {
-        throw new BookingRuntimeError("Booking cannot be assigned", {
+    if (["COMPLETED", "CANCELLED", "NO_SHOW"].includes(existingBooking.status)) {
+        throw new BookingRuntimeError("Không thể phân công nhân viên cho lịch hẹn đã kết thúc hoặc đã hủy.", {
+            code: "BOOKING_STATUS_TRANSITION_REJECTED",
+            statusCode: 409,
+            details: { status: existingBooking.status }
+        });
+    }
+
+    if (getAllowedNextStatuses(existingBooking.status).length === 0) {
+        throw new BookingRuntimeError("Trạng thái hiện tại không cho phép phân công nhân viên.", {
             code: "BOOKING_STATUS_TRANSITION_REJECTED",
             statusCode: 409,
             details: { status: existingBooking.status }
@@ -429,10 +590,18 @@ async function assignStaffToBooking(bookingCode, staffInput = {}, context = {}) 
     }
 
     const staff = await findOrCreateStaff(staffInput);
+    const workload = await buildWorkload(staff.id);
     const shouldSetAssignedStatus = ["CONFIRMED", "RESCHEDULED"].includes(
         existingBooking.status
     );
     const nextStatus = shouldSetAssignedStatus ? "ASSIGNED" : existingBooking.status;
+
+    if (existingBooking.status !== nextStatus) {
+        assertBookingStatusTransition(existingBooking.status, nextStatus, {
+            ...context,
+            source: "admin_booking_api"
+        });
+    }
 
     const updatedBooking = await repository.updateBookingByCode(bookingCode, {
         assignedStaffId: staff.id,
@@ -456,7 +625,10 @@ async function assignStaffToBooking(bookingCode, staffInput = {}, context = {}) 
         });
     }
 
-    return normalizeBooking(updatedBooking);
+    return normalizeBooking(updatedBooking, {
+        assignmentWarning: workload.warning,
+        assignedStaffWorkload: workload
+    });
 }
 
 async function updateInternalNote(bookingCode, internalNote, context = {}) {
@@ -482,7 +654,16 @@ async function updateInternalNote(bookingCode, internalNote, context = {}) {
 
 async function rescheduleBooking(bookingCode, input, context = {}) {
     const existingBooking = await repository.findBookingByCode(bookingCode);
-    assertCanReschedule(existingBooking);
+    if (!existingBooking) {
+        throw new BookingRuntimeError("Booking not found", {
+            code: "BOOKING_NOT_FOUND",
+            statusCode: 404
+        });
+    }
+    assertBookingStatusTransition(existingBooking.status, "RESCHEDULED", {
+        ...context,
+        source: "chat_reschedule"
+    });
 
     const data = {
         status: "RESCHEDULED"
@@ -517,6 +698,17 @@ async function rescheduleBooking(bookingCode, input, context = {}) {
         });
     }
 
+    const scheduleChanged = Boolean(input.sampleDate || input.sampleTimeStart);
+
+    if (scheduleChanged) {
+        await availabilitySlotService.assertSlotAvailable({
+            sampleDate: data.sampleDate || existingBooking.sampleDate,
+            sampleTimeStart: data.sampleTimeStart || existingBooking.sampleTimeStart,
+            area: input.area || null,
+            excludeBookingCode: bookingCode
+        });
+    }
+
     const updatedBooking = await repository.updateBookingByCode(bookingCode, data);
 
     await repository.createStatusHistory({
@@ -538,13 +730,40 @@ async function rescheduleBooking(bookingCode, input, context = {}) {
     });
 }
 
+async function rescheduleBookingForPhone(bookingCode, phone, input = {}, context = {}) {
+    const normalizedPhone = normalizePhone(phone);
+    const existingBooking = await repository.findBookingByCode(bookingCode);
+
+    if (!existingBooking || existingBooking.phone !== normalizedPhone) {
+        throw new BookingRuntimeError("Booking not found", {
+            code: "BOOKING_NOT_FOUND",
+            statusCode: 404
+        });
+    }
+
+    return rescheduleBooking(bookingCode, input, {
+        ...context,
+        source: "user_booking_chat"
+    });
+}
+
 async function cancelBooking(bookingCode, input = {}, context = {}) {
     const existingBooking = await repository.findBookingByCode(bookingCode);
-    assertCanCancel(existingBooking);
+    if (!existingBooking) {
+        throw new BookingRuntimeError("Booking not found", {
+            code: "BOOKING_NOT_FOUND",
+            statusCode: 404
+        });
+    }
 
     if (existingBooking.status === "CANCELLED") {
         return normalizeBooking(existingBooking, { alreadyCancelled: true });
     }
+
+    assertBookingStatusTransition(existingBooking.status, "CANCELLED", {
+        ...context,
+        source: context.source || "booking_cancel"
+    });
 
     const updatedBooking = await repository.updateBookingByCode(bookingCode, {
         status: "CANCELLED",
@@ -564,6 +783,87 @@ async function cancelBooking(bookingCode, input = {}, context = {}) {
     });
 
     return normalizeBooking(updatedBooking);
+}
+
+async function cancelBookingForPhone(bookingCode, phone, input = {}, context = {}) {
+    const normalizedPhone = normalizePhone(phone);
+    const existingBooking = await repository.findBookingByCode(bookingCode);
+
+    if (!existingBooking || existingBooking.phone !== normalizedPhone) {
+        throw new BookingRuntimeError("Booking not found", {
+            code: "BOOKING_NOT_FOUND",
+            statusCode: 404
+        });
+    }
+
+    return cancelBooking(bookingCode, input, {
+        ...context,
+        source: "user_booking_api"
+    });
+}
+
+function appendCollectorNote(existingNote, note) {
+    const trimmedNote = String(note || "").trim();
+
+    if (!trimmedNote) {
+        return existingNote || null;
+    }
+
+    const timestamp = new Date().toISOString();
+    const line = `[collector ${timestamp}] ${trimmedNote}`;
+
+    return existingNote ? `${existingNote}\n${line}` : line;
+}
+
+async function markSampleCollectedForCollectorPhone(
+    bookingCode,
+    phone,
+    input = {},
+    context = {}
+) {
+    const staff = await findCollectorByPhone(phone);
+
+    if (!staff) {
+        throw new BookingRuntimeError("Collector not found", {
+            code: "COLLECTOR_NOT_FOUND",
+            statusCode: 404
+        });
+    }
+
+    const existingBooking = await repository.findBookingByCode(bookingCode);
+
+    if (!existingBooking || existingBooking.assignedStaffId !== staff.id) {
+        throw new BookingRuntimeError("Booking not found", {
+            code: "BOOKING_NOT_FOUND",
+            statusCode: 404
+        });
+    }
+
+    assertBookingStatusTransition(existingBooking.status, "SAMPLE_COLLECTED", {
+        ...context,
+        source: "collector_booking_api"
+    });
+
+    await repository.updateBookingByCode(bookingCode, {
+        status: "SAMPLE_COLLECTED",
+        internalNote: appendCollectorNote(existingBooking.internalNote, input.note)
+    });
+
+    await repository.createStatusHistory({
+        bookingId: existingBooking.id,
+        fromStatus: existingBooking.status,
+        toStatus: "SAMPLE_COLLECTED",
+        reason: "collector_sample_collected",
+        changedByType: context.role || context.changedByType || "COLLECTOR_DEMO",
+        changedById: context.userId || context.changedById || staff.id,
+        metadata: {
+            source: "collector_booking_api",
+            collectorStaffId: staff.id,
+            note: String(input.note || "").trim() || null
+        }
+    });
+
+    return normalizeBooking(await repository.findBookingDetailByCode(bookingCode));
 }
 
 async function saveOrUpdateDraft(sessionId, slots, missingFields) {
@@ -590,12 +890,19 @@ module.exports = {
     createConfirmedBooking,
     getBookingByCode,
     getBookingDetailByCode,
+    getBookingDetailByCodeForPhone,
+    getBookingDetailByCodeForCollectorPhone,
     listBookings,
+    listBookingsForPhone,
+    listBookingsForCollectorPhone,
     updateBookingStatus,
     assignStaffToBooking,
     updateInternalNote,
     rescheduleBooking,
+    rescheduleBookingForPhone,
     cancelBooking,
+    cancelBookingForPhone,
+    markSampleCollectedForCollectorPhone,
     saveOrUpdateDraft,
     getDraft,
     clearDraft,

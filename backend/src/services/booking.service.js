@@ -1,13 +1,20 @@
 const mockSessions = require("../data/mockSessions");
 const bookingRuntime = require("./booking-runtime/booking.service");
+const BookingRuntimeError = require("./booking-runtime/booking-runtime-error");
 const { FLOWS, ACTIONS } = require("../constants/chat.constants");
 const { createChatResult } = require("../utils/chat-response.util");
+const {
+    formatSlotErrorMessage,
+    isBookingSlotError
+} = require("./booking-response.service");
 const {
     normalizeText,
     detectDateFromMessage,
     detectTimeFromMessage,
     formatDisplayDate
 } = require("../utils/text.util");
+const { normalizePhone } = require("./booking-runtime/booking-validation.service");
+const packageCatalog = require("./booking-package-catalog.service");
 
 const REQUIRED_FIELDS = [
     "testType",
@@ -19,7 +26,7 @@ const REQUIRED_FIELDS = [
 ];
 
 const FIELD_LABELS = {
-    testType: "Loại xét nghiệm",
+    testType: "Gói/xét nghiệm",
     appointmentDate: "Ngày lấy mẫu",
     appointmentTime: "Giờ lấy mẫu",
     address: "Địa chỉ",
@@ -28,18 +35,13 @@ const FIELD_LABELS = {
 };
 
 const FIELD_PROMPTS = {
-    testType:
-        "loại xét nghiệm/gói xét nghiệm bạn muốn đặt. Ví dụ: công thức máu, HbA1c, mỡ máu, chức năng gan",
+    testType: `gói/xét nghiệm bạn muốn đặt. HomeLab hiện có: ${packageCatalog.buildPackageListText()}`,
     appointmentDate:
         "ngày lấy mẫu. Ví dụ: ngày mai, hôm nay, hoặc 27/03/2026",
-    appointmentTime:
-        "giờ lấy mẫu. Ví dụ: 7h30, 8h, 14:00",
-    address:
-        "địa chỉ lấy mẫu. Ví dụ: 12 Nguyễn Trãi, Quận 1",
-    patientName:
-        "tên người đặt. Ví dụ: tên Nguyễn Văn A",
-    phoneNumber:
-        "số điện thoại liên hệ. Ví dụ: 0912345678"
+    appointmentTime: "giờ lấy mẫu. Ví dụ: 7h30, 8h, 14:00",
+    address: "địa chỉ lấy mẫu. Ví dụ: 12 Nguyễn Trãi, Quận 1",
+    patientName: "tên người đặt. Ví dụ: tên Nguyễn Văn A",
+    phoneNumber: "số điện thoại liên hệ. Ví dụ: 0912345678"
 };
 
 function getEmptyBookingDraft() {
@@ -49,7 +51,10 @@ function getEmptyBookingDraft() {
         appointmentTime: null,
         address: null,
         patientName: null,
-        phoneNumber: null
+        phoneNumber: null,
+        testCatalogItemId: null,
+        selectedPackage: null,
+        packageConfirmed: false
     };
 }
 
@@ -64,47 +69,43 @@ function hasActiveBookingSession(sessionId) {
     );
 }
 
+async function suspendActiveBookingSession(sessionId) {
+    if (!sessionId) {
+        return {
+            clearedMemorySession: false,
+            clearedDraftCount: 0
+        };
+    }
+
+    const clearedMemorySession = mockSessions.clearSession(sessionId);
+    const clearedDraft = await bookingRuntime.clearDraft(sessionId);
+
+    return {
+        clearedMemorySession,
+        clearedDraftCount: clearedDraft?.count || 0
+    };
+}
+
 function getMissingFields(draft) {
     return REQUIRED_FIELDS.filter((field) => !draft[field]);
 }
 
-function detectTestType(message) {
-    const normalizedMessage = normalizeText(message);
+async function detectPackageSelection(message) {
+    const intent = await packageCatalog.resolvePackageIntent(message);
 
-    const testTypeMappings = [
-        {
-            value: "Công thức máu",
-            keywords: ["cong thuc mau", "tong phan tich mau", "huyet hoc", "cbc"]
-        },
-        {
-            value: "HbA1c",
-            keywords: ["hba1c"]
-        },
-        {
-            value: "Mỡ máu",
-            keywords: ["mo mau", "lipid", "cholesterol"]
-        },
-        {
-            value: "Chức năng gan",
-            keywords: ["chuc nang gan", "men gan", "alt", "ast"]
-        },
-        {
-            value: "Chức năng thận",
-            keywords: ["chuc nang than", "creatinine", "egfr"]
-        },
-        {
-            value: "Xét nghiệm tổng quát",
-            keywords: ["xet nghiem tong quat", "kiem tra tong quat"]
-        }
-    ];
-
-    for (const item of testTypeMappings) {
-        if (item.keywords.some((keyword) => normalizedMessage.includes(keyword))) {
-            return item.value;
-        }
+    if (intent.type !== "selected" || !intent.package) {
+        return { intent, slots: {} };
     }
 
-    return null;
+    return {
+        intent,
+        slots: {
+            testType: intent.package.name,
+            testCatalogItemId: intent.package.id,
+            selectedPackage: intent.package,
+            packageConfirmed: false
+        }
+    };
 }
 
 function detectPhoneNumber(message) {
@@ -132,7 +133,7 @@ function detectPatientName(message) {
 function detectAddress(message) {
     const text = String(message || "");
     const explicitMatch = text.match(
-        /(?:địa chỉ|dia chi|address)\s*[:\-]\s*([^;.]+)/i
+        /(?:địa chỉ|dia chi|address)\s*[:\-]?\s*([^;.]+)/i
     );
 
     if (explicitMatch) {
@@ -192,17 +193,18 @@ function inferSingleFieldByContext(message, currentDraft) {
     return {};
 }
 
-function extractBookingSlots(message, currentDraft) {
+async function extractBookingSlots(message, currentDraft) {
     const extracted = {};
-
-    const testType = detectTestType(message);
+    const { intent: packageIntent, slots: packageSlots } =
+        await detectPackageSelection(message);
     const appointmentDate = detectDateFromMessage(message);
     const appointmentTime = detectTimeFromMessage(message);
     const address = detectAddress(message);
     const patientName = detectPatientName(message);
     const phoneNumber = detectPhoneNumber(message);
 
-    if (testType) extracted.testType = testType;
+    Object.assign(extracted, packageSlots);
+
     if (appointmentDate) extracted.appointmentDate = appointmentDate;
     if (appointmentTime) extracted.appointmentTime = appointmentTime;
     if (address) extracted.address = address;
@@ -215,8 +217,11 @@ function extractBookingSlots(message, currentDraft) {
     });
 
     return {
-        ...extracted,
-        ...contextInference
+        slots: {
+            ...extracted,
+            ...contextInference
+        },
+        packageIntent
     };
 }
 
@@ -275,6 +280,10 @@ function buildReadyReply(draft) {
     );
 }
 
+function buildDifferentPhoneReply(sessionPhone) {
+    return `Lịch hẹn sẽ được tạo theo số điện thoại tài khoản đang đăng nhập: ${sessionPhone}. Nếu bạn muốn đặt cho số khác, vui lòng đăng xuất và đăng nhập bằng tài khoản phù hợp.`;
+}
+
 function buildCreatedReply(booking) {
     return (
         `Đã tạo lịch hẹn thành công. Mã đặt lịch của bạn là ${booking.bookingCode}. ` +
@@ -307,7 +316,8 @@ function isConfirmationMessage(message) {
 
 function buildRuntimePayloadFromDraft(draft) {
     return {
-        testTypeText: draft.testType,
+        testCatalogItemId: draft.testCatalogItemId || draft.selectedPackage?.id || null,
+        testTypeText: draft.selectedPackage?.name || draft.testType,
         sampleDate: draft.appointmentDate,
         sampleTimeStart: draft.appointmentTime,
         address: draft.address,
@@ -322,7 +332,71 @@ async function persistDraft(sessionId, draft, missingFields) {
     await bookingRuntime.saveOrUpdateDraft(sessionId, draft, missingFields);
 }
 
-async function handleBookingMessage({ message, sessionId }) {
+function buildBookingMeta({
+    updatedSession,
+    extractedSlots,
+    packageIntent,
+    missingFields,
+    nextExpectedField
+}) {
+    return {
+        handledBy: "booking.service",
+        sessionState: updatedSession.status,
+        extractedSlots,
+        missingFields,
+        nextExpectedField: nextExpectedField || null,
+        confirmedBookingId: updatedSession.confirmedBookingId || null,
+        packageIntent: packageIntent?.type || null,
+        packageCandidates:
+            packageIntent?.type === "ambiguous" ? packageIntent.candidates : undefined,
+        selectedPackage:
+            packageIntent?.package || updatedSession.bookingDraft?.selectedPackage || null,
+        packageConfirmed:
+            Boolean(updatedSession.bookingDraft?.packageConfirmed)
+    };
+}
+
+async function returnDraftResult({
+    sessionId,
+    message,
+    status,
+    action,
+    reply,
+    booking,
+    draft,
+    missingFields,
+    extractedSlots,
+    packageIntent,
+    nextExpectedField
+}) {
+    await persistDraft(sessionId, draft, missingFields);
+
+    const updatedSession = mockSessions.upsertSession(sessionId, {
+        currentFlow: FLOWS.BOOKING,
+        status,
+        bookingDraft: draft,
+        confirmedBookingId: null
+    });
+
+    return createChatResult({
+        sessionId,
+        userMessage: message,
+        flow: FLOWS.BOOKING,
+        action,
+        reply,
+        booking,
+        meta: buildBookingMeta({
+            updatedSession,
+            extractedSlots,
+            packageIntent,
+            missingFields,
+            nextExpectedField
+        })
+    });
+}
+
+async function handleBookingMessage({ message, sessionId, userSession = {} }) {
+    const sessionPhone = normalizePhone(userSession.phone || "");
     let session = mockSessions.getSession(sessionId);
 
     if (!session || session.currentFlow !== FLOWS.BOOKING) {
@@ -334,28 +408,146 @@ async function handleBookingMessage({ message, sessionId }) {
         });
     }
 
-    const currentDraft = session.bookingDraft || getEmptyBookingDraft();
-    const extractedSlots = extractBookingSlots(message, currentDraft);
+    const currentDraft = {
+        ...getEmptyBookingDraft(),
+        ...(session.bookingDraft || {})
+    };
+    const { slots: extractedSlots, packageIntent } = await extractBookingSlots(
+        message,
+        currentDraft
+    );
+    const extractedPhone = normalizePhone(extractedSlots.phoneNumber || "");
+
+    if (sessionPhone && extractedPhone && extractedPhone !== sessionPhone) {
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildDifferentPhoneReply(sessionPhone),
+            booking: null,
+            meta: {
+                handledBy: "booking.service",
+                sessionState: "phone_mismatch",
+                authRequired: false,
+                sessionPhone,
+                rejectedPhone: extractedPhone
+            }
+        });
+    }
+
+    if (packageIntent.type === "ambiguous" && !currentDraft.selectedPackage) {
+        const nextDraft = {
+            ...currentDraft,
+            ...(sessionPhone ? { phoneNumber: sessionPhone } : {})
+        };
+        const missingFields = getMissingFields(nextDraft);
+
+        return returnDraftResult({
+            sessionId,
+            message,
+            status: "collecting_package",
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: packageCatalog.buildAmbiguousPackageReply(),
+            booking: {
+                status: "draft",
+                draft: nextDraft,
+                missingFields
+            },
+            draft: nextDraft,
+            missingFields,
+            extractedSlots,
+            packageIntent,
+            nextExpectedField: "testType"
+        });
+    }
+
     const nextDraft = {
         ...currentDraft,
-        ...extractedSlots
+        ...extractedSlots,
+        ...(sessionPhone ? { phoneNumber: sessionPhone } : {})
     };
     const missingFields = getMissingFields(nextDraft);
-    const canCreateFromConfirmation =
-        isConfirmationMessage(message) &&
-        getMissingFields(currentDraft).length === 0 &&
-        Object.keys(extractedSlots).length === 0;
 
-    if (canCreateFromConfirmation) {
-        const createdBooking = await bookingRuntime.createConfirmedBooking(
-            buildRuntimePayloadFromDraft(currentDraft),
-            { sessionId, createdSource: "CHAT" }
-        );
+    if (
+        isConfirmationMessage(message) &&
+        currentDraft.selectedPackage &&
+        !currentDraft.packageConfirmed &&
+        Object.keys(extractedSlots).length === 0
+    ) {
+        const confirmedDraft = {
+            ...nextDraft,
+            packageConfirmed: true
+        };
+        const confirmedMissingFields = getMissingFields(confirmedDraft);
+
+        if (confirmedMissingFields.length > 0) {
+            return returnDraftResult({
+                sessionId,
+                message,
+                status: "collecting_info",
+                action: ACTIONS.ASK_BOOKING_INFO,
+                reply: buildCollectingReply(confirmedDraft, confirmedMissingFields),
+                booking: {
+                    status: "draft",
+                    draft: confirmedDraft,
+                    missingFields: confirmedMissingFields
+                },
+                draft: confirmedDraft,
+                missingFields: confirmedMissingFields,
+                extractedSlots,
+                packageIntent,
+                nextExpectedField: confirmedMissingFields[0]
+            });
+        }
+
+        let createdBooking = null;
+
+        try {
+            createdBooking = await bookingRuntime.createConfirmedBooking(
+                buildRuntimePayloadFromDraft(confirmedDraft),
+                { sessionId, createdSource: "CHAT" }
+            );
+        } catch (error) {
+            if (!(error instanceof BookingRuntimeError)) {
+                throw error;
+            }
+
+            const isSlotError = isBookingSlotError(error);
+
+            return createChatResult({
+                sessionId,
+                userMessage: message,
+                flow: FLOWS.BOOKING,
+                action: ACTIONS.BOOKING_READY_TO_CONFIRM,
+                reply: isSlotError
+                    ? formatSlotErrorMessage(error, {
+                        mode: "booking",
+                        draft: confirmedDraft
+                    })
+                    : "Mình chưa thể tạo lịch hẹn với thông tin hiện tại. Bạn vui lòng kiểm tra lại thông tin đặt lịch hoặc liên hệ HomeLab để được hỗ trợ.",
+                booking: {
+                    status: "pending_confirmation",
+                    draft: confirmedDraft,
+                    missingFields: []
+                },
+                meta: {
+                    handledBy: "booking.service",
+                    sessionState: "slot_blocked",
+                    extractedSlots,
+                    missingFields: [],
+                    nextExpectedField: "appointmentTime",
+                    selectedPackage: confirmedDraft.selectedPackage || null,
+                    packageConfirmed: true,
+                    ...(isSlotError ? {} : { errorCode: error.code })
+                }
+            });
+        }
 
         const updatedSession = mockSessions.upsertSession(sessionId, {
             currentFlow: FLOWS.BOOKING,
             status: "booking_created",
-            bookingDraft: currentDraft,
+            bookingDraft: confirmedDraft,
             confirmedBookingId: createdBooking.bookingCode
         });
 
@@ -372,6 +564,111 @@ async function handleBookingMessage({ message, sessionId }) {
                 extractedSlots,
                 missingFields: [],
                 nextExpectedField: null,
+                selectedPackage: confirmedDraft.selectedPackage || null,
+                packageConfirmed: true,
+                confirmedBookingId: createdBooking.bookingCode
+            }
+        });
+    }
+
+    if (nextDraft.selectedPackage && !nextDraft.packageConfirmed) {
+        return returnDraftResult({
+            sessionId,
+            message,
+            status: "confirming_package",
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: packageCatalog.buildPackageConfirmationReply(
+                nextDraft.selectedPackage
+            ),
+            booking: {
+                status: "draft",
+                draft: nextDraft,
+                missingFields
+            },
+            draft: nextDraft,
+            missingFields,
+            extractedSlots,
+            packageIntent,
+            nextExpectedField: "packageConfirmation"
+        });
+    }
+
+    const currentDraftForCreate = {
+        ...currentDraft,
+        ...(sessionPhone ? { phoneNumber: sessionPhone } : {})
+    };
+    const canCreateFromConfirmation =
+        isConfirmationMessage(message) &&
+        currentDraftForCreate.packageConfirmed === true &&
+        getMissingFields(currentDraftForCreate).length === 0 &&
+        Object.keys(extractedSlots).length === 0;
+
+    if (canCreateFromConfirmation) {
+        let createdBooking = null;
+
+        try {
+            createdBooking = await bookingRuntime.createConfirmedBooking(
+                buildRuntimePayloadFromDraft(currentDraftForCreate),
+                { sessionId, createdSource: "CHAT" }
+            );
+        } catch (error) {
+            if (!(error instanceof BookingRuntimeError)) {
+                throw error;
+            }
+
+            const isSlotError = isBookingSlotError(error);
+
+            return createChatResult({
+                sessionId,
+                userMessage: message,
+                flow: FLOWS.BOOKING,
+                action: ACTIONS.BOOKING_READY_TO_CONFIRM,
+                reply: isSlotError
+                    ? formatSlotErrorMessage(error, {
+                        mode: "booking",
+                        draft: currentDraftForCreate
+                    })
+                    : "Mình chưa thể tạo lịch hẹn với thông tin hiện tại. Bạn vui lòng kiểm tra lại thông tin đặt lịch hoặc liên hệ HomeLab để được hỗ trợ.",
+                booking: {
+                    status: "pending_confirmation",
+                    draft: currentDraftForCreate,
+                    missingFields: []
+                },
+                meta: {
+                    handledBy: "booking.service",
+                    sessionState: "slot_blocked",
+                    extractedSlots,
+                    missingFields: [],
+                    nextExpectedField: "appointmentTime",
+                    selectedPackage: currentDraftForCreate.selectedPackage || null,
+                    packageConfirmed: true,
+                    ...(isSlotError ? {} : { errorCode: error.code })
+                }
+            });
+        }
+
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: "booking_created",
+            bookingDraft: currentDraftForCreate,
+            confirmedBookingId: createdBooking.bookingCode
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.BOOKING_CREATED,
+            reply: buildCreatedReply(createdBooking),
+            booking: createdBooking,
+            meta: {
+                handledBy: "booking.service",
+                sessionState: updatedSession.status,
+                extractedSlots,
+                missingFields: [],
+                nextExpectedField: null,
+                selectedPackage: currentDraftForCreate.selectedPackage || null,
+                packageConfirmed: true,
                 confirmedBookingId: createdBooking.bookingCode
             }
         });
@@ -397,34 +694,23 @@ async function handleBookingMessage({ message, sessionId }) {
         };
     }
 
-    await persistDraft(sessionId, nextDraft, missingFields);
-
-    const updatedSession = mockSessions.upsertSession(sessionId, {
-        currentFlow: FLOWS.BOOKING,
-        status,
-        bookingDraft: nextDraft,
-        confirmedBookingId: session.confirmedBookingId || null
-    });
-
-    return createChatResult({
+    return returnDraftResult({
         sessionId,
-        userMessage: message,
-        flow: FLOWS.BOOKING,
+        message,
+        status,
         action,
         reply,
         booking,
-        meta: {
-            handledBy: "booking.service",
-            sessionState: updatedSession.status,
-            extractedSlots,
-            missingFields,
-            nextExpectedField: missingFields[0] || null,
-            confirmedBookingId: updatedSession.confirmedBookingId || null
-        }
+        draft: nextDraft,
+        missingFields,
+        extractedSlots,
+        packageIntent,
+        nextExpectedField: missingFields[0] || null
     });
 }
 
 module.exports = {
     handleBookingMessage,
-    hasActiveBookingSession
+    hasActiveBookingSession,
+    suspendActiveBookingSession
 };

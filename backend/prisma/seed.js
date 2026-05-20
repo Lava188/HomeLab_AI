@@ -6,42 +6,42 @@ const testCatalogItems = [
   {
     code: "CBC",
     name: "Công thức máu",
-    description: "Xét nghiệm công thức máu toàn bộ.",
+    description: "Đánh giá các nhóm tế bào máu chính như hồng cầu, bạch cầu và tiểu cầu.",
     category: "Hematology",
     sampleType: "Blood"
   },
   {
     code: "HBA1C",
     name: "HbA1c",
-    description: "Đánh giá đường huyết trung bình trong vòng 2-3 tháng.",
+    description: "Đánh giá đường huyết trung bình trong khoảng 2-3 tháng gần đây.",
     category: "Diabetes",
     sampleType: "Blood"
   },
   {
     code: "LIPID_PROFILE",
     name: "Mỡ máu",
-    description: "Đánh giá cholesterol và triglyceride.",
+    description: "Đánh giá Cholesterol toàn phần, LDL-C, HDL-C và Triglyceride.",
     category: "Cardiometabolic",
     sampleType: "Blood"
   },
   {
     code: "LIVER_FUNCTION",
     name: "Chức năng gan",
-    description: "Đánh giá một số chỉ số liên quan chức năng gan.",
+    description: "Đánh giá ALT, AST và các chỉ số liên quan nếu có.",
     category: "Biochemistry",
     sampleType: "Blood"
   },
   {
     code: "KIDNEY_FUNCTION",
     name: "Chức năng thận",
-    description: "Đánh giá một số chỉ số liên quan chức năng thận.",
+    description: "Đánh giá Creatinine, eGFR nếu có và chức năng lọc thận ở mức thông tin chung.",
     category: "Biochemistry",
     sampleType: "Blood"
   },
   {
     code: "GENERAL_CHECKUP",
-    name: "Xét nghiệm tổng quát",
-    description: "Gói xét nghiệm tổng quát cơ bản.",
+    name: "Gói tổng quát cơ bản",
+    description: "Gồm Công thức máu, Đường huyết/HbA1c, Mỡ máu, Chức năng gan và Chức năng thận.",
     category: "General",
     sampleType: "Blood"
   }

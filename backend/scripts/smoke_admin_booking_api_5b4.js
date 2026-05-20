@@ -1,4 +1,5 @@
 const bookingRuntime = require("../src/services/booking-runtime/booking.service");
+const availabilitySlotService = require("../src/services/booking-runtime/availability-slot.service");
 const prisma = require("../src/services/booking-runtime/prisma-client");
 
 const API_BASE_URL = process.env.HOMELAB_API_BASE_URL || "http://localhost:5000";
@@ -21,13 +22,22 @@ function tomorrowIsoDate() {
 
 async function createTestBooking() {
     const suffix = `${Date.now()}`.slice(-8);
+    const sampleDate = tomorrowIsoDate();
+
+    await availabilitySlotService.createAvailabilitySlot({
+        date: sampleDate,
+        timeStart: "08:30",
+        timeEnd: "09:30",
+        capacity: 10,
+        area: "default"
+    });
 
     return bookingRuntime.createConfirmedBooking(
         {
             patientName: "Smoke Admin Booking",
             phone: `09${suffix}`,
             testTypeText: "Công thức máu",
-            sampleDate: tomorrowIsoDate(),
+            sampleDate,
             sampleTimeStart: "08:30",
             address: "12 Nguyen Trai, Smoke Test"
         },
@@ -177,18 +187,21 @@ async function main() {
         [
             "status_completed",
             async () => {
-                const { response, payload } = await request(
-                    `/api/admin/bookings/${state.bookingCode}/status`,
-                    {
-                        method: "PATCH",
-                        body: JSON.stringify({
-                            status: "COMPLETED",
-                            reason: "smoke completed"
-                        })
-                    }
-                );
+                for (const status of ["IN_LAB_PROCESSING", "RESULT_READY", "COMPLETED"]) {
+                    var { response, payload } = await request(
+                        `/api/admin/bookings/${state.bookingCode}/status`,
+                        {
+                            method: "PATCH",
+                            body: JSON.stringify({
+                                status,
+                                reason: `smoke ${status.toLowerCase()}`
+                            })
+                        }
+                    );
 
-                assert(response.status === 200 && payload.success, "complete endpoint failed");
+                    assert(response.status === 200 && payload.success, `${status} endpoint failed`);
+                }
+
                 assert(payload.data?.status === "COMPLETED", "status was not COMPLETED");
                 assert(Boolean(payload.data?.completedAt), "completedAt was not set");
             }
