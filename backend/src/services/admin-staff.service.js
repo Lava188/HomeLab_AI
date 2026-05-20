@@ -2,6 +2,7 @@ const repository = require("./booking-runtime/booking.repository");
 const prisma = require("./booking-runtime/prisma-client");
 const BookingRuntimeError = require("./booking-runtime/booking-runtime-error");
 const { normalizePhone } = require("./booking-runtime/booking-validation.service");
+const { hashPassword, isStrongEnoughPassword } = require("./password-auth.service");
 const {
     normalizeArea,
     normalizeSchedule
@@ -126,6 +127,29 @@ function validateStaffInput(input = {}, { partial = false } = {}) {
     }
 
     return data;
+}
+
+function getStaffPasswordInput(input = {}, fieldName) {
+    const value = input[fieldName];
+
+    if (value === undefined || value === null || String(value).trim() === "") {
+        return null;
+    }
+
+    const password = String(value);
+
+    if (!isStrongEnoughPassword(password)) {
+        throw new BookingRuntimeError("Mật khẩu cần có ít nhất 8 ký tự.", {
+            code: "PASSWORD_TOO_WEAK",
+            statusCode: 400
+        });
+    }
+
+    return password;
+}
+
+function buildGeneratedInitialPassword() {
+    return `HomeLab-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 function normalizeBooking(booking) {
@@ -302,13 +326,20 @@ async function getStaffDetail(id) {
 
 async function createStaff(input = {}) {
     const data = validateStaffInput(input);
+    const initialPassword = getStaffPasswordInput(input, "initialPassword");
     const existingByPhone = await repository.findStaffByPhone(data.phone);
 
     if (existingByPhone) {
+        if (initialPassword) {
+            data.passwordHash = await hashPassword(initialPassword);
+        }
+
         const updatedStaff = await repository.updateStaffProfile(existingByPhone.id, data);
 
         return normalizeStaff(updatedStaff, { includeBookings: true });
     }
+
+    data.passwordHash = await hashPassword(initialPassword || buildGeneratedInitialPassword());
 
     const staff = await repository.createStaffProfile(data);
 
@@ -333,6 +364,7 @@ async function updateStaff(id, input = {}) {
     }
 
     const data = validateStaffInput(input, { partial: true });
+    const newPassword = getStaffPasswordInput(input, "newPassword");
 
     if (data.phone && data.phone !== existingStaff.phone) {
         const duplicate = await repository.findStaffByPhone(data.phone);
@@ -343,6 +375,10 @@ async function updateStaff(id, input = {}) {
                 statusCode: 409
             });
         }
+    }
+
+    if (newPassword) {
+        data.passwordHash = await hashPassword(newPassword);
     }
 
     const updatedStaff = await repository.updateStaffProfile(id, data);

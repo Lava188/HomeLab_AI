@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
 
@@ -48,6 +49,8 @@ const testCatalogItems = [
 ];
 
 async function main() {
+  const defaultPasswordHash = await bcrypt.hash("HomeLab@12345", 12);
+
   for (const item of testCatalogItems) {
     await prisma.testCatalogItem.upsert({
       where: { code: item.code },
@@ -64,6 +67,57 @@ async function main() {
       }
     });
   }
+
+  await prisma.patient.upsert({
+    where: { phone: "0900001001" },
+    update: {
+      fullName: "Người dùng HomeLab",
+      passwordHash: defaultPasswordHash
+    },
+    create: {
+      fullName: "Người dùng HomeLab",
+      phone: "0900001001",
+      passwordHash: defaultPasswordHash
+    }
+  });
+
+  await prisma.staffProfile.upsert({
+    where: { id: "seed-admin-staff-5j2" },
+    update: {
+      fullName: "Quản trị viên HomeLab",
+      phone: "0900001002",
+      role: "ADMIN",
+      active: true,
+      passwordHash: defaultPasswordHash
+    },
+    create: {
+      id: "seed-admin-staff-5j2",
+      fullName: "Quản trị viên HomeLab",
+      phone: "0900001002",
+      role: "ADMIN",
+      active: true,
+      passwordHash: defaultPasswordHash
+    }
+  });
+
+  await prisma.staffProfile.upsert({
+    where: { id: "seed-collector-staff-5j2" },
+    update: {
+      fullName: "Nhân viên lấy mẫu HomeLab",
+      phone: "0900001003",
+      role: "SAMPLE_COLLECTOR",
+      active: true,
+      passwordHash: defaultPasswordHash
+    },
+    create: {
+      id: "seed-collector-staff-5j2",
+      fullName: "Nhân viên lấy mẫu HomeLab",
+      phone: "0900001003",
+      role: "SAMPLE_COLLECTOR",
+      active: true,
+      passwordHash: defaultPasswordHash
+    }
+  });
 }
 
 main()
