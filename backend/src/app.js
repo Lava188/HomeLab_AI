@@ -14,6 +14,7 @@ const collectorBookingRoute = require("./routes/collector-booking.route");
 const collectorWorkingAreaRoute = require("./routes/collector-working-area.route");
 const collectorWorkingScheduleRoute = require("./routes/collector-working-schedule.route");
 const collectorAssignmentRoute = require("./routes/collector-assignment.route");
+const labResultRoute = require("./routes/lab-result.route");
 
 dotenv.config({
   path: path.join(__dirname, "../.env")
@@ -47,6 +48,7 @@ app.use("/api/collector/bookings", collectorBookingRoute);
 app.use("/api/collector/working-areas", collectorWorkingAreaRoute);
 app.use("/api/collector/working-schedules", collectorWorkingScheduleRoute);
 app.use("/api/collector/assignments", collectorAssignmentRoute);
+app.use("/api/lab-results", labResultRoute);
 
 // 404 handler
 app.use((req, res) => {

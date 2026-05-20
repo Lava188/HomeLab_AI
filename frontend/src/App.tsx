@@ -10,6 +10,7 @@ import RoleLoginPage from './components/RoleLoginPage';
 import UserBookingsPlaceholderPage from './components/UserBookingsPlaceholderPage';
 import UserDashboardPage from './components/UserDashboardPage';
 import UserForgotPasswordPage from './components/UserForgotPasswordPage';
+import UserLabResultPage from './components/UserLabResultPage';
 
 export default function App() {
   const { pathname } = window.location;
@@ -65,6 +66,20 @@ export default function App() {
           subtitle="Theo dõi lịch xét nghiệm và trạng thái lịch hẹn của bạn."
         >
           <UserBookingsPlaceholderPage />
+        </RoleLayout>
+      </ProtectedRoleRoute>
+    );
+  }
+
+  if (pathname === '/user/lab-results') {
+    return (
+      <ProtectedRoleRoute expectedRole={DEMO_ROLES.USER}>
+        <RoleLayout
+          role={DEMO_ROLES.USER}
+          title="Phân tích kết quả xét nghiệm"
+          subtitle="Tải lên file PDF kết quả xét nghiệm để xem phần đọc chỉ số, so sánh khoảng tham chiếu và giải thích an toàn."
+        >
+          <UserLabResultPage />
         </RoleLayout>
       </ProtectedRoleRoute>
     );

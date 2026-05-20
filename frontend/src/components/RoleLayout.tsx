@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import {
   CalendarDays,
   ClipboardList,
+  FileText,
   Home,
   LogOut,
   MessageCircle,
@@ -57,6 +58,7 @@ function getNavItems(role: DemoRole) {
   return [
     { href: '/user/dashboard', label: 'Tổng quan', icon: Home },
     { href: '/user/bookings', label: 'Lịch của tôi', icon: CalendarDays },
+    { href: '/user/lab-results', label: 'Phân tích kết quả', icon: FileText },
     { href: '/', label: 'Đặt lịch mới', icon: MessageCircle },
   ];
 }
