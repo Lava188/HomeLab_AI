@@ -11,6 +11,7 @@ import UserBookingsPlaceholderPage from './components/UserBookingsPlaceholderPag
 import UserDashboardPage from './components/UserDashboardPage';
 import UserForgotPasswordPage from './components/UserForgotPasswordPage';
 import UserLabResultPage from './components/UserLabResultPage';
+import UserProfileEditPage from './components/UserProfileEditPage';
 
 export default function App() {
   const { pathname } = window.location;
@@ -66,6 +67,20 @@ export default function App() {
           subtitle="Theo dõi lịch xét nghiệm và trạng thái lịch hẹn của bạn."
         >
           <UserBookingsPlaceholderPage />
+        </RoleLayout>
+      </ProtectedRoleRoute>
+    );
+  }
+
+  if (pathname === '/user/profile') {
+    return (
+      <ProtectedRoleRoute expectedRole={DEMO_ROLES.USER}>
+        <RoleLayout
+          role={DEMO_ROLES.USER}
+          title="Thông tin cá nhân"
+          subtitle="Cập nhật họ tên và email dùng cho tài khoản HomeLab."
+        >
+          <UserProfileEditPage />
         </RoleLayout>
       </ProtectedRoleRoute>
     );

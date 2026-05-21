@@ -1,112 +1,114 @@
 import { FormEvent, useState } from 'react';
-import { ArrowRight, FlaskConical, MessageCircle, Phone, UserRound } from 'lucide-react';
+import { ArrowRight, FlaskConical, KeyRound, Mail, MessageCircle, Phone, UserRound } from 'lucide-react';
 import {
   DEMO_ROLES,
   DemoRole,
   getDashboardPathForRole,
   loginDemoRole,
   normalizePhone,
-  sanitizeHeaderValue,
 } from '../auth/demoAuth';
-import { listStaff } from '../api/adminStaffApi';
+import { loginAdmin, loginCollector, loginUser, registerUser } from '../api/roleAuthApi';
 import OperationsAccessMenu from './OperationsAccessMenu';
 
 type EntryMode = 'login' | 'register';
 
-const ROLE_COPY: Record<
-  DemoRole,
-  {
-    loginTitle: string;
-    registerTitle: string;
-    loginSubtitle: string;
-    registerSubtitle: string;
-    primaryLoginLabel: string;
-    primaryRegisterLabel: string;
-    idLabel: string;
-    idPlaceholder: string;
-    phoneLabel: string;
-    phonePlaceholder: string;
-  }
-> = {
+type RoleCopy = {
+  loginTitle: string;
+  registerTitle: string;
+  loginSubtitle: string;
+  registerSubtitle: string;
+  primaryLoginLabel: string;
+  primaryRegisterLabel: string;
+  phoneLabel: string;
+  phonePlaceholder: string;
+};
+
+const ROLE_COPY: Record<DemoRole, RoleCopy> = {
   USER: {
     loginTitle: 'Đăng nhập người dùng',
     registerTitle: 'Tạo tài khoản',
-    loginSubtitle: 'Nhập số điện thoại để theo dõi lịch xét nghiệm và trạng thái lịch hẹn.',
-    registerSubtitle: 'Tạo tài khoản để HomeLab ghi nhớ tên và số điện thoại khi theo dõi lịch hẹn.',
+    loginSubtitle: 'Đăng nhập để theo dõi lịch xét nghiệm và kết quả của bạn.',
+    registerSubtitle: 'Tạo tài khoản để HomeLab lưu thông tin đặt lịch và hỗ trợ theo dõi hồ sơ.',
     primaryLoginLabel: 'Đăng nhập',
-    primaryRegisterLabel: 'Tạo tài khoản',
-    idLabel: 'Họ tên',
-    idPlaceholder: 'Nguyễn Văn A',
+    primaryRegisterLabel: 'Đăng ký',
     phoneLabel: 'Số điện thoại',
     phonePlaceholder: '0912345678',
   },
   ADMIN: {
     loginTitle: 'Đăng nhập quản trị',
-    registerTitle: 'Đăng ký quản trị',
+    registerTitle: 'Đăng nhập quản trị',
     loginSubtitle: 'Dành cho nhân sự quản trị vận hành HomeLab.',
-    registerSubtitle: 'Tạo quyền truy cập quản trị cho nhân sự vận hành HomeLab.',
-    primaryLoginLabel: 'Vào trang quản lý lịch hẹn',
-    primaryRegisterLabel: 'Đăng ký quản trị',
-    idLabel: 'Tên quản trị viên',
-    idPlaceholder: 'Quản trị viên',
-    phoneLabel: 'Số điện thoại hoặc mã truy cập',
+    registerSubtitle: 'Dành cho nhân sự quản trị vận hành HomeLab.',
+    primaryLoginLabel: 'Đăng nhập',
+    primaryRegisterLabel: 'Đăng nhập',
+    phoneLabel: 'Số điện thoại',
     phonePlaceholder: '0900000001',
   },
   COLLECTOR: {
     loginTitle: 'Đăng nhập nhân viên lấy mẫu',
-    registerTitle: 'Kích hoạt tài khoản nhân viên',
-    loginSubtitle: 'Dành cho nhân viên lấy mẫu đã được phân công trong hệ thống.',
-    registerSubtitle: 'Kích hoạt tài khoản bằng số điện thoại nhân viên đang hoạt động trong hệ thống.',
-    primaryLoginLabel: 'Vào lịch được giao',
-    primaryRegisterLabel: 'Kích hoạt và vào lịch được giao',
-    idLabel: 'Họ tên nhân viên',
-    idPlaceholder: 'Nhân viên lấy mẫu',
-    phoneLabel: 'Số điện thoại nhân viên lấy mẫu',
+    registerTitle: 'Đăng nhập nhân viên lấy mẫu',
+    loginSubtitle: 'Dành cho nhân viên lấy mẫu đã được quản trị viên tạo tài khoản.',
+    registerSubtitle: 'Dành cho nhân viên lấy mẫu đã được quản trị viên tạo tài khoản.',
+    primaryLoginLabel: 'Đăng nhập',
+    primaryRegisterLabel: 'Đăng nhập',
+    phoneLabel: 'Số điện thoại',
     phonePlaceholder: '0987654321',
   },
 };
 
-function getSafeSessionId(role: DemoRole, phone: string, name: string) {
-  if (role === DEMO_ROLES.USER) return `user-${phone}`;
-  if (role === DEMO_ROLES.COLLECTOR) return `collector-${phone}`;
-  return phone ? `admin-${phone}` : sanitizeHeaderValue(name || 'admin-access') || 'admin-access';
+function mapAuthError(error: unknown) {
+  const codedError = error as Error & { code?: string };
+
+  if (codedError.code === 'INVALID_CREDENTIALS') {
+    return 'Số điện thoại hoặc mật khẩu không đúng.';
+  }
+
+  if (
+    codedError.code === 'USER_ACCOUNT_NOT_FOUND' ||
+    codedError.code === 'ADMIN_ACCOUNT_NOT_FOUND' ||
+    codedError.code === 'COLLECTOR_ACCOUNT_NOT_FOUND'
+  ) {
+    return 'Không tìm thấy tài khoản phù hợp.';
+  }
+
+  if (codedError.code === 'STAFF_INACTIVE') {
+    return 'Tài khoản đã bị tạm khóa. Vui lòng liên hệ quản trị viên.';
+  }
+
+  if (codedError.code === 'USER_PASSWORD_NOT_SET' || codedError.code === 'STAFF_PASSWORD_NOT_SET') {
+    return 'Tài khoản chưa thiết lập mật khẩu. Vui lòng liên hệ quản trị viên.';
+  }
+
+  if (codedError.code === 'USER_ACCOUNT_ALREADY_EXISTS') {
+    return 'Số điện thoại này đã có tài khoản. Vui lòng đăng nhập.';
+  }
+
+  if (codedError.code === 'USER_EMAIL_REQUIRED') {
+    return 'Vui lòng nhập email.';
+  }
+
+  if (codedError.code === 'USER_EMAIL_INVALID') {
+    return 'Email không đúng định dạng.';
+  }
+
+  if (codedError.code === 'USER_PHONE_INVALID') {
+    return 'Số điện thoại phải bắt đầu bằng 0 và có 10 chữ số.';
+  }
+
+  if (codedError.code === 'PASSWORD_TOO_WEAK') {
+    return 'Mật khẩu cần có ít nhất 8 ký tự.';
+  }
+
+  return codedError.message || 'Không thể đăng nhập. Vui lòng thử lại.';
 }
 
-function getRelatedLinks(role: DemoRole) {
-  if (role === DEMO_ROLES.USER) {
-    return [
-      { href: '/user/login', label: 'Đăng nhập' },
-      { href: '/user/register', label: 'Đăng ký' },
-    ];
-  }
-
-  if (role === DEMO_ROLES.ADMIN) {
-    return [
-      { href: '/admin/login', label: 'Đăng nhập quản trị' },
-      { href: '/admin/register', label: 'Đăng ký quản trị' },
-    ];
-  }
+function getRelatedLinks(role: DemoRole, mode: EntryMode) {
+  if (role !== DEMO_ROLES.USER) return [];
 
   return [
-    { href: '/collector/login', label: 'Đăng nhập nhân viên' },
-    { href: '/collector/register', label: 'Kích hoạt tài khoản nhân viên' },
-  ];
-}
-
-async function verifyCollector(phone: string) {
-  const data = await listStaff({
-    role: 'SAMPLE_COLLECTOR',
-    active: 'true',
-    search: phone,
-    limit: 100,
-  });
-  const staff = data.staff.find((item) => normalizePhone(item.phone || '') === phone);
-
-  if (!staff) {
-    throw new Error('Tài khoản nhân viên chưa được quản trị viên tạo hoặc đang tạm khóa.');
-  }
-
-  return staff;
+    { href: '/user/login', label: 'Đăng nhập' },
+    { href: '/user/register', label: 'Đăng ký' },
+  ].filter((item) => item.href !== `/user/${mode}`);
 }
 
 export default function RoleLoginPage({
@@ -116,64 +118,114 @@ export default function RoleLoginPage({
   role: DemoRole;
   mode?: EntryMode;
 }) {
+  const effectiveMode = role === DEMO_ROLES.USER ? mode : 'login';
+  const isRegister = effectiveMode === 'register';
   const copy = ROLE_COPY[role];
-  const isRegister = mode === 'register';
-  const relatedLinks = getRelatedLinks(role).filter((item) => item.href !== `/${role.toLowerCase()}/${mode}`);
+  const relatedLinks = getRelatedLinks(role, effectiveMode);
   const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError('');
+
+    const normalizedPhone = normalizePhone(phone);
+    const trimmedName = displayName.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (isRegister && !trimmedName) {
+      setError('Vui lòng nhập họ tên.');
+      return;
+    }
+
+    if (isRegister && !trimmedEmail) {
+      setError('Vui lòng nhập email.');
+      return;
+    }
+
+    if (isRegister && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError('Email không đúng định dạng.');
+      return;
+    }
+
+    if (!normalizedPhone) {
+      setError('Vui lòng nhập số điện thoại.');
+      return;
+    }
+
+    if (isRegister && !/^0\d{9}$/.test(normalizedPhone)) {
+      setError('Số điện thoại phải bắt đầu bằng 0 và có 10 chữ số.');
+      return;
+    }
+
+    if (!password) {
+      setError('Vui lòng nhập mật khẩu.');
+      return;
+    }
+
+    if (isRegister && password !== confirmPassword) {
+      setError('Mật khẩu xác nhận chưa khớp.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const normalizedPhone = normalizePhone(phone);
-      const trimmedName = displayName.trim();
-
-      if (role !== DEMO_ROLES.ADMIN && !normalizedPhone) {
-        setError('Vui lòng nhập số điện thoại.');
+      if (role === DEMO_ROLES.USER && isRegister) {
+        const data = await registerUser(trimmedName, trimmedEmail, normalizedPhone, password);
+        loginDemoRole({
+          role: DEMO_ROLES.USER,
+          patientId: data.session.patientId,
+          userId: data.session.patientId,
+          phone: data.session.phone,
+          displayName: data.session.name,
+          email: data.session.email || trimmedEmail,
+        });
+        window.location.href = getDashboardPathForRole(DEMO_ROLES.USER);
         return;
       }
 
-      if (role === DEMO_ROLES.USER && isRegister && !trimmedName) {
-        setError('Vui lòng nhập họ tên.');
+      if (role === DEMO_ROLES.USER) {
+        const data = await loginUser(normalizedPhone, password);
+        loginDemoRole({
+          role: DEMO_ROLES.USER,
+          patientId: data.session.patientId,
+          userId: data.session.patientId,
+          phone: data.session.phone,
+          displayName: data.session.name,
+          email: data.session.email || '',
+        });
+        window.location.href = getDashboardPathForRole(DEMO_ROLES.USER);
         return;
       }
 
-      let sessionName = trimmedName;
-      let sessionPhone = normalizedPhone;
-
-      if (role === DEMO_ROLES.ADMIN && !sessionName && phone.trim()) {
-        sessionName = phone.trim();
+      if (role === DEMO_ROLES.ADMIN) {
+        const data = await loginAdmin(normalizedPhone, password);
+        loginDemoRole({
+          role: DEMO_ROLES.ADMIN,
+          userId: data.session.staffId,
+          phone: data.session.phone,
+          displayName: data.session.name,
+        });
+        window.location.href = getDashboardPathForRole(DEMO_ROLES.ADMIN);
+        return;
       }
 
-      if (role === DEMO_ROLES.ADMIN && !sessionPhone && !trimmedName) {
-        sessionName = 'Quản trị viên';
-      }
-
-      if (role === DEMO_ROLES.COLLECTOR) {
-        const staff = await verifyCollector(normalizedPhone);
-        sessionName = staff.fullName || trimmedName || 'Nhân viên lấy mẫu';
-        sessionPhone = normalizePhone(staff.phone || normalizedPhone);
-      }
-
+      const data = await loginCollector(normalizedPhone, password);
       loginDemoRole({
-        role,
-        phone: sessionPhone,
-        displayName: sessionName,
-        userId: getSafeSessionId(role, sessionPhone, sessionName || phone),
+        role: DEMO_ROLES.COLLECTOR,
+        userId: data.session.staffId,
+        phone: data.session.phone,
+        displayName: data.session.name,
       });
-
-      window.location.href = getDashboardPathForRole(role);
+      window.location.href = getDashboardPathForRole(DEMO_ROLES.COLLECTOR);
     } catch (nextError) {
-      setError(
-        nextError instanceof Error
-          ? nextError.message
-          : 'Không thể đăng nhập. Vui lòng thử lại.',
-      );
+      setError(mapAuthError(nextError));
     } finally {
       setIsSubmitting(false);
     }
@@ -201,7 +253,7 @@ export default function RoleLoginPage({
               {isRegister ? copy.registerSubtitle : copy.loginSubtitle}
             </p>
             <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-              Thông tin đăng nhập được dùng để truy cập đúng khu vực tài khoản trong HomeLab.
+              Thông tin đăng nhập được kiểm tra với tài khoản đã lưu trong hệ thống HomeLab.
             </div>
           </section>
 
@@ -214,15 +266,31 @@ export default function RoleLoginPage({
             </div>
 
             <div className="space-y-4">
-              {(isRegister || role !== DEMO_ROLES.USER) && (
+              {isRegister && (
                 <label className="block text-sm font-semibold text-slate-700">
-                  {copy.idLabel}
+                  Họ tên
                   <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-teal-400 focus-within:bg-white">
                     <UserRound className="h-4 w-4 text-slate-400" />
                     <input
                       value={displayName}
                       onChange={(event) => setDisplayName(event.target.value)}
-                      placeholder={copy.idPlaceholder}
+                      placeholder="Nguyễn Văn A"
+                      className="w-full bg-transparent px-3 py-3 text-sm outline-none"
+                    />
+                  </div>
+                </label>
+              )}
+
+              {isRegister && (
+                <label className="block text-sm font-semibold text-slate-700">
+                  Email
+                  <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-teal-400 focus-within:bg-white">
+                    <Mail className="h-4 w-4 text-slate-400" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      placeholder="name@example.com"
                       className="w-full bg-transparent px-3 py-3 text-sm outline-none"
                     />
                   </div>
@@ -241,6 +309,34 @@ export default function RoleLoginPage({
                   />
                 </div>
               </label>
+
+              <label className="block text-sm font-semibold text-slate-700">
+                Mật khẩu
+                <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-teal-400 focus-within:bg-white">
+                  <KeyRound className="h-4 w-4 text-slate-400" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    className="w-full bg-transparent px-3 py-3 text-sm outline-none"
+                  />
+                </div>
+              </label>
+
+              {isRegister && (
+                <label className="block text-sm font-semibold text-slate-700">
+                  Xác nhận mật khẩu
+                  <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-teal-400 focus-within:bg-white">
+                    <KeyRound className="h-4 w-4 text-slate-400" />
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(event) => setConfirmPassword(event.target.value)}
+                      className="w-full bg-transparent px-3 py-3 text-sm outline-none"
+                    />
+                  </div>
+                </label>
+              )}
             </div>
 
             {error ? (
@@ -275,22 +371,24 @@ export default function RoleLoginPage({
               Về Chatbot
             </a>
 
-            <div className="mt-5 border-t border-slate-100 pt-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                {role === DEMO_ROLES.USER ? 'Tài khoản' : 'Cổng liên quan'}
-              </p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {relatedLinks.map((item) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
-                  >
-                    {item.label}
-                  </a>
-                ))}
+            {relatedLinks.length > 0 ? (
+              <div className="mt-5 border-t border-slate-100 pt-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Tài khoản
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {relatedLinks.map((item) => (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : null}
           </form>
         </div>
       </div>

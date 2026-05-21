@@ -33,6 +33,8 @@ const EMPTY_FORM = {
   phone: '',
   role: 'SAMPLE_COLLECTOR' as StaffRole,
   active: true,
+  initialPassword: '',
+  newPassword: '',
 };
 
 const ROLE_OPTIONS: StaffRole[] = ['SAMPLE_COLLECTOR', 'ADMIN', 'LAB_TECHNICIAN', 'STAFF'];
@@ -41,6 +43,17 @@ function validateForm(form: typeof EMPTY_FORM) {
   if (!form.name.trim()) return 'Tên nhân viên là bắt buộc.';
   if (!form.phone.trim()) return 'Số điện thoại nhân viên là bắt buộc.';
   if (!form.role) return 'Vai trò nhân viên là bắt buộc.';
+  if (!form.initialPassword.trim()) return 'Mật khẩu ban đầu là bắt buộc.';
+  if (form.initialPassword.length < 8) return 'Mật khẩu cần có ít nhất 8 ký tự.';
+
+  return '';
+}
+
+function validateEditForm(form: typeof EMPTY_FORM) {
+  if (!form.name.trim()) return 'Tên nhân viên là bắt buộc.';
+  if (!form.phone.trim()) return 'Số điện thoại nhân viên là bắt buộc.';
+  if (!form.role) return 'Vai trò nhân viên là bắt buộc.';
+  if (form.newPassword.trim() && form.newPassword.length < 8) return 'Mật khẩu mới cần có ít nhất 8 ký tự.';
 
   return '';
 }
@@ -145,6 +158,8 @@ export default function AdminStaffPage() {
       phone: item.phone || '',
       role: item.role,
       active: item.active,
+      initialPassword: '',
+      newPassword: '',
     });
     setError('');
     setSuccess('');
@@ -153,7 +168,7 @@ export default function AdminStaffPage() {
   async function handleUpdate() {
     if (!editingStaff) return;
 
-    const validationError = validateForm(editForm);
+    const validationError = validateEditForm(editForm);
     if (validationError) {
       setError(validationError);
       return;
@@ -292,6 +307,15 @@ export default function AdminStaffPage() {
                 checked={form.active}
                 onChange={(event) => setForm((current) => ({ ...current, active: event.target.checked }))}
                 className="h-4 w-4 accent-indigo-600"
+              />
+            </label>
+            <label className="block text-sm font-semibold text-slate-700">
+              Mật khẩu ban đầu
+              <input
+                type="password"
+                value={form.initialPassword}
+                onChange={(event) => setForm((current) => ({ ...current, initialPassword: event.target.value }))}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
               />
             </label>
           </div>
@@ -497,6 +521,16 @@ export default function AdminStaffPage() {
                   checked={editForm.active}
                   onChange={(event) => setEditForm((current) => ({ ...current, active: event.target.checked }))}
                   className="h-4 w-4 accent-indigo-600"
+                />
+              </label>
+              <label className="block text-sm font-semibold text-slate-700">
+                Đặt mật khẩu mới
+                <input
+                  type="password"
+                  value={editForm.newPassword}
+                  onChange={(event) => setEditForm((current) => ({ ...current, newPassword: event.target.value }))}
+                  placeholder="Bỏ trống nếu không đổi mật khẩu"
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
                 />
               </label>
             </div>

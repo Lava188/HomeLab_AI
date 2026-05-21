@@ -68,9 +68,9 @@ function buildQuery(filters: UserBookingFilters = {}) {
 async function request<T>(path: string, options: RequestInit = {}) {
   const session = getUserSession();
 
-  if (!session.phone) {
+  if (!session.phone || !session.patientId) {
     window.location.replace('/user/login');
-    throw new Error('Vui lòng đăng nhập bằng số điện thoại để xem lịch hẹn.');
+    throw new Error('Vui lòng đăng nhập bằng tài khoản người dùng đã đăng ký để xem lịch hẹn.');
   }
 
   const response = await fetch(`${API_BASE_URL}${path}`, {

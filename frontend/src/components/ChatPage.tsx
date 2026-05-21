@@ -17,7 +17,7 @@ import {
   Stethoscope,
 } from 'lucide-react';
 import { clearChatSession, Message, mockSendMessage, SourceCitation } from '../api/chatApi';
-import { DEMO_ROLES, getDemoSession, logoutDemoRole } from '../auth/demoAuth';
+import { getUserSession, logoutDemoRole } from '../auth/demoAuth';
 import OperationsAccessMenu from './OperationsAccessMenu';
 
 const STORAGE_KEY = 'homelab_chat_history';
@@ -139,11 +139,11 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [session, setSession] = useState(() => getDemoSession());
+  const [session, setSession] = useState(() => getUserSession());
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const isUserLoggedIn = session.role === DEMO_ROLES.USER && Boolean(session.phone);
-  const userDashboardPath = isUserLoggedIn ? '/user/dashboard' : '/user/login';
+  const isUserLoggedIn = Boolean(session.role && session.phone && session.patientId);
+  const userBookingsPath = isUserLoggedIn ? '/user/bookings' : '/user/login';
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -180,7 +180,16 @@ export default function ChatPage() {
 
   function handleUserLogout() {
     logoutDemoRole();
-    setSession(getDemoSession());
+    setSession(getUserSession());
+  }
+
+  function handleBookingCta() {
+    if (!isUserLoggedIn) {
+      window.location.href = '/user/login';
+      return;
+    }
+
+    focusChat('Tôi muốn đặt lịch xét nghiệm tại nhà. Vui lòng hướng dẫn tôi các bước tiếp theo.');
   }
 
   async function handleSend(text = inputValue) {
@@ -229,7 +238,7 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(20,184,166,0.16),_transparent_34%),linear-gradient(135deg,#f8fafc_0%,#eef8ff_52%,#ecfdf5_100%)] text-slate-900">
       <header className="sticky top-0 z-20 border-b border-white/70 bg-white/85 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <a href="/" className="flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500 to-sky-600 text-white shadow-sm">
               <FlaskConical className="h-5 w-5" />
@@ -240,25 +249,21 @@ export default function ChatPage() {
             </span>
           </a>
 
-          <nav className="hidden items-center gap-2 md:flex">
+          <nav className="hidden items-center gap-2 lg:flex">
             <a href="/" className="rounded-xl bg-teal-50 px-3.5 py-2 text-sm font-semibold text-teal-700">
               Chatbot
             </a>
             <a
-              href={userDashboardPath}
+              href={userBookingsPath}
               className="rounded-xl px-3.5 py-2 text-sm font-semibold text-slate-600 hover:bg-white hover:text-teal-700"
             >
               Theo dõi lịch hẹn
             </a>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             {isUserLoggedIn ? (
-              <div className="hidden items-center gap-2 lg:flex">
-                <div className="rounded-xl border border-teal-100 bg-teal-50 px-3 py-2 text-xs font-semibold text-teal-800">
-                  <span className="block">Đã đăng nhập</span>
-                  <span className="mt-0.5 block text-teal-700">{session.phone}</span>
-                </div>
+              <>
                 <a
                   href="/user/dashboard"
                   className="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
@@ -272,32 +277,23 @@ export default function ChatPage() {
                   <LogOut className="h-4 w-4" />
                   Đăng xuất
                 </button>
-              </div>
+              </>
             ) : (
               <>
                 <a
                   href="/user/login"
-                  className="hidden rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 sm:inline-flex"
+                  className="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
                 >
                   Đăng nhập
                 </a>
                 <a
                   href="/user/register"
-                  className="hidden rounded-xl bg-slate-900 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 sm:inline-flex"
+                  className="rounded-xl bg-teal-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-700"
                 >
                   Đăng ký
                 </a>
               </>
             )}
-            {isUserLoggedIn ? (
-              <div className="inline-flex items-center gap-2 rounded-xl border border-teal-100 bg-teal-50 px-2.5 py-2 text-xs font-semibold text-teal-800 shadow-sm lg:hidden">
-                <span className="hidden sm:inline">Đã đăng nhập</span>
-                <span>{session.phone}</span>
-                <button onClick={handleUserLogout} className="text-slate-700 hover:text-slate-900">
-                  Đăng xuất
-                </button>
-              </div>
-            ) : null}
             <OperationsAccessMenu compact />
           </div>
         </div>
@@ -319,14 +315,14 @@ export default function ChatPage() {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <button
-                onClick={() => focusChat('Tôi muốn đặt lịch xét nghiệm tại nhà. Vui lòng hướng dẫn tôi các bước tiếp theo.')}
+                onClick={handleBookingCta}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-600/20 hover:bg-teal-700"
               >
                 <CalendarPlus className="h-5 w-5" />
                 Đặt lịch xét nghiệm
               </button>
               <a
-                href={userDashboardPath}
+                href={userBookingsPath}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-sky-200 bg-white px-5 py-3 text-sm font-semibold text-sky-700 shadow-sm hover:bg-sky-50"
               >
                 <CalendarCheck className="h-5 w-5" />

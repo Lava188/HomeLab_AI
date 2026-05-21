@@ -77,6 +77,8 @@ export type StaffPayload = {
   phone?: string;
   role?: StaffRole;
   active?: boolean;
+  initialPassword?: string;
+  newPassword?: string;
 };
 
 type ApiResponse<T> = {

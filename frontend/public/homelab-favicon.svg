@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="HomeLab">
+  <rect width="64" height="64" rx="14" fill="#0f766e"/>
+  <path d="M22 12h20v6h-4v13.5l10.5 15.8A7 7 0 0 1 42.7 58H21.3a7 7 0 0 1-5.8-10.7L26 31.5V18h-4z" fill="#ecfeff"/>
+  <path d="M23 43h18l4.2 6.2A3 3 0 0 1 42.7 54H21.3a3 3 0 0 1-2.5-4.8z" fill="#67e8f9"/>
+  <path d="M30 24h4v6h6v4h-6v6h-4v-6h-6v-4h6z" fill="#dc2626"/>
+</svg>

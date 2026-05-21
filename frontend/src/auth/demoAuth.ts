@@ -10,16 +10,20 @@ export type DemoSession = {
   role: DemoRole | '';
   token: string;
   userId: string;
+  patientId: string;
   phone: string;
   displayName: string;
+  email: string;
 };
 
 const STORAGE_KEYS = {
   role: 'homelab_demo_role',
   token: 'homelab_demo_token',
   userId: 'homelab_demo_user_id',
+  patientId: 'homelab_patient_id',
   phone: 'homelab_demo_phone',
   displayName: 'homelab_demo_display_name',
+  email: 'homelab_demo_email',
 };
 
 function isDemoRole(value: string | null): value is DemoRole {
@@ -55,22 +59,45 @@ function getDefaultUserId(role: DemoRole, phone: string, userId?: string) {
 export function loginDemoRole({
   role,
   userId,
+  patientId,
   phone = '',
   displayName = '',
+  email = '',
 }: {
   role: DemoRole;
   userId?: string;
+  patientId?: string;
   phone?: string;
   displayName?: string;
+  email?: string;
 }) {
   const normalizedPhone = normalizePhone(phone);
-  const normalizedUserId = getDefaultUserId(role, normalizedPhone, userId);
+  const normalizedPatientId = sanitizeHeaderValue(patientId || '');
+  const normalizedUserId = getDefaultUserId(role, normalizedPhone, userId || normalizedPatientId);
 
   localStorage.setItem(STORAGE_KEYS.role, role);
   localStorage.setItem(STORAGE_KEYS.token, `demo-${role.toLowerCase()}-${Date.now()}`);
   localStorage.setItem(STORAGE_KEYS.userId, normalizedUserId);
+  localStorage.setItem(STORAGE_KEYS.patientId, normalizedPatientId);
   localStorage.setItem(STORAGE_KEYS.phone, normalizedPhone);
   localStorage.setItem(STORAGE_KEYS.displayName, displayName.trim());
+  localStorage.setItem(STORAGE_KEYS.email, email.trim().toLowerCase());
+}
+
+export function updateUserSessionProfile({
+  displayName,
+  email,
+}: {
+  displayName?: string;
+  email?: string;
+}) {
+  if (displayName !== undefined) {
+    localStorage.setItem(STORAGE_KEYS.displayName, displayName.trim());
+  }
+
+  if (email !== undefined) {
+    localStorage.setItem(STORAGE_KEYS.email, email.trim().toLowerCase());
+  }
 }
 
 export function logoutDemoRole() {
@@ -82,25 +109,25 @@ export function getDemoSession(): DemoSession {
   const phone = normalizePhone(localStorage.getItem(STORAGE_KEYS.phone) || '');
   const role = isDemoRole(roleValue) ? roleValue : '';
   const storedUserId = sanitizeHeaderValue(localStorage.getItem(STORAGE_KEYS.userId) || '');
-  const userId =
-    role === DEMO_ROLES.USER && phone
-      ? `user-${phone}`
-      : role === DEMO_ROLES.COLLECTOR && phone
-        ? `collector-${phone}`
-        : storedUserId || getDefaultUserId(role || DEMO_ROLES.USER, phone);
+  const patientId = sanitizeHeaderValue(localStorage.getItem(STORAGE_KEYS.patientId) || '');
+  const userId = storedUserId || getDefaultUserId(role || DEMO_ROLES.USER, phone);
 
   return {
     role,
     token: localStorage.getItem(STORAGE_KEYS.token) || '',
     userId,
+    patientId,
     phone,
     displayName: localStorage.getItem(STORAGE_KEYS.displayName) || '',
+    email: localStorage.getItem(STORAGE_KEYS.email) || '',
   };
 }
 
 export function getUserSession() {
   const session = getDemoSession();
-  return session.role === DEMO_ROLES.USER ? session : { ...session, role: '' as const };
+  return session.role === DEMO_ROLES.USER && session.patientId && session.phone
+    ? session
+    : { ...session, role: '' as const };
 }
 
 export function getAdminSession() {
@@ -115,6 +142,10 @@ export function getCollectorSession() {
 
 export function hasRole(expectedRole: DemoRole) {
   const session = getDemoSession();
+  if (expectedRole === DEMO_ROLES.USER) {
+    return session.role === expectedRole && Boolean(session.token && session.phone && session.patientId);
+  }
+
   return session.role === expectedRole && Boolean(session.token);
 }
 

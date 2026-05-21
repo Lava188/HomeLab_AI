@@ -17,7 +17,7 @@ export default function UserForgotPasswordPage() {
       return;
     }
 
-    setSuccess('Yêu cầu khôi phục đã được ghi nhận. Vui lòng liên hệ HomeLab hoặc quản trị viên để được hỗ trợ.');
+    setSuccess('Tính năng đặt lại mật khẩu sẽ được hoàn thiện sau.');
   }
 
   return (
