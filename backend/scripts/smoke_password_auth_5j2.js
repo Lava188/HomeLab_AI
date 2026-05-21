@@ -66,6 +66,7 @@ async function runCase(id, fn, state) {
 async function prepareState() {
     const state = {
         userPhone: makePhone("09"),
+        userEmail: `smoke-${Date.now()}@example.com`,
         unknownUserPhone: makePhone("08"),
         adminPhone: makePhone("07"),
         collectorPhone: makePhone("06"),
@@ -156,12 +157,47 @@ async function main() {
     const state = await prepareState();
     const cases = [
         [
+            "user_register_invalid_email_rejected",
+            async () => {
+                const { response, payload } = await request("/api/user/auth/register", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        name: "Invalid Email Smoke 5J2",
+                        email: "not-an-email",
+                        phone: makePhone("09"),
+                        password: state.userPassword
+                    })
+                });
+
+                assert(response.status === 400, "invalid email did not return 400");
+                assert(payload.code === "USER_EMAIL_INVALID", "invalid email code mismatch");
+            }
+        ],
+        [
+            "user_register_invalid_phone_rejected",
+            async () => {
+                const { response, payload } = await request("/api/user/auth/register", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        name: "Invalid Phone Smoke 5J2",
+                        email: `invalid-phone-${Date.now()}@example.com`,
+                        phone: `84${state.userPhone.slice(1)}`,
+                        password: state.userPassword
+                    })
+                });
+
+                assert(response.status === 400, "invalid phone did not return 400");
+                assert(payload.code === "USER_PHONE_INVALID", "invalid phone code mismatch");
+            }
+        ],
+        [
             "user_register_success",
             async () => {
                 const { response, payload } = await request("/api/user/auth/register", {
                     method: "POST",
                     body: JSON.stringify({
                         name: "Người dùng Smoke 5J2",
+                        email: state.userEmail,
                         phone: state.userPhone,
                         password: state.userPassword
                     })
@@ -180,6 +216,7 @@ async function main() {
                     method: "POST",
                     body: JSON.stringify({
                         name: "Người dùng trùng Smoke 5J2",
+                        email: `duplicate-${Date.now()}@example.com`,
                         phone: state.userPhone,
                         password: state.userPassword
                     })

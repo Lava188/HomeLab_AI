@@ -24,6 +24,18 @@ function isStrongEnoughPassword(password) {
     return validatePassword(password).length >= PASSWORD_MIN_LENGTH;
 }
 
+function normalizeEmail(email) {
+    return String(email || "").trim().toLowerCase();
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(email));
+}
+
+function isValidRegistrationPhone(phone) {
+    return /^0\d{9}$/.test(normalizePhone(phone || ""));
+}
+
 async function hashPassword(password) {
     return bcrypt.hash(validatePassword(password), PASSWORD_SALT_ROUNDS);
 }
@@ -104,16 +116,29 @@ function collectorSession(staff) {
     };
 }
 
-async function registerUser({ name, phone, password }) {
+async function registerUser({ name, email, phone, password }) {
     const fullName = String(name || "").trim();
+    const normalizedEmail = normalizeEmail(email);
     const normalizedPhone = normalizePhone(phone || "");
 
     if (!fullName) {
         return authError("USER_NAME_REQUIRED", "Vui lòng nhập họ tên.", 400);
     }
 
+    if (!normalizedEmail) {
+        return authError("USER_EMAIL_REQUIRED", "Vui lòng nhập email.", 400);
+    }
+
+    if (!isValidEmail(normalizedEmail)) {
+        return authError("USER_EMAIL_INVALID", "Email không đúng định dạng.", 400);
+    }
+
     if (!normalizedPhone) {
         return authError("USER_PHONE_REQUIRED", "Vui lòng nhập số điện thoại.", 400);
+    }
+
+    if (!isValidRegistrationPhone(normalizedPhone)) {
+        return authError("USER_PHONE_INVALID", "Số điện thoại phải bắt đầu bằng 0 và có 10 chữ số.", 400);
     }
 
     if (!isStrongEnoughPassword(password)) {
@@ -133,6 +158,7 @@ async function registerUser({ name, phone, password }) {
     const patient = await prisma.patient.create({
         data: {
             fullName,
+            email: normalizedEmail,
             phone: normalizedPhone,
             passwordHash: await hashPassword(password)
         }
@@ -237,6 +263,8 @@ module.exports = {
     findPatientByPhone,
     findStaffByPhone,
     hashPassword,
+    isValidEmail,
+    isValidRegistrationPhone,
     isStrongEnoughPassword,
     loginAdmin,
     loginCollector,

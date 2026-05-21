@@ -34,6 +34,7 @@ async function register(req, res, next) {
     try {
         const result = await userAuthService.registerUser({
             name: req.body?.name,
+            email: req.body?.email,
             phone: req.body?.phone,
             password: req.body?.password
         });

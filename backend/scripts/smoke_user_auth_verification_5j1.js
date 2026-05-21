@@ -59,6 +59,8 @@ async function main() {
     const state = {
         unknownPhone: makePhone("08"),
         registeredPhone: makePhone("09"),
+        registeredEmail: `smoke-5j1-${Date.now()}@example.com`,
+        password: "UserPass@5j1",
         name: "Nguyễn Văn Smoke 5J1",
         session: null
     };
@@ -77,7 +79,7 @@ async function main() {
             async () => {
                 const { response, payload } = await request("/api/user/auth/login", {
                     method: "POST",
-                    body: JSON.stringify({ phone: state.unknownPhone })
+                    body: JSON.stringify({ phone: state.unknownPhone, password: state.password })
                 });
 
                 assert(response.status === 404, "unknown phone did not return 404");
@@ -92,7 +94,9 @@ async function main() {
                     method: "POST",
                     body: JSON.stringify({
                         name: state.name,
-                        phone: state.registeredPhone
+                        email: state.registeredEmail,
+                        phone: state.registeredPhone,
+                        password: state.password
                     })
                 });
 
@@ -108,7 +112,7 @@ async function main() {
             async () => {
                 const { response, payload } = await request("/api/user/auth/login", {
                     method: "POST",
-                    body: JSON.stringify({ phone: state.registeredPhone })
+                    body: JSON.stringify({ phone: state.registeredPhone, password: state.password })
                 });
 
                 state.session = payload.data?.session;
@@ -125,7 +129,9 @@ async function main() {
                     method: "POST",
                     body: JSON.stringify({
                         name: "Nguyễn Văn Trùng",
-                        phone: state.registeredPhone
+                        email: `duplicate-5j1-${Date.now()}@example.com`,
+                        phone: state.registeredPhone,
+                        password: state.password
                     })
                 });
 
