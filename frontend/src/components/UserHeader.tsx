@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { LogOut, Pencil, UserRound, X } from 'lucide-react';
+import { LogOut, Pencil, UserRound } from 'lucide-react';
 import { DemoSession, logoutDemoRole } from '../auth/demoAuth';
-import { UserProfileEditForm } from './UserProfileEditPage';
-
-const USER_HEADER_SUBTITLE =
-  'Theo dõi lịch xét nghiệm, trạng thái lịch hẹn và quay lại Chatbot khi cần đặt lịch mới.';
 
 function getInitial(name: string) {
   return name.trim().charAt(0).toUpperCase() || 'U';
@@ -12,7 +8,6 @@ function getInitial(name: string) {
 
 export default function UserHeader({ session }: { session: DemoSession }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [displayName, setDisplayName] = useState(session.displayName || 'Người dùng');
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -48,9 +43,6 @@ export default function UserHeader({ session }: { session: DemoSession }) {
         >
           <span className="min-w-0">
             <span className="block truncate text-sm font-semibold text-slate-900">{displayName}</span>
-            <span className="mt-0.5 block line-clamp-2 max-w-[20rem] text-xs font-medium leading-5 text-slate-500">
-              {USER_HEADER_SUBTITLE}
-            </span>
           </span>
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-teal-100 bg-gradient-to-br from-teal-500 to-sky-500 text-sm font-semibold text-white shadow-sm">
             {displayName ? getInitial(displayName) : <UserRound className="h-5 w-5" />}
@@ -59,17 +51,13 @@ export default function UserHeader({ session }: { session: DemoSession }) {
 
         {isOpen ? (
           <div className="absolute right-0 z-50 mt-3 w-[min(16rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 text-left shadow-xl">
-            <button
-              type="button"
-              onClick={() => {
-                setIsOpen(false);
-                setIsProfileModalOpen(true);
-              }}
+            <a
+              href="/user/profile"
               className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-teal-50 hover:text-teal-700"
             >
               <Pencil className="h-4 w-4" />
               Chỉnh sửa thông tin
-            </button>
+            </a>
             <button
               type="button"
               onClick={handleLogout}
@@ -81,25 +69,6 @@ export default function UserHeader({ session }: { session: DemoSession }) {
           </div>
         ) : null}
       </div>
-
-      {isProfileModalOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4">
-          <div className="relative max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-xl">
-            <button
-              type="button"
-              onClick={() => setIsProfileModalOpen(false)}
-              className="absolute right-4 top-4 z-10 rounded-lg p-2 text-slate-500 hover:bg-slate-100"
-              aria-label="Đóng form chỉnh sửa thông tin"
-            >
-              <X className="h-5 w-5" />
-            </button>
-            <UserProfileEditForm
-              onCancel={() => setIsProfileModalOpen(false)}
-              onSaved={(profile) => setDisplayName(profile.displayName)}
-            />
-          </div>
-        </div>
-      ) : null}
     </>
   );
 }

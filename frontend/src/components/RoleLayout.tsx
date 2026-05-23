@@ -79,6 +79,7 @@ export default function RoleLayout({
   const navItems = getNavItems(role);
   const activeNavItem = navItems.find((item) => window.location.pathname === item.href.split('#')[0]);
   const pageTitle = activeNavItem?.title || title;
+  const PageIcon = activeNavItem?.icon || Home;
 
   function handleLogout() {
     logoutDemoRole();
@@ -90,10 +91,18 @@ export default function RoleLayout({
       <header className="border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
           {role === DEMO_ROLES.USER ? (
-            <div className="flex items-center justify-between gap-4">
-              <h1 className="min-w-0 truncate text-xl font-semibold text-slate-900 sm:text-2xl">
-                {pageTitle}
-              </h1>
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${ROLE_ACCENTS[role]} text-white shadow-sm`}>
+                  <PageIcon className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <h1 className="truncate text-xl font-semibold text-slate-900 sm:text-2xl">
+                    {pageTitle}
+                  </h1>
+                  <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-500">{subtitle}</p>
+                </div>
+              </div>
               <UserHeader session={session} />
             </div>
           ) : (
