@@ -294,6 +294,19 @@ const TEST_ADVICE_SIGNALS = [
     "giai thich ket qua"
 ];
 
+const SYMPTOM_INTAKE_SIGNALS = [
+    "hay met",
+    "met moi",
+    "met",
+    "an uong kem",
+    "chan an",
+    "nhuc dau",
+    "dau dau",
+    "buon non",
+    "hay non",
+    "chong mat"
+];
+
 const URGENT_HEALTH_INTENT_SIGNALS = [
     ...HIGH_RISK_SHORT_QUERY_SIGNALS,
     "dau nguc",
@@ -374,6 +387,10 @@ function hasExplicitBookingActionText(expandedMessage) {
 
 function isTestAdviceQuery(expandedMessage) {
     if (includesAny(expandedMessage, TEST_ADVICE_SIGNALS)) {
+        return true;
+    }
+
+    if (includesAny(expandedMessage, SYMPTOM_INTAKE_SIGNALS)) {
         return true;
     }
 

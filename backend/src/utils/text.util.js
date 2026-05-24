@@ -42,7 +42,12 @@ function detectDateFromMessage(message, baseDate = new Date()) {
         );
     }
 
-    if (normalizedMessage.includes("ngay mai")) {
+    if (
+        normalizedMessage.includes("ngay mai") ||
+        normalizedMessage.includes("sang mai") ||
+        normalizedMessage.includes("chieu mai") ||
+        normalizedMessage.includes("toi mai")
+    ) {
         const tomorrow = new Date(baseDate);
         tomorrow.setDate(baseDate.getDate() + 1);
 
@@ -70,17 +75,34 @@ function detectDateFromMessage(message, baseDate = new Date()) {
 
 function detectTimeFromMessage(message) {
     const text = String(message || "");
+    const normalizedMessage = normalizeText(message);
     const timePattern1 = text.match(/\b(\d{1,2})[:hH](\d{1,2})?\b/);
     const timePattern2 = text.match(/\b(\d{1,2})\s*giờ(?:\s*(\d{1,2}))?\b/i);
 
-    const match = timePattern1 || timePattern2;
+    const normalizedTimePattern = normalizedMessage.match(
+        /\b(\d{1,2})\s*gio(?:\s*(\d{1,2}))?\b/i
+    );
+    const match = timePattern1 || timePattern2 || normalizedTimePattern;
 
     if (!match) {
         return null;
     }
 
-    const hour = Number(match[1]);
+    let hour = Number(match[1]);
     const minute = match[2] ? Number(match[2]) : 0;
+
+    if (
+        hour >= 1 &&
+        hour <= 11 &&
+        (
+            normalizedMessage.includes("gio chieu") ||
+            normalizedMessage.includes("buoi chieu") ||
+            normalizedMessage.includes("gio toi") ||
+            normalizedMessage.includes("buoi toi")
+        )
+    ) {
+        hour += 12;
+    }
 
     if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
         return null;

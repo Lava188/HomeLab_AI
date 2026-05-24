@@ -210,6 +210,36 @@ async function listAvailabilitySlots(filter = {}) {
     return normalized;
 }
 
+async function findAvailableNearbySlots({
+    requestedDate,
+    area = null,
+    days = 7,
+    limit = 5
+} = {}) {
+    const startDate = parseDateOnly(requestedDate || new Date());
+    assertValidDateTime(startDate, "requestedDate");
+
+    const endDate = new Date(startDate);
+    endDate.setUTCDate(startDate.getUTCDate() + Math.max(Number(days) || 7, 1));
+
+    const slots = await listAvailabilitySlots({
+        dateFrom: formatDateOnly(startDate),
+        dateTo: formatDateOnly(endDate),
+        area,
+        active: true,
+        limit: 200
+    });
+
+    return slots
+        .filter((slot) => slot.active && Number(slot.remainingCapacity) > 0)
+        .sort((left, right) => {
+            const leftKey = `${left.date}T${left.timeStart}`;
+            const rightKey = `${right.date}T${right.timeStart}`;
+            return leftKey.localeCompare(rightKey);
+        })
+        .slice(0, Math.max(Number(limit) || 5, 1));
+}
+
 async function createAvailabilitySlot(input = {}) {
     const date = parseDateOnly(input.date);
     const startTime = parseTimeOnly(input.timeStart || input.startTime);
@@ -278,6 +308,7 @@ module.exports = {
     ACTIVE_CAPACITY_STATUSES,
     assertSlotAvailable,
     listAvailabilitySlots,
+    findAvailableNearbySlots,
     createAvailabilitySlot,
     updateAvailabilitySlot,
     normalizeSlot,

@@ -222,12 +222,14 @@ async function runCase(id, fn, state) {
 }
 
 async function main() {
-    const offsetBase = 120 + Math.floor(Math.random() * 180);
+    const offsetBase = 365 + Math.floor(Math.random() * 365);
+    const minute = String(10 + Math.floor(Math.random() * 45)).padStart(2, "0");
     const state = {
         slotDate: isoDate(offsetBase),
         unopenedDate: isoDate(offsetBase + 1),
-        slotTime: "08:33",
-        slotEnd: "09:33",
+        nearbyDate: isoDate(offsetBase + 2),
+        slotTime: `08:${minute}`,
+        slotEnd: `09:${minute}`,
         userAPhone: makePhone("09"),
         userBPhone: makePhone("09"),
         userCPhone: makePhone("09"),
@@ -255,6 +257,14 @@ async function main() {
                 assert(payload.data?.active === true, "slot is not active");
                 assert(payload.data?.date === state.slotDate, "slot date mismatch");
                 assert(payload.data?.timeStart === state.slotTime, "slot time mismatch");
+
+                await createSlotViaApi({
+                    date: state.nearbyDate,
+                    timeStart: state.slotTime,
+                    timeEnd: state.slotEnd,
+                    capacity: 2,
+                    active: true
+                });
             }
         ],
         [

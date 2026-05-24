@@ -144,7 +144,8 @@ function assertPackagePrompt(data) {
     assert(!hasBookingCode(reply), "reply unexpectedly has booking code");
     assert(
         normalizedReply.includes("chon goi") ||
-            normalizedReply.includes("goi xet nghiem nao"),
+            normalizedReply.includes("goi xet nghiem nao") ||
+            normalizedReply.includes("goi/xet nghiem"),
         "reply did not ask user to choose package"
     );
     assert(
@@ -255,9 +256,16 @@ async function main() {
 
                 assert(response.status === 200 && payload.success, "chat failed");
                 assert(data.meta?.selectedPackage?.code === "GENERAL_CHECKUP", "selectedPackage missing");
-                assert(normalizedReply.includes("xac nhan chon"), "package confirmation missing");
-                assert(!hasBookingCode(data.reply || ""), "confirmation reply has booking code");
-                assert(after === before, "booking created before package confirmation");
+                assert(
+                    normalizedReply.includes("gio lay mau") ||
+                        normalizedReply.includes("gio") ||
+                        normalizedReply.includes("thieu"),
+                    "package selection should ask for missing field (time), not confirmation"
+                );
+                assert(!normalizedReply.includes("xac nhan chon") && !normalizedReply.includes("xac nhan dat lich"),
+                    "package selection should NOT ask for confirmation when fields are missing");
+                assert(!hasBookingCode(data.reply || ""), "reply has booking code");
+                assert(after === before, "booking created before confirmation");
             }
         ],
         [

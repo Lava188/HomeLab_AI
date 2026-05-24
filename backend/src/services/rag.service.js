@@ -339,7 +339,17 @@ function getIntentGroup(message) {
         "muc loc cau than",
         "kiem tra thieu mau",
         "thieu mau",
-        "cbc"
+        "cbc",
+        "hay met",
+        "met moi",
+        "met",
+        "an uong kem",
+        "chan an",
+        "nhuc dau",
+        "dau dau",
+        "buon non",
+        "hay non",
+        "chong mat"
     ];
 
     if (

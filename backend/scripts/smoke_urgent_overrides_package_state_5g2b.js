@@ -224,7 +224,7 @@ async function main() {
 
                 await postChat("Tôi muốn đặt lịch gói tổng quát cơ bản sáng mai", sessionId, headers);
                 const result = await postChat(
-                    "Đặt lịch gói tổng quát cơ bản 8h sáng mai tại 12 Nguyễn Trãi",
+                    "Đặt lịch gói tổng quát cơ bản 8h sáng mai tại 12 Nguyễn Trãi, Quận 1, TP Hồ Chí Minh, tên: Smoke User",
                     sessionId,
                     headers
                 );

@@ -164,12 +164,36 @@ function isBookingConfirmationContinuation(message, sessionId) {
     const confirmationSignals = [
         "xac nhan",
         "dong y",
-        "ok",
         "ok dat lich",
-        "dat lich"
+        "oke dat lich",
+        "dung roi"
     ];
 
+    if (isBookingEditOrNegativeText(message)) {
+        return false;
+    }
+
     return confirmationSignals.some((signal) =>
+        normalizedMessage.includes(signal)
+    );
+}
+
+function isBookingEditOrNegativeText(message) {
+    const normalizedMessage = normalizeText(message);
+    const editOrNegativeSignals = [
+        "khong phai",
+        "chua dung",
+        "khong dung",
+        "thay doi thong tin",
+        "sua thong tin",
+        "doi lich",
+        "doi dia chi",
+        "doi gio",
+        "doi ngay",
+        "doi goi"
+    ];
+
+    return editOrNegativeSignals.some((signal) =>
         normalizedMessage.includes(signal)
     );
 }
@@ -642,6 +666,67 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
         };
     }
 
+    if (bookingService.shouldHandleBookingFailureFollowup(sessionId, message)) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
+        const bookingContinuationResult =
+            await bookingService.handleBookingMessage({
+                message,
+                sessionId,
+                userSession
+            });
+
+        return {
+            ...bookingContinuationResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(
+                    bookingContinuationResult,
+                    gateDebug
+                ),
+                safetyResult.meta,
+                routeResult
+            )
+        };
+    }
+
+    if (
+        bookingService.hasActiveBookingSession(sessionId) &&
+        isBookingEditOrNegativeText(message)
+    ) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
+        const bookingContinuationResult =
+            await bookingService.handleBookingMessage({
+                message,
+                sessionId,
+                userSession
+            });
+
+        return {
+            ...bookingContinuationResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(
+                    bookingContinuationResult,
+                    gateDebug
+                ),
+                safetyResult.meta,
+                routeResult
+            )
+        };
+    }
+
     if (
         [FLOWS.HEALTH_RAG, FLOWS.FALLBACK].includes(routeResult.flow) &&
         routeResult.routerDebug?.intentGroup !== "urgent_health" &&
@@ -769,6 +854,30 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
             sessionId,
             flow: FLOWS.BOOKING
         });
+    }
+
+    if (
+        isAuthenticatedUserSession(userSession) &&
+        isStandaloneBookingConfirmation(message)
+    ) {
+        const bookingConfirmationResult =
+            await bookingService.handleBookingMessage({
+                message,
+                sessionId,
+                userSession
+            });
+
+        return {
+            ...bookingConfirmationResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(
+                    bookingConfirmationResult,
+                    gateDebug
+                ),
+                safetyResult.meta,
+                routeResult
+            )
+        };
     }
 
     if (routeResult.flow === "booking") {
