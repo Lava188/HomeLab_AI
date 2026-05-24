@@ -106,6 +106,11 @@ function composeMedicalReviewBoundaryAnswer(recommendationDecision) {
 }
 
 function composeAskMoreAnswer(recommendationDecision) {
+    const symptomAnswer = composeSymptomAwareAskMoreAnswer(recommendationDecision);
+    if (symptomAnswer) {
+        return symptomAnswer;
+    }
+
     const questions = buildNaturalQuestions(recommendationDecision).slice(0, 4);
 
     return [
@@ -113,6 +118,73 @@ function composeAskMoreAnswer(recommendationDecision) {
         ...questions.map((question) => `- ${question}`),
         "Nếu bạn đang đau ngực, khó thở, ngất/lú lẫn, sốt cao rét run hoặc tình trạng xấu đi nhanh, hãy ưu tiên liên hệ cơ sở y tế khẩn cấp."
     ].join("\n");
+}
+
+function composeSymptomAwareAskMoreAnswer(recommendationDecision) {
+    const normalizedMessage =
+        recommendationDecision.debug?.normalizedMessage || "";
+    const collectedSlots =
+        recommendationDecision.extractedSlots ||
+        recommendationDecision.debug?.collectedSlots ||
+        {};
+    const hasHeadache =
+        normalizedMessage.includes("nhuc dau") ||
+        normalizedMessage.includes("dau dau");
+    const hasPoorAppetite =
+        normalizedMessage.includes("chan an") ||
+        normalizedMessage.includes("an uong kem");
+    const hasVomiting =
+        normalizedMessage.includes("hay non") ||
+        normalizedMessage.includes("buon non") ||
+        normalizedMessage.includes(" non");
+    const hasFatigue =
+        normalizedMessage.includes("met moi") ||
+        normalizedMessage.includes("hay met") ||
+        normalizedMessage.includes(" met");
+    const isGeneralCheckup =
+        collectedSlots.recommendation_goal === "basic_blood_package";
+
+    if (isGeneralCheckup && !hasFatigue && !hasHeadache && !hasPoorAppetite && !hasVomiting) {
+        return [
+            "Bạn đang muốn kiểm tra sức khỏe tổng quát. Để gợi ý hướng xét nghiệm phù hợp hơn, HomeLab cần thêm vài thông tin ngắn:",
+            "- Bạn bao nhiêu tuổi và giới tính sinh học là gì?",
+            "- Bạn muốn ưu tiên mục tiêu nào: tổng quát, thiếu máu/CBC, đường huyết/HbA1c, mỡ máu, gan hay thận?",
+            "- Hiện có triệu chứng đáng lo như đau ngực, khó thở, ngất/lơ mơ, sốt cao rét run hoặc tình trạng xấu đi nhanh không?",
+            "",
+            "Nếu chỉ là kiểm tra định kỳ và không có dấu hiệu nguy hiểm, có thể trao đổi thêm về gói tổng quát cơ bản hoặc các nhóm xét nghiệm riêng theo mục tiêu."
+        ].join("\n");
+    }
+
+    if (hasHeadache && (hasPoorAppetite || hasVomiting)) {
+        return [
+            "Bạn đang có nhức đầu kèm chán ăn và hay nôn. Trước khi gợi ý gói xét nghiệm, HomeLab cần kiểm tra một số dấu hiệu cần đi khám sớm:",
+            "- Đau đầu dữ dội đột ngột, nặng dần hoặc khác thường không?",
+            "- Có sốt cao, cứng cổ, lơ mơ, co giật, yếu/tê một bên người không?",
+            "- Bạn có nôn liên tục, không uống được nước, đau bụng dữ dội hoặc dấu hiệu mất nước không?",
+            "- Tình trạng này kéo dài bao lâu, và bạn có đang dùng thuốc hoặc có bệnh nền gì không?",
+            "",
+            "Nếu không có các dấu hiệu trên, bạn có thể trao đổi thêm với nhân viên y tế về hướng kiểm tra cơ bản như công thức máu, đường huyết/HbA1c, chức năng gan/thận hoặc gói tổng quát cơ bản tùy mục tiêu kiểm tra. HomeLab không chẩn đoán nguyên nhân chỉ từ triệu chứng."
+        ].join("\n");
+    }
+
+    if (hasFatigue || hasPoorAppetite) {
+        const symptomText = hasFatigue && hasPoorAppetite
+            ? "mệt và ăn uống kém"
+            : hasFatigue
+                ? "mệt mỏi"
+                : "ăn uống kém/chán ăn";
+
+        return [
+            `Bạn đang nhắc tới tình trạng ${symptomText}. Trước khi chọn gói xét nghiệm, HomeLab cần làm rõ thêm:`,
+            "- Tình trạng này kéo dài bao lâu, có sụt cân, sốt kéo dài, nôn nhiều, tiêu chảy hoặc đau bụng dữ dội không?",
+            "- Bạn có đang mang thai, có bệnh nền, dùng thuốc dài ngày, hoặc gần đây thay đổi ăn uống/sinh hoạt không?",
+            "- Có lơ mơ, yếu nhiều, không uống được nước, dấu hiệu mất nước hoặc tình trạng xấu đi nhanh không?",
+            "",
+            "Nếu không có dấu hiệu cần khám gấp, bạn có thể trao đổi thêm về hướng kiểm tra cơ bản như công thức máu, đường huyết/HbA1c, chức năng gan/thận, mỡ máu hoặc gói tổng quát cơ bản tùy mục tiêu. HomeLab không chốt một gói duy nhất khi còn thiếu bối cảnh."
+        ].join("\n");
+    }
+
+    return null;
 }
 
 function composeLivePackageAnswer(recommendationDecision) {

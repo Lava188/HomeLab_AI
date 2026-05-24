@@ -7,6 +7,7 @@ const packageCatalog = require("./booking-package-catalog.service");
 const { detectFlow } = require("./router-intent.service");
 const { runSemanticBridge } = require("./health-rag/semantic-bridge.service");
 const { normalizeText } = require("../utils/text.util");
+const mockSessions = require("../data/mockSessions");
 
 const {
     CHAT_ENGINE_VERSION,
@@ -386,20 +387,100 @@ function buildAuthRequiredResult({ message, sessionId, flow }) {
     });
 }
 
-function requiresUserAuthForOperationalFlow(flow) {
-    return [FLOWS.BOOKING, FLOWS.RESCHEDULE, FLOWS.CANCEL].includes(flow);
+function getConversationContext(sessionId) {
+    return mockSessions.getSession(sessionId)?.chatContext || {};
+}
+
+function hasSymptomSignal(message) {
+    const normalizedMessage = normalizeText(message);
+    const symptomSignals = [
+        "nhuc dau",
+        "dau dau",
+        "chan an",
+        "an uong kem",
+        "hay non",
+        "non",
+        "buon non",
+        "met",
+        "met moi",
+        "chong mat",
+        "choang"
+    ];
+
+    return symptomSignals.some((signal) => normalizedMessage.includes(signal));
+}
+
+function isPackageChoiceFollowUp(message) {
+    const normalizedMessage = normalizeText(message);
+    const followUpSignals = [
+        "vay toi nen chon goi nao",
+        "vay nen chon goi nao",
+        "toi nen chon goi nao",
+        "nen chon goi nao",
+        "vay dat goi nao",
+        "dat goi nao",
+        "goi nao phu hop",
+        "chon goi nao"
+    ];
+
+    return followUpSignals.some((signal) => normalizedMessage.includes(signal));
+}
+
+function buildContextAwareHealthMessage(message, conversationContext) {
+    if (
+        isPackageChoiceFollowUp(message) &&
+        conversationContext?.lastSymptomMessage &&
+        !hasSymptomSignal(message)
+    ) {
+        return [
+            message,
+            `Triệu chứng người dùng đã cung cấp trước đó: ${conversationContext.lastSymptomMessage}`
+        ].join("\n");
+    }
+
+    return message;
+}
+
+function rememberConversationContext({ sessionId, message, result, packageIntent }) {
+    if (!sessionId || result?.flow === FLOWS.BOOKING) {
+        return result;
+    }
+
+    const previous = getConversationContext(sessionId);
+    const nextContext = {
+        ...previous,
+        lastIntentGroup: result?.meta?.intentGroup || previous.lastIntentGroup || null,
+        lastUserMessage: message
+    };
+
+    if (packageIntent?.type === "listing") {
+        nextContext.lastCatalogListedAt = new Date().toISOString();
+    }
+
+    if (hasSymptomSignal(message)) {
+        nextContext.lastSymptomMessage = message;
+    }
+
+    mockSessions.upsertSession(sessionId, {
+        chatContext: nextContext
+    });
+
+    return result;
 }
 
 function buildCatalogInfoResult({ message, sessionId, packageIntent }) {
     const selectedPackage = packageIntent.package || null;
     const isAmbiguous = packageIntent.type === "ambiguous";
+    const isListing = packageIntent.type === "listing";
 
     return createChatResult({
         sessionId,
         userMessage: message,
         flow: FLOWS.HEALTH_RAG,
         action: ACTIONS.ANSWER_HEALTH_QUERY,
-        reply: isAmbiguous
+        reply: isListing
+            ? packageCatalog.buildCatalogListingReply()
+            : isAmbiguous
             ? packageCatalog.buildAmbiguousPackageReply()
             : packageCatalog.buildPackageDetailReply(selectedPackage),
         booking: null,
@@ -407,7 +488,7 @@ function buildCatalogInfoResult({ message, sessionId, packageIntent }) {
             handledBy: "booking-package-catalog.service",
             intentGroup: "test_advice",
             packageIntent: packageIntent.type,
-            packageCandidates: isAmbiguous ? packageIntent.candidates : undefined,
+            packageCandidates: isAmbiguous || isListing ? packageIntent.candidates : undefined,
             selectedPackage
         }
     });
@@ -506,6 +587,11 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
 
     let routeResult = detectFlow(message);
     const packageIntent = await packageCatalog.resolvePackageIntent(message);
+    const conversationContext = getConversationContext(sessionId);
+    const healthMessage = buildContextAwareHealthMessage(
+        message,
+        conversationContext
+    );
     const semanticGateResult = await applySemanticRouterGate({
         message,
         sessionId,
@@ -559,7 +645,7 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
     if (
         [FLOWS.HEALTH_RAG, FLOWS.FALLBACK].includes(routeResult.flow) &&
         routeResult.routerDebug?.intentGroup !== "urgent_health" &&
-        ["ambiguous", "detail_question"].includes(packageIntent.type)
+        ["listing", "ambiguous", "detail_question"].includes(packageIntent.type)
     ) {
         const catalogResult = buildCatalogInfoResult({
             message,
@@ -567,18 +653,23 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
             packageIntent
         });
 
-        return {
+        return rememberConversationContext({
+            sessionId,
+            message,
+            packageIntent,
+            result: {
             ...catalogResult,
             meta: mergeRouterMeta(
                 attachSemanticRouterGateDebug(catalogResult, gateDebug),
                 safetyResult.meta,
                 routeResult
             )
-        };
+            }
+        });
     }
 
     if (
-        [FLOWS.HEALTH_RAG, FLOWS.FALLBACK].includes(routeResult.flow) &&
+        routeResult.flow === FLOWS.FALLBACK &&
         routeResult.routerDebug?.intentGroup !== "urgent_health" &&
         packageIntent.type === "selected" &&
         packageIntent.package?.code === "GENERAL_CHECKUP"
@@ -599,34 +690,45 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
                 }
             });
 
-            return {
+            return rememberConversationContext({
+                sessionId,
+                message,
+                packageIntent,
+                result: {
                 ...catalogResult,
                 meta: mergeRouterMeta(
                     attachSemanticRouterGateDebug(catalogResult, gateDebug),
                     safetyResult.meta,
                     routeResult
                 )
-            };
+                }
+            });
         }
     }
 
     if (routeResult.flow === "health_rag") {
         const ragResult = applyCustomerTestSafetyGate(
             await ragService.answerHealthQuery({
-            message,
+            message: healthMessage,
             sessionId
             }),
             routeResult
         );
 
-        return {
+        return rememberConversationContext({
+            sessionId,
+            message,
+            packageIntent,
+            result: {
             ...ragResult,
+            userMessage: message,
             meta: mergeRouterMeta(
                 attachSemanticRouterGateDebug(ragResult, gateDebug),
                 safetyResult.meta,
                 routeResult
             )
-        };
+            }
+        });
     }
 
     if (isBookingConfirmationContinuation(message, sessionId)) {
@@ -831,7 +933,7 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
         };
     }
 
-    return attachSemanticRouterGateDebug(createChatResult({
+    const fallbackResult = attachSemanticRouterGateDebug(createChatResult({
         sessionId,
         userMessage: message,
         flow: routeResult.flow,
@@ -846,6 +948,13 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
             routing: routeResult.routerDebug || null
         }
     }), gateDebug);
+
+    return rememberConversationContext({
+        sessionId,
+        message,
+        packageIntent,
+        result: fallbackResult
+    });
 }
 
 module.exports = {

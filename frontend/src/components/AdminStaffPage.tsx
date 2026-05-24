@@ -1,11 +1,15 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   AlertCircle,
+  CalendarCheck,
   Check,
+  Clock3,
   Edit3,
   RefreshCw,
   Save,
   Search,
+  ShieldAlert,
+  UserCheck,
   UserRoundPlus,
   UsersRound,
   X,
@@ -96,11 +100,11 @@ export default function AdminStaffPage() {
   }, [staff]);
 
   const summaryCards = [
-    { label: 'Tổng nhân viên', value: summary.total, tone: 'border-slate-200 bg-white text-slate-800' },
-    { label: 'Đang hoạt động', value: summary.active, tone: 'border-emerald-100 bg-emerald-50 text-emerald-700' },
-    { label: 'Tạm khóa', value: summary.inactive, tone: 'border-slate-200 bg-slate-50 text-slate-700' },
-    { label: 'Lịch được giao hôm nay', value: summary.assignedToday, tone: 'border-sky-100 bg-sky-50 text-sky-700' },
-    { label: 'Lịch đang chờ lấy mẫu', value: summary.pendingToday, tone: 'border-amber-100 bg-amber-50 text-amber-700' },
+    { label: 'Tổng nhân viên', value: summary.total, icon: UsersRound, tone: 'border-sky-100 bg-sky-50 text-sky-700' },
+    { label: 'Đang hoạt động', value: summary.active, icon: UserCheck, tone: 'border-emerald-100 bg-emerald-50 text-emerald-700' },
+    { label: 'Tạm khóa', value: summary.inactive, icon: ShieldAlert, tone: 'border-slate-200 bg-slate-50 text-slate-700' },
+    { label: 'Lịch được giao hôm nay', value: summary.assignedToday, icon: CalendarCheck, tone: 'border-cyan-100 bg-cyan-50 text-cyan-700' },
+    { label: 'Lịch đang chờ lấy mẫu', value: summary.pendingToday, icon: Clock3, tone: 'border-amber-100 bg-amber-50 text-amber-700' },
   ];
 
   async function loadStaff(nextFilters = appliedFilters) {
@@ -230,10 +234,10 @@ export default function AdminStaffPage() {
         </div>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-sky-100 bg-white/95 p-6 shadow-[0_12px_35px_rgba(14,165,233,0.08)]">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase text-indigo-700">Vận hành nhân sự</p>
+            <p className="text-sm font-semibold uppercase text-sky-700">Vận hành nhân sự</p>
             <h2 className="mt-2 text-2xl font-semibold">Quản lý nhân viên lấy mẫu</h2>
             <p className="mt-2 text-sm text-slate-500">
               Quản lý hồ sơ nhân viên, trạng thái hoạt động và khối lượng lịch được phân công.
@@ -242,7 +246,7 @@ export default function AdminStaffPage() {
           <button
             onClick={() => loadStaff(appliedFilters)}
             disabled={isLoading}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 px-4 py-3 text-sm font-semibold text-white hover:from-sky-600 hover:to-teal-600 disabled:opacity-60"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             Làm mới
@@ -251,18 +255,29 @@ export default function AdminStaffPage() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        {summaryCards.map((card) => (
-          <div key={card.label} className={`rounded-2xl border p-5 shadow-sm ${card.tone}`}>
-            <p className="text-sm font-semibold">{card.label}</p>
-            <p className="mt-3 text-3xl font-semibold">{card.value}</p>
-          </div>
-        ))}
+        {summaryCards.map((card) => {
+          const Icon = card.icon;
+
+          return (
+            <div key={card.label} className={`rounded-2xl border p-5 shadow-sm ${card.tone}`}>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold">{card.label}</p>
+                  <p className="mt-3 text-3xl font-semibold">{card.value}</p>
+                </div>
+                <div className="rounded-xl bg-white/80 p-3">
+                  <Icon className="h-5 w-5" />
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[420px_1fr]">
-        <form onSubmit={handleCreate} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form onSubmit={handleCreate} className="rounded-2xl border border-sky-100 bg-white/95 p-5 shadow-[0_12px_35px_rgba(14,165,233,0.08)]">
           <div className="mb-4 flex items-center gap-2">
-            <div className="rounded-xl bg-indigo-50 p-2 text-indigo-700">
+            <div className="rounded-xl bg-sky-50 p-2 text-sky-700">
               <UserRoundPlus className="h-5 w-5" />
             </div>
             <div>
@@ -277,7 +292,8 @@ export default function AdminStaffPage() {
               <input
                 value={form.name}
                 onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                placeholder="Nhập tên nhân viên"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
               />
             </label>
             <label className="block text-sm font-semibold text-slate-700">
@@ -285,7 +301,8 @@ export default function AdminStaffPage() {
               <input
                 value={form.phone}
                 onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                placeholder="Nhập số điện thoại"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
               />
             </label>
             <label className="block text-sm font-semibold text-slate-700">
@@ -293,20 +310,20 @@ export default function AdminStaffPage() {
               <select
                 value={form.role}
                 onChange={(event) => setForm((current) => ({ ...current, role: event.target.value as StaffRole }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
               >
                 {ROLE_OPTIONS.map((role) => (
                   <option key={role} value={role}>{getStaffRoleLabel(role)}</option>
                 ))}
               </select>
             </label>
-            <label className="flex h-12 items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700">
+            <label className="flex h-12 items-center justify-between rounded-xl border border-sky-100 bg-sky-50/70 px-3 text-sm font-semibold text-slate-700">
               Đang hoạt động
               <input
                 type="checkbox"
                 checked={form.active}
                 onChange={(event) => setForm((current) => ({ ...current, active: event.target.checked }))}
-                className="h-4 w-4 accent-indigo-600"
+                className="h-4 w-4 accent-sky-600"
               />
             </label>
             <label className="block text-sm font-semibold text-slate-700">
@@ -315,7 +332,8 @@ export default function AdminStaffPage() {
                 type="password"
                 value={form.initialPassword}
                 onChange={(event) => setForm((current) => ({ ...current, initialPassword: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                placeholder="Nhập mật khẩu ban đầu"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
               />
             </label>
           </div>
@@ -323,14 +341,14 @@ export default function AdminStaffPage() {
           <button
             type="submit"
             disabled={isSaving}
-            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 px-4 py-3 text-sm font-semibold text-white hover:from-sky-600 hover:to-teal-600 disabled:opacity-60"
           >
             <UserRoundPlus className="h-4 w-4" />
             Tạo nhân viên
           </button>
         </form>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-sky-100 bg-white/95 p-5 shadow-[0_12px_35px_rgba(14,165,233,0.08)]">
           <div className="grid gap-3 lg:grid-cols-4">
             <label className="text-sm font-semibold text-slate-700">
               Tìm kiếm
@@ -338,7 +356,7 @@ export default function AdminStaffPage() {
                 value={filters.search || ''}
                 onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
                 placeholder="Tên hoặc số điện thoại"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
               />
             </label>
             <label className="text-sm font-semibold text-slate-700">
@@ -346,7 +364,7 @@ export default function AdminStaffPage() {
               <select
                 value={filters.role || ''}
                 onChange={(event) => setFilters((current) => ({ ...current, role: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
               >
                 <option value="">Tất cả</option>
                 {ROLE_OPTIONS.map((role) => (
@@ -359,7 +377,7 @@ export default function AdminStaffPage() {
               <select
                 value={filters.active || ''}
                 onChange={(event) => setFilters((current) => ({ ...current, active: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
               >
                 <option value="">Tất cả</option>
                 <option value="true">Đang hoạt động</option>
@@ -371,7 +389,7 @@ export default function AdminStaffPage() {
                 type="button"
                 onClick={handleApplyFilters}
                 disabled={isLoading}
-                className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-slate-900 px-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
+                className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 px-3 text-sm font-semibold text-white hover:from-sky-600 hover:to-teal-600 disabled:opacity-60"
               >
                 <Search className="h-4 w-4" />
                 Tìm kiếm
@@ -380,7 +398,7 @@ export default function AdminStaffPage() {
                 type="button"
                 onClick={handleResetFilters}
                 disabled={isLoading}
-                className="h-12 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                className="h-12 rounded-xl border border-sky-100 bg-white px-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-50 disabled:opacity-60"
               >
                 Đặt lại
               </button>
@@ -389,18 +407,18 @@ export default function AdminStaffPage() {
         </section>
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+      <section className="overflow-hidden rounded-2xl border border-sky-100 bg-white/95 shadow-[0_12px_35px_rgba(14,165,233,0.08)]">
+        <div className="flex items-center justify-between border-b border-sky-100 px-5 py-4">
           <div>
             <h3 className="font-semibold">Danh sách nhân viên</h3>
             <p className="mt-1 text-sm text-slate-500">{staff.length} nhân viên đang hiển thị</p>
           </div>
-          <UsersRound className="h-5 w-5 text-indigo-600" />
+          <UsersRound className="h-5 w-5 text-sky-600" />
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-[1080px] w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
+          <table className="min-w-[1080px] w-full divide-y divide-sky-100 text-sm">
+            <thead className="bg-sky-50 text-left text-xs font-semibold uppercase text-sky-800">
               <tr>
                 <th className="px-5 py-3">Tên nhân viên</th>
                 <th className="px-5 py-3">Số điện thoại</th>
@@ -412,7 +430,7 @@ export default function AdminStaffPage() {
                 <th className="px-5 py-3 text-right">Hành động</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-sky-50">
               {isLoading ? (
                 <tr>
                   <td colSpan={8} className="px-5 py-12 text-center text-slate-500">
@@ -427,7 +445,7 @@ export default function AdminStaffPage() {
                 </tr>
               ) : (
                 staff.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50">
+                  <tr key={item.id} className="hover:bg-sky-50/70">
                     <td className="whitespace-nowrap px-5 py-4 font-semibold text-slate-900">{item.fullName}</td>
                     <td className="whitespace-nowrap px-5 py-4">{item.phone || '-'}</td>
                     <td className="whitespace-nowrap px-5 py-4">{getStaffRoleLabel(item.role)}</td>
@@ -447,13 +465,13 @@ export default function AdminStaffPage() {
                       <div className="inline-flex gap-2">
                         <button
                           onClick={() => handleViewDetail(item)}
-                          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                          className="rounded-xl border border-sky-100 bg-white px-3 py-2 text-sm font-semibold text-sky-700 transition hover:bg-sky-50"
                         >
                           Chi tiết
                         </button>
                         <button
                           onClick={() => startEdit(item)}
-                          className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 px-3 py-2 text-sm font-semibold text-white hover:from-sky-600 hover:to-teal-600"
                         >
                           <Edit3 className="h-4 w-4" />
                           Sửa
@@ -469,8 +487,8 @@ export default function AdminStaffPage() {
       </section>
 
       {editingStaff && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-[0_24px_70px_rgba(14,165,233,0.18)]">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold">Sửa hồ sơ nhân viên</h3>
@@ -491,7 +509,8 @@ export default function AdminStaffPage() {
                 <input
                   value={editForm.name}
                   onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))}
-                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                  placeholder="Nhập tên nhân viên"
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
                 />
               </label>
               <label className="block text-sm font-semibold text-slate-700">
@@ -499,7 +518,8 @@ export default function AdminStaffPage() {
                 <input
                   value={editForm.phone}
                   onChange={(event) => setEditForm((current) => ({ ...current, phone: event.target.value }))}
-                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                  placeholder="Nhập số điện thoại"
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
                 />
               </label>
               <label className="block text-sm font-semibold text-slate-700">
@@ -507,20 +527,20 @@ export default function AdminStaffPage() {
                 <select
                   value={editForm.role}
                   onChange={(event) => setEditForm((current) => ({ ...current, role: event.target.value as StaffRole }))}
-                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
                 >
                   {ROLE_OPTIONS.map((role) => (
                     <option key={role} value={role}>{getStaffRoleLabel(role)}</option>
                   ))}
                 </select>
               </label>
-              <label className="flex h-12 items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700">
+              <label className="flex h-12 items-center justify-between rounded-xl border border-sky-100 bg-sky-50/70 px-3 text-sm font-semibold text-slate-700">
                 Đang hoạt động
                 <input
                   type="checkbox"
                   checked={editForm.active}
                   onChange={(event) => setEditForm((current) => ({ ...current, active: event.target.checked }))}
-                  className="h-4 w-4 accent-indigo-600"
+                  className="h-4 w-4 accent-sky-600"
                 />
               </label>
               <label className="block text-sm font-semibold text-slate-700">
@@ -530,7 +550,7 @@ export default function AdminStaffPage() {
                   value={editForm.newPassword}
                   onChange={(event) => setEditForm((current) => ({ ...current, newPassword: event.target.value }))}
                   placeholder="Bỏ trống nếu không đổi mật khẩu"
-                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:bg-white"
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(56,189,248,0.14)]"
                 />
               </label>
             </div>
@@ -538,14 +558,14 @@ export default function AdminStaffPage() {
             <div className="mt-5 flex justify-end gap-3">
               <button
                 onClick={() => setEditingStaff(null)}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                className="rounded-xl border border-sky-100 bg-white px-4 py-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-50"
               >
                 Hủy
               </button>
               <button
                 onClick={handleUpdate}
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 px-4 py-3 text-sm font-semibold text-white hover:from-sky-600 hover:to-teal-600 disabled:opacity-60"
               >
                 <Save className="h-4 w-4" />
                 Lưu thay đổi
@@ -556,8 +576,8 @@ export default function AdminStaffPage() {
       )}
 
       {selectedStaff && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 backdrop-blur-sm p-4">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-5 shadow-[0_24px_70px_rgba(14,165,233,0.18)]">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold">{selectedStaff.fullName}</h3>
@@ -575,19 +595,19 @@ export default function AdminStaffPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-4">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <div className="rounded-xl border border-sky-100 bg-sky-50/70 p-3">
                 <p className="text-xs font-semibold text-slate-500">Trạng thái</p>
                 <p className="mt-2 font-semibold">{getStaffActiveLabel(selectedStaff.active)}</p>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <div className="rounded-xl border border-sky-100 bg-sky-50/70 p-3">
                 <p className="text-xs font-semibold text-slate-500">Lịch hôm nay</p>
                 <p className="mt-2 text-xl font-semibold">{selectedStaff.workload?.assignedToday || 0}</p>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <div className="rounded-xl border border-sky-100 bg-sky-50/70 p-3">
                 <p className="text-xs font-semibold text-slate-500">Chờ lấy mẫu</p>
                 <p className="mt-2 text-xl font-semibold">{selectedStaff.workload?.pendingToday || 0}</p>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <div className="rounded-xl border border-sky-100 bg-sky-50/70 p-3">
                 <p className="text-xs font-semibold text-slate-500">Đang phụ trách</p>
                 <p className="mt-2 text-xl font-semibold">{selectedStaff.workload?.totalActiveAssigned || 0}</p>
               </div>
@@ -602,7 +622,7 @@ export default function AdminStaffPage() {
             <section className="mt-5 grid gap-4 lg:grid-cols-2">
               <div>
                 <h4 className="font-semibold">Vùng làm việc</h4>
-                <div className="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200">
+                <div className="mt-3 divide-y divide-sky-50 rounded-2xl border border-slate-200">
                   {(selectedStaff.workingAreas || []).length === 0 ? (
                     <p className="p-4 text-sm text-slate-500">Chưa có vùng làm việc.</p>
                   ) : (
@@ -622,7 +642,7 @@ export default function AdminStaffPage() {
 
               <div>
                 <h4 className="font-semibold">Lịch làm việc sắp tới</h4>
-                <div className="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200">
+                <div className="mt-3 divide-y divide-sky-50 rounded-2xl border border-slate-200">
                   {(selectedStaff.workingSchedules || []).length === 0 ? (
                     <p className="p-4 text-sm text-slate-500">Chưa có lịch làm việc sắp tới.</p>
                   ) : (
@@ -643,7 +663,7 @@ export default function AdminStaffPage() {
 
             <section className="mt-5">
               <h4 className="font-semibold">Lịch đang được giao</h4>
-              <div className="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200">
+              <div className="mt-3 divide-y divide-sky-50 rounded-2xl border border-slate-200">
                 {(selectedStaff.assignedBookings || []).length === 0 ? (
                   <p className="p-4 text-sm text-slate-500">Chưa có lịch đang phụ trách.</p>
                 ) : (

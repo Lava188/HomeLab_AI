@@ -4,7 +4,6 @@ import {
   CalendarClock,
   CheckCircle2,
   ClipboardList,
-  Clock3,
   MapPinned,
   RefreshCw,
   Search,
@@ -49,16 +48,20 @@ const STATUS_OPTIONS = [
 ];
 
 const STATUS_STYLES: Record<string, string> = {
-  CONFIRMED: 'bg-sky-50 text-sky-700 border-sky-200',
-  RESCHEDULED: 'bg-violet-50 text-violet-700 border-violet-200',
-  ASSIGNED: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  SAMPLE_COLLECTED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  IN_LAB_PROCESSING: 'bg-orange-50 text-orange-700 border-orange-200',
-  RESULT_READY: 'bg-teal-50 text-teal-700 border-teal-200',
+  CONFIRMED: 'bg-lime-50 text-lime-800 border-lime-200',
+  RESCHEDULED: 'bg-yellow-50 text-yellow-800 border-yellow-200',
+  ASSIGNED: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  SAMPLE_COLLECTED: 'bg-teal-50 text-teal-800 border-teal-200',
+  IN_LAB_PROCESSING: 'bg-amber-50 text-amber-800 border-amber-200',
+  RESULT_READY: 'bg-cyan-50 text-cyan-800 border-cyan-200',
   COMPLETED: 'bg-slate-100 text-slate-700 border-slate-200',
   CANCELLED: 'bg-rose-50 text-rose-700 border-rose-200',
   NO_SHOW: 'bg-zinc-100 text-zinc-700 border-zinc-200',
 };
+
+const collectorPanelClass = 'rounded-2xl border border-emerald-100 bg-white/95 shadow-[0_14px_36px_rgba(16,185,129,0.08)]';
+const collectorPanelHeaderClass = 'border-b border-emerald-100 bg-gradient-to-r from-emerald-50 to-yellow-50/70 px-5 py-4';
+const collectorSubtleButtonClass = 'inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-100 bg-white px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:border-yellow-200 hover:bg-yellow-50 disabled:opacity-60';
 
 const EMPTY_AREA_FORM = {
   province: 'Hà Nội',
@@ -412,10 +415,10 @@ export default function CollectorDashboardPage() {
   }, [session.phone]);
 
   const summaryCards = [
-    { label: 'Tổng lịch được giao', value: summary.total, icon: ClipboardList, tone: 'bg-white text-slate-800 border-slate-200' },
-    { label: 'Lịch hôm nay', value: summary.today, icon: CalendarClock, tone: 'bg-teal-50 text-teal-700 border-teal-100' },
-    { label: 'Đang chờ lấy mẫu', value: summary.waiting, icon: Clock3, tone: 'bg-orange-50 text-orange-700 border-orange-100' },
-    { label: 'Đã lấy mẫu', value: summary.collected, icon: CheckCircle2, tone: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
+    { label: 'Tổng lịch được giao', value: summary.total, icon: ClipboardList, tone: 'bg-emerald-50 text-emerald-900 border-emerald-100' },
+    { label: 'Lịch hôm nay', value: summary.today, icon: CalendarClock, tone: 'bg-yellow-50 text-yellow-900 border-yellow-100' },
+    { label: 'Đang chờ lấy mẫu', value: summary.waiting, icon: AlertCircle, tone: 'bg-lime-50 text-lime-900 border-lime-100' },
+    { label: 'Đã lấy mẫu', value: summary.collected, icon: CheckCircle2, tone: 'bg-teal-50 text-teal-900 border-teal-100' },
   ];
 
   function handleLogout() {
@@ -429,7 +432,7 @@ export default function CollectorDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className={`${collectorPanelClass} p-6`}>
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase text-emerald-700">Nhân viên lấy mẫu</p>
@@ -443,13 +446,13 @@ export default function CollectorDashboardPage() {
           <div className="flex flex-wrap gap-2">
             <a
               href="/"
-              className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
+              className="inline-flex items-center justify-center rounded-xl bg-yellow-100 px-4 py-3 text-sm font-semibold text-emerald-900 shadow-sm transition hover:bg-yellow-200"
             >
               Quay lại Chatbot
             </a>
             <button
               onClick={handleLogout}
-              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className={collectorSubtleButtonClass}
             >
               Đăng xuất
             </button>
@@ -457,18 +460,18 @@ export default function CollectorDashboardPage() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((card) => {
           const Icon = card.icon;
 
           return (
-            <div key={card.label} className={`rounded-2xl border p-5 shadow-sm ${card.tone}`}>
+            <div key={card.label} className={`rounded-2xl border p-5 shadow-[0_12px_30px_rgba(16,185,129,0.07)] ${card.tone}`}>
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold">{card.label}</p>
                   <p className="mt-3 text-3xl font-semibold">{card.value}</p>
                 </div>
-                <div className="rounded-xl bg-white/80 p-3">
+                <div className="rounded-xl bg-white/80 p-3 shadow-sm">
                   <Icon className="h-5 w-5" />
                 </div>
               </div>
@@ -484,8 +487,8 @@ export default function CollectorDashboardPage() {
         </div>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+      <section className={collectorPanelClass}>
+        <div className={`flex items-center justify-between ${collectorPanelHeaderClass}`}>
           <div>
             <h3 className="flex items-center gap-2 font-semibold">
               <ClipboardList className="h-5 w-5 text-emerald-700" />
@@ -498,7 +501,7 @@ export default function CollectorDashboardPage() {
           <button
             onClick={loadPendingAssignments}
             disabled={isSaving}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl border border-emerald-100 bg-white px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-yellow-50 disabled:opacity-60"
           >
             <RefreshCw className="h-4 w-4" />
             Làm mới
@@ -510,9 +513,17 @@ export default function CollectorDashboardPage() {
             Hiện chưa có nhiệm vụ chờ xác nhận.
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div>
+            <div className="hidden grid-cols-[1fr_1fr_1.4fr_1fr_auto] items-center gap-4 border-b border-emerald-100 bg-yellow-50/70 px-5 py-3 text-xs font-bold uppercase text-emerald-900 xl:grid">
+              <span>Ma lich</span>
+              <span>Thoi gian</span>
+              <span>Dia chi</span>
+              <span>Trang thai</span>
+              <span className="text-right">Thao tac</span>
+            </div>
+            <div className="divide-y divide-emerald-100">
             {pendingAssignments.map((assignment) => (
-              <article key={assignment.id} className="grid gap-4 px-5 py-4 xl:grid-cols-[1fr_1fr_1.4fr_1fr_auto] xl:items-center">
+              <article key={assignment.id} className="grid gap-4 px-5 py-4 transition hover:bg-yellow-50 xl:grid-cols-[1fr_1fr_1.4fr_1fr_auto] xl:items-center">
                 <div>
                   <p className="font-semibold text-slate-900">{assignment.bookingCode || '-'}</p>
                   <p className="mt-1 text-sm text-slate-500">{assignment.patientName || '-'}</p>
@@ -524,14 +535,14 @@ export default function CollectorDashboardPage() {
                 <p className="text-sm text-slate-600 xl:truncate" title={assignment.address || ''}>
                   {assignment.address || '-'}
                 </p>
-                <span className="inline-flex w-fit rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                <span className="inline-flex w-fit rounded-full border border-yellow-200 bg-yellow-50 px-2.5 py-1 text-xs font-semibold text-yellow-800">
                   Chờ xác nhận
                 </span>
                 <div className="flex flex-wrap gap-2 xl:justify-end">
                   <button
                     onClick={() => handleAcceptAssignment(assignment)}
                     disabled={isSaving}
-                    className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                    className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-emerald-950 shadow-sm shadow-emerald-100 transition hover:bg-emerald-500 disabled:opacity-60"
                   >
                     Chấp nhận
                   </button>
@@ -548,12 +559,13 @@ export default function CollectorDashboardPage() {
                 </div>
               </article>
             ))}
+            </div>
           </div>
         )}
       </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className={`${collectorPanelClass} p-5`}>
           <div className="mb-4 flex items-center gap-2">
             <MapPinned className="h-5 w-5 text-emerald-700" />
             <h3 className="font-semibold">Vùng làm việc</h3>
@@ -564,7 +576,7 @@ export default function CollectorDashboardPage() {
               <select
                 value={areaForm.province}
                 onChange={(event) => setAreaForm((current) => ({ ...current, province: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-3 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
               >
                 <option value="Hà Nội">Hà Nội</option>
                 <option value="TP.HCM">TP.HCM</option>
@@ -575,7 +587,7 @@ export default function CollectorDashboardPage() {
               <input
                 value={areaForm.district}
                 onChange={(event) => setAreaForm((current) => ({ ...current, district: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-3 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
               />
             </label>
             <label className="text-sm font-semibold text-slate-700">
@@ -583,18 +595,18 @@ export default function CollectorDashboardPage() {
               <input
                 value={areaForm.ward}
                 onChange={(event) => setAreaForm((current) => ({ ...current, ward: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-3 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
               />
             </label>
             <button
               type="submit"
               disabled={isSaving}
-              className="inline-flex h-12 items-center justify-center rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60 lg:self-end"
+              className="inline-flex h-12 items-center justify-center rounded-xl bg-emerald-400 px-4 text-sm font-semibold text-emerald-950 shadow-sm shadow-emerald-100 transition hover:bg-emerald-500 disabled:opacity-60 lg:self-end"
             >
               Thêm vùng
             </button>
           </form>
-          <div className="mt-4 divide-y divide-slate-100 rounded-2xl border border-slate-200">
+          <div className="mt-4 divide-y divide-emerald-100 rounded-2xl border border-emerald-100">
             {workingAreas.length === 0 ? (
               <p className="p-4 text-sm text-slate-500">Chưa có vùng làm việc.</p>
             ) : (
@@ -611,7 +623,7 @@ export default function CollectorDashboardPage() {
                   <button
                     onClick={() => handleToggleArea(area)}
                     disabled={isSaving}
-                    className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                    className="rounded-xl border border-emerald-100 bg-white px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-yellow-50 disabled:opacity-60"
                   >
                     {area.active ? 'Tạm tắt' : 'Bật lại'}
                   </button>
@@ -621,7 +633,7 @@ export default function CollectorDashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className={`${collectorPanelClass} p-5`}>
           <div className="mb-4 flex items-center gap-2">
             <CalendarClock className="h-5 w-5 text-emerald-700" />
             <h3 className="font-semibold">Lịch làm việc</h3>
@@ -633,7 +645,7 @@ export default function CollectorDashboardPage() {
                 type="date"
                 value={scheduleForm.workDate}
                 onChange={(event) => setScheduleForm((current) => ({ ...current, workDate: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-3 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
               />
             </label>
             <label className="text-sm font-semibold text-slate-700">
@@ -642,7 +654,7 @@ export default function CollectorDashboardPage() {
                 type="time"
                 value={scheduleForm.startTime}
                 onChange={(event) => setScheduleForm((current) => ({ ...current, startTime: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-3 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
               />
             </label>
             <label className="text-sm font-semibold text-slate-700">
@@ -651,7 +663,7 @@ export default function CollectorDashboardPage() {
                 type="time"
                 value={scheduleForm.endTime}
                 onChange={(event) => setScheduleForm((current) => ({ ...current, endTime: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-3 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
               />
             </label>
             <label className="text-sm font-semibold text-slate-700">
@@ -661,18 +673,18 @@ export default function CollectorDashboardPage() {
                 min={1}
                 value={scheduleForm.capacity}
                 onChange={(event) => setScheduleForm((current) => ({ ...current, capacity: Number(event.target.value) }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-3 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
               />
             </label>
             <button
               type="submit"
               disabled={isSaving}
-              className="inline-flex h-12 items-center justify-center rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60 lg:self-end"
+              className="inline-flex h-12 items-center justify-center rounded-xl bg-emerald-400 px-4 text-sm font-semibold text-emerald-950 shadow-sm shadow-emerald-100 transition hover:bg-emerald-500 disabled:opacity-60 lg:self-end"
             >
               Thêm lịch
             </button>
           </form>
-          <div className="mt-4 divide-y divide-slate-100 rounded-2xl border border-slate-200">
+          <div className="mt-4 divide-y divide-emerald-100 rounded-2xl border border-emerald-100">
             {workingSchedules.length === 0 ? (
               <p className="p-4 text-sm text-slate-500">Chưa có lịch làm việc.</p>
             ) : (
@@ -689,7 +701,7 @@ export default function CollectorDashboardPage() {
                   <button
                     onClick={() => handleToggleSchedule(schedule)}
                     disabled={isSaving}
-                    className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                    className="rounded-xl border border-emerald-100 bg-white px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-yellow-50 disabled:opacity-60"
                   >
                     {schedule.active ? 'Tạm tắt' : 'Bật lại'}
                   </button>
@@ -700,14 +712,14 @@ export default function CollectorDashboardPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className={`${collectorPanelClass} p-5`}>
         <div className="grid gap-3 xl:grid-cols-[200px_220px_1fr_auto_auto]">
           <label className="text-sm font-semibold text-slate-700">
             Trạng thái
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white"
+              className="mt-2 w-full rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-3 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
             >
               {STATUS_OPTIONS.map((status) => (
                 <option key={status || 'ALL'} value={status}>
@@ -722,7 +734,7 @@ export default function CollectorDashboardPage() {
             <select
               value={dateMode}
               onChange={(event) => setDateMode(event.target.value as 'all' | 'today' | 'upcoming')}
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white"
+              className="mt-2 w-full rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-3 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
             >
               <option value="today">Hôm nay</option>
               <option value="upcoming">Sắp tới</option>
@@ -732,7 +744,7 @@ export default function CollectorDashboardPage() {
 
           <label className="text-sm font-semibold text-slate-700">
             Mã lịch hẹn
-            <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-emerald-400 focus-within:bg-white">
+            <div className="mt-2 flex items-center rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 transition focus-within:border-emerald-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-100">
               <Search className="h-4 w-4 text-slate-400" />
               <input
                 value={bookingCodeSearch}
@@ -746,7 +758,7 @@ export default function CollectorDashboardPage() {
           <button
             onClick={() => loadBookings()}
             disabled={isLoading}
-            className="inline-flex items-end justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60 xl:self-end"
+            className="inline-flex items-end justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-emerald-950 shadow-sm shadow-emerald-100 transition hover:bg-emerald-500 disabled:opacity-60 xl:self-end"
           >
             <Search className="h-4 w-4" />
             Lọc
@@ -759,7 +771,7 @@ export default function CollectorDashboardPage() {
               loadBookings({ status: '', bookingCode: '', mode: 'today' });
             }}
             disabled={isLoading}
-            className="inline-flex items-end justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 xl:self-end"
+            className="inline-flex items-end justify-center gap-2 rounded-xl border border-emerald-100 bg-white px-4 py-3 text-sm font-semibold text-emerald-800 transition hover:bg-yellow-50 disabled:opacity-60 xl:self-end"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             Làm mới
@@ -767,8 +779,8 @@ export default function CollectorDashboardPage() {
         </div>
       </section>
 
-      <section id="assigned" className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-100 px-5 py-4">
+      <section id="assigned" className={collectorPanelClass}>
+        <div className={collectorPanelHeaderClass}>
           <h3 className="flex items-center gap-2 font-semibold">
             <Truck className="h-5 w-5 text-emerald-700" />
             Lịch được giao
@@ -780,16 +792,25 @@ export default function CollectorDashboardPage() {
           <div className="px-5 py-12 text-center text-sm text-slate-500">Đang tải lịch được giao...</div>
         ) : bookings.length === 0 ? (
           <div className="px-5 py-12 text-center">
-            <MapPinned className="mx-auto h-10 w-10 text-emerald-600" />
+            <MapPinned className="mx-auto h-10 w-10 text-emerald-700" />
             <h4 className="mt-4 font-semibold">Chưa có lịch được giao</h4>
             <p className="mt-2 text-sm text-slate-500">
               Kiểm tra lại số điện thoại nhân viên lấy mẫu hoặc nhờ quản trị viên phân công lịch hẹn cho nhân viên này.
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div>
+            <div className="hidden grid-cols-[1fr_1fr_1.1fr_1.4fr_1fr_auto] items-center gap-4 border-b border-emerald-100 bg-yellow-50/70 px-5 py-3 text-xs font-bold uppercase text-emerald-900 xl:grid">
+              <span>Ma / Benh nhan</span>
+              <span>Lien he</span>
+              <span>Xet nghiem</span>
+              <span>Dia chi</span>
+              <span>Trang thai</span>
+              <span className="text-right">Thao tac</span>
+            </div>
+            <div className="divide-y divide-emerald-100">
             {bookings.map((booking) => (
-              <article key={booking.bookingCode} className="grid gap-4 px-5 py-4 hover:bg-slate-50 xl:grid-cols-[1fr_1fr_1.1fr_1.4fr_1fr_auto] xl:items-center">
+              <article key={booking.bookingCode} className="grid gap-4 px-5 py-4 hover:bg-yellow-50 xl:grid-cols-[1fr_1fr_1.1fr_1.4fr_1fr_auto] xl:items-center">
                 <div>
                   <p className="font-semibold text-slate-900">{booking.bookingCode}</p>
                   <p className="mt-1 text-sm text-slate-500">{booking.patientName || booking.patient?.fullName || '-'}</p>
@@ -811,7 +832,7 @@ export default function CollectorDashboardPage() {
                 <div className="flex flex-wrap gap-2 xl:justify-end">
                   <button
                     onClick={() => loadDetail(booking.bookingCode)}
-                    className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                    className="rounded-xl border border-emerald-100 bg-white px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-yellow-50"
                   >
                     Chi tiết
                   </button>
@@ -822,7 +843,7 @@ export default function CollectorDashboardPage() {
                         setCollectorNote('');
                         setConfirmCollectCode(booking.bookingCode);
                       }}
-                      className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                      className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-emerald-950 shadow-sm shadow-emerald-100 transition hover:bg-emerald-500"
                     >
                       Đã lấy mẫu
                     </button>
@@ -830,13 +851,14 @@ export default function CollectorDashboardPage() {
                 </div>
               </article>
             ))}
+            </div>
           </div>
         )}
       </section>
 
       {rejectingAssignment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4">
-          <form onSubmit={handleRejectAssignment} className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-emerald-950/35 p-4">
+          <form onSubmit={handleRejectAssignment} className="w-full max-w-lg rounded-2xl border border-emerald-100 bg-white p-5 shadow-[0_24px_70px_rgba(16,185,129,0.18)]">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold">Từ chối nhiệm vụ</h3>
@@ -847,7 +869,7 @@ export default function CollectorDashboardPage() {
               <button
                 type="button"
                 onClick={() => setRejectingAssignment(null)}
-                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+                className="rounded-lg p-2 text-slate-500 hover:bg-yellow-50"
                 aria-label="Đóng từ chối nhiệm vụ"
               >
                 <X className="h-5 w-5" />
@@ -859,7 +881,7 @@ export default function CollectorDashboardPage() {
                 value={rejectReason}
                 onChange={(event) => setRejectReason(event.target.value)}
                 rows={4}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-rose-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-rose-100 bg-rose-50/60 px-3 py-3 text-sm outline-none transition focus:border-rose-300 focus:bg-white focus:ring-2 focus:ring-rose-100"
                 placeholder="Nhập lý do để quản trị viên xem xét"
               />
             </label>
@@ -868,14 +890,14 @@ export default function CollectorDashboardPage() {
                 type="button"
                 onClick={() => setRejectingAssignment(null)}
                 disabled={isSaving}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                className="rounded-xl border border-emerald-100 bg-white px-4 py-3 text-sm font-semibold text-emerald-800 transition hover:bg-yellow-50 disabled:opacity-60"
               >
                 Hủy
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="rounded-xl bg-rose-600 px-4 py-3 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-60"
+                className="rounded-xl bg-rose-100 px-4 py-3 text-sm font-semibold text-rose-800 transition hover:bg-rose-200 disabled:opacity-60"
               >
                 Gửi lý do từ chối
               </button>
@@ -885,9 +907,9 @@ export default function CollectorDashboardPage() {
       )}
 
       {selectedBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4">
-          <div className="max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-emerald-950/35 p-4">
+          <div className="max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-[0_24px_70px_rgba(16,185,129,0.18)]">
+            <div className="flex items-center justify-between border-b border-emerald-100 bg-emerald-50/70 px-5 py-4">
               <div>
                 <div className="flex flex-wrap items-center gap-3">
                   <h3 className="text-lg font-semibold">{selectedBooking.bookingCode}</h3>
@@ -899,7 +921,7 @@ export default function CollectorDashboardPage() {
               </div>
               <button
                 onClick={() => setSelectedBooking(null)}
-                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+                className="rounded-lg p-2 text-slate-500 hover:bg-yellow-50"
                 aria-label="Đóng chi tiết"
               >
                 <X className="h-5 w-5" />
@@ -912,7 +934,7 @@ export default function CollectorDashboardPage() {
               ) : (
                 <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
                   <section className="space-y-5">
-                    <div className="grid gap-3 rounded-2xl border border-slate-200 p-4 sm:grid-cols-2">
+                    <div className="grid gap-3 rounded-2xl border border-emerald-100 p-4 sm:grid-cols-2">
                       <Info label="Bệnh nhân" value={selectedBooking.patientName || selectedBooking.patient?.fullName || '-'} />
                       <Info label="Số điện thoại" value={selectedBooking.phone || '-'} />
                       <Info label="Xét nghiệm/gói" value={getTestName(selectedBooking)} />
@@ -922,7 +944,7 @@ export default function CollectorDashboardPage() {
 
                     <div>
                       <h4 className="font-semibold">Dòng thời gian trạng thái</h4>
-                      <div className="mt-3 rounded-2xl border border-slate-200">
+                      <div className="mt-3 rounded-2xl border border-emerald-100">
                         {(selectedBooking.statusHistory || []).length === 0 ? (
                           <div className="p-4 text-sm text-slate-500">Chưa có lịch sử trạng thái.</div>
                         ) : (
@@ -942,7 +964,7 @@ export default function CollectorDashboardPage() {
                   </section>
 
                   <aside className="space-y-4">
-                    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                    <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-yellow-50/70 p-4">
                       <h4 className="font-semibold text-emerald-800">Đã lấy mẫu</h4>
                       <p className="mt-2 text-sm text-emerald-700">
                         Ghi chú không bắt buộc cho tình huống lấy mẫu hoặc bàn giao mẫu.
@@ -951,7 +973,7 @@ export default function CollectorDashboardPage() {
                         value={collectorNote}
                         onChange={(event) => setCollectorNote(event.target.value)}
                         rows={4}
-                        className="mt-4 w-full rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-400"
+                        className="mt-4 w-full rounded-xl border border-emerald-100 bg-white px-3 py-2 text-sm outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100"
                         placeholder="VD: Đã lấy mẫu lúc 08:45, mẫu bàn giao tại quầy..."
                       />
                       {COLLECTABLE_STATUSES.has(selectedBooking.status) ? (
@@ -960,14 +982,14 @@ export default function CollectorDashboardPage() {
                             <button
                               onClick={() => handleMarkCollected(selectedBooking.bookingCode)}
                               disabled={isSaving}
-                              className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                              className="rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-emerald-950 shadow-sm shadow-emerald-100 transition hover:bg-emerald-500 disabled:opacity-60"
                             >
                               {isSaving ? 'Đang cập nhật...' : 'Xác nhận đã lấy mẫu'}
                             </button>
                             <button
                               onClick={() => setConfirmCollectCode('')}
                               disabled={isSaving}
-                              className="rounded-xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-60"
+                              className="rounded-xl border border-emerald-100 bg-white px-4 py-3 text-sm font-semibold text-emerald-800 transition hover:bg-yellow-50 disabled:opacity-60"
                             >
                               Hủy xác nhận
                             </button>
@@ -975,13 +997,13 @@ export default function CollectorDashboardPage() {
                         ) : (
                           <button
                             onClick={() => setConfirmCollectCode(selectedBooking.bookingCode)}
-                            className="mt-3 w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
+                            className="mt-3 w-full rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-emerald-950 shadow-sm shadow-emerald-100 transition hover:bg-emerald-500"
                           >
                             Đã lấy mẫu
                           </button>
                         )
                       ) : (
-                        <div className="mt-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500">
+                        <div className="mt-3 rounded-xl border border-emerald-100 bg-white px-3 py-2 text-sm text-slate-500">
                           Lịch hẹn ở trạng thái {getBookingStatusLabel(selectedBooking.status)} nên không thể cập nhật lấy mẫu.
                         </div>
                       )}

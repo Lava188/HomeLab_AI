@@ -98,6 +98,39 @@ const AMBIGUOUS_TEST_SIGNALS = [
     "dat lich lay mau"
 ];
 
+const CATALOG_LISTING_SIGNALS = [
+    "hien tai dang co nhung goi xet nghiem gi",
+    "hien tai co nhung goi xet nghiem gi",
+    "homelab co nhung goi nao",
+    "danh sach goi xet nghiem",
+    "co goi xet nghiem nao",
+    "cac goi xet nghiem hien co",
+    "xem cac goi xet nghiem",
+    "nhung goi xet nghiem gi",
+    "co nhung goi nao",
+    "cac goi xet nghiem",
+    "danh sach goi"
+];
+
+const CATALOG_LISTING_EXCLUSION_SIGNALS = [
+    "phu hop",
+    "nen",
+    "nen chon",
+    "chon goi nao",
+    "dat goi nao",
+    "toi bi",
+    "gan day",
+    "hay met",
+    "met",
+    "dau dau",
+    "nhuc dau",
+    "buon non",
+    "non",
+    "chan an",
+    "an uong kem",
+    "chong mat"
+];
+
 const PACKAGE_DETAIL_SIGNALS = [
     "gom nhung gi",
     "co nhung gi",
@@ -224,10 +257,52 @@ function findStaticPackageInMessage(message) {
 function isAmbiguousCatalogRequest(message) {
     const normalizedMessage = normalizeText(message);
     const matchedPackage = findStaticPackageInMessage(message);
+    const explanationOrResultSignals = [
+        "ket qua",
+        "doc ket qua",
+        "giai thich",
+        "doc giup",
+        "chi so",
+        "cao co",
+        "co phai",
+        "bat thuong"
+    ];
 
     if (matchedPackage) return false;
+    if (
+        explanationOrResultSignals.some((signal) =>
+            normalizedMessage.includes(signal)
+        )
+    ) {
+        return false;
+    }
 
     return AMBIGUOUS_TEST_SIGNALS.some((signal) =>
+        normalizedMessage.includes(signal)
+    );
+}
+
+function isCatalogListingRequest(message) {
+    const normalizedMessage = normalizeText(message);
+
+    if (
+        normalizedMessage.includes("dat lich") ||
+        normalizedMessage.includes("book") ||
+        normalizedMessage.includes("hen lay mau") ||
+        normalizedMessage.includes("lay mau tai nha")
+    ) {
+        return false;
+    }
+
+    if (
+        CATALOG_LISTING_EXCLUSION_SIGNALS.some((signal) =>
+            normalizedMessage.includes(signal)
+        )
+    ) {
+        return false;
+    }
+
+    return CATALOG_LISTING_SIGNALS.some((signal) =>
         normalizedMessage.includes(signal)
     );
 }
@@ -243,6 +318,14 @@ function isPackageDetailQuestion(message) {
 }
 
 async function resolvePackageIntent(message) {
+    if (isCatalogListingRequest(message)) {
+        return {
+            type: "listing",
+            package: null,
+            candidates: getCandidateSummaries()
+        };
+    }
+
     if (isAmbiguousCatalogRequest(message)) {
         return {
             type: "ambiguous",
@@ -278,6 +361,17 @@ function buildAmbiguousPackageReply() {
     return `Bạn muốn chọn gói xét nghiệm nào? HomeLab hiện có: ${buildPackageListText()}.`;
 }
 
+function buildCatalogListingReply() {
+    const lines = REQUIRED_PACKAGES.map((item) => `- ${item.name}`);
+
+    return [
+        "Hiện HomeLab đang hỗ trợ các gói/xét nghiệm như:",
+        ...lines,
+        "",
+        "Bạn muốn xem chi tiết gói nào, hay muốn HomeLab gợi ý theo triệu chứng/mục tiêu sức khỏe của bạn?"
+    ].join("\n");
+}
+
 function buildPackageDetailReply(packageItem) {
     const item = summarizePackage(packageItem);
 
@@ -311,6 +405,7 @@ module.exports = {
     getCatalogPackageByCode,
     resolvePackageIntent,
     buildPackageListText,
+    buildCatalogListingReply,
     buildAmbiguousPackageReply,
     buildPackageDetailReply,
     buildPackageConfirmationReply

@@ -23,6 +23,20 @@ type RoleCopy = {
   phonePlaceholder: string;
 };
 
+type RoleTheme = {
+  pageClass: string;
+  brandClass: string;
+  panelClass: string;
+  sideClass: string;
+  iconClass: string;
+  sideTextClass: string;
+  infoClass: string;
+  eyebrowClass: string;
+  inputClass: string;
+  buttonClass: string;
+  chatbotClass: string;
+};
+
 const ROLE_COPY: Record<DemoRole, RoleCopy> = {
   USER: {
     loginTitle: 'Đăng nhập người dùng',
@@ -37,22 +51,64 @@ const ROLE_COPY: Record<DemoRole, RoleCopy> = {
   ADMIN: {
     loginTitle: 'Đăng nhập quản trị',
     registerTitle: 'Đăng nhập quản trị',
-    loginSubtitle: 'Dành cho nhân sự quản trị vận hành HomeLab.',
-    registerSubtitle: 'Dành cho nhân sự quản trị vận hành HomeLab.',
+    loginSubtitle: 'Đăng nhập để quản lý lịch hẹn, nhân viên và vận hành hệ thống HomeLab.',
+    registerSubtitle: 'Đăng nhập để quản lý lịch hẹn, nhân viên và vận hành hệ thống HomeLab.',
     primaryLoginLabel: 'Đăng nhập',
     primaryRegisterLabel: 'Đăng nhập',
-    phoneLabel: 'Số điện thoại',
-    phonePlaceholder: '0900000001',
+    phoneLabel: 'Email hoặc số điện thoại',
+    phonePlaceholder: 'Nhập email hoặc số điện thoại',
   },
   COLLECTOR: {
     loginTitle: 'Đăng nhập nhân viên lấy mẫu',
     registerTitle: 'Đăng nhập nhân viên lấy mẫu',
-    loginSubtitle: 'Dành cho nhân viên lấy mẫu đã được quản trị viên tạo tài khoản.',
-    registerSubtitle: 'Dành cho nhân viên lấy mẫu đã được quản trị viên tạo tài khoản.',
+    loginSubtitle: 'Đăng nhập để xem lịch lấy mẫu, cập nhật tiến trình và nhận nhiệm vụ.',
+    registerSubtitle: 'Đăng nhập để xem lịch lấy mẫu, cập nhật tiến trình và nhận nhiệm vụ.',
     primaryLoginLabel: 'Đăng nhập',
     primaryRegisterLabel: 'Đăng nhập',
-    phoneLabel: 'Số điện thoại',
-    phonePlaceholder: '0987654321',
+    phoneLabel: 'Email, tên đăng nhập hoặc số điện thoại',
+    phonePlaceholder: 'Nhập thông tin tài khoản',
+  },
+};
+
+const ROLE_THEME: Record<DemoRole, RoleTheme> = {
+  USER: {
+    pageClass: 'min-h-screen bg-gradient-to-br from-slate-100 via-sky-50 to-teal-50 px-4 py-8 text-slate-900',
+    brandClass: 'text-sm font-semibold text-teal-700 hover:text-teal-800',
+    panelClass: 'grid w-full overflow-hidden rounded-2xl border border-white/70 bg-white shadow-xl md:grid-cols-[0.95fr_1.05fr]',
+    sideClass: 'bg-gradient-to-br from-slate-900 to-teal-950 px-8 py-10 text-white',
+    iconClass: 'flex h-12 w-12 items-center justify-center rounded-xl bg-teal-400/20 text-teal-200',
+    sideTextClass: 'mt-4 text-sm leading-6 text-slate-300',
+    infoClass: 'mt-8 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300',
+    eyebrowClass: 'text-sm font-semibold uppercase tracking-wide text-teal-700',
+    inputClass: 'mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-teal-400 focus-within:bg-white',
+    buttonClass: 'mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60',
+    chatbotClass: 'mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50',
+  },
+  ADMIN: {
+    pageClass: 'min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-50 px-4 py-8 text-slate-900',
+    brandClass: 'text-sm font-semibold text-blue-700 transition hover:text-blue-800',
+    panelClass: 'grid w-full overflow-hidden rounded-2xl border border-blue-100/80 bg-white shadow-[0_24px_70px_rgba(37,99,235,0.14)] md:grid-cols-[0.95fr_1.05fr]',
+    sideClass: 'bg-gradient-to-br from-blue-50 via-sky-50 to-white px-8 py-10 text-slate-900',
+    iconClass: 'flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-700 shadow-sm',
+    sideTextClass: 'mt-4 text-sm leading-6 text-slate-600',
+    infoClass: 'mt-8 rounded-xl border border-blue-100 bg-white/80 p-4 text-sm text-slate-600 shadow-sm',
+    eyebrowClass: 'text-sm font-semibold uppercase tracking-wide text-blue-700',
+    inputClass: 'mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 shadow-sm transition focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(96,165,250,0.16)]',
+    buttonClass: 'mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-blue-600/30 disabled:translate-y-0 disabled:opacity-60',
+    chatbotClass: 'mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-blue-100 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700',
+  },
+  COLLECTOR: {
+    pageClass: 'min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50 px-4 py-8 text-slate-900',
+    brandClass: 'text-sm font-semibold text-emerald-700 transition hover:text-emerald-800',
+    panelClass: 'grid w-full overflow-hidden rounded-2xl border border-emerald-100/80 bg-white shadow-[0_24px_70px_rgba(16,185,129,0.14)] md:grid-cols-[0.95fr_1.05fr]',
+    sideClass: 'bg-gradient-to-br from-emerald-50 via-lime-50 to-amber-50 px-8 py-10 text-slate-900',
+    iconClass: 'flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 shadow-sm',
+    sideTextClass: 'mt-4 text-sm leading-6 text-slate-600',
+    infoClass: 'mt-8 rounded-xl border border-emerald-100 bg-white/80 p-4 text-sm text-slate-600 shadow-sm',
+    eyebrowClass: 'text-sm font-semibold uppercase tracking-wide text-emerald-700',
+    inputClass: 'mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 shadow-sm transition focus-within:border-emerald-400 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(52,211,153,0.16)]',
+    buttonClass: 'mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-emerald-600/30 disabled:translate-y-0 disabled:opacity-60',
+    chatbotClass: 'mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-100 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700',
   },
 };
 
@@ -121,6 +177,7 @@ export default function RoleLoginPage({
   const effectiveMode = role === DEMO_ROLES.USER ? mode : 'login';
   const isRegister = effectiveMode === 'register';
   const copy = ROLE_COPY[role];
+  const theme = ROLE_THEME[role];
   const relatedLinks = getRelatedLinks(role, effectiveMode);
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -232,34 +289,34 @@ export default function RoleLoginPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-sky-50 to-teal-50 px-4 py-8 text-slate-900">
+    <div className={theme.pageClass}>
       <div className="mx-auto flex max-w-5xl items-center justify-between">
-        <a href="/" className="text-sm font-semibold text-teal-700 hover:text-teal-800">
+        <a href="/" className={theme.brandClass}>
           HomeLab
         </a>
         {role === DEMO_ROLES.USER ? <OperationsAccessMenu compact /> : null}
       </div>
 
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center">
-        <div className="grid w-full overflow-hidden rounded-2xl border border-white/70 bg-white shadow-xl md:grid-cols-[0.95fr_1.05fr]">
-          <section className="bg-gradient-to-br from-slate-900 to-teal-950 px-8 py-10 text-white">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-400/20 text-teal-200">
+        <div className={theme.panelClass}>
+          <section className={theme.sideClass}>
+            <div className={theme.iconClass}>
               <FlaskConical className="h-6 w-6" />
             </div>
             <h1 className="mt-8 text-3xl font-semibold">
               {isRegister ? copy.registerTitle : copy.loginTitle}
             </h1>
-            <p className="mt-4 text-sm leading-6 text-slate-300">
+            <p className={theme.sideTextClass}>
               {isRegister ? copy.registerSubtitle : copy.loginSubtitle}
             </p>
-            <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+            <div className={theme.infoClass}>
               Thông tin đăng nhập được kiểm tra với tài khoản đã lưu trong hệ thống HomeLab.
             </div>
           </section>
 
           <form onSubmit={handleSubmit} className="px-8 py-10">
             <div className="mb-6">
-              <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">HomeLab AI</p>
+              <p className={theme.eyebrowClass}>HomeLab AI</p>
               <h2 className="mt-2 text-2xl font-semibold">
                 {role === DEMO_ROLES.USER ? 'Tài khoản người dùng' : 'Khu vực nội bộ'}
               </h2>
@@ -269,7 +326,7 @@ export default function RoleLoginPage({
               {isRegister && (
                 <label className="block text-sm font-semibold text-slate-700">
                   Họ tên
-                  <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-teal-400 focus-within:bg-white">
+                  <div className={theme.inputClass}>
                     <UserRound className="h-4 w-4 text-slate-400" />
                     <input
                       value={displayName}
@@ -284,7 +341,7 @@ export default function RoleLoginPage({
               {isRegister && (
                 <label className="block text-sm font-semibold text-slate-700">
                   Email
-                  <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-teal-400 focus-within:bg-white">
+                  <div className={theme.inputClass}>
                     <Mail className="h-4 w-4 text-slate-400" />
                     <input
                       type="email"
@@ -299,7 +356,7 @@ export default function RoleLoginPage({
 
               <label className="block text-sm font-semibold text-slate-700">
                 {copy.phoneLabel}
-                <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-teal-400 focus-within:bg-white">
+                <div className={theme.inputClass}>
                   <Phone className="h-4 w-4 text-slate-400" />
                   <input
                     value={phone}
@@ -312,7 +369,7 @@ export default function RoleLoginPage({
 
               <label className="block text-sm font-semibold text-slate-700">
                 Mật khẩu
-                <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-teal-400 focus-within:bg-white">
+                <div className={theme.inputClass}>
                   <KeyRound className="h-4 w-4 text-slate-400" />
                   <input
                     type="password"
@@ -326,7 +383,7 @@ export default function RoleLoginPage({
               {isRegister && (
                 <label className="block text-sm font-semibold text-slate-700">
                   Xác nhận mật khẩu
-                  <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-teal-400 focus-within:bg-white">
+                  <div className={theme.inputClass}>
                     <KeyRound className="h-4 w-4 text-slate-400" />
                     <input
                       type="password"
@@ -348,7 +405,7 @@ export default function RoleLoginPage({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60"
+              className={theme.buttonClass}
             >
               {isSubmitting ? 'Đang xử lý...' : isRegister ? copy.primaryRegisterLabel : copy.primaryLoginLabel}
               <ArrowRight className="h-4 w-4" />
@@ -365,7 +422,7 @@ export default function RoleLoginPage({
 
             <a
               href="/"
-              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className={theme.chatbotClass}
             >
               <MessageCircle className="h-4 w-4" />
               Về Chatbot

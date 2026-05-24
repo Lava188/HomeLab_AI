@@ -130,7 +130,7 @@ export default function AdminAvailabilitySlotsPage() {
       label: 'Đã đặt',
       value: summary.booked,
       icon: Check,
-      tone: 'border-indigo-100 bg-indigo-50 text-indigo-700',
+      tone: 'border-sky-100 bg-sky-50 text-sky-700',
     },
     {
       label: 'Còn trống',
@@ -267,7 +267,7 @@ export default function AdminAvailabilitySlotsPage() {
         </div>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-sky-100 bg-white/95 p-6 shadow-[0_12px_35px_rgba(14,165,233,0.08)]">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase text-teal-700">Vận hành quản trị</p>
@@ -279,7 +279,7 @@ export default function AdminAvailabilitySlotsPage() {
           <button
             onClick={() => loadSlots(appliedFilters)}
             disabled={isLoading}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 px-4 py-3 text-sm font-semibold text-white hover:from-sky-600 hover:to-teal-600 disabled:opacity-60"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             Làm mới
@@ -310,7 +310,7 @@ export default function AdminAvailabilitySlotsPage() {
       <section className="grid gap-6 xl:grid-cols-[420px_1fr]">
         <form
           onSubmit={handleCreateSlot}
-          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+          className="rounded-2xl border border-sky-100 bg-white/95 p-5 shadow-[0_12px_35px_rgba(14,165,233,0.08)]"
         >
           <div className="mb-4 flex items-center gap-2">
             <div className="rounded-xl bg-teal-50 p-2 text-teal-700">
@@ -329,7 +329,7 @@ export default function AdminAvailabilitySlotsPage() {
                 type="date"
                 value={form.date}
                 onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
               />
             </label>
 
@@ -339,7 +339,7 @@ export default function AdminAvailabilitySlotsPage() {
                 value={form.area}
                 onChange={(event) => setForm((current) => ({ ...current, area: event.target.value }))}
                 placeholder="default"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
               />
             </label>
 
@@ -349,7 +349,7 @@ export default function AdminAvailabilitySlotsPage() {
                 type="time"
                 value={form.timeStart}
                 onChange={(event) => setForm((current) => ({ ...current, timeStart: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
               />
             </label>
 
@@ -359,7 +359,7 @@ export default function AdminAvailabilitySlotsPage() {
                 type="time"
                 value={form.timeEnd}
                 onChange={(event) => setForm((current) => ({ ...current, timeEnd: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
               />
             </label>
 
@@ -370,12 +370,12 @@ export default function AdminAvailabilitySlotsPage() {
                 min="1"
                 value={form.capacity}
                 onChange={(event) => setForm((current) => ({ ...current, capacity: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
               />
             </label>
 
             <label className="flex items-end text-sm font-semibold text-slate-700">
-              <span className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3">
+              <span className="flex h-12 w-full items-center justify-between rounded-xl border border-sky-100 bg-sky-50/70 px-3">
                 Đang mở
                 <input
                   type="checkbox"
@@ -390,14 +390,14 @@ export default function AdminAvailabilitySlotsPage() {
           <button
             type="submit"
             disabled={isSaving}
-            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60"
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 px-4 py-3 text-sm font-semibold text-white hover:from-sky-600 hover:to-teal-600 disabled:opacity-60"
           >
             <Plus className="h-4 w-4" />
             Tạo khung giờ
           </button>
         </form>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-sky-100 bg-white/95 p-5 shadow-[0_12px_35px_rgba(14,165,233,0.08)]">
           <div className="grid gap-3 lg:grid-cols-5">
             <label className="text-sm font-semibold text-slate-700">
               Từ ngày
@@ -405,7 +405,7 @@ export default function AdminAvailabilitySlotsPage() {
                 type="date"
                 value={filters.dateFrom || ''}
                 onChange={(event) => setFilters((current) => ({ ...current, dateFrom: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
               />
             </label>
 
@@ -415,7 +415,7 @@ export default function AdminAvailabilitySlotsPage() {
                 type="date"
                 value={filters.dateTo || ''}
                 onChange={(event) => setFilters((current) => ({ ...current, dateTo: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
               />
             </label>
 
@@ -424,7 +424,7 @@ export default function AdminAvailabilitySlotsPage() {
               <select
                 value={filters.active || ''}
                 onChange={(event) => setFilters((current) => ({ ...current, active: event.target.value }))}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
               >
                 <option value="">Tất cả</option>
                 <option value="true">Đang mở</option>
@@ -438,7 +438,7 @@ export default function AdminAvailabilitySlotsPage() {
                 value={filters.area || ''}
                 onChange={(event) => setFilters((current) => ({ ...current, area: event.target.value }))}
                 placeholder="default"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
               />
             </label>
 
@@ -447,7 +447,7 @@ export default function AdminAvailabilitySlotsPage() {
                 type="button"
                 onClick={handleApplyFilters}
                 disabled={isLoading}
-                className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-slate-900 px-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
+                className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 px-3 text-sm font-semibold text-white hover:from-sky-600 hover:to-teal-600 disabled:opacity-60"
               >
                 <Search className="h-4 w-4" />
                 Tìm kiếm
@@ -456,7 +456,7 @@ export default function AdminAvailabilitySlotsPage() {
                 type="button"
                 onClick={handleResetFilters}
                 disabled={isLoading}
-                className="h-12 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                className="h-12 rounded-xl border border-sky-100 bg-white px-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-50 disabled:opacity-60"
               >
                 Đặt lại
               </button>
@@ -465,8 +465,8 @@ export default function AdminAvailabilitySlotsPage() {
         </section>
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-col justify-between gap-3 border-b border-slate-100 px-5 py-4 md:flex-row md:items-center">
+      <section className="overflow-hidden rounded-2xl border border-sky-100 bg-white/95 shadow-[0_12px_35px_rgba(14,165,233,0.08)]">
+        <div className="flex flex-col justify-between gap-3 border-b border-sky-100 px-5 py-4 md:flex-row md:items-center">
           <div>
             <h3 className="font-semibold">Khung giờ lấy mẫu</h3>
             <p className="mt-1 text-sm text-slate-500">{slots.length} khung giờ đang hiển thị</p>
@@ -474,8 +474,8 @@ export default function AdminAvailabilitySlotsPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-[980px] w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
+          <table className="min-w-[980px] w-full divide-y divide-sky-100 text-sm">
+            <thead className="bg-sky-50 text-left text-xs font-semibold uppercase text-sky-800">
               <tr>
                 <th className="px-5 py-3">Ngày</th>
                 <th className="px-5 py-3">Bắt đầu</th>
@@ -488,7 +488,7 @@ export default function AdminAvailabilitySlotsPage() {
                 <th className="px-5 py-3 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-sky-50">
               {isLoading ? (
                 <tr>
                   <td colSpan={9} className="px-5 py-12 text-center text-slate-500">
@@ -507,7 +507,7 @@ export default function AdminAvailabilitySlotsPage() {
                 </tr>
               ) : (
                 slots.map((slot) => (
-                  <tr key={slot.id} className="hover:bg-slate-50">
+                  <tr key={slot.id} className="hover:bg-sky-50/70">
                     <td className="whitespace-nowrap px-5 py-4 font-semibold text-slate-900">
                       {slot.date}
                     </td>
@@ -533,7 +533,7 @@ export default function AdminAvailabilitySlotsPage() {
                     <td className="whitespace-nowrap px-5 py-4 text-right">
                       <button
                         onClick={() => startEdit(slot)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 px-4 py-2 text-sm font-semibold text-white hover:from-sky-600 hover:to-teal-600"
                       >
                         <Edit3 className="h-4 w-4" />
                         Sửa
@@ -548,8 +548,8 @@ export default function AdminAvailabilitySlotsPage() {
       </section>
 
       {editingSlot && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-[0_24px_70px_rgba(14,165,233,0.18)]">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold">Sửa khung giờ lấy mẫu</h3>
@@ -568,11 +568,11 @@ export default function AdminAvailabilitySlotsPage() {
                   min={Math.max(1, editingSlot.bookedCount)}
                   value={editForm.capacity}
                   onChange={(event) => setEditForm((current) => ({ ...current, capacity: event.target.value }))}
-                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                  className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
                 />
               </label>
 
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-600">
+              <div className="rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm text-slate-600">
                 Đã đặt: <strong>{editingSlot.bookedCount}</strong>. Sức chứa không nên nhỏ hơn số lịch đã được đặt.
               </div>
 
@@ -581,11 +581,11 @@ export default function AdminAvailabilitySlotsPage() {
                 <input
                   value={editForm.area}
                   onChange={(event) => setEditForm((current) => ({ ...current, area: event.target.value }))}
-                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
+                  className="mt-2 w-full rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-3 text-sm outline-none focus:border-teal-400 focus:bg-white"
                 />
               </label>
 
-              <label className="flex h-12 items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700">
+              <label className="flex h-12 items-center justify-between rounded-xl border border-sky-100 bg-sky-50/70 px-3 text-sm font-semibold text-slate-700">
                 Đang mở
                 <input
                   type="checkbox"
@@ -599,14 +599,14 @@ export default function AdminAvailabilitySlotsPage() {
             <div className="mt-5 flex justify-end gap-3">
               <button
                 onClick={() => setEditingSlot(null)}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                className="rounded-xl border border-sky-100 bg-white px-4 py-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-50"
               >
                 Hủy
               </button>
               <button
                 onClick={handleUpdateSlot}
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 px-4 py-3 text-sm font-semibold text-white hover:from-sky-600 hover:to-teal-600 disabled:opacity-60"
               >
                 <Save className="h-4 w-4" />
                 Lưu thay đổi
