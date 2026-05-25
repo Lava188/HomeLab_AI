@@ -132,9 +132,16 @@ const CATALOG_LISTING_EXCLUSION_SIGNALS = [
 ];
 
 const PACKAGE_DETAIL_SIGNALS = [
+    "la gi",
+    "giai thich",
     "gom nhung gi",
+    "gom gi",
     "co nhung gi",
+    "bao gom gi",
     "bao gom",
+    "y nghia",
+    "xem chi tiet",
+    "chi tiet",
     "thanh phan",
     "mo ta",
     "phu hop",
@@ -148,17 +155,49 @@ function getRequiredPackages() {
 
 function summarizePackage(item) {
     if (!item) return null;
+    const displayOverrides = {
+        CBC: {
+            name: "Công thức máu",
+            components: ["CBC"]
+        },
+        LIPID_PROFILE: {
+            name: "Mỡ máu",
+            components: ["Cholesterol toàn phần", "LDL-C", "HDL-C", "Triglyceride"]
+        },
+        LIVER_FUNCTION: {
+            name: "Chức năng gan",
+            description: "Giúp kiểm tra một số chỉ số liên quan đến gan như ALT, AST ở mức thông tin chung.",
+            components: ["ALT", "AST", "Các chỉ số liên quan nếu có"],
+            suitableFor: "ALT/AST thường dùng để tham khảo tình trạng men gan hoặc tổn thương tế bào gan ở mức sàng lọc.",
+            preparationNotes: ["Kết quả cần đọc cùng triệu chứng, thuốc đang dùng, bệnh nền và bác sĩ/nhân viên y tế."]
+        },
+        KIDNEY_FUNCTION: {
+            name: "Chức năng thận",
+            components: ["Creatinine", "eGFR"]
+        },
+        GENERAL_CHECKUP: {
+            name: "Gói tổng quát cơ bản",
+            components: [
+                "Công thức máu",
+                "Đường huyết/HbA1c",
+                "Mỡ máu",
+                "Chức năng gan",
+                "Chức năng thận"
+            ]
+        }
+    };
+    const override = displayOverrides[item.code] || {};
 
     return {
         id: item.id || null,
         code: item.code,
-        name: item.name,
-        description: item.description,
+        name: override.name || item.name,
+        description: override.description || item.description,
         category: item.category || null,
         sampleType: item.sampleType || null,
-        components: item.components || [],
-        suitableFor: item.suitableFor || null,
-        preparationNotes: item.preparationNotes || []
+        components: override.components || item.components || [],
+        suitableFor: override.suitableFor || item.suitableFor || null,
+        preparationNotes: override.preparationNotes || item.preparationNotes || []
     };
 }
 
@@ -354,7 +393,7 @@ async function resolvePackageIntent(message) {
 }
 
 function buildPackageListText() {
-    return REQUIRED_PACKAGES.map((item) => item.name).join(", ");
+    return REQUIRED_PACKAGES.map((item) => summarizePackage(item).name).join(", ");
 }
 
 function buildAmbiguousPackageReply() {
@@ -376,6 +415,15 @@ function buildPackageDetailReply(packageItem) {
     const item = summarizePackage(packageItem);
 
     if (!item) return buildAmbiguousPackageReply();
+
+    if (item.code === "LIVER_FUNCTION") {
+        return [
+            "Chức năng gan: Gói này giúp kiểm tra một số chỉ số liên quan đến gan như ALT, AST ở mức thông tin chung.",
+            "Thành phần: ALT, AST, các chỉ số liên quan nếu có.",
+            "Phù hợp: ALT/AST thường dùng để tham khảo tình trạng men gan hoặc tổn thương tế bào gan, không dùng riêng lẻ để chẩn đoán.",
+            "Lưu ý: Các chỉ số này chỉ mang ý nghĩa tham khảo và cần đọc cùng triệu chứng, thuốc đang dùng, bệnh nền và bác sĩ/nhân viên y tế."
+        ].join("\n");
+    }
 
     const parts = [
         `${item.name}: ${item.description}`,

@@ -186,15 +186,42 @@ function isBookingEditOrNegativeText(message) {
         "khong dung",
         "thay doi thong tin",
         "sua thong tin",
+        "doi sang",
+        "chuyen sang",
         "doi lich",
         "doi dia chi",
         "doi gio",
         "doi ngay",
-        "doi goi"
+        "doi goi",
+        "huy di",
+        "huy lich nay",
+        "thoi khong dat nua",
+        "bo lich nay"
     ];
 
     return editOrNegativeSignals.some((signal) =>
         normalizedMessage.includes(signal)
+    );
+}
+
+function shouldKeepActiveBookingContext(message, routeResult) {
+    const normalizedMessage = normalizeText(message);
+    const contextSignals = [
+        "de toi hoi lai",
+        "hoi lai da",
+        "khong huy",
+        "khong huy nua",
+        "tiep tuc dat",
+        "quay lai",
+        "giu gio cu",
+        "giu nhu cu",
+        "dong y doi",
+        "dung roi sua"
+    ];
+
+    return (
+        [FLOWS.RESCHEDULE, FLOWS.CANCEL].includes(routeResult.flow) ||
+        contextSignals.some((signal) => normalizedMessage.includes(signal))
     );
 }
 
@@ -541,6 +568,41 @@ function shouldContinueBookingForPackageSelection(message, sessionId, packageInt
     return !questionSignals.some((signal) => normalizedMessage.includes(signal));
 }
 
+function shouldContinueBookingForInformationalDetour(message, sessionId, packageIntent) {
+    if (!bookingService.hasActiveBookingSession(sessionId)) {
+        return false;
+    }
+
+    const normalizedMessage = normalizeText(message);
+    const detourSignals = [
+        "la gi",
+        "giai thich",
+        "gom gi",
+        "gom nhung gi",
+        "bao gom gi",
+        "bao gom",
+        "y nghia",
+        "xem chi tiet"
+    ];
+
+    return (
+        packageIntent.type === "detail_question" ||
+        detourSignals.some((signal) => normalizedMessage.includes(signal))
+    );
+}
+
+function hasExplicitBookingRequestText(message) {
+    const normalizedMessage = normalizeText(message);
+    const bookingSignals = [
+        "dat lich",
+        "tao lich",
+        "hen lay mau",
+        "lay mau tai nha"
+    ];
+
+    return bookingSignals.some((signal) => normalizedMessage.includes(signal));
+}
+
 async function suspendPendingStateForUrgent(sessionId) {
     const bookingSuspension =
         await bookingService.suspendActiveBookingSession(sessionId);
@@ -637,7 +699,64 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
         });
     }
 
+    if (
+        packageIntent.type === "selected" &&
+        hasExplicitBookingRequestText(message)
+    ) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
+        const bookingResult = await bookingService.handleBookingMessage({
+            message,
+            sessionId,
+            userSession
+        });
+
+        return {
+            ...bookingResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(bookingResult, gateDebug),
+                safetyResult.meta,
+                routeResult
+            )
+        };
+    }
+
     if (shouldContinueBookingForPackageSelection(message, sessionId, packageIntent)) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
+        const bookingContinuationResult =
+            await bookingService.handleBookingMessage({
+                message,
+                sessionId,
+                userSession
+            });
+
+        return {
+            ...bookingContinuationResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(
+                    bookingContinuationResult,
+                    gateDebug
+                ),
+                safetyResult.meta,
+                routeResult
+            )
+        };
+    }
+
+    if (shouldContinueBookingForInformationalDetour(message, sessionId, packageIntent)) {
         if (!isAuthenticatedUserSession(userSession)) {
             return buildAuthRequiredResult({
                 message,
@@ -698,6 +817,38 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
     if (
         bookingService.hasActiveBookingSession(sessionId) &&
         isBookingEditOrNegativeText(message)
+    ) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
+        const bookingContinuationResult =
+            await bookingService.handleBookingMessage({
+                message,
+                sessionId,
+                userSession
+            });
+
+        return {
+            ...bookingContinuationResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(
+                    bookingContinuationResult,
+                    gateDebug
+                ),
+                safetyResult.meta,
+                routeResult
+            )
+        };
+    }
+
+    if (
+        bookingService.hasActiveBookingSession(sessionId) &&
+        shouldKeepActiveBookingContext(message, routeResult)
     ) {
         if (!isAuthenticatedUserSession(userSession)) {
             return buildAuthRequiredResult({

@@ -142,6 +142,23 @@ async function findDateWindowWithoutSlots(offsetStart = 700) {
     throw new Error("could not find empty slot window for smoke");
 }
 
+async function findDateWithoutBookings(offsetStart = 460) {
+    for (let offset = offsetStart; offset < offsetStart + 160; offset += 3) {
+        const date = isoDate(offset);
+        const count = await prisma.booking.count({
+            where: {
+                sampleDate: new Date(`${date}T00:00:00.000Z`)
+            }
+        });
+
+        if (count === 0) {
+            return date;
+        }
+    }
+
+    throw new Error("could not find date without bookings for smoke");
+}
+
 function getRecommendation(data) {
     return data.meta?.recommendation || null;
 }
@@ -332,9 +349,11 @@ async function main() {
                 const draftAfterDetail = await getDraftBySession(sessionId);
                 const draftSlots = draftAfterDetail?.slotsJson || {};
 
-                assert(detail.flow === "health_rag", "package detail did not detour to health_rag");
+                assert(detail.flow === "booking", "package detail did not stay in booking draft");
                 assert(detail.meta?.packageIntent === "detail_question", "package detail intent missing");
                 assert(detailText.includes("creatinine") || detailText.includes("egfr"), "package detail missing kidney components");
+                assert(detail.meta?.missingFields?.includes("testType"), "package detail detour should not set testType");
+                assert(detailText.includes("goi/xet nghiem") || detailText.includes("chon goi"), "package detail did not ask for missing package field");
                 assert(afterDetail === before, "package detail detour created booking");
                 assert(draftSlots.appointmentTime === "08:00", "draft lost appointment time after detail detour");
                 assert(String(draftSlots.address || "").includes("12"), "draft lost address after detail detour");
@@ -433,7 +452,7 @@ async function main() {
             async () => {
                 const sessionId = uniqueId("slot_full");
                 const headers = userHeaders();
-                const requestedDate = isoDate(460 + Math.floor(Math.random() * 120));
+                const requestedDate = await findDateWithoutBookings();
                 await createSlot({ date: requestedDate, timeStart: "14:00", timeEnd: "15:00", capacity: 1 });
                 await createSlot({ date: requestedDate, timeStart: "15:00", timeEnd: "16:00", resetDate: false });
                 await createOccupyingBooking({
@@ -476,7 +495,11 @@ async function main() {
                 const afterFailure = await countBookingsBySession(sessionId);
 
                 assert(failed.meta?.lastBookingFailure?.reasonCode === "NO_AVAILABLE_NEARBY_SLOT", "no nearby slot reason missing");
-                assert(failedText.includes("chua co khung gio lay mau kha dung gan ngay"), "no nearby slot message missing");
+                assert(
+                    failedText.includes("chua co khung gio lay mau kha dung gan ngay") ||
+                        failedText.includes("chua mo lich lay mau"),
+                    "no nearby slot message missing"
+                );
                 assert((failed.meta?.lastBookingFailure?.suggestedSlots || []).length === 0, "no nearby slot invented suggestions");
                 assert(afterFailure === before, "no nearby slot created booking");
             }

@@ -174,6 +174,44 @@ async function activeCount(date, timeStart) {
     }).length;
 }
 
+async function countActiveBookingsOnDate(date) {
+    return prisma.booking.count({
+        where: {
+            sampleDate: new Date(`${date}T00:00:00.000Z`),
+            status: {
+                in: [
+                    "CONFIRMED",
+                    "RESCHEDULED",
+                    "ASSIGNED",
+                    "SAMPLE_COLLECTED",
+                    "IN_LAB_PROCESSING",
+                    "RESULT_READY"
+                ]
+            }
+        }
+    });
+}
+
+async function findCleanDateBlock() {
+    const startOffset = 45 + Math.floor(Math.random() * 200);
+
+    for (let offset = startOffset; offset < startOffset + 240; offset += 3) {
+        const dates = [
+            isoDate(offset),
+            isoDate(offset + 1),
+            isoDate(offset + 2),
+            isoDate(offset + 3)
+        ];
+        const counts = await Promise.all(dates.map(countActiveBookingsOnDate));
+
+        if (counts.every((count) => count === 0)) {
+            return dates;
+        }
+    }
+
+    throw new Error("could not find clean date block for slot capacity smoke");
+}
+
 function assert(condition, message) {
     if (!condition) {
         throw new Error(message);
@@ -218,11 +256,12 @@ async function runCase(id, fn, state) {
 }
 
 async function main() {
-    const offsetBase = 45 + Math.floor(Math.random() * 200);
+    const [dateA, dateB, dateC, dateD] = await findCleanDateBlock();
     const state = {
-        dateA: isoDate(offsetBase),
-        dateB: isoDate(offsetBase + 1),
-        dateC: isoDate(offsetBase + 2),
+        dateA,
+        dateB,
+        dateC,
+        dateD,
         timeA: "08:11",
         timeB: "09:11",
         timeC: "10:11",
@@ -442,7 +481,7 @@ async function main() {
                 const collectorPhone = makePhone("08");
 
                 await createSlot({
-                    date: isoDate(offsetBase + 3),
+                    date: state.dateD,
                     timeStart: "11:11",
                     timeEnd: "12:11",
                     capacity: 2
@@ -451,7 +490,7 @@ async function main() {
                 state.roleBooking = await createBooking({
                     patientName: "Smoke Slot Role E2E",
                     phone: patientPhone,
-                    sampleDate: isoDate(offsetBase + 3),
+                    sampleDate: state.dateD,
                     sampleTimeStart: "11:11"
                 });
 

@@ -98,6 +98,28 @@ async function postChat(message, sessionId, headers = {}) {
 }
 
 async function createSlot({ date, timeStart, timeEnd, capacity = 5 }) {
+    const existing = await request(
+        `/api/admin/availability-slots?date=${encodeURIComponent(date)}&active=true`,
+        { method: "GET", headers: adminHeaders() }
+    );
+    const existingSlot = (existing.payload.data?.slots || []).find(
+        (slot) => slot.date === date && slot.timeStart === timeStart
+    );
+
+    if (existingSlot) {
+        const { response, payload } = await request(
+            `/api/admin/availability-slots/${existingSlot.id}`,
+            {
+                method: "PATCH",
+                headers: adminHeaders(),
+                body: JSON.stringify({ capacity: Math.max(capacity, 50), active: true })
+            }
+        );
+
+        assert(response.status === 200 && payload.success, "slot update failed");
+        return;
+    }
+
     const { response, payload } = await request("/api/admin/availability-slots", {
         method: "POST",
         headers: adminHeaders(),

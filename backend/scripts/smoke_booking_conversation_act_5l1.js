@@ -1,0 +1,697 @@
+const prisma = require("../src/services/booking-runtime/prisma-client");
+const packageCatalog = require("../src/services/booking-package-catalog.service");
+const { normalizeText } = require("../src/utils/text.util");
+
+const API_BASE_URL = process.env.HOMELAB_API_BASE_URL || "http://localhost:5000";
+const CHAT_URL = process.env.HOMELAB_CHAT_API_URL || `${API_BASE_URL}/api/chat`;
+
+function uniqueId(prefix) {
+    return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function makePhone() {
+    const suffix = `${Date.now()}${Math.floor(Math.random() * 10000)}`
+        .replace(/\D/g, "")
+        .slice(-8)
+        .padStart(8, "0");
+
+    return `09${suffix}`;
+}
+
+function isoDate(offsetDays = 140) {
+    const date = new Date();
+    date.setDate(date.getDate() + offsetDays);
+
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0")
+    ].join("-");
+}
+
+function displayDate(value) {
+    const [year, month, day] = String(value).split("-");
+    return `${day}/${month}/${year}`;
+}
+
+function userHeaders(phone) {
+    return {
+        "x-demo-role": "USER",
+        "x-demo-user-id": `user-${phone}`,
+        "x-demo-phone": phone
+    };
+}
+
+function adminHeaders() {
+    return {
+        "x-demo-role": "ADMIN",
+        "x-demo-user-id": "admin-smoke-5l1"
+    };
+}
+
+function assert(condition, message) {
+    if (!condition) {
+        throw new Error(message);
+    }
+}
+
+function hasBookingCode(text) {
+    return /\bHLB-\d{8}-[A-Z0-9]{4,}\b/i.test(String(text || ""));
+}
+
+async function parseJsonResponse(response) {
+    try {
+        return await response.json();
+    } catch {
+        throw new Error(`API did not return JSON: ${response.status}`);
+    }
+}
+
+async function request(path, options = {}) {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        },
+        signal: AbortSignal.timeout(20000)
+    });
+    const payload = await parseJsonResponse(response);
+
+    return { response, payload };
+}
+
+async function postChat(message, sessionId, headers = {}) {
+    const response = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify({ message, sessionId }),
+        signal: AbortSignal.timeout(20000)
+    });
+    const payload = await parseJsonResponse(response);
+
+    return { response, payload };
+}
+
+async function createSlot({ date, timeStart, timeEnd, capacity = 8 }) {
+    const existing = await request(
+        `/api/admin/availability-slots?date=${encodeURIComponent(date)}&active=true`,
+        { method: "GET", headers: adminHeaders() }
+    );
+    const existingSlot = (existing.payload.data?.slots || []).find(
+        (slot) => slot.date === date && slot.timeStart === timeStart
+    );
+
+    if (existingSlot) {
+        const { response, payload } = await request(
+            `/api/admin/availability-slots/${existingSlot.id}`,
+            {
+                method: "PATCH",
+                headers: adminHeaders(),
+                body: JSON.stringify({ capacity: Math.max(capacity, 50), active: true })
+            }
+        );
+
+        assert(response.status === 200 && payload.success, "slot update failed");
+        return;
+    }
+
+    const { response, payload } = await request("/api/admin/availability-slots", {
+        method: "POST",
+        headers: adminHeaders(),
+        body: JSON.stringify({
+            date,
+            timeStart,
+            timeEnd,
+            capacity,
+            area: "default",
+            active: true
+        })
+    });
+
+    assert(response.status === 201 && payload.success, "slot create failed");
+}
+
+async function countBookingsBySession(sessionId) {
+    return prisma.booking.count({ where: { createdFromSessionId: sessionId } });
+}
+
+async function setupReadyDraft({ sessionId, phone, date, time = "07:30" }) {
+    const before = await countBookingsBySession(sessionId);
+    const message = [
+        `Tôi muốn đặt lịch gói chức năng thận ngày ${displayDate(date)} lúc ${time}`,
+        "địa chỉ: 12 Nguyễn Trãi, phường Bến Thành, Quận 1, TP Hồ Chí Minh",
+        "tên: Smoke Conversation Act"
+    ].join(", ");
+    const first = await postChat(message, sessionId, userHeaders(phone));
+    const data = first.payload.data || {};
+    const reply = data.reply || "";
+    const normalizedReply = normalizeText(reply);
+    const after = await countBookingsBySession(sessionId);
+
+    assert(first.response.status === 200 && first.payload.success, "ready draft setup failed");
+    assert(after === before, "setup created booking before confirmation");
+    assert(!hasBookingCode(reply), "setup reply unexpectedly has booking code");
+    assert(
+        data.booking?.draft && (
+            normalizedReply.includes("xac nhan") ||
+            data.booking?.status === "pending_confirmation"
+        ),
+        "setup did not produce pending confirmation draft"
+    );
+}
+
+async function setupMissingAddressDraft({ sessionId, phone, date, time = "07:30" }) {
+    const before = await countBookingsBySession(sessionId);
+    const message = [
+        `Tôi muốn đặt lịch gói chức năng thận ngày ${displayDate(date)} lúc ${time}`,
+        "tên: Smoke Missing Address"
+    ].join(", ");
+    const first = await postChat(message, sessionId, userHeaders(phone));
+    const data = first.payload.data || {};
+    const after = await countBookingsBySession(sessionId);
+
+    assert(first.response.status === 200 && first.payload.success, "missing address draft setup failed");
+    assert(after === before, "missing address setup created booking");
+    assert(data.booking?.draft, "missing address setup lost draft");
+    assert((data.booking?.missingFields || []).includes("address"), "setup did not leave address missing");
+}
+
+async function setupMissingNameDraft({ sessionId, phone, date, time = "07:30" }) {
+    const before = await countBookingsBySession(sessionId);
+    const message = [
+        `Tôi muốn đặt lịch gói chức năng thận ngày ${displayDate(date)} lúc ${time}`,
+        "địa chỉ: 12 Nguyễn Trãi, phường Bến Thành, Quận 1, TP Hồ Chí Minh"
+    ].join(", ");
+    const first = await postChat(message, sessionId, userHeaders(phone));
+    const data = first.payload.data || {};
+    const after = await countBookingsBySession(sessionId);
+
+    assert(first.response.status === 200 && first.payload.success, "missing name draft setup failed");
+    assert(after === before, "missing name setup created booking");
+    assert(data.booking?.draft, "missing name setup lost draft");
+    assert((data.booking?.missingFields || []).includes("patientName"), "setup did not leave patientName missing");
+}
+
+async function runCase(id, fn, state) {
+    try {
+        await fn(state);
+        console.log(`PASS ${id}`);
+        return { id, passed: true };
+    } catch (error) {
+        console.error(`FAIL ${id}: ${error.message}`);
+        return { id, passed: false, error };
+    }
+}
+
+async function main() {
+    const state = {
+        phone: makePhone(),
+        date: isoDate(170 + Math.floor(Math.random() * 20))
+    };
+
+    await packageCatalog.ensureRequiredCatalogItems();
+    await createSlot({ date: state.date, timeStart: "07:30", timeEnd: "08:30" });
+    await createSlot({ date: state.date, timeStart: "08:00", timeEnd: "09:00" });
+
+    const cases = [
+        [
+            "field_value_does_not_accept_vague_patient_name",
+            async () => {
+                const sessionId = uniqueId("vague_name_5l1b");
+                await setupMissingNameDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const reply = await postChat("tôi chưa biết", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = reply.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "vague patient name created booking");
+                assert(!data.booking?.draft?.patientName, "vague text was set as patientName");
+                assert(
+                    normalizedReply.includes("ten nguoi dat") ||
+                        normalizedReply.includes("ho ten"),
+                    "vague patient name did not ask for patient name again"
+                );
+            }
+        ],
+        [
+            "ambiguous_short_confirmation_requires_clarification",
+            async () => {
+                const sessionId = uniqueId("ambiguous_short_5l1a");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const reply = await postChat("ừ", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(reply.payload.data?.reply || "");
+
+                assert(after === before, "ambiguous short confirmation created booking");
+                assert(
+                    normalizedReply.includes("xac nhan") &&
+                        normalizedReply.includes("sua") &&
+                        normalizedReply.includes("hoi them"),
+                    "ambiguous short confirmation did not ask clarify"
+                );
+            }
+        ],
+        [
+            "pause_at_ready_confirmation",
+            async () => {
+                const sessionId = uniqueId("pause_ready_5l1");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const pause = await postChat("Khoan đã", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = pause.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(pause.response.status === 200 && pause.payload.success, "pause chat failed");
+                assert(after === before, "pause created booking");
+                assert(data.booking?.draft, "pause lost draft");
+                assert(data.meta?.sessionState === "booking_paused", "draft was not marked paused");
+                assert(
+                    normalizedReply.includes("chua tao lich") ||
+                        normalizedReply.includes("van giu ban nhap"),
+                    "pause reply did not say draft is held"
+                );
+            }
+        ],
+        [
+            "confirm_after_pause_requires_reconfirm",
+            async () => {
+                const sessionId = uniqueId("pause_confirm_5l1");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                await postChat("Khoan đã", sessionId, userHeaders(state.phone));
+                const before = await countBookingsBySession(sessionId);
+                const confirm = await postChat("Xác nhận", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(confirm.payload.data?.reply || "");
+
+                assert(after === before, "short confirm after pause created booking");
+                assert(
+                    normalizedReply.includes("tiep tuc xac nhan") &&
+                        normalizedReply.includes("tam dung"),
+                    "short confirm after pause did not ask resume confirmation"
+                );
+            }
+        ],
+        [
+            "explicit_resume_confirm_creates_or_slot_failure",
+            async () => {
+                const sessionId = uniqueId("pause_explicit_5l1");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                await postChat("Khoan đã", sessionId, userHeaders(state.phone));
+                const before = await countBookingsBySession(sessionId);
+                const resume = await postChat("Đúng, xác nhận lịch này", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = resume.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(resume.response.status === 200 && resume.payload.success, "explicit resume failed");
+                assert(
+                    after === before + 1 ||
+                        normalizedReply.includes("khung gio") ||
+                        normalizedReply.includes("het cho") ||
+                        normalizedReply.includes("chua mo lich"),
+                    "explicit resume neither created booking nor returned slot reason"
+                );
+                assert(!normalizedReply.includes("chua hieu ro"), "explicit resume returned generic fallback");
+            }
+        ],
+        [
+            "conflicting_confirm_and_edit_prefers_edit",
+            async () => {
+                const sessionId = uniqueId("conflict_edit_5l1a");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const conflict = await postChat("xác nhận nhưng đổi sang 8h", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(conflict.payload.data?.reply || "");
+
+                assert(after === before, "conflicting intent created booking");
+                assert(
+                    normalizedReply.includes("doi gio lay mau sang 08:00") ||
+                        normalizedReply.includes("sang 08:00 dung khong") ||
+                        normalizedReply.includes("sua thong tin"),
+                    "conflicting intent did not prefer edit or clarify"
+                );
+            }
+        ],
+        [
+            "edit_time_at_ready_does_not_create",
+            async () => {
+                const sessionId = uniqueId("edit_time_5l1");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const edit = await postChat("đổi sang 8h nhé", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(edit.payload.data?.reply || "");
+
+                assert(after === before, "edit time created booking");
+                assert(
+                    normalizedReply.includes("doi gio lay mau sang 08:00") ||
+                        normalizedReply.includes("sang 08:00 dung khong"),
+                    "edit time did not ask for change confirmation"
+                );
+
+                const confirmEdit = await postChat("đúng", sessionId, userHeaders(state.phone));
+                const afterConfirmEdit = await countBookingsBySession(sessionId);
+                const normalizedConfirmEditReply = normalizeText(confirmEdit.payload.data?.reply || "");
+
+                assert(afterConfirmEdit === before, "confirmed edit created booking");
+                assert(
+                    normalizedConfirmEditReply.includes("08:00") &&
+                        normalizedConfirmEditReply.includes("xac nhan"),
+                    "confirmed edit did not re-summarize and ask final confirmation"
+                );
+            }
+        ],
+        [
+            "pending_edit_confirm_natural_updates_time_only",
+            async () => {
+                const sessionId = uniqueId("edit_confirm_natural_5l1b");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                await postChat("đổi sang 8h nhé", sessionId, userHeaders(state.phone));
+                const confirmEdit = await postChat("đồng ý đổi giờ đó", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = confirmEdit.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "natural edit confirmation created booking");
+                assert(data.booking?.draft?.appointmentTime === "08:00", "natural edit confirmation did not update time");
+                assert(normalizedReply.includes("08:00") && normalizedReply.includes("xac nhan"), "natural edit confirmation did not re-summarize");
+            }
+        ],
+        [
+            "pending_edit_reject_keeps_old_time",
+            async () => {
+                const sessionId = uniqueId("edit_reject_5l1b");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                await postChat("đổi sang 8h nhé", sessionId, userHeaders(state.phone));
+                const rejectEdit = await postChat("không, giữ giờ cũ", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = rejectEdit.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "edit rejection created booking");
+                assert(data.booking?.draft?.appointmentTime === "07:30", "edit rejection changed old time");
+                assert(normalizedReply.includes("07:30") && normalizedReply.includes("xac nhan"), "edit rejection did not return ready confirmation");
+            }
+        ],
+        [
+            "edit_date_at_ready_asks_confirmation",
+            async () => {
+                const sessionId = uniqueId("edit_date_5l1b");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const edit = await postChat("đổi sang ngày kia", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(edit.payload.data?.reply || "");
+
+                assert(after === before, "edit date created booking");
+                assert(
+                    normalizedReply.includes("doi ngay lay mau") &&
+                        normalizedReply.includes("dung khong"),
+                    "edit date did not ask confirmation"
+                );
+            }
+        ],
+        [
+            "edit_package_at_ready_asks_confirmation",
+            async () => {
+                const sessionId = uniqueId("edit_package_5l1b");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const edit = await postChat("đổi sang gói mỡ máu", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = edit.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "edit package created booking");
+                assert(
+                    normalizedReply.includes("doi goi xet nghiem sang mo mau") &&
+                        normalizedReply.includes("dung khong"),
+                    "edit package did not ask confirmation"
+                );
+                assert(data.meta?.conversationAct?.targetField === "testType", "edit package missing act target");
+            }
+        ],
+        [
+            "not_correct_asks_what_to_edit",
+            async () => {
+                const sessionId = uniqueId("not_correct_5l1");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const edit = await postChat("không đúng", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(edit.payload.data?.reply || "");
+
+                assert(after === before, "not correct created booking");
+                assert(
+                    normalizedReply.includes("doi goi") &&
+                        normalizedReply.includes("ngay gio") &&
+                        normalizedReply.includes("dia chi") &&
+                        normalizedReply.includes("nguoi dat"),
+                    "not correct did not ask which field to edit"
+                );
+            }
+        ],
+        [
+            "info_detour_missing_patient_name_does_not_mutate",
+            async () => {
+                const sessionId = uniqueId("info_missing_name_5l1b");
+                await setupMissingNameDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const info = await postChat("gói này gồm những gì", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = info.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "info detour missing name created booking");
+                assert(!data.booking?.draft?.patientName, "info detour was set as patientName");
+                assert(normalizedReply.includes("chuc nang than"), "info detour missing package detail");
+                assert(normalizedReply.includes("ten nguoi dat"), "info detour did not continue asking patient name");
+            }
+        ],
+        [
+            "info_detour_at_ready_keeps_draft",
+            async () => {
+                const sessionId = uniqueId("info_ready_5l1");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const info = await postChat("gói chức năng thận gồm gì", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = info.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "info detour created booking");
+                assert(data.booking?.draft, "info detour lost draft");
+                assert(normalizedReply.includes("chuc nang than"), "info detour did not explain package");
+                assert(
+                    normalizedReply.includes("creatinine") ||
+                        normalizedReply.includes("egfr"),
+                    "info detour missing kidney components"
+                );
+            }
+        ],
+        [
+            "info_detour_oke_explain_keeps_draft",
+            async () => {
+                const sessionId = uniqueId("info_oke_5l1a");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const info = await postChat("oke giải thích giúp tôi về gói chức năng thận", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = info.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "oke info detour created booking");
+                assert(data.booking?.draft, "oke info detour lost draft");
+                assert(normalizedReply.includes("chuc nang than"), "oke info detour did not explain package");
+                assert(normalizedReply.includes("creatinine") || normalizedReply.includes("egfr"), "oke info detour missing components");
+            }
+        ],
+        [
+            "help_next_step_missing_address",
+            async () => {
+                const sessionId = uniqueId("help_next_5l1a");
+                await setupMissingAddressDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const help = await postChat("giờ tôi cần làm gì", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(help.payload.data?.reply || "");
+
+                assert(after === before, "help next step created booking");
+                assert(
+                    normalizedReply.includes("con thieu") &&
+                        normalizedReply.includes("dia chi"),
+                    "help next step did not ask for missing address"
+                );
+            }
+        ],
+        [
+            "unclear_life_phrase_missing_address_no_mutation",
+            async () => {
+                const sessionId = uniqueId("unclear_address_5l1b");
+                await setupMissingAddressDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const unclear = await postChat("để tôi hỏi lại đã", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = unclear.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "unclear address phrase created booking");
+                assert(!data.booking?.draft?.address, "unclear phrase was set as address");
+                assert(
+                    normalizedReply.includes("tam dung") ||
+                        normalizedReply.includes("dia chi"),
+                    "unclear address phrase did not ask pause/address clarification"
+                );
+            }
+        ],
+        [
+            "review_draft_shows_current_summary",
+            async () => {
+                const sessionId = uniqueId("review_draft_5l1a");
+                await setupMissingAddressDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const review = await postChat("cho tôi xem lại thông tin", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(review.payload.data?.reply || "");
+
+                assert(after === before, "review draft created booking");
+                assert(
+                    normalizedReply.includes("thong tin") &&
+                        normalizedReply.includes("chuc nang than") &&
+                        normalizedReply.includes("dia chi"),
+                    "review draft did not show summary and missing fields"
+                );
+            }
+        ],
+        [
+            "cancel_draft_requires_confirmation",
+            async () => {
+                const sessionId = uniqueId("cancel_draft_5l1");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const cancel = await postChat("hủy đi", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(cancel.payload.data?.reply || "");
+
+                assert(after === before, "cancel draft created booking");
+                assert(
+                    normalizedReply.includes("huy ban nhap") &&
+                        normalizedReply.includes("dung khong"),
+                    "cancel draft did not ask confirmation"
+                );
+            }
+        ],
+        [
+            "pending_cancel_reject_resumes_draft",
+            async () => {
+                const sessionId = uniqueId("cancel_reject_5l1b");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                await postChat("hủy đi", sessionId, userHeaders(state.phone));
+                const before = await countBookingsBySession(sessionId);
+                const reject = await postChat("không hủy nữa, tiếp tục đặt", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = reject.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "cancel reject created booking");
+                assert(data.booking?.draft, "cancel reject lost draft");
+                assert(data.meta?.sessionState === "ready_for_confirmation", "cancel reject did not clear pending cancel");
+                assert(normalizedReply.includes("xac nhan"), "cancel reject did not return ready confirmation");
+            }
+        ],
+        [
+            "pending_cancel_unclear_asks_again",
+            async () => {
+                const sessionId = uniqueId("cancel_unclear_5l1b");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                await postChat("hủy đi", sessionId, userHeaders(state.phone));
+                const before = await countBookingsBySession(sessionId);
+                const unclear = await postChat("ờ", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = unclear.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "cancel unclear created booking");
+                assert(data.booking?.draft, "cancel unclear lost draft");
+                assert(data.meta?.sessionState === "booking_cancel_confirmation", "cancel unclear cleared pending cancel");
+                assert(
+                    normalizedReply.includes("huy ban nhap") ||
+                        normalizedReply.includes("tiep tuc dat lich"),
+                    "cancel unclear did not ask cancel-or-continue"
+                );
+            }
+        ],
+        [
+            "final_confirm_clear_creates_or_slot_failure",
+            async () => {
+                const sessionId = uniqueId("final_confirm_5l1a");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const confirm = await postChat("xác nhận đặt lịch", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(confirm.payload.data?.reply || "");
+
+                assert(
+                    after === before + 1 ||
+                        normalizedReply.includes("khung gio") ||
+                        normalizedReply.includes("het cho") ||
+                        normalizedReply.includes("chua mo lich"),
+                    "clear final confirm neither created booking nor returned slot reason"
+                );
+                assert(!normalizedReply.includes("chua hieu ro"), "clear final confirm returned generic fallback");
+            }
+        ],
+        [
+            "urgent_override_still_wins",
+            async () => {
+                const sessionId = uniqueId("urgent_active_5l1");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const urgent = await postChat("tôi đau ngực khó thở", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = urgent.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "urgent override created booking");
+                assert(data.flow !== "booking", "urgent routed to booking");
+                assert(
+                    data.meta?.intentGroup === "urgent_health" ||
+                        normalizedReply.includes("cap cuu") ||
+                        normalizedReply.includes("khan cap"),
+                    "urgent override missing urgent_health handling"
+                );
+            }
+        ]
+    ];
+
+    const results = [];
+
+    for (const [id, fn] of cases) {
+        results.push(await runCase(id, fn, state));
+    }
+
+    const passed = results.filter((result) => result.passed).length;
+    const failed = results.length - passed;
+
+    console.log(`TOTAL ${results.length} PASSED ${passed} FAILED ${failed}`);
+
+    if (failed > 0) {
+        process.exitCode = 1;
+    }
+}
+
+main()
+    .catch((error) => {
+        console.error(error);
+        process.exitCode = 1;
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });

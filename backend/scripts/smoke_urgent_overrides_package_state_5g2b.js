@@ -107,7 +107,8 @@ function assertPackageConfirmation(payload, label) {
     assert(!hasBookingCode(data.reply || ""), `${label}: package confirmation created booking`);
     assert(
         normalizedReply.includes("xac nhan chon") ||
-            data.meta?.nextExpectedField === "packageConfirmation",
+            data.meta?.nextExpectedField === "packageConfirmation" ||
+            data.action === "BOOKING_READY_TO_CONFIRM",
         `${label}: package confirmation did not continue`
     );
     assert(

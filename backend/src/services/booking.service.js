@@ -4,10 +4,7 @@ const availabilitySlotService = require("./booking-runtime/availability-slot.ser
 const BookingRuntimeError = require("./booking-runtime/booking-runtime-error");
 const { FLOWS, ACTIONS } = require("../constants/chat.constants");
 const { createChatResult } = require("../utils/chat-response.util");
-const {
-    formatSlotErrorMessage,
-    isBookingSlotError
-} = require("./booking-response.service");
+const { isBookingSlotError } = require("./booking-response.service");
 const {
     normalizeText,
     detectDateFromMessage,
@@ -16,6 +13,10 @@ const {
 } = require("../utils/text.util");
 const { normalizePhone } = require("./booking-runtime/booking-validation.service");
 const packageCatalog = require("./booking-package-catalog.service");
+const {
+    ACTS,
+    classifyConversationAct
+} = require("./booking-conversation-act.service");
 
 const NEARBY_SLOT_LOOKAHEAD_DAYS = 7;
 const NEARBY_SLOT_LIMIT = 5;
@@ -69,6 +70,18 @@ const EXPLICIT_CONFIRMATION_SIGNALS = [
     "dong y dat lich",
     "tao lich giup toi",
     "xong dat lich"
+];
+
+const INFORMATIONAL_DETOUR_SIGNALS = [
+    "la gi",
+    "giai thich",
+    "gom gi",
+    "gom nhung gi",
+    "bao gom gi",
+    "bao gom",
+    "y nghia",
+    "xem chi tiet",
+    "chi tiet"
 ];
 
 const FIELD_LABELS = {
@@ -398,21 +411,21 @@ function isLikelyAddressInput(message) {
 
 function buildAddressIncompleteReply(currentAddress) {
     return (
-        "Äá»‹a chá»‰ nÃ y chÆ°a Ä‘á»§ rÃµ Ä‘á»ƒ nhÃ¢n viÃªn láº¥y máº«u Ä‘áº¿n Ä‘Ãºng nÆ¡i. " +
-        "Báº¡n vui lÃ²ng bá»• sung phÆ°á»ng/xÃ£ hoáº·c quáº­n/huyá»‡n vÃ  tá»‰nh/thÃ nh phá»‘. " +
-        `Hiá»‡n báº¡n Ä‘Ã£ cung cáº¥p: "${currentAddress}".`
+        "Địa chỉ này chưa đủ rõ để nhân viên lấy mẫu đến đúng nơi. " +
+        "Bạn vui lòng bổ sung phường/xã hoặc quận/huyện và tỉnh/thành phố. " +
+        `Hiện bạn đã cung cấp: "${currentAddress}".`
     );
 }
 
 function buildAdminOnlyAddressReply() {
     return (
-        "MÃ¬nh Ä‘Ã£ ghi nháº­n khu vá»±c hÃ nh chÃ­nh, nhÆ°ng váº«n cáº§n sá»‘ nhÃ /tÃªn Ä‘Æ°á»ng hoáº·c thÃ´n/xÃ³m/áº¥p/tá»•/khu cá»¥ thá»ƒ. " +
-        "Báº¡n vui lÃ²ng nháº­p Ä‘áº§y Ä‘á»§ Ä‘á»‹a chá»‰ láº¥y máº«u. VÃ­ dá»¥: 766 ÄÃª La ThÃ nh, phÆ°á»ng Giáº£ng VÃµ, HÃ  Ná»™i."
+        "Mình đã ghi nhận khu vực hành chính, nhưng vẫn cần số nhà/tên đường hoặc thôn/xóm/ấp/tổ/khu cụ thể. " +
+        "Bạn vui lòng nhập đầy đủ địa chỉ lấy mẫu. Ví dụ: 766 Đê La Thành, phường Giảng Võ, Hà Nội."
     );
 }
 
 function buildAddressValidationReply() {
-    return "Äá»‹a chá»‰ láº¥y máº«u chÆ°a Ä‘á»§ rÃµ. Báº¡n vui lÃ²ng cung cáº¥p sá»‘ nhÃ /tÃªn Ä‘Æ°á»ng hoáº·c thÃ´n/xÃ³m, phÆ°á»ng/xÃ£ hoáº·c quáº­n/huyá»‡n, tá»‰nh/thÃ nh phá»‘.";
+    return "Địa chỉ lấy mẫu chưa đủ rõ. Bạn vui lòng cung cấp số nhà/tên đường hoặc thôn/xóm, phường/xã hoặc quận/huyện, tỉnh/thành phố.";
 }
 
 function buildAddressValidationReasonReply(validation, addressText) {
@@ -425,16 +438,16 @@ function buildAddressValidationReasonReply(validation, addressText) {
 
     if (validation?.reason === "house_number_only") {
         return (
-            `Äá»‹a chá»‰${quotedText} chÆ°a Ä‘á»§ rÃµ vÃ¬ má»›i cÃ³ sá»‘ nhÃ , chÆ°a cÃ³ tÃªn Ä‘Æ°á»ng/thÃ´n/xÃ³m, ` +
-            "phÆ°á»ng/xÃ£ hoáº·c quáº­n/huyá»‡n, tá»‰nh/thÃ nh phá»‘. Báº¡n vui lÃ²ng nháº­p Ä‘áº§y Ä‘á»§ hÆ¡n, " +
-            "vÃ­ dá»¥: 766 ÄÃª La ThÃ nh, phÆ°á»ng Giáº£ng VÃµ, HÃ  Ná»™i."
+            `Địa chỉ${quotedText} chưa đủ rõ vì mới có số nhà, chưa có tên đường/thôn/xóm, ` +
+            "phường/xã hoặc quận/huyện, tỉnh/thành phố. Bạn vui lòng nhập đầy đủ hơn, " +
+            "ví dụ: 766 Đê La Thành, phường Giảng Võ, Hà Nội."
         );
     }
 
     if (validation?.reason === "missing_admin_division") {
         return (
-            `Äá»‹a chá»‰${quotedText} chÆ°a Ä‘á»§ rÃµ vÃ¬ cÃ²n thiáº¿u phÆ°á»ng/xÃ£ hoáº·c quáº­n/huyá»‡n vÃ  tá»‰nh/thÃ nh phá»‘. ` +
-            "Báº¡n vui lÃ²ng bá»• sung khu vá»±c hÃ nh chÃ­nh, vÃ­ dá»¥: 766 ÄÃª La ThÃ nh, phÆ°á»ng Giáº£ng VÃµ, HÃ  Ná»™i."
+            `Địa chỉ${quotedText} chưa đủ rõ vì còn thiếu phường/xã hoặc quận/huyện và tỉnh/thành phố. ` +
+            "Bạn vui lòng bổ sung khu vực hành chính, ví dụ: 766 Đê La Thành, phường Giảng Võ, Hà Nội."
         );
     }
 
@@ -447,8 +460,8 @@ function buildAddressValidationReasonReply(validation, addressText) {
 
     if (validation?.reason === "too_vague" || validation?.reason === "no_address_signals") {
         return (
-            `MÃ´ táº£ Ä‘á»‹a chá»‰${quotedText} chÆ°a Ä‘á»§ chÃ­nh xÃ¡c Ä‘á»ƒ nhÃ¢n viÃªn Ä‘áº¿n láº¥y máº«u. ` +
-            "Báº¡n vui lÃ²ng nháº­p sá»‘ nhÃ /tÃªn Ä‘Æ°á»ng hoáº·c thÃ´n/xÃ³m, kÃ¨m phÆ°á»ng/xÃ£ hoáº·c quáº­n/huyá»‡n, tá»‰nh/thÃ nh phá»‘."
+            `Mô tả địa chỉ${quotedText} chưa đủ chính xác để nhân viên đến lấy mẫu. ` +
+            "Bạn vui lòng nhập số nhà/tên đường hoặc thôn/xóm, kèm phường/xã hoặc quận/huyện, tỉnh/thành phố."
         );
     }
 
@@ -507,6 +520,10 @@ function isConfirmationOnlyMessage(message) {
         return false;
     }
 
+    if (hasInformationalDetourIntent(message)) {
+        return false;
+    }
+
     const exactMatches = [
         "xac nhan",
         "dong y",
@@ -535,7 +552,7 @@ function isConfirmationOnlyMessage(message) {
         trimmed.startsWith(prefix)
     );
 
-    if (hasConfirmationPrefix) {
+    if (hasConfirmationPrefix && isNearConfirmationOnlyText(trimmed)) {
         return true;
     }
 
@@ -598,6 +615,33 @@ function hasBookingEditOrNegativeIntent(message) {
     return BOOKING_EDIT_NEGATIVE_SIGNALS.some((signal) =>
         normalizedMessage.includes(signal)
     );
+}
+
+function hasInformationalDetourIntent(message) {
+    const normalizedMessage = normalizeText(message);
+
+    return INFORMATIONAL_DETOUR_SIGNALS.some((signal) =>
+        normalizedMessage.includes(signal)
+    );
+}
+
+function isNearConfirmationOnlyText(trimmed) {
+    const remaining = trimmed
+        .replace(/^(xac nhan|dong y|ok|oke|dung roi|xong)\b/, "")
+        .trim();
+
+    if (!remaining) {
+        return true;
+    }
+
+    return [
+        "dat lich",
+        "tao lich",
+        "giup toi",
+        "nhe",
+        "a",
+        "di"
+    ].includes(remaining);
 }
 
 function inferSingleFieldByContext(message, currentDraft) {
@@ -896,7 +940,7 @@ function buildReadyReply(draft) {
 }
 
 function formatSuggestedSlot(slot) {
-    return `${formatDisplayDate(slot.date)} lÃºc ${slot.timeStart}`;
+    return `${formatDisplayDate(slot.date)} lúc ${slot.timeStart}`;
 }
 
 function buildSuggestedSlotsText(suggestedSlots) {
@@ -1012,28 +1056,28 @@ function buildRuntimeValidationFailureMessage(error) {
     }
 
     if (field === "phone") {
-        return "Sá»‘ Ä‘iá»‡n thoáº¡i liÃªn há»‡ chÆ°a há»£p lá»‡. Báº¡n vui lÃ²ng cung cáº¥p sá»‘ Ä‘iá»‡n thoáº¡i Viá»‡t Nam há»£p lá»‡, vÃ­ dá»¥: 0912345678.";
+        return "Số điện thoại liên hệ chưa hợp lệ. Bạn vui lòng cung cấp số điện thoại Việt Nam hợp lệ, ví dụ: 0912345678.";
     }
 
     if (field === "sampleDate") {
-        return "NgÃ y láº¥y máº«u chÆ°a há»£p lá»‡ hoáº·c Ä‘Ã£ á»Ÿ quÃ¡ khá»©. Báº¡n vui lÃ²ng chá»n ngÃ y láº¥y máº«u khÃ¡c.";
+        return "Ngày lấy mẫu chưa hợp lệ hoặc đã ở quá khứ. Bạn vui lòng chọn ngày lấy mẫu khác.";
     }
 
     if (field === "sampleTimeStart") {
-        return "Giá» láº¥y máº«u chÆ°a há»£p lá»‡. Báº¡n vui lÃ²ng nháº­p láº¡i giá» láº¥y máº«u, vÃ­ dá»¥: 7h30, 8h hoáº·c 14:00.";
+        return "Giờ lấy mẫu chưa hợp lệ. Bạn vui lòng nhập lại giờ lấy mẫu, ví dụ: 7h30, 8h hoặc 14:00.";
     }
 
     if (field === "patientName") {
-        return "TÃªn ngÆ°á»i Ä‘áº·t chÆ°a há»£p lá»‡. Báº¡n vui lÃ²ng cung cáº¥p há» tÃªn ngÆ°á»i Ä‘áº·t lá»‹ch.";
+        return "Tên người đặt chưa hợp lệ. Bạn vui lòng cung cấp họ tên người đặt lịch.";
     }
 
     if (field === "testType") {
-        return `GÃ³i/xÃ©t nghiá»‡m chÆ°a há»£p lá»‡. Báº¡n vui lÃ²ng chá»n má»™t gÃ³i HomeLab Ä‘ang há»— trá»£: ${packageCatalog.buildPackageListText()}.`;
+        return `Gói/xét nghiệm chưa hợp lệ. Bạn vui lòng chọn một gói HomeLab đang hỗ trợ: ${packageCatalog.buildPackageListText()}.`;
     }
 
     return error?.message
-        ? `MÃ¬nh chÆ°a thá»ƒ táº¡o lá»‹ch vÃ¬ ${error.message}.`
-        : "MÃ¬nh chÆ°a thá»ƒ táº¡o lá»‹ch vÃ¬ thÃ´ng tin Ä‘áº·t lá»‹ch chÆ°a há»£p lá»‡.";
+        ? `Mình chưa thể tạo lịch vì ${error.message}.`
+        : "Mình chưa thể tạo lịch vì thông tin đặt lịch chưa hợp lệ.";
 }
 
 function isLastBookingFailureQuestion(message) {
@@ -1056,8 +1100,8 @@ function buildLastBookingFailureReply(lastBookingFailure) {
     const suggestionsText = buildSuggestedSlotsText(suggestedSlots);
 
     return [
-        lastBookingFailure?.message || "Lá»‹ch chÆ°a Ä‘Æ°á»£c táº¡o vÃ¬ thÃ´ng tin Ä‘áº·t lá»‹ch hiá»‡n táº¡i chÆ°a thá»ƒ xÃ¡c nháº­n.",
-        "MÃ¬nh váº«n giá»¯ báº£n nhÃ¡p Ä‘áº·t lá»‹ch cá»§a báº¡n.",
+        lastBookingFailure?.message || "Lịch chưa được tạo vì thông tin đặt lịch hiện tại chưa thể xác nhận.",
+        "Mình vẫn giữ bản nháp đặt lịch của bạn.",
         suggestionsText || null
     ].filter(Boolean).join("\n\n");
 }
@@ -1310,15 +1354,203 @@ function buildConfirmationOnlyBlockedReply(draft, missingFields) {
     );
 }
 
+function buildInformationalDetourReply(packageItem, draft, missingFields) {
+    const detail = packageCatalog.buildPackageDetailReply(packageItem);
+    const nextField = missingFields[0];
+    const followUp = nextField
+        ? `Mình vẫn giữ bản nháp đặt lịch của bạn. Bạn vui lòng cung cấp thêm ${FIELD_PROMPTS[nextField]}.`
+        : "Mình vẫn giữ bản nháp đặt lịch của bạn. Bạn muốn tiếp tục xác nhận lịch này hay sửa thông tin nào?";
+
+    return [detail, followUp].join("\n\n");
+}
+
+async function resolveBookingInformationalDetour(message, currentDraft) {
+    if (!hasInformationalDetourIntent(message)) {
+        return null;
+    }
+
+    const packageIntent = await packageCatalog.resolvePackageIntent(message);
+    const packageFromMessage = packageIntent.package || null;
+    const packageFromDraft = currentDraft.selectedPackage || null;
+    const targetPackage = packageFromMessage || packageFromDraft;
+
+    if (!targetPackage) {
+        return null;
+    }
+
+    return {
+        packageIntent: packageFromMessage
+            ? {
+                ...packageIntent,
+                type: "detail_question"
+            }
+            : {
+                type: "detail_question",
+                package: targetPackage,
+                candidates: []
+            },
+        packageItem: targetPackage
+    };
+}
+
 function buildNoActiveDraftConfirmationReply() {
     return (
-        "Minh chua co thong tin lich hen nao dang cho xac nhan trong phien chat nay. " +
-        "Ban vui long cung cap thong tin dat lich gom goi xet nghiem, ngay gio lay mau, dia chi va thong tin lien he."
+        "Mình chưa có thông tin lịch hẹn nào đang chờ xác nhận trong phiên chat này. " +
+        "Bạn vui lòng cung cấp thông tin đặt lịch gồm gói xét nghiệm, ngày giờ lấy mẫu, địa chỉ và thông tin liên hệ."
     );
 }
 
 function buildBookingEditIntentReply() {
-    return "Ban muon doi goi xet nghiem, ngay gio lay mau, dia chi hay thong tin nguoi dat?";
+    return "Bạn muốn đổi gói xét nghiệm, ngày giờ lấy mẫu, địa chỉ hay thông tin người đặt?";
+}
+
+function buildPauseReply() {
+    return (
+        "Được, mình sẽ chưa tạo lịch. Mình vẫn giữ bản nháp đặt lịch này. " +
+        "Bạn muốn sửa thông tin nào, hỏi thêm về gói xét nghiệm, hủy bản nháp, hay tiếp tục xác nhận sau?"
+    );
+}
+
+function buildPausedResumeReconfirmReply() {
+    return (
+        "Bạn muốn tiếp tục xác nhận lịch vừa tạm dừng đúng không? " +
+        "Nếu đúng, hãy trả lời 'Đúng, xác nhận lịch này'."
+    );
+}
+
+function buildCancelDraftConfirmReply() {
+    return "Bạn muốn hủy bản nháp đặt lịch này đúng không? Nếu đúng, hãy trả lời 'Đúng, hủy bản nháp'.";
+}
+
+function buildUnclearBookingDraftReply() {
+    return "Ý bạn là muốn tiếp tục đặt lịch, sửa thông tin, hay hỏi thêm về gói xét nghiệm?";
+}
+
+function buildReviewDraftReply(draft, missingFields) {
+    const knownFields = buildKnownFieldsText(draft);
+    const knownText = knownFields.length
+        ? `Thông tin mình đang giữ: ${knownFields.join("; ")}.`
+        : "Mình chưa ghi nhận đủ thông tin đặt lịch nào trong bản nháp này.";
+    const missingText = missingFields.length
+        ? `Hiện còn thiếu: ${missingFields.map((field) => FIELD_LABELS[field]).join(", ")}.`
+        : "Bản nháp đã đủ thông tin, nhưng lịch chưa được tạo.";
+    const nextText = missingFields.length
+        ? `Bạn vui lòng cung cấp thêm ${FIELD_PROMPTS[missingFields[0]]}.`
+        : "Nếu muốn tạo lịch, bạn trả lời rõ 'Xác nhận đặt lịch'.";
+
+    return [knownText, missingText, nextText].join(" ");
+}
+
+function buildHelpNextStepReply(draft, missingFields) {
+    if (missingFields.length > 0) {
+        const nextField = missingFields[0];
+        return (
+            `Mình đang giữ bản nháp đặt lịch của bạn và còn thiếu ${FIELD_LABELS[nextField]}. ` +
+            `Bạn vui lòng cung cấp ${FIELD_PROMPTS[nextField]}.`
+        );
+    }
+
+    return (
+        "Mình đã có đủ thông tin trong bản nháp. " +
+        "Bạn có thể trả lời 'Xác nhận đặt lịch' để tạo lịch, hoặc nói rõ thông tin muốn sửa."
+    );
+}
+
+function buildEditTimeConfirmationReply(timeValue) {
+    return `Bạn muốn đổi giờ lấy mẫu sang ${timeValue} đúng không?`;
+}
+
+function buildEditConfirmationReply(edit) {
+    if (!edit?.field) {
+        return buildBookingEditIntentReply();
+    }
+
+    if (edit.field === "appointmentTime") {
+        return `Bạn muốn đổi giờ lấy mẫu sang ${edit.value} đúng không?`;
+    }
+
+    if (edit.field === "appointmentDate") {
+        return `Bạn muốn đổi ngày lấy mẫu sang ${formatDisplayDate(edit.value)} đúng không?`;
+    }
+
+    if (edit.field === "address") {
+        return `Bạn muốn đổi địa chỉ lấy mẫu sang "${edit.value}" đúng không?`;
+    }
+
+    if (edit.field === "patientName") {
+        return `Bạn muốn đổi tên người đặt sang "${edit.value}" đúng không?`;
+    }
+
+    if (edit.field === "testType") {
+        return `Bạn muốn đổi gói xét nghiệm sang ${edit.displayValue || edit.value} đúng không?`;
+    }
+
+    return buildBookingEditIntentReply();
+}
+
+function buildPendingEditRejectedReply(draft, missingFields) {
+    const prefix = "Mình sẽ giữ thông tin cũ trong bản nháp.";
+
+    if (missingFields.length > 0) {
+        return `${prefix} ${buildCollectingReply(draft, missingFields)}`;
+    }
+
+    return `${prefix} ${buildReadyReply(draft)}`;
+}
+
+async function normalizePendingDraftEdit(edit) {
+    if (!edit?.field) {
+        return edit;
+    }
+
+    if (edit.field !== "testType") {
+        return edit;
+    }
+
+    const packageIntent = await packageCatalog.resolvePackageIntent(edit.value || "");
+
+    if (packageIntent.type !== "selected" || !packageIntent.package) {
+        return {
+            ...edit,
+            value: edit.value,
+            displayValue: edit.value
+        };
+    }
+
+    return {
+        ...edit,
+        value: packageIntent.package.name,
+        displayValue: packageIntent.package.name,
+        packageIntent,
+        packageSlots: {
+            testType: packageIntent.package.name,
+            testCatalogItemId: packageIntent.package.id,
+            selectedPackage: packageIntent.package,
+            packageConfirmed: false
+        }
+    };
+}
+
+function applyPendingDraftEdit(draft, edit) {
+    if (edit?.field === "testType" && edit.packageSlots) {
+        return {
+            ...draft,
+            ...edit.packageSlots
+        };
+    }
+
+    if (!edit?.field) {
+        return draft;
+    }
+
+    return {
+        ...draft,
+        [edit.field]: edit.value
+    };
+}
+
+function buildDraftCancelledReply() {
+    return "Mình đã hủy bản nháp đặt lịch này. Khi cần đặt lịch mới, bạn chỉ cần gửi lại thông tin gói xét nghiệm, ngày giờ lấy mẫu, địa chỉ và tên người đặt.";
 }
 
 function buildDifferentPhoneReply(sessionPhone) {
@@ -1342,7 +1574,11 @@ function isConfirmationMessage(message) {
     const normalizedMessage = normalizeText(message);
     const trimmed = normalizedMessage.trim();
 
-    if (!trimmed || hasBookingEditOrNegativeIntent(message)) {
+    if (
+        !trimmed ||
+        hasBookingEditOrNegativeIntent(message) ||
+        hasInformationalDetourIntent(message)
+    ) {
         return false;
     }
 
@@ -1351,7 +1587,8 @@ function isConfirmationMessage(message) {
     }
 
     return EXPLICIT_CONFIRMATION_SIGNALS.some((keyword) =>
-        normalizedMessage.startsWith(`${keyword} `)
+        normalizedMessage.startsWith(`${keyword} `) &&
+            isNearConfirmationOnlyText(trimmed)
     );
 }
 
@@ -1388,7 +1625,8 @@ function buildBookingMeta({
     extractedSlots,
     packageIntent,
     missingFields,
-    nextExpectedField
+    nextExpectedField,
+    conversationAct = null
 }) {
     return {
         handledBy: "booking.service",
@@ -1403,7 +1641,8 @@ function buildBookingMeta({
         selectedPackage:
             packageIntent?.package || updatedSession.bookingDraft?.selectedPackage || null,
         packageConfirmed:
-            Boolean(updatedSession.bookingDraft?.packageConfirmed)
+            Boolean(updatedSession.bookingDraft?.packageConfirmed),
+        ...(conversationAct ? { conversationAct } : {})
     };
 }
 
@@ -1418,7 +1657,8 @@ async function returnDraftResult({
     missingFields,
     extractedSlots,
     packageIntent,
-    nextExpectedField
+    nextExpectedField,
+    conversationAct = null
 }) {
     await persistDraft(sessionId, draft, missingFields);
 
@@ -1427,7 +1667,9 @@ async function returnDraftResult({
         status,
         bookingDraft: draft,
         confirmedBookingId: null,
-        lastBookingFailure: null
+        lastBookingFailure: null,
+        pendingDraftEdit: null,
+        pendingDraftCancel: null
     });
 
     return createChatResult({
@@ -1442,8 +1684,101 @@ async function returnDraftResult({
             extractedSlots,
             packageIntent,
             missingFields,
-            nextExpectedField
+            nextExpectedField,
+            conversationAct
         })
+    });
+}
+
+async function createBookingFromDraft({
+    sessionId,
+    message,
+    draft,
+    extractedSlots = {},
+    packageIntent = { type: "none", package: null },
+    conversationAct = null
+}) {
+    const confirmedDraft = {
+        ...draft,
+        packageConfirmed: true
+    };
+
+    const finalAddressValidation = isLikelyAddressInput(confirmedDraft.address || "");
+    if (!finalAddressValidation.valid && confirmedDraft.address) {
+        const addressDraft = {
+            ...confirmedDraft,
+            address: null,
+            addressPartial: confirmedDraft.address
+        };
+
+        return returnDraftResult({
+            sessionId,
+            message,
+            status: "collecting_info",
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: finalAddressValidation.reason === "admin_only"
+                ? buildAdminOnlyAddressReply()
+                : buildAddressValidationReply(),
+            booking: {
+                status: "draft",
+                draft: addressDraft,
+                missingFields: ["address"]
+            },
+            draft: addressDraft,
+            missingFields: ["address"],
+            extractedSlots,
+            packageIntent,
+            nextExpectedField: "address",
+            conversationAct
+        });
+    }
+
+    let createdBooking = null;
+
+    try {
+        createdBooking = await bookingRuntime.createConfirmedBooking(
+            buildRuntimePayloadFromDraft(confirmedDraft),
+            { sessionId, createdSource: "CHAT" }
+        );
+    } catch (error) {
+        return buildBookingFailureResult({
+            error,
+            sessionId,
+            message,
+            draft: confirmedDraft,
+            extractedSlots,
+            packageIntent
+        });
+    }
+
+    const updatedSession = mockSessions.upsertSession(sessionId, {
+        currentFlow: null,
+        status: "booking_created",
+        bookingDraft: null,
+        confirmedBookingId: null,
+        lastBookingFailure: null,
+        pendingDraftEdit: null,
+        pendingDraftCancel: null
+    });
+
+    return createChatResult({
+        sessionId,
+        userMessage: message,
+        flow: FLOWS.BOOKING,
+        action: ACTIONS.BOOKING_CREATED,
+        reply: buildCreatedReply(createdBooking),
+        booking: createdBooking,
+        meta: {
+            handledBy: "booking.service",
+            sessionState: updatedSession.status,
+            extractedSlots,
+            missingFields: [],
+            nextExpectedField: null,
+            selectedPackage: confirmedDraft.selectedPackage || null,
+            packageConfirmed: true,
+            confirmedBookingId: createdBooking.bookingCode,
+            ...(conversationAct ? { conversationAct } : {})
+        }
     });
 }
 
@@ -1523,8 +1858,315 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         ...getEmptyBookingDraft(),
         ...(session.bookingDraft || {})
     };
+    const currentMissingFields = getMissingFields(currentDraft);
+    const conversationAct = classifyConversationAct({
+        message,
+        session,
+        draft: currentDraft,
+        missingFields: currentMissingFields
+    });
 
-    if (editOrNegativeIntent) {
+    if (
+        session.pendingDraftCancel &&
+        conversationAct.act === ACTS.CANCEL_OR_ABORT &&
+        conversationAct.confidence >= 0.8 &&
+        conversationAct.reason === "explicit_cancel_draft_confirmation_in_pending_cancel_context"
+    ) {
+        await bookingRuntime.clearDraft(sessionId);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: null,
+            status: "booking_closed",
+            bookingDraft: null,
+            confirmedBookingId: null,
+            lastBookingFailure: null,
+            pendingDraftEdit: null,
+            pendingDraftCancel: null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildDraftCancelledReply(),
+            booking: null,
+            meta: {
+                handledBy: "booking.service",
+                sessionState: updatedSession.status,
+                missingFields: [],
+                nextExpectedField: null,
+                conversationAct
+            }
+        });
+    }
+
+    if (conversationAct.act === ACTS.PAUSE_OR_HOLD) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: "booking_paused",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: null,
+            pendingDraftEdit: null,
+            pendingDraftCancel: null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildPauseReply(),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: currentMissingFields[0] || null,
+                conversationAct
+            })
+        });
+    }
+
+    if (
+        conversationAct.act === ACTS.RESUME_AFTER_PAUSE &&
+        conversationAct.resumeMode === "needs_reconfirm"
+    ) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: "booking_paused",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: null,
+            pendingDraftEdit: null,
+            pendingDraftCancel: null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildPausedResumeReconfirmReply(),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: currentMissingFields[0] || null,
+                conversationAct
+            })
+        });
+    }
+
+    if (
+        conversationAct.act === ACTS.RESUME_AFTER_PAUSE &&
+        conversationAct.resumeMode === "explicit"
+    ) {
+        if (currentMissingFields.length > 0) {
+            return returnDraftResult({
+                sessionId,
+                message,
+                status: "collecting_info",
+                action: ACTIONS.ASK_BOOKING_INFO,
+                reply: buildCollectingReply(currentDraft, currentMissingFields),
+                booking: {
+                    status: "draft",
+                    draft: currentDraft,
+                    missingFields: currentMissingFields
+                },
+                draft: currentDraft,
+                missingFields: currentMissingFields,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                nextExpectedField: currentMissingFields[0]
+            });
+        }
+
+        return createBookingFromDraft({
+            sessionId,
+            message,
+            draft: {
+                ...currentDraft,
+                ...(sessionPhone ? { phoneNumber: sessionPhone } : {})
+            },
+            extractedSlots: {},
+            packageIntent: currentDraft.selectedPackage
+                ? { type: "selected", package: currentDraft.selectedPackage }
+                : { type: "none", package: null },
+            conversationAct
+        });
+    }
+
+    if (
+        conversationAct.act === ACTS.EDIT_REQUEST &&
+        conversationAct.editMode === "confirm_pending" &&
+        conversationAct.edit?.field
+    ) {
+        const editedDraft = applyPendingDraftEdit(currentDraft, conversationAct.edit);
+        const editedMissingFields = getMissingFields(editedDraft);
+
+        return returnDraftResult({
+            sessionId,
+            message,
+            status: editedMissingFields.length ? "collecting_info" : "ready_for_confirmation",
+            action: editedMissingFields.length
+                ? ACTIONS.ASK_BOOKING_INFO
+                : ACTIONS.BOOKING_READY_TO_CONFIRM,
+            reply: editedMissingFields.length
+                ? buildCollectingReply(editedDraft, editedMissingFields)
+                : buildReadyReply(editedDraft),
+            booking: {
+                status: editedMissingFields.length ? "draft" : "pending_confirmation",
+                draft: editedDraft,
+                missingFields: editedMissingFields
+            },
+            draft: editedDraft,
+            missingFields: editedMissingFields,
+            extractedSlots: {
+                [conversationAct.edit.field]: conversationAct.edit.value
+            },
+            packageIntent: conversationAct.edit.packageIntent || { type: "none", package: null },
+            nextExpectedField: editedMissingFields[0] || null,
+            conversationAct
+        });
+    }
+
+    if (
+        conversationAct.act === ACTS.EDIT_REQUEST &&
+        conversationAct.editMode === "reject_pending"
+    ) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: currentMissingFields.length ? "collecting_info" : "ready_for_confirmation",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: null,
+            pendingDraftEdit: null,
+            pendingDraftCancel: null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: currentMissingFields.length
+                ? ACTIONS.ASK_BOOKING_INFO
+                : ACTIONS.BOOKING_READY_TO_CONFIRM,
+            reply: buildPendingEditRejectedReply(currentDraft, currentMissingFields),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: currentMissingFields[0] || null,
+                conversationAct
+            })
+        });
+    }
+
+    if (
+        conversationAct.act === ACTS.EDIT_REQUEST &&
+        conversationAct.editMode === "clarify_pending"
+    ) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: "editing_booking_draft",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: null,
+            pendingDraftEdit: session.pendingDraftEdit,
+            pendingDraftCancel: null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: conversationAct.suggestedNextQuestion,
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: "editConfirmation",
+                conversationAct
+            })
+        });
+    }
+
+    if (
+        conversationAct.act === ACTS.EDIT_REQUEST &&
+        conversationAct.editMode === "propose_change" &&
+        conversationAct.edit?.field
+    ) {
+        const pendingDraftEdit = await normalizePendingDraftEdit(conversationAct.edit);
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: "editing_booking_draft",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: null,
+            pendingDraftEdit,
+            pendingDraftCancel: null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildEditConfirmationReply(pendingDraftEdit),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: "editConfirmation",
+                conversationAct: {
+                    ...conversationAct,
+                    edit: pendingDraftEdit,
+                    targetValue: pendingDraftEdit.value
+                }
+            })
+        });
+    }
+
+    if (
+        conversationAct.act === ACTS.EDIT_REQUEST &&
+        conversationAct.editMode === "ask_target"
+    ) {
         return returnDraftResult({
             sessionId,
             message,
@@ -1534,15 +2176,256 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             booking: {
                 status: "draft",
                 draft: currentDraft,
-                missingFields: getMissingFields(currentDraft)
+                missingFields: currentMissingFields
             },
             draft: currentDraft,
-            missingFields: getMissingFields(currentDraft),
+            missingFields: currentMissingFields,
             extractedSlots: {},
             packageIntent: { type: "none", package: null },
-            nextExpectedField: "editTarget"
+            nextExpectedField: "editTarget",
+            conversationAct
         });
     }
+
+    if (
+        conversationAct.act === ACTS.CANCEL_OR_ABORT &&
+        conversationAct.cancelMode === "reject_pending"
+    ) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: currentMissingFields.length ? "collecting_info" : "ready_for_confirmation",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: null,
+            pendingDraftEdit: null,
+            pendingDraftCancel: null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: currentMissingFields.length
+                ? ACTIONS.ASK_BOOKING_INFO
+                : ACTIONS.BOOKING_READY_TO_CONFIRM,
+            reply: currentMissingFields.length
+                ? buildCollectingReply(currentDraft, currentMissingFields)
+                : buildReadyReply(currentDraft),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: currentMissingFields[0] || null,
+                conversationAct
+            })
+        });
+    }
+
+    if (
+        conversationAct.act === ACTS.CANCEL_OR_ABORT &&
+        conversationAct.requiresClarification
+    ) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: "booking_cancel_confirmation",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: null,
+            pendingDraftEdit: null,
+            pendingDraftCancel: true
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: conversationAct.suggestedNextQuestion || "Bạn muốn hủy bản nháp hay tiếp tục đặt lịch?",
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: "cancelConfirmation",
+                conversationAct
+            })
+        });
+    }
+
+    if (conversationAct.act === ACTS.CANCEL_OR_ABORT) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: "booking_cancel_confirmation",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: null,
+            pendingDraftEdit: null,
+            pendingDraftCancel: true
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildCancelDraftConfirmReply(),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: "cancelConfirmation",
+                conversationAct
+            })
+        });
+    }
+
+    if (conversationAct.act === ACTS.INFO_DETOUR) {
+        const informationalDetour = await resolveBookingInformationalDetour(
+            message,
+            currentDraft
+        );
+
+        if (informationalDetour) {
+            return returnDraftResult({
+                sessionId,
+                message,
+                status: session.status || "collecting_info",
+                action: ACTIONS.ASK_BOOKING_INFO,
+                reply: buildInformationalDetourReply(
+                    informationalDetour.packageItem,
+                    currentDraft,
+                    currentMissingFields
+                ),
+                booking: {
+                    status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                    draft: currentDraft,
+                    missingFields: currentMissingFields
+                },
+                draft: currentDraft,
+                missingFields: currentMissingFields,
+                extractedSlots: {},
+                packageIntent: informationalDetour.packageIntent,
+                nextExpectedField: currentMissingFields[0] || null
+            });
+        }
+    }
+
+    if (
+        conversationAct.act === ACTS.FINAL_CONFIRM &&
+        !conversationAct.requiresClarification &&
+        conversationAct.confidence >= 0.8 &&
+        currentMissingFields.length === 0 &&
+        !session.pendingDraftEdit &&
+        !session.pendingDraftCancel &&
+        session.status !== "booking_paused"
+    ) {
+        return createBookingFromDraft({
+            sessionId,
+            message,
+            draft: {
+                ...currentDraft,
+                ...(sessionPhone ? { phoneNumber: sessionPhone } : {})
+            },
+            extractedSlots: {},
+            packageIntent: currentDraft.selectedPackage
+                ? { type: "selected", package: currentDraft.selectedPackage }
+                : { type: "none", package: null },
+            conversationAct
+        });
+    }
+
+    if (conversationAct.act === ACTS.REVIEW_DRAFT) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: session.status || "collecting_info",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: session.lastBookingFailure || null,
+            pendingDraftEdit: session.pendingDraftEdit || null,
+            pendingDraftCancel: session.pendingDraftCancel || null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildReviewDraftReply(currentDraft, currentMissingFields),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: {
+                ...buildBookingMeta({
+                    updatedSession,
+                    extractedSlots: {},
+                    packageIntent: { type: "none", package: null },
+                    missingFields: currentMissingFields,
+                    nextExpectedField: currentMissingFields[0] || null
+                }),
+                conversationAct
+            }
+        });
+    }
+
+    if (conversationAct.act === ACTS.HELP_NEXT_STEP) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: session.status || "collecting_info",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: session.lastBookingFailure || null,
+            pendingDraftEdit: session.pendingDraftEdit || null,
+            pendingDraftCancel: session.pendingDraftCancel || null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildHelpNextStepReply(currentDraft, currentMissingFields),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: {
+                ...buildBookingMeta({
+                    updatedSession,
+                    extractedSlots: {},
+                    packageIntent: { type: "none", package: null },
+                    missingFields: currentMissingFields,
+                    nextExpectedField: currentMissingFields[0] || null
+                }),
+                conversationAct
+            }
+        });
+    }
+
     if (session.lastBookingFailure && isLastBookingFailureQuestion(message)) {
         return createChatResult({
             sessionId,
@@ -1561,6 +2444,55 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 lastBookingFailure: session.lastBookingFailure,
                 missingFields: getMissingFields(currentDraft),
                 nextExpectedField: "appointmentTime"
+            }
+        });
+    }
+
+    if (
+        !(
+            session.lastBookingFailure &&
+            resolveSuggestedSlotSelection(
+                message,
+                session.lastBookingFailure.suggestedSlots || []
+            )
+        ) &&
+        (
+            conversationAct.requiresClarification ||
+            conversationAct.act === ACTS.UNCLEAR ||
+            conversationAct.shouldMutateDraft === false
+        )
+    ) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: session.status || "collecting_info",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: session.lastBookingFailure || null,
+            pendingDraftEdit: session.pendingDraftEdit || null,
+            pendingDraftCancel: session.pendingDraftCancel || null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: conversationAct.suggestedNextQuestion || buildUnclearBookingDraftReply(),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: {
+                ...buildBookingMeta({
+                    updatedSession,
+                    extractedSlots: {},
+                    packageIntent: { type: "none", package: null },
+                    missingFields: currentMissingFields,
+                    nextExpectedField: currentMissingFields[0] || "clarifyBookingIntent"
+                }),
+                conversationAct
             }
         });
     }
@@ -1592,6 +2524,45 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         if (!addressValidation.valid) {
             delete extractedSlots.address;
         }
+    }
+
+    if (
+        conversationAct.act === ACTS.FIELD_VALUE &&
+        currentMissingFields.length === 0 &&
+        packageIntent.type === "none" &&
+        Object.keys(extractedSlots).length === 0 &&
+        !session.lastBookingFailure
+    ) {
+        await persistDraft(sessionId, currentDraft, []);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: session.status === "booking_paused" ? "booking_paused" : "ready_for_confirmation",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: null,
+            pendingDraftEdit: null,
+            pendingDraftCancel: null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildUnclearBookingDraftReply(),
+            booking: {
+                status: "pending_confirmation",
+                draft: currentDraft,
+                missingFields: []
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent,
+                missingFields: [],
+                nextExpectedField: "clarifyBookingIntent"
+            })
+        });
     }
 
     const extractedPhone = normalizePhone(extractedSlots.phoneNumber || "");
@@ -1637,7 +2608,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             missingFields,
             extractedSlots,
             packageIntent,
-            nextExpectedField: "testType"
+            nextExpectedField: "testType",
+            conversationAct
         });
     }
 
@@ -1675,7 +2647,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 missingFields: getAddressMissingFields(missingFields),
                 extractedSlots,
                 packageIntent,
-                nextExpectedField: "address"
+                nextExpectedField: "address",
+                conversationAct
             });
         }
     }
@@ -1696,7 +2669,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             missingFields,
             extractedSlots,
             packageIntent,
-            nextExpectedField: "address"
+            nextExpectedField: "address",
+            conversationAct
         });
     }
 
@@ -1724,7 +2698,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             missingFields: addressMissingFields,
             extractedSlots,
             packageIntent,
-            nextExpectedField: "address"
+            nextExpectedField: "address",
+            conversationAct
         });
     }
 
@@ -1749,7 +2724,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             missingFields: addressMissingFields,
             extractedSlots,
             packageIntent,
-            nextExpectedField: "address"
+            nextExpectedField: "address",
+            conversationAct
         });
     }
 
@@ -1782,143 +2758,6 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         }
     }
 
-    if (
-        isConfirmationMessage(message) &&
-        currentDraft.selectedPackage &&
-        !currentDraft.packageConfirmed &&
-        Object.keys(extractedSlots).length === 0
-    ) {
-        const confirmedDraft = {
-            ...nextDraft,
-            packageConfirmed: true
-        };
-        const confirmedMissingFields = getMissingFields(confirmedDraft);
-
-        if (confirmedMissingFields.length > 0) {
-            return returnDraftResult({
-                sessionId,
-                message,
-                status: "collecting_info",
-                action: ACTIONS.ASK_BOOKING_INFO,
-                reply: buildCollectingReply(confirmedDraft, confirmedMissingFields),
-                booking: {
-                    status: "draft",
-                    draft: confirmedDraft,
-                    missingFields: confirmedMissingFields
-                },
-                draft: confirmedDraft,
-                missingFields: confirmedMissingFields,
-                extractedSlots,
-                packageIntent,
-                nextExpectedField: confirmedMissingFields[0]
-            });
-        }
-
-        let createdBooking = null;
-
-        const finalAddressValidation = isLikelyAddressInput(confirmedDraft.address || "");
-        if (!finalAddressValidation.valid && confirmedDraft.address) {
-            const addressDraft = {
-                ...confirmedDraft,
-                address: null,
-                addressPartial: confirmedDraft.address
-            };
-
-            return returnDraftResult({
-                sessionId,
-                message,
-                status: "collecting_info",
-                action: ACTIONS.ASK_BOOKING_INFO,
-                reply: finalAddressValidation.reason === "admin_only"
-                    ? buildAdminOnlyAddressReply()
-                    : buildAddressValidationReply(),
-                booking: {
-                    status: "draft",
-                    draft: addressDraft,
-                    missingFields: ["address"]
-                },
-                draft: addressDraft,
-                missingFields: ["address"],
-                extractedSlots,
-                packageIntent,
-                nextExpectedField: "address"
-            });
-        }
-
-        try {
-            createdBooking = await bookingRuntime.createConfirmedBooking(
-                buildRuntimePayloadFromDraft(confirmedDraft),
-                { sessionId, createdSource: "CHAT" }
-            );
-        } catch (error) {
-            return buildBookingFailureResult({
-                error,
-                sessionId,
-                message,
-                draft: confirmedDraft,
-                extractedSlots,
-                packageIntent
-            });
-
-            const isSlotError = isBookingSlotError(error);
-
-            return createChatResult({
-                sessionId,
-                userMessage: message,
-                flow: FLOWS.BOOKING,
-                action: ACTIONS.BOOKING_READY_TO_CONFIRM,
-                reply: isSlotError
-                    ? formatSlotErrorMessage(error, {
-                        mode: "booking",
-                        draft: confirmedDraft
-                    })
-                    : "MÃ¬nh chÆ°a thá»ƒ táº¡o lá»‹ch háº¹n vá»›i thÃ´ng tin hiá»‡n táº¡i. Báº¡n vui lÃ²ng kiá»ƒm tra láº¡i thÃ´ng tin Ä‘áº·t lá»‹ch hoáº·c liÃªn há»‡ HomeLab Ä‘á»ƒ Ä‘Æ°á»£c há»— trá»£.",
-                booking: {
-                    status: "pending_confirmation",
-                    draft: confirmedDraft,
-                    missingFields: []
-                },
-                meta: {
-                    handledBy: "booking.service",
-                    sessionState: "slot_blocked",
-                    extractedSlots,
-                    missingFields: [],
-                    nextExpectedField: "appointmentTime",
-                    selectedPackage: confirmedDraft.selectedPackage || null,
-                    packageConfirmed: true,
-                    ...(isSlotError ? {} : { errorCode: error.code })
-                }
-            });
-        }
-
-        const updatedSession = mockSessions.upsertSession(sessionId, {
-            currentFlow: null,
-            status: "booking_created",
-            bookingDraft: null,
-            confirmedBookingId: null,
-            lastBookingFailure: null
-        });
-
-        return createChatResult({
-            sessionId,
-            userMessage: message,
-            flow: FLOWS.BOOKING,
-            action: ACTIONS.BOOKING_CREATED,
-            reply: buildCreatedReply(createdBooking),
-            booking: createdBooking,
-            meta: {
-                handledBy: "booking.service",
-                sessionState: updatedSession.status,
-                extractedSlots,
-                missingFields: [],
-                nextExpectedField: null,
-                selectedPackage: confirmedDraft.selectedPackage || null,
-                packageConfirmed: true,
-                confirmedBookingId: createdBooking.bookingCode
-            }
-        });
-    }
-
     if (nextDraft.selectedPackage && !nextDraft.packageConfirmed) {
         const isMissingFields = missingFields.length > 0;
         const isUserConfirming = isConfirmationMessage(message);
@@ -1940,7 +2779,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                     missingFields,
                     extractedSlots,
                     packageIntent,
-                    nextExpectedField: missingFields[0]
+                    nextExpectedField: missingFields[0],
+                    conversationAct
                 });
             }
 
@@ -1959,7 +2799,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 missingFields,
                 extractedSlots,
                 packageIntent,
-                nextExpectedField: missingFields[0]
+                nextExpectedField: missingFields[0],
+                conversationAct
             });
         }
 
@@ -1979,7 +2820,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 missingFields: [],
                 extractedSlots,
                 packageIntent,
-                nextExpectedField: null
+                nextExpectedField: null,
+                conversationAct
             });
         }
 
@@ -1999,7 +2841,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 missingFields,
                 extractedSlots,
                 packageIntent,
-                nextExpectedField: "packageConfirmation"
+                nextExpectedField: "packageConfirmation",
+                conversationAct
             });
         }
 
@@ -2018,123 +2861,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             missingFields,
             extractedSlots,
             packageIntent,
-            nextExpectedField: missingFields[0] || null
-        });
-    }
-
-    const currentDraftForCreate = {
-        ...currentDraft,
-        ...(sessionPhone ? { phoneNumber: sessionPhone } : {})
-    };
-    const canCreateFromConfirmation =
-        isConfirmationMessage(message) &&
-        currentDraftForCreate.packageConfirmed === true &&
-        getMissingFields(currentDraftForCreate).length === 0 &&
-        Object.keys(extractedSlots).length === 0;
-
-    if (canCreateFromConfirmation) {
-        let createdBooking = null;
-
-        const finalAddressValidation = isLikelyAddressInput(currentDraftForCreate.address || "");
-        if (!finalAddressValidation.valid && currentDraftForCreate.address) {
-            const addressDraft = {
-                ...currentDraftForCreate,
-                address: null,
-                addressPartial: currentDraftForCreate.address
-            };
-
-            return returnDraftResult({
-                sessionId,
-                message,
-                status: "collecting_info",
-                action: ACTIONS.ASK_BOOKING_INFO,
-                reply: finalAddressValidation.reason === "admin_only"
-                    ? buildAdminOnlyAddressReply()
-                    : buildAddressValidationReply(),
-                booking: {
-                    status: "draft",
-                    draft: addressDraft,
-                    missingFields: ["address"]
-                },
-                draft: addressDraft,
-                missingFields: ["address"],
-                extractedSlots,
-                packageIntent,
-                nextExpectedField: "address"
-            });
-        }
-
-        try {
-            createdBooking = await bookingRuntime.createConfirmedBooking(
-                buildRuntimePayloadFromDraft(currentDraftForCreate),
-                { sessionId, createdSource: "CHAT" }
-            );
-        } catch (error) {
-            return buildBookingFailureResult({
-                error,
-                sessionId,
-                message,
-                draft: currentDraftForCreate,
-                extractedSlots,
-                packageIntent
-            });
-
-            const isSlotError = isBookingSlotError(error);
-
-            return createChatResult({
-                sessionId,
-                userMessage: message,
-                flow: FLOWS.BOOKING,
-                action: ACTIONS.BOOKING_READY_TO_CONFIRM,
-                reply: isSlotError
-                    ? formatSlotErrorMessage(error, {
-                        mode: "booking",
-                        draft: currentDraftForCreate
-                    })
-                    : "MÃ¬nh chÆ°a thá»ƒ táº¡o lá»‹ch háº¹n vá»›i thÃ´ng tin hiá»‡n táº¡i. Báº¡n vui lÃ²ng kiá»ƒm tra láº¡i thÃ´ng tin Ä‘áº·t lá»‹ch hoáº·c liÃªn há»‡ HomeLab Ä‘á»ƒ Ä‘Æ°á»£c há»— trá»£.",
-                booking: {
-                    status: "pending_confirmation",
-                    draft: currentDraftForCreate,
-                    missingFields: []
-                },
-                meta: {
-                    handledBy: "booking.service",
-                    sessionState: "slot_blocked",
-                    extractedSlots,
-                    missingFields: [],
-                    nextExpectedField: "appointmentTime",
-                    selectedPackage: currentDraftForCreate.selectedPackage || null,
-                    packageConfirmed: true,
-                    ...(isSlotError ? {} : { errorCode: error.code })
-                }
-            });
-        }
-
-        const updatedSession = mockSessions.upsertSession(sessionId, {
-            currentFlow: null,
-            status: "booking_created",
-            bookingDraft: null,
-            confirmedBookingId: null,
-            lastBookingFailure: null
-        });
-
-        return createChatResult({
-            sessionId,
-            userMessage: message,
-            flow: FLOWS.BOOKING,
-            action: ACTIONS.BOOKING_CREATED,
-            reply: buildCreatedReply(createdBooking),
-            booking: createdBooking,
-            meta: {
-                handledBy: "booking.service",
-                sessionState: updatedSession.status,
-                extractedSlots,
-                missingFields: [],
-                nextExpectedField: null,
-                selectedPackage: currentDraftForCreate.selectedPackage || null,
-                packageConfirmed: true,
-                confirmedBookingId: createdBooking.bookingCode
-            }
+            nextExpectedField: missingFields[0] || null,
+            conversationAct
         });
     }
 
@@ -2169,7 +2897,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         missingFields,
         extractedSlots,
         packageIntent,
-        nextExpectedField: missingFields[0] || null
+        nextExpectedField: missingFields[0] || null,
+        conversationAct
     });
 }
 

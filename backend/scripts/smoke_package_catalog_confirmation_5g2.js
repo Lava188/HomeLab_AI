@@ -269,6 +269,93 @@ async function main() {
             }
         ],
         [
+            "booking_draft_package_detail_detour_keeps_missing_time",
+            async () => {
+                const sessionId = uniqueId("liver_detail_detour_5g2");
+                const before = await countBookingsBySession(sessionId);
+                const first = await postChat(
+                    `tôi muốn đặt lịch gói chức năng gan ngày ${displayDate(state.date)}, địa chỉ: 12 Nguyễn Trãi, Quận 1, tên: Smoke Liver User`,
+                    sessionId,
+                    userHeaders(state.phone)
+                );
+                const second = await postChat(
+                    "chức năng gan là gì",
+                    sessionId,
+                    userHeaders(state.phone)
+                );
+                const data = second.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+                const after = await countBookingsBySession(sessionId);
+
+                assert(first.response.status === 200 && first.payload.success, "first chat failed");
+                assert(second.response.status === 200 && second.payload.success, "detail detour failed");
+                assert(normalizedReply.includes("chuc nang gan"), "detour missing package name");
+                assert(normalizedReply.includes("alt") && normalizedReply.includes("ast"), "detour missing ALT/AST");
+                assert(normalizedReply.includes("gio lay mau"), "detour did not ask for missing time");
+                assert(data.booking?.draft?.testType, "draft lost package");
+                assert(data.booking?.draft?.appointmentDate, "draft lost date");
+                assert(data.booking?.draft?.phoneNumber === state.phone, "draft lost session phone");
+                assert((data.booking?.missingFields || []).includes("appointmentTime"), "missingFields lost appointmentTime");
+                assert(!hasBookingCode(data.reply || ""), "detour reply has booking code");
+                assert(after === before, "detail detour created booking");
+            }
+        ],
+        [
+            "booking_draft_oke_explain_is_not_confirmation",
+            async () => {
+                const sessionId = uniqueId("liver_oke_explain_5g2");
+                const before = await countBookingsBySession(sessionId);
+                await postChat(
+                    `tôi muốn đặt lịch gói chức năng gan ngày ${displayDate(state.date)}, địa chỉ: 12 Nguyễn Trãi, Quận 1, tên: Smoke Liver User`,
+                    sessionId,
+                    userHeaders(state.phone)
+                );
+                const { response, payload } = await postChat(
+                    "oke giải thích giúp tôi về gói chức năng gan",
+                    sessionId,
+                    userHeaders(state.phone)
+                );
+                const data = payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+                const after = await countBookingsBySession(sessionId);
+
+                assert(response.status === 200 && payload.success, "oke explain chat failed");
+                assert(normalizedReply.includes("chuc nang gan"), "oke explain missing package detail");
+                assert(normalizedReply.includes("alt") && normalizedReply.includes("ast"), "oke explain missing ALT/AST");
+                assert(!normalizedReply.includes("minh chua the tao lich vi con thieu"), "oke explain was treated as confirmation block");
+                assert(!hasBookingCode(data.reply || ""), "oke explain reply has booking code");
+                assert(after === before, "oke explain created booking");
+            }
+        ],
+        [
+            "booking_draft_invalid_address_reply_is_specific_utf8",
+            async () => {
+                const sessionId = uniqueId("invalid_address_5g2");
+                const before = await countBookingsBySession(sessionId);
+                await postChat(
+                    `tôi muốn đặt lịch gói chức năng gan ngày ${displayDate(state.date)} lúc ${state.time}, tên: Smoke Address User`,
+                    sessionId,
+                    userHeaders(state.phone)
+                );
+                const { response, payload } = await postChat(
+                    "abc, xyz, ymn",
+                    sessionId,
+                    userHeaders(state.phone)
+                );
+                const data = payload.data || {};
+                const reply = data.reply || "";
+                const normalizedReply = normalizeText(reply);
+                const after = await countBookingsBySession(sessionId);
+
+                assert(response.status === 200 && payload.success, "invalid address chat failed");
+                assert(!data.booking?.draft?.address, "invalid address was set on draft");
+                assert(normalizedReply.includes("mo ta dia chi"), "reply missing specific invalid-address reason");
+                assert(normalizedReply.includes("chua du chinh xac"), "reply did not say address is not valid enough");
+                assert(!/[ÃÄÆ]|á»|áº|Â/.test(reply), "reply contains mojibake");
+                assert(after === before, "invalid address created booking");
+            }
+        ],
+        [
             "confirmed_package_booking_creates_booking",
             async () => {
                 const sessionId = uniqueId("create_general_5g2");
