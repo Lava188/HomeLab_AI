@@ -583,8 +583,146 @@ async function main() {
                 assert(after === before, "cancel draft created booking");
                 assert(
                     normalizedReply.includes("huy ban nhap") &&
-                        normalizedReply.includes("dung khong"),
+                        normalizedReply.includes("dung huy ban nhap"),
                     "cancel draft did not ask confirmation"
+                );
+            }
+        ],
+        [
+            "ready_draft_cancel_natural_phrase",
+            async () => {
+                const sessionId = uniqueId("cancel_natural_5l1c");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const cancel = await postChat("Tôi không muốn khám nữa bỏ lịch giúp tôi", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = cancel.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "natural cancel phrase created booking");
+                assert(data.booking?.draft, "natural cancel phrase lost draft");
+                assert(data.meta?.sessionState === "booking_cancel_confirmation", "natural cancel did not set pending cancel state");
+                assert(data.meta?.conversationAct?.act === "cancel_or_abort", "natural cancel was not classified as cancel_or_abort");
+                assert(!normalizedReply.includes("y ban la muon tiep tuc"), "natural cancel returned generic unclear");
+                assert(
+                    normalizedReply.includes("chua tao lich") &&
+                        normalizedReply.includes("dung huy ban nhap") &&
+                        normalizedReply.includes("tiep tuc dat lich"),
+                    "natural cancel did not ask draft cancel confirmation"
+                );
+            }
+        ],
+        [
+            "ready_draft_cancel_huy_lich",
+            async () => {
+                const sessionId = uniqueId("cancel_huy_lich_5l1c");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const cancel = await postChat("Hủy lịch", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = cancel.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "huy lich created booking");
+                assert(data.booking?.draft, "huy lich lost draft");
+                assert(data.meta?.sessionState === "booking_cancel_confirmation", "huy lich did not set pending cancel state");
+                assert(data.meta?.conversationAct?.act === "cancel_or_abort", "huy lich was not classified as cancel_or_abort");
+                assert(normalizedReply.includes("huy ban nhap"), "huy lich did not ask draft cancel confirmation");
+            }
+        ],
+        [
+            "ready_draft_cancel_short_huy",
+            async () => {
+                const sessionId = uniqueId("cancel_short_huy_5l1c");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const cancel = await postChat("Hủy", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = cancel.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "short huy created booking");
+                assert(data.booking?.draft, "short huy lost draft");
+                assert(data.meta?.sessionState === "booking_cancel_confirmation", "short huy did not set pending cancel state");
+                assert(data.meta?.conversationAct?.reason === "short_cancel_in_active_booking_context", "short huy missing active context reason");
+                assert(normalizedReply.includes("huy ban nhap"), "short huy did not ask draft cancel confirmation");
+            }
+        ],
+        [
+            "pending_cancel_huy_lich_still_requires_explicit",
+            async () => {
+                const sessionId = uniqueId("pending_huy_lich_5l1c");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                await postChat("Hủy", sessionId, userHeaders(state.phone));
+                const before = await countBookingsBySession(sessionId);
+                const again = await postChat("Hủy lịch", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = again.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "pending huy lich created booking");
+                assert(data.booking?.draft, "pending huy lich cleared draft");
+                assert(data.meta?.sessionState === "booking_cancel_confirmation", "pending huy lich left cancel state");
+                assert(
+                    normalizedReply.includes("dung huy ban nhap") &&
+                        normalizedReply.includes("de xac nhan"),
+                    "pending huy lich did not require explicit draft confirmation"
+                );
+            }
+        ],
+        [
+            "pending_cancel_explicit_confirm",
+            async () => {
+                const sessionId = uniqueId("pending_confirm_5l1c");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                await postChat("Hủy", sessionId, userHeaders(state.phone));
+                const before = await countBookingsBySession(sessionId);
+                const confirmed = await postChat("Đúng, hủy bản nháp", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = confirmed.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "explicit cancel confirm created booking");
+                assert(!data.booking, "explicit cancel confirm returned active booking");
+                assert(data.meta?.sessionState === "booking_closed", "explicit cancel confirm did not close draft");
+                assert(normalizedReply.includes("da huy ban nhap"), "explicit cancel confirm did not say draft cancelled");
+            }
+        ],
+        [
+            "pending_cancel_reject",
+            async () => {
+                const sessionId = uniqueId("pending_reject_5l1c");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                await postChat("Hủy", sessionId, userHeaders(state.phone));
+                const before = await countBookingsBySession(sessionId);
+                const reject = await postChat("Không hủy nữa, tiếp tục đặt", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = reject.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "pending cancel reject created booking");
+                assert(data.booking?.draft, "pending cancel reject lost draft");
+                assert(data.meta?.sessionState === "ready_for_confirmation", "pending cancel reject did not resume ready draft");
+                assert(normalizedReply.includes("xac nhan"), "pending cancel reject did not return ready confirmation");
+            }
+        ],
+        [
+            "no_active_draft_cancel_existing",
+            async () => {
+                const sessionId = uniqueId("no_active_cancel_5l1c");
+                const before = await countBookingsBySession(sessionId);
+                const cancel = await postChat("Hủy lịch", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = cancel.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "no active draft cancel created booking");
+                assert(!normalizedReply.includes("da huy ban nhap"), "no active draft claimed draft was cancelled");
+                assert(data.meta?.handledBy === "cancel.service", "no active draft did not route to existing booking cancel flow");
+                assert(
+                    normalizedReply.includes("ma dat lich") ||
+                        normalizedReply.includes("hlb-yyyy"),
+                    "no active draft cancel did not ask for booking code"
                 );
             }
         ],

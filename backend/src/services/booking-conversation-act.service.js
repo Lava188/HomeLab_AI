@@ -125,6 +125,50 @@ const PENDING_CANCEL_REJECT_SIGNALS = [
     "giu lai"
 ];
 
+const CANCEL_ABORT_CONFIRM_QUESTION =
+    "Được, mình sẽ chưa tạo lịch này. Bạn muốn hủy bản nháp đặt lịch hiện tại đúng không? Nếu đúng, hãy trả lời 'Đúng, hủy bản nháp'. Nếu không, hãy trả lời 'Tiếp tục đặt lịch'.";
+
+const PENDING_CANCEL_EXPLICIT_QUESTION =
+    "Bạn muốn hủy bản nháp đặt lịch này đúng không? Hãy trả lời 'Đúng, hủy bản nháp' để xác nhận.";
+
+const CANCEL_ABORT_VERB_PATTERNS = [
+    /\bhuy\b/,
+    /\bbo\b/,
+    /\bthoi\b/,
+    /\bkhong\s+can\b/,
+    /\bkhong\s+muon\b/,
+    /\bdoi\s+y\b/,
+    /\bkhoi\b/,
+    /\bdung\s+(?:dat|viec\s+dat|lich|kham|xet\s+nghiem|lay\s+mau)\b/
+];
+
+const CANCEL_ABORT_CONTEXT_PATTERNS = [
+    /\blich\b/,
+    /\bdat\s+lich\b/,
+    /\bkham\b/,
+    /\bxet\s+nghiem\b/,
+    /\blay\s+mau\b/,
+    /\bgoi\s+nay\b/,
+    /\bban\s+nhap\b/
+];
+
+const CANCEL_ABORT_NATURAL_PATTERNS = [
+    /\bkhong\s+muon\s+(?:kham|dat|xet\s+nghiem|lay\s+mau)(?:\s+nua)?\b/,
+    /\bkhong\s+dat\s+nua\b/,
+    /\bthoi\s+(?:khoi\s+)?dat\b/,
+    /\bkhoi\s+dat\b/,
+    /\bbo\s+lich\b/,
+    /\bhuy\s+lich\b/,
+    /\bhuy\s+dat\s+lich\b/
+];
+
+const SHORT_CANCEL_ABORT_SIGNALS = new Set([
+    "huy",
+    "bo",
+    "thoi",
+    "khoi"
+]);
+
 const PENDING_EDIT_REJECT_SIGNALS = [
     "khong",
     "khong sua",
@@ -169,6 +213,74 @@ function exactAny(text, signals) {
     return signals.includes(text.trim());
 }
 
+function testAnyPattern(text, patterns) {
+    return patterns.some((pattern) => pattern.test(text));
+}
+
+function detectCancelAbortEvidence({ normalized, context }) {
+    const trimmed = String(normalized || "").trim();
+    const activeDraft = Boolean(context?.activeDraft);
+
+    if (!trimmed) {
+        return {
+            detected: false,
+            confidence: 0,
+            reason: null,
+            suggestedNextQuestion: CANCEL_ABORT_CONFIRM_QUESTION
+        };
+    }
+
+    const hasNaturalCancel = testAnyPattern(trimmed, CANCEL_ABORT_NATURAL_PATTERNS);
+    const hasCancelVerb = testAnyPattern(trimmed, CANCEL_ABORT_VERB_PATTERNS);
+    const hasBookingContext = testAnyPattern(trimmed, CANCEL_ABORT_CONTEXT_PATTERNS);
+    const isShortCancel = SHORT_CANCEL_ABORT_SIGNALS.has(trimmed);
+
+    if (activeDraft && isShortCancel) {
+        return {
+            detected: true,
+            confidence: 0.82,
+            reason: "short_cancel_in_active_booking_context",
+            suggestedNextQuestion: CANCEL_ABORT_CONFIRM_QUESTION
+        };
+    }
+
+    if (hasNaturalCancel && (activeDraft || hasBookingContext)) {
+        return {
+            detected: true,
+            confidence: 0.9,
+            reason: "cancel_abort_current_booking_draft",
+            suggestedNextQuestion: CANCEL_ABORT_CONFIRM_QUESTION
+        };
+    }
+
+    if (hasCancelVerb && hasBookingContext) {
+        return {
+            detected: true,
+            confidence: activeDraft ? 0.88 : 0.78,
+            reason: activeDraft
+                ? "cancel_abort_current_booking_draft"
+                : "cancel_signal_without_active_booking_draft",
+            suggestedNextQuestion: CANCEL_ABORT_CONFIRM_QUESTION
+        };
+    }
+
+    if (activeDraft && hasCancelVerb) {
+        return {
+            detected: true,
+            confidence: 0.76,
+            reason: "cancel_abort_current_booking_draft",
+            suggestedNextQuestion: CANCEL_ABORT_CONFIRM_QUESTION
+        };
+    }
+
+    return {
+        detected: false,
+        confidence: 0,
+        reason: null,
+        suggestedNextQuestion: CANCEL_ABORT_CONFIRM_QUESTION
+    };
+}
+
 function countEvidence(normalized) {
     return {
         finalConfirm: includesAny(normalized, SIGNALS.finalConfirm),
@@ -202,9 +314,13 @@ function isCancelDraftConfirmation(message) {
     const normalized = normalizeText(message).trim();
 
     return Boolean(
-        normalized.includes("huy ban nhap") ||
-            normalized.includes("huy lich nay") ||
-            (normalized.startsWith("dung") && normalized.includes("huy"))
+        (
+            normalized.startsWith("dung") ||
+            normalized.startsWith("dong y") ||
+            normalized.startsWith("xac nhan")
+        ) &&
+            normalized.includes("huy") &&
+            normalized.includes("ban nhap")
     );
 }
 
@@ -470,6 +586,8 @@ function classifyConversationAct({ message, session = null, draft = null, missin
     const normalized = normalizeText(message).trim();
     const context = buildContext({ session, draft, missingFields });
     const evidence = countEvidence(normalized);
+    const cancelEvidence = detectCancelAbortEvidence({ normalized, context });
+    evidence.cancel = cancelEvidence.detected;
     const editTarget = detectEditTarget(message);
     const intentCount = [
         evidence.finalConfirm,
@@ -514,12 +632,13 @@ function classifyConversationAct({ message, session = null, draft = null, missin
         return baseResult({
             act: ACTS.CANCEL_OR_ABORT,
             confidence: 0.56,
-            reason: "pending_cancel_needs_clear_yes_or_no",
+            reason: cancelEvidence.detected
+                ? "pending_cancel_still_requires_explicit_cancel_draft_confirmation"
+                : "pending_cancel_needs_clear_yes_or_no",
             requiresClarification: true,
             shouldMutateDraft: false,
             blockedBy: ["pending_cancel"],
-            suggestedNextQuestion:
-                "Bạn muốn hủy bản nháp đặt lịch này hay tiếp tục đặt lịch?"
+            suggestedNextQuestion: PENDING_CANCEL_EXPLICIT_QUESTION
         });
     }
 
@@ -622,15 +741,18 @@ function classifyConversationAct({ message, session = null, draft = null, missin
         });
     }
 
-    if (evidence.cancel) {
+    if (cancelEvidence.detected) {
         return baseResult({
             act: ACTS.CANCEL_OR_ABORT,
-            confidence: 0.86,
-            reason: context.activeDraft
-                ? "cancel_signal_with_active_booking_draft"
-                : "cancel_signal_without_booking_code",
-            requiresClarification: false,
-            shouldMutateDraft: false
+            confidence: cancelEvidence.confidence || 0.86,
+            reason: cancelEvidence.reason || (
+                context.activeDraft
+                    ? "cancel_abort_current_booking_draft"
+                    : "cancel_signal_without_booking_code"
+            ),
+            requiresClarification: true,
+            shouldMutateDraft: false,
+            suggestedNextQuestion: cancelEvidence.suggestedNextQuestion
         });
     }
 
@@ -755,6 +877,7 @@ function classifyConversationAct({ message, session = null, draft = null, missin
 module.exports = {
     ACTS,
     classifyConversationAct,
+    detectCancelAbortEvidence,
     isExplicitResumeConfirmation,
     isShortConfirmation
 };

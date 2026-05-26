@@ -320,7 +320,17 @@ const URGENT_HEALTH_INTENT_SIGNALS = [
     "lu lan",
     "lo mo",
     "tho nhanh",
-    "moi tim"
+    "moi tim",
+    "dau dau du doi",
+    "dau dau dot ngot",
+    "yeu mot ben",
+    "yeu nua nguoi",
+    "te mot ben",
+    "te nua nguoi",
+    "liet nua nguoi",
+    "meo mieng",
+    "noi kho",
+    "co giat"
 ];
 
 function tokenize(text) {
@@ -353,6 +363,27 @@ function rewriteForRouting(message) {
 
 function includesAny(text, signals) {
     return signals.some((signal) => text.includes(signal));
+}
+
+function hasNeurologicalRedFlag(expandedMessage) {
+    return (
+        includesAny(expandedMessage, [
+            "dau dau du doi",
+            "dau dau dot ngot",
+            "meo mieng",
+            "noi kho",
+            "lo mo",
+            "co giat"
+        ]) ||
+        (
+            includesAny(expandedMessage, ["yeu mot ben", "yeu nua nguoi", "te mot ben", "te nua nguoi", "liet nua nguoi"]) &&
+            includesAny(expandedMessage, ["nguoi", "tay", "chan", "mat"])
+        ) ||
+        (
+            expandedMessage.includes("non lien tuc") &&
+            includesAny(expandedMessage, ["dau dau", "yeu", "te", "meo mieng", "noi kho", "lo mo", "co giat"])
+        )
+    );
 }
 
 function isEducationalLabQuestion(expandedMessage) {
@@ -398,6 +429,10 @@ function isTestAdviceQuery(expandedMessage) {
 }
 
 function getIntentGroup(expandedMessage) {
+    if (hasNeurologicalRedFlag(expandedMessage)) {
+        return "urgent_health";
+    }
+
     if (includesAny(expandedMessage, URGENT_HEALTH_INTENT_SIGNALS)) {
         return "urgent_health";
     }

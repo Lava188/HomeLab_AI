@@ -17,9 +17,19 @@ const {
     ACTS,
     classifyConversationAct
 } = require("./booking-conversation-act.service");
+const {
+    classifySemanticIntent,
+    classifySemanticIntentAsync,
+    getProviderName
+} = require("./conversation-intent-classifier.service");
+const {
+    buildSemanticReadonlyAssist,
+    buildSemanticAssistMeta
+} = require("./booking-semantic-readonly-assist.service");
 
 const NEARBY_SLOT_LOOKAHEAD_DAYS = 7;
 const NEARBY_SLOT_LIMIT = 5;
+const INTENT_CLASSIFIER_SHADOW_ASYNC_ENABLED_ENV = "HOMELAB_INTENT_CLASSIFIER_SHADOW_ASYNC_ENABLED";
 
 const REQUIRED_FIELDS = [
     "testType",
@@ -1152,7 +1162,8 @@ async function buildBookingFailureResult({
     message,
     draft,
     extractedSlots,
-    packageIntent
+    packageIntent,
+    conversationAct = null
 }) {
     if (
         error?.code === "BOOKING_VALIDATION_ERROR" &&
@@ -1200,7 +1211,8 @@ async function buildBookingFailureResult({
                     extractedSlots,
                     packageIntent,
                     missingFields: ["address"],
-                    nextExpectedField: "address"
+                    nextExpectedField: "address",
+                    conversationAct
                 }),
                 lastBookingFailure,
                 errorCode: error.code
@@ -1248,7 +1260,8 @@ async function buildBookingFailureResult({
                     extractedSlots,
                     packageIntent,
                     missingFields,
-                    nextExpectedField: missingFields[0] || null
+                    nextExpectedField: missingFields[0] || null,
+                    conversationAct
                 }),
                 lastBookingFailure,
                 errorCode: error.code
@@ -1305,7 +1318,8 @@ async function buildBookingFailureResult({
                 extractedSlots,
                 packageIntent,
                 missingFields: [],
-                nextExpectedField: "appointmentTime"
+                nextExpectedField: "appointmentTime",
+                conversationAct
             }),
             lastBookingFailure,
             slotFailureReason: reasonCode
@@ -1646,6 +1660,105 @@ function buildBookingMeta({
     };
 }
 
+function getRuleConversationAct(conversationAct) {
+    return conversationAct?.rule || conversationAct || null;
+}
+
+function compareConversationActs(ruleAct, semanticShadow) {
+    if (!ruleAct || !semanticShadow) {
+        return {
+            match: false,
+            disagreementReason: semanticShadow
+                ? "rule_or_semantic_missing"
+                : "semantic_classifier_unavailable"
+        };
+    }
+
+    if (semanticShadow.safetyDecision === "block_mutation") {
+        return {
+            match: false,
+            disagreementReason: "semantic_shadow_safety_block_differs_from_rule"
+        };
+    }
+
+    if (ruleAct.act === semanticShadow.conversationAct) {
+        return {
+            match: true,
+            disagreementReason: null
+        };
+    }
+
+    if (ruleAct.act === ACTS.FINAL_CONFIRM && semanticShadow.conversationAct === ACTS.EDIT_REQUEST) {
+        return {
+            match: false,
+            disagreementReason: "semantic_shadow_prioritized_edit_over_confirmation"
+        };
+    }
+
+    return {
+        match: false,
+        disagreementReason: `rule_${ruleAct.act || "unknown"}_semantic_${semanticShadow.conversationAct || "unknown"}`
+    };
+}
+
+function isIntentClassifierShadowAsyncEnabled(env = process.env) {
+    return String(env[INTENT_CLASSIFIER_SHADOW_ASYNC_ENABLED_ENV] || "")
+        .trim()
+        .toLowerCase() === "true";
+}
+
+function buildConversationActShadowMeta(ruleAct, semanticShadow, options = {}) {
+    const comparison = compareConversationActs(ruleAct, semanticShadow);
+
+    return {
+        ...(ruleAct || {}),
+        rule: ruleAct || null,
+        semanticShadow: semanticShadow || null,
+        match: comparison.match,
+        disagreementReason: comparison.disagreementReason,
+        ...(Object.prototype.hasOwnProperty.call(options, "semanticShadowAvailable")
+            ? { semanticShadowAvailable: options.semanticShadowAvailable }
+            : {}),
+        ...(Object.prototype.hasOwnProperty.call(options, "shadowAsyncEnabled")
+            ? { shadowAsyncEnabled: options.shadowAsyncEnabled }
+            : {}),
+        ...(Object.prototype.hasOwnProperty.call(options, "shadowProvider")
+            ? { shadowProvider: options.shadowProvider }
+            : {})
+    };
+}
+
+async function buildConversationActShadowMetaAsync(ruleAct, classifierInput) {
+    const shadowProvider = getProviderName();
+    const semanticShadow = await classifySemanticIntentAsync({
+        ...classifierInput,
+        ruleAct
+    });
+
+    return buildConversationActShadowMeta(ruleAct, semanticShadow, {
+        semanticShadowAvailable: Boolean(semanticShadow),
+        shadowAsyncEnabled: true,
+        shadowProvider
+    });
+}
+
+function withConversationActMeta(conversationAct, overrides = {}) {
+    const ruleAct = {
+        ...(getRuleConversationAct(conversationAct) || {}),
+        ...overrides
+    };
+    const semanticShadow = conversationAct?.semanticShadow || null;
+    const metaOptions = {};
+
+    for (const key of ["semanticShadowAvailable", "shadowAsyncEnabled", "shadowProvider"]) {
+        if (Object.prototype.hasOwnProperty.call(conversationAct || {}, key)) {
+            metaOptions[key] = conversationAct[key];
+        }
+    }
+
+    return buildConversationActShadowMeta(ruleAct, semanticShadow, metaOptions);
+}
+
 async function returnDraftResult({
     sessionId,
     message,
@@ -1747,7 +1860,8 @@ async function createBookingFromDraft({
             message,
             draft: confirmedDraft,
             extractedSlots,
-            packageIntent
+            packageIntent,
+            conversationAct
         });
     }
 
@@ -1865,6 +1979,67 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         draft: currentDraft,
         missingFields: currentMissingFields
     });
+    const semanticClassifierInput = {
+        message,
+        sessionContext: session,
+        draft: currentDraft,
+        lastBotAction: session.status || null,
+        domainContext: {
+            missingFields: currentMissingFields,
+            nextExpectedField: currentMissingFields[0] || null,
+            selectedPackage: currentDraft.selectedPackage || null,
+            pendingDraftEdit: session.pendingDraftEdit || null,
+            pendingDraftCancel: session.pendingDraftCancel || null
+        }
+    };
+    const shadowAsyncEnabled = isIntentClassifierShadowAsyncEnabled();
+    const conversationActMeta = shadowAsyncEnabled
+        ? await buildConversationActShadowMetaAsync(conversationAct, semanticClassifierInput)
+        : buildConversationActShadowMeta(
+            conversationAct,
+            classifySemanticIntent(semanticClassifierInput),
+            {
+                semanticShadowAvailable: true,
+                shadowAsyncEnabled: false,
+                shadowProvider: getProviderName()
+            }
+        );
+    const semanticAssist = await buildSemanticReadonlyAssist({
+        ruleAct: conversationAct,
+        semanticShadow: conversationActMeta.semanticShadow,
+        draft: currentDraft,
+        sessionState: session.status || null,
+        lastBotAction: session.status || null,
+        message,
+        context: {
+            ...semanticClassifierInput.domainContext,
+            missingFields: currentMissingFields
+        }
+    });
+    conversationActMeta.semanticAssist = buildSemanticAssistMeta(semanticAssist);
+
+    if (semanticAssist.enabled && semanticAssist.reply) {
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: semanticAssist.reply,
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession: session,
+                extractedSlots: {},
+                packageIntent: semanticAssist.meta?.packageIntent || { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: currentMissingFields[0] || null,
+                conversationAct: conversationActMeta
+            })
+        });
+    }
 
     if (
         session.pendingDraftCancel &&
@@ -1895,7 +2070,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 sessionState: updatedSession.status,
                 missingFields: [],
                 nextExpectedField: null,
-                conversationAct
+                conversationAct: conversationActMeta
             }
         });
     }
@@ -1929,7 +2104,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 packageIntent: { type: "none", package: null },
                 missingFields: currentMissingFields,
                 nextExpectedField: currentMissingFields[0] || null,
-                conversationAct
+                conversationAct: conversationActMeta
             })
         });
     }
@@ -1966,7 +2141,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 packageIntent: { type: "none", package: null },
                 missingFields: currentMissingFields,
                 nextExpectedField: currentMissingFields[0] || null,
-                conversationAct
+                conversationAct: conversationActMeta
             })
         });
     }
@@ -1991,7 +2166,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 missingFields: currentMissingFields,
                 extractedSlots: {},
                 packageIntent: { type: "none", package: null },
-                nextExpectedField: currentMissingFields[0]
+                nextExpectedField: currentMissingFields[0],
+                conversationAct: conversationActMeta
             });
         }
 
@@ -2006,7 +2182,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             packageIntent: currentDraft.selectedPackage
                 ? { type: "selected", package: currentDraft.selectedPackage }
                 : { type: "none", package: null },
-            conversationAct
+            conversationAct: conversationActMeta
         });
     }
 
@@ -2040,7 +2216,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             },
             packageIntent: conversationAct.edit.packageIntent || { type: "none", package: null },
             nextExpectedField: editedMissingFields[0] || null,
-            conversationAct
+            conversationAct: conversationActMeta
         });
     }
 
@@ -2078,7 +2254,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 packageIntent: { type: "none", package: null },
                 missingFields: currentMissingFields,
                 nextExpectedField: currentMissingFields[0] || null,
-                conversationAct
+                conversationAct: conversationActMeta
             })
         });
     }
@@ -2115,7 +2291,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 packageIntent: { type: "none", package: null },
                 missingFields: currentMissingFields,
                 nextExpectedField: "editConfirmation",
-                conversationAct
+                conversationAct: conversationActMeta
             })
         });
     }
@@ -2154,11 +2330,10 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 packageIntent: { type: "none", package: null },
                 missingFields: currentMissingFields,
                 nextExpectedField: "editConfirmation",
-                conversationAct: {
-                    ...conversationAct,
+                conversationAct: withConversationActMeta(conversationActMeta, {
                     edit: pendingDraftEdit,
                     targetValue: pendingDraftEdit.value
-                }
+                })
             })
         });
     }
@@ -2183,7 +2358,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             extractedSlots: {},
             packageIntent: { type: "none", package: null },
             nextExpectedField: "editTarget",
-            conversationAct
+            conversationAct: conversationActMeta
         });
     }
 
@@ -2223,7 +2398,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 packageIntent: { type: "none", package: null },
                 missingFields: currentMissingFields,
                 nextExpectedField: currentMissingFields[0] || null,
-                conversationAct
+                conversationAct: conversationActMeta
             })
         });
     }
@@ -2260,7 +2435,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 packageIntent: { type: "none", package: null },
                 missingFields: currentMissingFields,
                 nextExpectedField: "cancelConfirmation",
-                conversationAct
+                conversationAct: conversationActMeta
             })
         });
     }
@@ -2294,7 +2469,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 packageIntent: { type: "none", package: null },
                 missingFields: currentMissingFields,
                 nextExpectedField: "cancelConfirmation",
-                conversationAct
+                conversationAct: conversationActMeta
             })
         });
     }
@@ -2325,7 +2500,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 missingFields: currentMissingFields,
                 extractedSlots: {},
                 packageIntent: informationalDetour.packageIntent,
-                nextExpectedField: currentMissingFields[0] || null
+                nextExpectedField: currentMissingFields[0] || null,
+                conversationAct: conversationActMeta
             });
         }
     }
@@ -2350,7 +2526,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             packageIntent: currentDraft.selectedPackage
                 ? { type: "selected", package: currentDraft.selectedPackage }
                 : { type: "none", package: null },
-            conversationAct
+            conversationAct: conversationActMeta
         });
     }
 
@@ -2385,7 +2561,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                     missingFields: currentMissingFields,
                     nextExpectedField: currentMissingFields[0] || null
                 }),
-                conversationAct
+                conversationAct: conversationActMeta
             }
         });
     }
@@ -2421,7 +2597,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                     missingFields: currentMissingFields,
                     nextExpectedField: currentMissingFields[0] || null
                 }),
-                conversationAct
+                conversationAct: conversationActMeta
             }
         });
     }
@@ -2443,7 +2619,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 sessionState: session.status,
                 lastBookingFailure: session.lastBookingFailure,
                 missingFields: getMissingFields(currentDraft),
-                nextExpectedField: "appointmentTime"
+                nextExpectedField: "appointmentTime",
+                conversationAct: conversationActMeta
             }
         });
     }
@@ -2492,7 +2669,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                     missingFields: currentMissingFields,
                     nextExpectedField: currentMissingFields[0] || "clarifyBookingIntent"
                 }),
-                conversationAct
+                conversationAct: conversationActMeta
             }
         });
     }
@@ -2560,7 +2737,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 extractedSlots: {},
                 packageIntent,
                 missingFields: [],
-                nextExpectedField: "clarifyBookingIntent"
+                nextExpectedField: "clarifyBookingIntent",
+                conversationAct: conversationActMeta
             })
         });
     }
@@ -2580,7 +2758,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 sessionState: "phone_mismatch",
                 authRequired: false,
                 sessionPhone,
-                rejectedPhone: extractedPhone
+                rejectedPhone: extractedPhone,
+                conversationAct: conversationActMeta
             }
         });
     }
@@ -2609,7 +2788,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             extractedSlots,
             packageIntent,
             nextExpectedField: "testType",
-            conversationAct
+            conversationAct: conversationActMeta
         });
     }
 
@@ -2648,7 +2827,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 extractedSlots,
                 packageIntent,
                 nextExpectedField: "address",
-                conversationAct
+                conversationAct: conversationActMeta
             });
         }
     }
@@ -2670,7 +2849,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             extractedSlots,
             packageIntent,
             nextExpectedField: "address",
-            conversationAct
+            conversationAct: conversationActMeta
         });
     }
 
@@ -2699,7 +2878,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             extractedSlots,
             packageIntent,
             nextExpectedField: "address",
-            conversationAct
+            conversationAct: conversationActMeta
         });
     }
 
@@ -2725,7 +2904,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             extractedSlots,
             packageIntent,
             nextExpectedField: "address",
-            conversationAct
+            conversationAct: conversationActMeta
         });
     }
 
@@ -2753,7 +2932,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 message,
                 draft: nextDraft,
                 extractedSlots,
-                packageIntent
+                packageIntent,
+                conversationAct: conversationActMeta
             });
         }
     }
@@ -2780,7 +2960,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                     extractedSlots,
                     packageIntent,
                     nextExpectedField: missingFields[0],
-                    conversationAct
+                    conversationAct: conversationActMeta
                 });
             }
 
@@ -2800,7 +2980,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 extractedSlots,
                 packageIntent,
                 nextExpectedField: missingFields[0],
-                conversationAct
+                conversationAct: conversationActMeta
             });
         }
 
@@ -2821,7 +3001,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 extractedSlots,
                 packageIntent,
                 nextExpectedField: null,
-                conversationAct
+                conversationAct: conversationActMeta
             });
         }
 
@@ -2842,7 +3022,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 extractedSlots,
                 packageIntent,
                 nextExpectedField: "packageConfirmation",
-                conversationAct
+                conversationAct: conversationActMeta
             });
         }
 
@@ -2862,7 +3042,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             extractedSlots,
             packageIntent,
             nextExpectedField: missingFields[0] || null,
-            conversationAct
+            conversationAct: conversationActMeta
         });
     }
 
@@ -2898,13 +3078,16 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         extractedSlots,
         packageIntent,
         nextExpectedField: missingFields[0] || null,
-        conversationAct
+        conversationAct: conversationActMeta
     });
 }
 
 module.exports = {
     handleBookingMessage,
+    buildConversationActShadowMeta,
+    buildConversationActShadowMetaAsync,
     hasActiveBookingSession,
+    isIntentClassifierShadowAsyncEnabled,
     shouldHandleBookingFailureFollowup,
     suspendActiveBookingSession
 };
