@@ -16,6 +16,7 @@ const CONVERSATION_ACTS = {
     CANCEL_OR_ABORT: "cancel_or_abort",
     REVIEW_DRAFT: "review_draft",
     HELP_NEXT_STEP: "help_next_step",
+    AVAILABILITY_INQUIRY: "availability_inquiry",
     FIELD_VALUE: "field_value",
     UNCLEAR: "unclear"
 };

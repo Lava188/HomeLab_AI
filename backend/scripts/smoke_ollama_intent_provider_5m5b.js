@@ -119,6 +119,14 @@ function mockFetchJson(output) {
     });
 }
 
+function mockFetchStatus(status, body = "provider error") {
+    return async () => ({
+        ok: false,
+        status,
+        text: async () => body
+    });
+}
+
 async function classifyWithMockFetch(message, fetchImpl) {
     return classifierService.classifySemanticIntentAsync(makeInput(message), {
         providerName: PROVIDERS.OLLAMA_SHADOW,
@@ -231,7 +239,23 @@ async function main() {
         }));
         assert(unavailable.fallbackReason === "provider_connection_failed_fallback_deterministic", "A: wrong unavailable fallbackReason");
         assert(unavailable.evidence.provider === PROVIDERS.DETERMINISTIC_STUB, "A: fallback should use deterministic output");
+        assert(unavailable.evidence.baseUrl, "A: missing fallback baseUrl evidence");
+        assert(unavailable.evidence.model === "qwen2.5:3b", "A: missing fallback model evidence");
+        assert(unavailable.evidence.requestShape === "ollama_generate", "A: missing requestShape evidence");
+        assert(Number.isFinite(Number(unavailable.evidence.elapsedMs)), "A: missing elapsedMs evidence");
         summaries.push({ case: "A", result: "ollama unavailable falls back deterministic" });
+
+        const status500 = await classifyWithMockFetch(
+            "toi muon hieu ky hon ve goi nay",
+            mockFetchStatus(500, "ollama internal error")
+        );
+        assert(status500.fallbackReason === "provider_connection_failed_fallback_deterministic", "A2: wrong 500 fallbackReason");
+        assert(status500.evidence.fetchStatus === 500, "A2: missing fetchStatus=500 evidence");
+        assert(status500.evidence.baseUrl === "http://127.0.0.1:11434", "A2: missing baseUrl evidence");
+        assert(status500.evidence.model === "qwen2.5:3b", "A2: missing model evidence");
+        assert(status500.evidence.requestShape === "ollama_generate", "A2: missing requestShape evidence");
+        assert(Number.isFinite(Number(status500.evidence.elapsedMs)), "A2: missing elapsedMs evidence");
+        summaries.push({ case: "A2", result: "ollama 500 evidence is surfaced on fallback" });
 
         const valid = await classifyWithMockFetch("cho tôi xem lại thông tin", mockFetchJson(llmOutput({
             conversationAct: "review_draft",

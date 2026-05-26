@@ -14,7 +14,8 @@ const ASSIST_ACTS = new Set([
     "pause_or_hold",
     "info_detour",
     "help_next_step",
-    "review_draft"
+    "review_draft",
+    "availability_inquiry"
 ]);
 const BLOCKED_ACTS = new Set([
     "final_confirm",
@@ -30,11 +31,18 @@ const SAFE_RULE_ACTIONS = new Set([
     "info_detour",
     "help_next_step",
     "review_draft",
-    "final_confirm",
-    "field_value",
-    "edit_request",
-    "cancel_or_abort",
+    "availability_inquiry",
+    "unclear",
     "resume_after_pause"
+]);
+
+const ELIGIBLE_RULE_ACTIONS = new Set([
+    "pause_or_hold",
+    "info_detour",
+    "help_next_step",
+    "review_draft",
+    "availability_inquiry",
+    "unclear"
 ]);
 
 const REQUIRED_FIELDS = [
@@ -104,12 +112,8 @@ function hasAllowedSemanticProvider(semanticShadow) {
 
 function isRuleEligible(ruleAct) {
     if (!ruleAct) return false;
-    if (ruleAct.act === "unclear") return true;
 
-    return Boolean(
-        ruleAct.requiresClarification === true &&
-            !SAFE_RULE_ACTIONS.has(ruleAct.act)
-    );
+    return ELIGIBLE_RULE_ACTIONS.has(ruleAct.act);
 }
 
 function buildKnownFieldsText(draft = {}) {
@@ -311,6 +315,21 @@ async function buildSemanticReadonlyAssist({
             "semantic_shadow_readonly_info_detour",
             infoAssist.reply,
             { packageIntent: infoAssist.packageIntent }
+        );
+    }
+
+    if (assistAct === "availability_inquiry") {
+        const availabilityReply = typeof context.buildAvailabilityInquiryReply === "function"
+            ? await context.buildAvailabilityInquiryReply()
+            : null;
+
+        return enabled(
+            assistAct,
+            "semantic_shadow_readonly_availability_inquiry",
+            availabilityReply || (
+                "Mình sẽ giữ bản nháp hiện tại và chỉ kiểm tra khung giờ trống. " +
+                "Bạn muốn xem lịch trống cho ngày nào?"
+            )
         );
     }
 

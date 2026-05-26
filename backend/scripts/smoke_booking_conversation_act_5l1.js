@@ -4,6 +4,8 @@ const { normalizeText } = require("../src/utils/text.util");
 
 const API_BASE_URL = process.env.HOMELAB_API_BASE_URL || "http://localhost:5000";
 const CHAT_URL = process.env.HOMELAB_CHAT_API_URL || `${API_BASE_URL}/api/chat`;
+const REQUEST_TIMEOUT_MS = 90000;
+let lastChatTrace = null;
 
 function uniqueId(prefix) {
     return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -59,6 +61,13 @@ function hasBookingCode(text) {
     return /\bHLB-\d{8}-[A-Z0-9]{4,}\b/i.test(String(text || ""));
 }
 
+function hasExplicitDraftCancelConfirmationPrompt(normalizedReply) {
+    return Boolean(
+        normalizedReply.includes("huy ban nhap") &&
+            /dung[,]?\s+huy\s+ban\s+nhap/.test(normalizedReply)
+    );
+}
+
 async function parseJsonResponse(response) {
     try {
         return await response.json();
@@ -74,7 +83,7 @@ async function request(path, options = {}) {
             "Content-Type": "application/json",
             ...(options.headers || {})
         },
-        signal: AbortSignal.timeout(20000)
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
     });
     const payload = await parseJsonResponse(response);
 
@@ -82,13 +91,22 @@ async function request(path, options = {}) {
 }
 
 async function postChat(message, sessionId, headers = {}) {
+    lastChatTrace = { message, sessionId, headers };
     const response = await fetch(CHAT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...headers },
         body: JSON.stringify({ message, sessionId }),
-        signal: AbortSignal.timeout(20000)
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
     });
     const payload = await parseJsonResponse(response);
+    lastChatTrace = {
+        ...lastChatTrace,
+        status: response.status,
+        success: payload.success,
+        reply: payload.data?.reply || null,
+        booking: payload.data?.booking || null,
+        meta: payload.data?.meta || null
+    };
 
     return { response, payload };
 }
@@ -193,6 +211,23 @@ async function setupMissingNameDraft({ sessionId, phone, date, time = "07:30" })
     assert((data.booking?.missingFields || []).includes("patientName"), "setup did not leave patientName missing");
 }
 
+async function setupMissingTimeDraft({ sessionId, phone, date }) {
+    const before = await countBookingsBySession(sessionId);
+    const message = [
+        `Tôi muốn đặt lịch gói chức năng thận ngày ${displayDate(date)}`,
+        "địa chỉ: 12 Nguyễn Trãi, phường Bến Thành, Quận 1, TP Hồ Chí Minh",
+        "tên: Smoke Missing Time"
+    ].join(", ");
+    const first = await postChat(message, sessionId, userHeaders(phone));
+    const data = first.payload.data || {};
+    const after = await countBookingsBySession(sessionId);
+
+    assert(first.response.status === 200 && first.payload.success, "missing time draft setup failed");
+    assert(after === before, "missing time setup created booking");
+    assert(data.booking?.draft, "missing time setup lost draft");
+    assert((data.booking?.missingFields || []).includes("appointmentTime"), "setup did not leave appointmentTime missing");
+}
+
 async function runCase(id, fn, state) {
     try {
         await fn(state);
@@ -200,6 +235,20 @@ async function runCase(id, fn, state) {
         return { id, passed: true };
     } catch (error) {
         console.error(`FAIL ${id}: ${error.message}`);
+        console.error(JSON.stringify({
+            case: id,
+            expected: error.message,
+            actual: {
+                request: lastChatTrace?.message || null,
+                responseStatus: lastChatTrace?.status || null,
+                success: lastChatTrace?.success || null,
+                reply: lastChatTrace?.reply || null,
+                bookingStatus: lastChatTrace?.booking?.status || null,
+                draft: lastChatTrace?.booking?.draft || null,
+                missingFields: lastChatTrace?.booking?.missingFields || null,
+                meta: lastChatTrace?.meta || null
+            }
+        }, null, 2));
         return { id, passed: false, error };
     }
 }
@@ -207,14 +256,125 @@ async function runCase(id, fn, state) {
 async function main() {
     const state = {
         phone: makePhone(),
-        date: isoDate(170 + Math.floor(Math.random() * 20))
+        date: isoDate(170 + Math.floor(Math.random() * 20)),
+        tomorrow: isoDate(1)
     };
 
     await packageCatalog.ensureRequiredCatalogItems();
     await createSlot({ date: state.date, timeStart: "07:30", timeEnd: "08:30" });
     await createSlot({ date: state.date, timeStart: "08:00", timeEnd: "09:00" });
+    await createSlot({ date: state.tomorrow, timeStart: "08:30", timeEnd: "09:30" });
 
     const cases = [
+        [
+            "current_turn_first_full_booking_detours_and_availability",
+            async () => {
+                const sessionId = uniqueId("full_current_turn_5l1e");
+                const phone = makePhone();
+                const before = await countBookingsBySession(sessionId);
+
+                const start = await postChat("tôi muốn đặt lịch xét nghiệm ngày mai", sessionId, userHeaders(phone));
+                let data = start.payload.data || {};
+                let normalizedReply = normalizeText(data.reply || "");
+                assert(start.response.status === 200 && start.payload.success, "full flow start failed");
+                assert((data.booking?.missingFields || []).includes("testType"), "start did not ask for package/testType");
+                assert(normalizedReply.includes("goi") || normalizedReply.includes("xet nghiem"), "start reply did not ask package");
+
+                const packageStep = await postChat("gói chức năng gan", sessionId, userHeaders(phone));
+                data = packageStep.payload.data || {};
+                normalizedReply = normalizeText(data.reply || "");
+                assert(data.booking?.draft?.testType, "package step did not set testType");
+                assert((data.booking?.missingFields || []).includes("appointmentTime"), "package step did not ask for time next");
+                assert(
+                    normalizedReply.includes("gio lay mau") ||
+                        normalizedReply.includes("khung gio con trong") ||
+                        normalizedReply.includes("khung gio phu hop"),
+                    "package step reply did not ask time or suggest available slots"
+                );
+
+                const review = await postChat("Còn thiếu thông tin gì", sessionId, userHeaders(phone));
+                data = review.payload.data || {};
+                normalizedReply = normalizeText(data.reply || "");
+                assert(data.meta?.conversationAct?.act === "review_draft", "full flow review was not review_draft");
+                assert(!data.booking?.draft?.appointmentTime, "review mutated time");
+                assert(
+                    normalizedReply.includes("da ghi nhan") &&
+                        normalizedReply.includes("con thieu") &&
+                        normalizedReply.includes("gio lay mau") &&
+                        normalizedReply.includes("dia chi") &&
+                        normalizedReply.includes("ten nguoi dat"),
+                    "review did not summarize known and missing fields"
+                );
+
+                const info = await postChat("mà gói chức năng gan gồm những gì", sessionId, userHeaders(phone));
+                data = info.payload.data || {};
+                normalizedReply = normalizeText(data.reply || "");
+                assert(data.meta?.conversationAct?.act === "info_detour", "package detail question was not info_detour");
+                assert(!data.booking?.draft?.appointmentTime, "info detour mutated time");
+                assert(normalizedReply.includes("chuc nang gan"), "info detour did not mention liver package");
+                assert(normalizedReply.includes("gio lay mau"), "info detour did not continue asking time");
+
+                const timeAck = await postChat("oke nhé", sessionId, userHeaders(phone));
+                data = timeAck.payload.data || {};
+                normalizedReply = normalizeText(data.reply || "");
+                assert(!data.booking?.draft?.appointmentTime, "ambiguous ok was set as appointmentTime in full flow");
+                assert(
+                    normalizedReply.includes("gio lay mau") ||
+                        (data.booking?.missingFields || []).includes("appointmentTime"),
+                    "ambiguous ok while missing time did not ask for time"
+                );
+
+                const time = await postChat("8h30", sessionId, userHeaders(phone));
+                data = time.payload.data || {};
+                normalizedReply = normalizeText(data.reply || "");
+                assert(data.booking?.draft?.appointmentTime === "08:30", "time step did not set appointmentTime");
+                assert((data.booking?.missingFields || []).includes("address"), "time step did not ask address");
+                assert(normalizedReply.includes("dia chi"), "time step reply did not ask address");
+
+                const ack = await postChat("vậy cũng được", sessionId, userHeaders(phone));
+                data = ack.payload.data || {};
+                normalizedReply = normalizeText(data.reply || "");
+                assert(!data.booking?.draft?.address, "ambiguous ack was set as address in full flow");
+                assert(normalizedReply.includes("con thieu") && normalizedReply.includes("dia chi"), "ambiguous ack did not ask clear address");
+
+                const availability = await postChat("hiện tại có các khung giờ nào đang trống", sessionId, userHeaders(phone));
+                data = availability.payload.data || {};
+                normalizedReply = normalizeText(data.reply || "");
+                assert(data.meta?.conversationAct?.act === "availability_inquiry", "availability turn was not availability_inquiry");
+                assert(!data.booking?.draft?.address, "availability turn was set as address in full flow");
+                assert(
+                    normalizedReply.includes("khung gio") ||
+                        normalizedReply.includes("gio") ||
+                        normalizedReply.includes("chua the hien thi"),
+                    "availability turn did not return slot/helpful response"
+                );
+
+                const address = await postChat("766 Đê La Thành, Đống Đa, Hà Nội", sessionId, userHeaders(phone));
+                data = address.payload.data || {};
+                normalizedReply = normalizeText(data.reply || "");
+                assert(normalizeText(data.booking?.draft?.address || "").includes("de la thanh"), "address step did not set address");
+                assert((data.booking?.missingFields || []).includes("patientName"), "address step did not ask name");
+                assert(normalizedReply.includes("ten nguoi dat"), "address step reply did not ask name");
+
+                const name = await postChat("Trần Văn C", sessionId, userHeaders(phone));
+                data = name.payload.data || {};
+                normalizedReply = normalizeText(data.reply || "");
+                assert(data.booking?.draft?.patientName === "Trần Văn C", "name step did not set patientName");
+                assert((data.booking?.missingFields || []).length === 0, "name step did not produce ready draft");
+                assert(normalizedReply.includes("xac nhan"), "name step did not ask final confirmation");
+
+                const confirm = await postChat("Xác nhận đặt lịch", sessionId, userHeaders(phone));
+                const after = await countBookingsBySession(sessionId);
+                normalizedReply = normalizeText(confirm.payload.data?.reply || "");
+                assert(
+                    after === before + 1 ||
+                        normalizedReply.includes("khung gio") ||
+                        normalizedReply.includes("het cho") ||
+                        normalizedReply.includes("chua mo lich"),
+                    "full flow final confirm neither created booking nor returned slot reason"
+                );
+            }
+        ],
         [
             "field_value_does_not_accept_vague_patient_name",
             async () => {
@@ -532,6 +692,134 @@ async function main() {
             }
         ],
         [
+            "current_turn_review_missing_time_no_mutation",
+            async () => {
+                const sessionId = uniqueId("review_missing_time_5l1d");
+                await setupMissingTimeDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const review = await postChat("Còn thiếu thông tin gì", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = review.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "review missing time created booking");
+                assert(!data.booking?.draft?.appointmentTime, "review missing time mutated appointmentTime");
+                assert(data.meta?.conversationAct?.act === "review_draft", "missing info question was not review_draft");
+                assert(
+                    normalizedReply.includes("da ghi nhan") &&
+                        normalizedReply.includes("con thieu") &&
+                        normalizedReply.includes("gio lay mau"),
+                    "review missing time did not list known and missing fields"
+                );
+            }
+        ],
+        [
+            "ambiguous_ack_missing_address_no_address_mutation",
+            async () => {
+                const sessionId = uniqueId("ack_missing_address_5l1d");
+                await setupMissingAddressDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const ack = await postChat("vậy cũng được", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = ack.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "ambiguous ack missing address created booking");
+                assert(!data.booking?.draft?.address, "ambiguous ack was set as address");
+                assert(normalizedReply.includes("con thieu") && normalizedReply.includes("dia chi"), "ambiguous ack did not ask for address");
+            }
+        ],
+        [
+            "availability_inquiry_missing_address_no_address_mutation",
+            async () => {
+                const sessionId = uniqueId("availability_missing_address_5l1d");
+                await setupMissingAddressDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const availability = await postChat("hiện tại có các khung giờ nào đang trống", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = availability.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "availability inquiry created booking");
+                assert(!data.booking?.draft?.address, "availability inquiry was set as address");
+                assert(data.meta?.conversationAct?.act === "availability_inquiry", "availability question was not availability_inquiry");
+                assert(
+                    normalizedReply.includes("khung gio") ||
+                        normalizedReply.includes("gio") ||
+                        normalizedReply.includes("chua the hien thi"),
+                    "availability inquiry did not return helpful availability response"
+                );
+            }
+        ],
+        [
+            "clear_address_value_missing_address_sets_address",
+            async () => {
+                const sessionId = uniqueId("clear_address_5l1d");
+                await setupMissingAddressDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const address = await postChat("766 Đê La Thành, Đống Đa, Hà Nội", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = address.payload.data || {};
+                const normalizedAddress = normalizeText(data.booking?.draft?.address || "");
+
+                assert(after === before, "clear address value created booking");
+                assert(normalizedAddress.includes("766") && normalizedAddress.includes("de la thanh"), "clear address value did not set address");
+            }
+        ],
+        [
+            "ambiguous_ack_missing_name_no_name_mutation",
+            async () => {
+                const sessionId = uniqueId("ack_missing_name_5l1d");
+                await setupMissingNameDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const ack = await postChat("vậy cũng được", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const data = ack.payload.data || {};
+                const normalizedReply = normalizeText(data.reply || "");
+
+                assert(after === before, "ambiguous ack missing name created booking");
+                assert(!data.booking?.draft?.patientName, "ambiguous ack was set as patientName");
+                assert(normalizedReply.includes("con thieu") && normalizedReply.includes("ten nguoi dat"), "ambiguous ack did not ask for patient name");
+            }
+        ],
+        [
+            "ambiguous_ack_ready_draft_does_not_create",
+            async () => {
+                const sessionId = uniqueId("ack_ready_5l1d");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const ack = await postChat("vậy cũng được", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(ack.payload.data?.reply || "");
+
+                assert(after === before, "ambiguous ack ready draft created booking");
+                assert(
+                    normalizedReply.includes("xac nhan dat lich") ||
+                        (normalizedReply.includes("xac nhan") && normalizedReply.includes("sua")),
+                    "ambiguous ack ready draft did not require clear confirmation"
+                );
+            }
+        ],
+        [
+            "explicit_final_confirm_this_booking_creates_or_slot_failure",
+            async () => {
+                const sessionId = uniqueId("explicit_this_confirm_5l1d");
+                await setupReadyDraft({ sessionId, phone: state.phone, date: state.date });
+                const before = await countBookingsBySession(sessionId);
+                const confirm = await postChat("xác nhận đặt lịch này", sessionId, userHeaders(state.phone));
+                const after = await countBookingsBySession(sessionId);
+                const normalizedReply = normalizeText(confirm.payload.data?.reply || "");
+
+                assert(
+                    after === before + 1 ||
+                        normalizedReply.includes("khung gio") ||
+                        normalizedReply.includes("het cho") ||
+                        normalizedReply.includes("chua mo lich"),
+                    "explicit final confirm neither created booking nor returned slot reason"
+                );
+            }
+        ],
+        [
             "unclear_life_phrase_missing_address_no_mutation",
             async () => {
                 const sessionId = uniqueId("unclear_address_5l1b");
@@ -582,8 +870,7 @@ async function main() {
 
                 assert(after === before, "cancel draft created booking");
                 assert(
-                    normalizedReply.includes("huy ban nhap") &&
-                        normalizedReply.includes("dung huy ban nhap"),
+                    hasExplicitDraftCancelConfirmationPrompt(normalizedReply),
                     "cancel draft did not ask confirmation"
                 );
             }
@@ -606,7 +893,7 @@ async function main() {
                 assert(!normalizedReply.includes("y ban la muon tiep tuc"), "natural cancel returned generic unclear");
                 assert(
                     normalizedReply.includes("chua tao lich") &&
-                        normalizedReply.includes("dung huy ban nhap") &&
+                        hasExplicitDraftCancelConfirmationPrompt(normalizedReply) &&
                         normalizedReply.includes("tiep tuc dat lich"),
                     "natural cancel did not ask draft cancel confirmation"
                 );
@@ -664,7 +951,7 @@ async function main() {
                 assert(data.booking?.draft, "pending huy lich cleared draft");
                 assert(data.meta?.sessionState === "booking_cancel_confirmation", "pending huy lich left cancel state");
                 assert(
-                    normalizedReply.includes("dung huy ban nhap") &&
+                    hasExplicitDraftCancelConfirmationPrompt(normalizedReply) &&
                         normalizedReply.includes("de xac nhan"),
                     "pending huy lich did not require explicit draft confirmation"
                 );

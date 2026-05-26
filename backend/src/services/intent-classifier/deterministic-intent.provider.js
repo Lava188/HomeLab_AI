@@ -342,7 +342,15 @@ function classify(input = {}) {
             }, context);
         }
 
-        if (includesAny(normalized, ["xem lai thong tin", "cho toi xem lai", "tom tat lai", "thong tin hien tai"])) {
+        if (includesAny(normalized, [
+            "xem lai thong tin",
+            "cho toi xem lai",
+            "tom tat lai",
+            "thong tin hien tai",
+            "con thieu thong tin gi",
+            "toi con thieu thong tin gi",
+            "dang thieu thong tin gi"
+        ])) {
             return makeProviderResult({
                 intentGroup: INTENT_GROUPS.BOOKING,
                 conversationAct: CONVERSATION_ACTS.REVIEW_DRAFT,
@@ -356,7 +364,15 @@ function classify(input = {}) {
             }, context);
         }
 
-        if (includesAny(normalized, ["gio toi can lam gi", "toi can lam gi", "can lam gi", "tiep theo lam gi", "con thieu gi"])) {
+        if (includesAny(normalized, [
+            "gio toi can lam gi",
+            "toi can lam gi",
+            "can lam gi",
+            "tiep theo lam gi",
+            "con thieu gi",
+            "can bo sung gi",
+            "toi can bo sung gi"
+        ])) {
             return makeProviderResult({
                 intentGroup: INTENT_GROUPS.BOOKING,
                 conversationAct: CONVERSATION_ACTS.HELP_NEXT_STEP,
@@ -367,6 +383,27 @@ function classify(input = {}) {
                 safetyDecision: SAFETY_DECISIONS.ALLOW_READ_ONLY,
                 reason: "semantic_stub_help_next_step",
                 evidence: { ...evidence, helpLike: true }
+            }, context);
+        }
+
+        if (includesAny(normalized, [
+            "khung gio nao trong",
+            "khung gio nao dang trong",
+            "co khung gio nao trong",
+            "con slot nao",
+            "con lich trong",
+            "gio nao trong"
+        ])) {
+            return makeProviderResult({
+                intentGroup: INTENT_GROUPS.BOOKING,
+                conversationAct: CONVERSATION_ACTS.AVAILABILITY_INQUIRY,
+                confidence: 0.84,
+                target: { type: TARGET_TYPES.CURRENT_BOOKING_DRAFT },
+                shouldMutateDraft: false,
+                requiresClarification: false,
+                safetyDecision: SAFETY_DECISIONS.ALLOW_READ_ONLY,
+                reason: "semantic_stub_availability_inquiry",
+                evidence: { ...evidence, availabilityLike: true }
             }, context);
         }
 
@@ -392,6 +429,32 @@ function classify(input = {}) {
                     ? "semantic_stub_final_confirm_ready_draft"
                     : "semantic_stub_final_confirm_blocked_by_missing_context",
                 evidence: { ...evidence, finalConfirmLike: true }
+            }, context);
+        }
+
+        if ([
+            "u",
+            "uh",
+            "um",
+            "ok",
+            "oke",
+            "ok nhe",
+            "oke nhe",
+            "duoc",
+            "vay cung duoc"
+        ].includes(normalized)) {
+            return makeProviderResult({
+                intentGroup: INTENT_GROUPS.BOOKING,
+                conversationAct: CONVERSATION_ACTS.UNCLEAR,
+                confidence: 0.52,
+                target: { type: TARGET_TYPES.CURRENT_BOOKING_DRAFT },
+                shouldMutateDraft: false,
+                requiresClarification: true,
+                safetyDecision: SAFETY_DECISIONS.ASK_CLARIFICATION,
+                reason: facts.readyDraft
+                    ? "semantic_stub_ambiguous_ack_ready_draft"
+                    : "semantic_stub_ambiguous_ack_missing_field",
+                evidence: { ...evidence, ambiguousAck: true }
             }, context);
         }
 

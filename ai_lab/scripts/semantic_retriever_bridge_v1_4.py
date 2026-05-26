@@ -380,7 +380,7 @@ class SemanticRetrieverV14:
         with contextlib.redirect_stdout(io.StringIO()):
             self.index = faiss.read_index(str(faiss_index_path))
             self.model = SentenceTransformer(self.model_name)
-
+            
     def _search_candidates(self, query: str, candidate_top_k: int) -> list[dict[str, Any]]:
         with contextlib.redirect_stdout(io.StringIO()):
             query_text = self.config.get("query_prefix", "query: ") + query.strip()

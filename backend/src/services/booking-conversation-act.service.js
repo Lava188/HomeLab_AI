@@ -13,6 +13,7 @@ const ACTS = {
     CANCEL_OR_ABORT: "cancel_or_abort",
     REVIEW_DRAFT: "review_draft",
     HELP_NEXT_STEP: "help_next_step",
+    AVAILABILITY_INQUIRY: "availability_inquiry",
     FIELD_VALUE: "field_value",
     UNCLEAR: "unclear"
 };
@@ -32,6 +33,10 @@ const SIGNALS = {
         "um",
         "ok",
         "oke",
+        "ok nhe",
+        "oke nhe",
+        "duoc",
+        "vay cung duoc",
         "roi",
         "the nhe",
         "cai do",
@@ -92,7 +97,10 @@ const SIGNALS = {
         "cho toi xem lai",
         "tom tat lai",
         "thong tin hien tai",
-        "lich nay dang co thong tin gi"
+        "lich nay dang co thong tin gi",
+        "con thieu thong tin gi",
+        "toi con thieu thong tin gi",
+        "dang thieu thong tin gi"
     ],
     help: [
         "can lam gi",
@@ -101,6 +109,20 @@ const SIGNALS = {
         "tiep theo lam gi",
         "con thieu gi",
         "can bo sung gi"
+    ],
+    availability: [
+        "khung gio nao trong",
+        "khung gio nao dang trong",
+        "co khung gio nao trong",
+        "co khung gio nao dang trong",
+        "gio nao trong",
+        "gio nao dang trong",
+        "con gio nao",
+        "con slot nao",
+        "slot nao trong",
+        "lich trong",
+        "con lich trong",
+        "khung trong"
     ]
 };
 
@@ -110,6 +132,8 @@ const VAGUE_FIELD_VALUE_SIGNALS = [
     "de toi hoi lai",
     "khong ro",
     "sao cung duoc",
+    "vay cung duoc",
+    "duoc",
     "tiep tuc di",
     "nhu tren",
     "de sau",
@@ -230,6 +254,15 @@ function detectCancelAbortEvidence({ normalized, context }) {
         };
     }
 
+    if (/\bbo\s+sung\b/.test(trimmed)) {
+        return {
+            detected: false,
+            confidence: 0,
+            reason: null,
+            suggestedNextQuestion: CANCEL_ABORT_CONFIRM_QUESTION
+        };
+    }
+
     const hasNaturalCancel = testAnyPattern(trimmed, CANCEL_ABORT_NATURAL_PATTERNS);
     const hasCancelVerb = testAnyPattern(trimmed, CANCEL_ABORT_VERB_PATTERNS);
     const hasBookingContext = testAnyPattern(trimmed, CANCEL_ABORT_CONTEXT_PATTERNS);
@@ -290,7 +323,8 @@ function countEvidence(normalized) {
         edit: includesAny(normalized, SIGNALS.edit),
         cancel: includesAny(normalized, SIGNALS.cancel),
         review: includesAny(normalized, SIGNALS.review),
-        help: includesAny(normalized, SIGNALS.help)
+        help: includesAny(normalized, SIGNALS.help),
+        availability: includesAny(normalized, SIGNALS.availability)
     };
 }
 
@@ -513,7 +547,8 @@ function isLikelyFieldValueForContext({ message, normalized, context, evidence }
         evidence.edit,
         evidence.cancel,
         evidence.review,
-        evidence.help
+        evidence.help,
+        evidence.availability
     ].some(Boolean)) {
         return false;
     }
@@ -558,6 +593,12 @@ function isLikelyFieldValueForContext({ message, normalized, context, evidence }
     return false;
 }
 
+function shouldAskReadyDraftQuestion(context) {
+    if (context.ready) return true;
+    if (context.missingFields[0]) return false;
+    return false;
+}
+
 function buildUnclearFieldQuestion(nextField) {
     if (nextField === "patientName") {
         return "Mình chưa ghi nhận tên người đặt. Bạn vui lòng cho mình họ tên người đặt lịch.";
@@ -596,7 +637,8 @@ function classifyConversationAct({ message, session = null, draft = null, missin
         evidence.edit,
         evidence.cancel,
         evidence.review,
-        evidence.help
+        evidence.help,
+        evidence.availability
     ].filter(Boolean).length;
 
     if (!normalized) {
@@ -788,6 +830,17 @@ function classifyConversationAct({ message, session = null, draft = null, missin
         });
     }
 
+    if (evidence.availability) {
+        return baseResult({
+            act: ACTS.AVAILABILITY_INQUIRY,
+            confidence: 0.86,
+            reason: "current_message_asks_available_slots",
+            requiresClarification: false,
+            shouldMutateDraft: false,
+            suggestedNextQuestion: null
+        });
+    }
+
     if (evidence.review) {
         return baseResult({
             act: ACTS.REVIEW_DRAFT,
@@ -817,8 +870,10 @@ function classifyConversationAct({ message, session = null, draft = null, missin
                 : "short_ambiguous_message",
             requiresClarification: true,
             shouldMutateDraft: false,
-            blockedBy: context.ready ? ["ready_confirmation_requires_clear_intent"] : [],
-            suggestedNextQuestion: context.ready
+            blockedBy: context.ready
+                ? ["ready_confirmation_requires_clear_intent"]
+                : (context.missingFields[0] ? ["field_value_not_confident"] : []),
+            suggestedNextQuestion: shouldAskReadyDraftQuestion(context)
                 ? "Bạn muốn xác nhận lịch này, sửa thông tin, hay hỏi thêm?"
                 : "Ý bạn là muốn tiếp tục đặt lịch, sửa thông tin, hay hỏi thêm về gói xét nghiệm?"
         });

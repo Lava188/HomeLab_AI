@@ -31,6 +31,23 @@ const NEARBY_SLOT_LOOKAHEAD_DAYS = 7;
 const NEARBY_SLOT_LIMIT = 5;
 const INTENT_CLASSIFIER_SHADOW_ASYNC_ENABLED_ENV = "HOMELAB_INTENT_CLASSIFIER_SHADOW_ASYNC_ENABLED";
 
+const SEMANTIC_READONLY_RULE_ACTS = new Set([
+    ACTS.PAUSE_OR_HOLD,
+    ACTS.INFO_DETOUR,
+    ACTS.HELP_NEXT_STEP,
+    ACTS.REVIEW_DRAFT,
+    ACTS.AVAILABILITY_INQUIRY,
+    ACTS.UNCLEAR
+]);
+
+const SEMANTIC_READONLY_ASSIST_ACTS = new Set([
+    ACTS.PAUSE_OR_HOLD,
+    ACTS.INFO_DETOUR,
+    ACTS.HELP_NEXT_STEP,
+    ACTS.REVIEW_DRAFT,
+    ACTS.AVAILABILITY_INQUIRY
+]);
+
 const REQUIRED_FIELDS = [
     "testType",
     "appointmentDate",
@@ -158,7 +175,7 @@ function shouldHandleBookingFailureFollowup(sessionId, message) {
     if (
         !session ||
         session.currentFlow !== FLOWS.BOOKING ||
-        !session.lastBookingFailure
+        (!session.lastBookingFailure && !session.lastAvailabilitySuggestion)
     ) {
         return false;
     }
@@ -170,7 +187,10 @@ function shouldHandleBookingFailureFollowup(sessionId, message) {
     if (
         resolveSuggestedSlotSelection(
             message,
-            session.lastBookingFailure.suggestedSlots || []
+            [
+                ...(session.lastBookingFailure?.suggestedSlots || []),
+                ...(session.lastAvailabilitySuggestion?.suggestedSlots || [])
+            ]
         )
     ) {
         return true;
@@ -953,6 +973,10 @@ function formatSuggestedSlot(slot) {
     return `${formatDisplayDate(slot.date)} lúc ${slot.timeStart}`;
 }
 
+function formatSuggestedSlotTime(slot) {
+    return slot.timeStart;
+}
+
 function buildSuggestedSlotsText(suggestedSlots) {
     if (!suggestedSlots.length) {
         return "";
@@ -962,6 +986,196 @@ function buildSuggestedSlotsText(suggestedSlots) {
         "Bạn có thể chọn một trong các khung giờ gần nhất còn trống:",
         ...suggestedSlots.map((slot) => `- ${formatSuggestedSlot(slot)}`)
     ].join("\n");
+}
+
+function getDraftPackageName(draft = {}) {
+    return draft.selectedPackage?.name || draft.testType || null;
+}
+
+function hasDraftPackage(draft = {}) {
+    return Boolean(draft.selectedPackage || draft.testCatalogItemId || draft.testType);
+}
+
+function buildSlotSuggestionSummary(draft = {}) {
+    const parts = [];
+    const packageName = getDraftPackageName(draft);
+
+    if (draft.appointmentDate) {
+        parts.push(`ngày lấy mẫu ${formatDisplayDate(draft.appointmentDate)}`);
+    }
+    if (packageName) {
+        parts.push(`gói ${packageName}`);
+    }
+    if (draft.phoneNumber) {
+        parts.push(`số điện thoại ${draft.phoneNumber}`);
+    }
+
+    return parts.length ? `Mình đã ghi nhận ${parts.join(" và ")}.` : "";
+}
+
+function formatDateIntentDisplay(day, month, year) {
+    return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+}
+
+function parseDateIntentFromMessage(message, baseDate = new Date()) {
+    const text = String(message || "");
+    const normalized = normalizeText(text);
+    const numericMatch = text.match(
+        /(?:ngÃ y\s*|ngày\s*|ngay\s*)?(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{4}))?/i
+    );
+
+    if (numericMatch) {
+        const day = Number(numericMatch[1]);
+        const month = Number(numericMatch[2]);
+        const year = numericMatch[3] ? Number(numericMatch[3]) : baseDate.getFullYear();
+        const parsed = detectDateFromMessage(message, baseDate);
+        const displayDate = formatDateIntentDisplay(day, month, year);
+
+        if (!parsed) {
+            return {
+                hasDateIntent: true,
+                valid: false,
+                requestedDate: null,
+                displayDate,
+                source: "numeric_date",
+                reason: "calendar_date_out_of_range"
+            };
+        }
+
+        return {
+            hasDateIntent: true,
+            valid: true,
+            requestedDate: parsed,
+            displayDate,
+            source: "numeric_date",
+            reason: null
+        };
+    }
+
+    const relativeDate = detectDateFromMessage(message, baseDate);
+
+    if (relativeDate) {
+        return {
+            hasDateIntent: true,
+            valid: true,
+            requestedDate: relativeDate,
+            displayDate: formatDisplayDate(relativeDate),
+            source: normalized.includes("hom nay") ? "relative_today" : "relative_tomorrow",
+            reason: null
+        };
+    }
+
+    const hasDateChangeWords = /\b(doi|sua|chuyen|dat|lay)\b/.test(normalized) &&
+        /\b(ngay|lich|lay mau)\b/.test(normalized);
+
+    return {
+        hasDateIntent: hasDateChangeWords,
+        valid: false,
+        requestedDate: null,
+        displayDate: null,
+        source: hasDateChangeWords ? "date_words" : null,
+        reason: hasDateChangeWords ? "date_value_missing_or_unrecognized" : null
+    };
+}
+
+function buildInvalidDateReply(dateText) {
+    return `Ngày ${dateText} không hợp lệ. Bạn vui lòng chọn lại ngày lấy mẫu hợp lệ, ví dụ 29/05/2026 hoặc 'ngày mai'.`;
+}
+
+function isSameDateSlot(slot, requestedDate) {
+    return slot?.date === requestedDate;
+}
+
+async function findAvailableSlotSuggestions(requestedDate) {
+    if (!availabilitySlotService.findAvailableNearbySlots) {
+        return [];
+    }
+
+    const slots = await availabilitySlotService.findAvailableNearbySlots({
+        requestedDate,
+        limit: 200,
+        days: NEARBY_SLOT_LOOKAHEAD_DAYS
+    });
+
+    return Array.isArray(slots) ? slots : [];
+}
+
+async function buildAvailableSlotSuggestionReply(draft, options = {}) {
+    const requestedDate = options.requestedDate || draft.appointmentDate;
+    const includeCurrentSelection = Boolean(options.includeCurrentSelection && draft.appointmentTime);
+
+    if (!hasDraftPackage(draft)) {
+        return {
+            reply: buildCollectingReply(draft, ["testType"]),
+            suggestedSlots: [],
+            reason: "missing_package"
+        };
+    }
+
+    if (!requestedDate) {
+        return {
+            reply: buildCollectingReply(draft, ["appointmentDate"]),
+            suggestedSlots: [],
+            reason: "missing_date"
+        };
+    }
+
+    let slots = [];
+
+    try {
+        slots = await findAvailableSlotSuggestions(requestedDate);
+    } catch {
+        slots = [];
+    }
+
+    const sameDaySlots = slots
+        .filter((slot) => isSameDateSlot(slot, requestedDate))
+        .slice(0, NEARBY_SLOT_LIMIT);
+    const summary = buildSlotSuggestionSummary({ ...draft, appointmentDate: requestedDate });
+
+    if (sameDaySlots.length) {
+        return {
+            reply: [
+                includeCurrentSelection
+                    ? `Hiện bạn đang chọn ${draft.appointmentTime} ngày ${formatDisplayDate(requestedDate)}.`
+                    : null,
+                summary,
+                "Các khung giờ còn trống trong ngày này:",
+                ...sameDaySlots.map((slot) => `- ${formatSuggestedSlotTime(slot)}`),
+                includeCurrentSelection
+                    ? `Bạn muốn giữ ${draft.appointmentTime} hay đổi sang khung giờ khác?`
+                    : "Bạn muốn chọn khung giờ nào?"
+            ].filter(Boolean).join("\n"),
+            suggestedSlots: sameDaySlots,
+            reason: "same_day_slots"
+        };
+    }
+
+    const nearbySlots = slots
+        .filter((slot) => slot.date > requestedDate)
+        .slice(0, NEARBY_SLOT_LIMIT);
+
+    if (nearbySlots.length) {
+        return {
+            reply: [
+                `Ngày ${formatDisplayDate(requestedDate)} hiện chưa còn khung giờ phù hợp.`,
+                "Mình tìm thấy một số khung giờ gần nhất:",
+                ...nearbySlots.map((slot) => `- ${formatSuggestedSlot(slot)}`),
+                "Bạn muốn chọn một trong các khung giờ trên hay đổi sang ngày khác?"
+            ].join("\n"),
+            suggestedSlots: nearbySlots,
+            reason: "nearby_slots"
+        };
+    }
+
+    return {
+        reply: (
+            `Hiện HomeLab chưa tìm thấy khung giờ khả dụng gần ngày ${formatDisplayDate(requestedDate)}. ` +
+            "Bạn muốn thử chọn một ngày khác không?"
+        ),
+        suggestedSlots: [],
+        reason: "no_nearby_slots"
+    };
 }
 
 function getSlotFailureReasonCode(error, suggestedSlots) {
@@ -1378,8 +1592,113 @@ function buildInformationalDetourReply(packageItem, draft, missingFields) {
     return [detail, followUp].join("\n\n");
 }
 
-async function resolveBookingInformationalDetour(message, currentDraft) {
-    if (!hasInformationalDetourIntent(message)) {
+function countPhraseMatches(normalized, phrases = []) {
+    return phrases.reduce((count, phrase) => (
+        normalized.includes(phrase) ? count + 1 : count
+    ), 0);
+}
+
+function hasCurrentPackageReference(normalized, draft = {}) {
+    const packageName = normalizeText(draft.testType || draft.selectedPackage?.name || "");
+
+    return Boolean(
+        normalized.includes("goi nay") ||
+            normalized.includes("xet nghiem nay") ||
+            normalized.includes("cai nay") ||
+            normalized.includes("loai nay") ||
+            normalized.includes("goi xet nghiem") ||
+            normalized.includes("xet nghiem") ||
+            normalized.includes("goi") ||
+            (packageName && normalized.includes(packageName))
+    );
+}
+
+function scoreReadonlyCurrentTurnIntent(message, draft = {}, missingFields = []) {
+    const normalized = normalizeText(message);
+    const hasSelectedPackage = Boolean(draft.selectedPackage || draft.testType);
+    const hasPackageRef = hasCurrentPackageReference(normalized, draft);
+    const hasQuestionShape = /(\?|^(ai|cai gi|gi|nhu the nao|the nao|vi sao|tai sao|co|con|gom|kiem tra|dung de|de lam gi)\b)/i.test(normalized);
+
+    const explainScore =
+        countPhraseMatches(normalized, [
+            "noi ro", "lam ro", "ro hon", "ky hon", "hieu ky", "hieu hon",
+            "biet them", "tim hieu", "giai thich", "de hieu", "chi tiet",
+            "gom", "bao gom", "kiem tra", "dung de", "de lam gi", "la gi",
+            "y nghia", "cho toi biet"
+        ]) +
+        (hasQuestionShape ? 1 : 0) +
+        (hasPackageRef ? 2 : 0) +
+        (hasSelectedPackage ? 1 : 0);
+
+    if (hasSelectedPackage && hasPackageRef && explainScore >= 4) {
+        return {
+            act: ACTS.INFO_DETOUR,
+            confidence: Math.min(0.95, 0.55 + explainScore * 0.08),
+            reason: "fallback_policy_package_explanation_request",
+            evidence: { explainScore, hasPackageRef, hasSelectedPackage }
+        };
+    }
+
+    const availabilityScore =
+        countPhraseMatches(normalized, [
+            "khung gio", "lich trong", "gio nao", "gio trong", "con trong",
+            "slot", "lich nao", "thoi gian nao", "khi nao trong"
+        ]) +
+        (normalized.includes("trong") ? 1 : 0) +
+        (normalized.includes("hien tai") ? 1 : 0);
+
+    if (availabilityScore >= 2) {
+        return {
+            act: ACTS.AVAILABILITY_INQUIRY,
+            confidence: Math.min(0.92, 0.58 + availabilityScore * 0.1),
+            reason: "fallback_policy_availability_question",
+            evidence: { availabilityScore }
+        };
+    }
+
+    const reviewScore =
+        countPhraseMatches(normalized, [
+            "con thieu", "thieu thong tin", "xem lai", "kiem tra lai",
+            "da co thong tin gi", "thong tin hien tai", "tom tat", "nhac lai"
+        ]) +
+        (missingFields.length > 0 && normalized.includes("thieu") ? 1 : 0);
+
+    if (reviewScore >= 1) {
+        return {
+            act: normalized.includes("thieu") ? ACTS.REVIEW_DRAFT : ACTS.HELP_NEXT_STEP,
+            confidence: Math.min(0.9, 0.62 + reviewScore * 0.12),
+            reason: "fallback_policy_draft_review_or_help",
+            evidence: { reviewScore }
+        };
+    }
+
+    const pauseScore = countPhraseMatches(normalized, [
+        "khoan", "tam dung", "de sau", "can nhac", "chua dat", "giu lai"
+    ]);
+
+    if (pauseScore >= 1) {
+        return {
+            act: ACTS.PAUSE_OR_HOLD,
+            confidence: Math.min(0.88, 0.64 + pauseScore * 0.1),
+            reason: "fallback_policy_pause_or_hold",
+            evidence: { pauseScore }
+        };
+    }
+
+    if (hasQuestionShape && hasSelectedPackage && hasPackageRef) {
+        return {
+            act: ACTS.INFO_DETOUR,
+            confidence: 0.72,
+            reason: "fallback_policy_contextual_package_question",
+            evidence: { hasQuestionShape, hasPackageRef, hasSelectedPackage }
+        };
+    }
+
+    return null;
+}
+
+async function resolveBookingInformationalDetour(message, currentDraft, options = {}) {
+    if (!options.allowContextOnly && !hasInformationalDetourIntent(message)) {
         return null;
     }
 
@@ -1443,10 +1762,10 @@ function buildUnclearBookingDraftReply() {
 function buildReviewDraftReply(draft, missingFields) {
     const knownFields = buildKnownFieldsText(draft);
     const knownText = knownFields.length
-        ? `Thông tin mình đang giữ: ${knownFields.join("; ")}.`
+        ? `Thông tin hiện tại, mình đã ghi nhận: ${knownFields.join("; ")}.`
         : "Mình chưa ghi nhận đủ thông tin đặt lịch nào trong bản nháp này.";
     const missingText = missingFields.length
-        ? `Hiện còn thiếu: ${missingFields.map((field) => FIELD_LABELS[field]).join(", ")}.`
+        ? `Còn thiếu: ${missingFields.map((field) => FIELD_LABELS[field]).join(", ")}.`
         : "Bản nháp đã đủ thông tin, nhưng lịch chưa được tạo.";
     const nextText = missingFields.length
         ? `Bạn vui lòng cung cấp thêm ${FIELD_PROMPTS[missingFields[0]]}.`
@@ -1456,18 +1775,31 @@ function buildReviewDraftReply(draft, missingFields) {
 }
 
 function buildHelpNextStepReply(draft, missingFields) {
+    return buildReviewDraftReply(draft, missingFields);
+}
+
+function buildAmbiguousAcknowledgementReply(draft, missingFields) {
     if (missingFields.length > 0) {
         const nextField = missingFields[0];
         return (
-            `Mình đang giữ bản nháp đặt lịch của bạn và còn thiếu ${FIELD_LABELS[nextField]}. ` +
+            `Mình hiểu. Hiện lịch chưa thể tạo vì còn thiếu ${FIELD_LABELS[nextField]}. ` +
             `Bạn vui lòng cung cấp ${FIELD_PROMPTS[nextField]}.`
         );
     }
 
     return (
-        "Mình đã có đủ thông tin trong bản nháp. " +
-        "Bạn có thể trả lời 'Xác nhận đặt lịch' để tạo lịch, hoặc nói rõ thông tin muốn sửa."
+        "Mình đang giữ bản nháp đã đủ thông tin. " +
+        "Nếu muốn tạo lịch, bạn vui lòng trả lời rõ 'Xác nhận đặt lịch này'. Bạn cũng có thể nói thông tin muốn sửa hoặc hỏi thêm."
     );
+}
+
+async function buildAvailabilityInquiryReply({ message, draft }) {
+    const requestedDate = detectDateFromMessage(message) || draft.appointmentDate;
+
+    return buildAvailableSlotSuggestionReply(draft, {
+        requestedDate,
+        includeCurrentSelection: true
+    });
 }
 
 function buildEditTimeConfirmationReply(timeValue) {
@@ -1707,6 +2039,15 @@ function isIntentClassifierShadowAsyncEnabled(env = process.env) {
         .toLowerCase() === "true";
 }
 
+function shouldEvaluateSemanticReadonlyShadow(ruleAct, { session, draft } = {}) {
+    return Boolean(
+        ruleAct &&
+            SEMANTIC_READONLY_RULE_ACTS.has(ruleAct.act) &&
+            session?.currentFlow === FLOWS.BOOKING &&
+            draft
+    );
+}
+
 function buildConversationActShadowMeta(ruleAct, semanticShadow, options = {}) {
     const comparison = compareConversationActs(ruleAct, semanticShadow);
 
@@ -1724,8 +2065,50 @@ function buildConversationActShadowMeta(ruleAct, semanticShadow, options = {}) {
             : {}),
         ...(Object.prototype.hasOwnProperty.call(options, "shadowProvider")
             ? { shadowProvider: options.shadowProvider }
+            : {}),
+        ...(Object.prototype.hasOwnProperty.call(options, "semanticShadowSkippedReason")
+            ? { semanticShadowSkippedReason: options.semanticShadowSkippedReason }
             : {})
     };
+}
+
+function annotateCurrentTurnIntent(conversationActMeta, intentMeta = {}) {
+    if (!conversationActMeta) return conversationActMeta;
+
+    const semanticFallbackReason =
+        conversationActMeta.semanticShadow?.fallbackReason ||
+        conversationActMeta.semanticShadow?.evidence?.fallbackReason ||
+        null;
+
+    Object.assign(conversationActMeta, {
+        currentTurnIntentSource: intentMeta.source || conversationActMeta.currentTurnIntentSource || "rule",
+        currentTurnIntentUsed: intentMeta.used || conversationActMeta.currentTurnIntentUsed || conversationActMeta.rule?.act || conversationActMeta.act || null,
+        ...(intentMeta.reason ? { currentTurnIntentReason: intentMeta.reason } : {}),
+        ...(intentMeta.evidence ? { currentTurnIntentEvidence: intentMeta.evidence } : {}),
+        ...(Object.prototype.hasOwnProperty.call(intentMeta, "previousDate")
+            ? { previousDate: intentMeta.previousDate }
+            : {}),
+        ...(Object.prototype.hasOwnProperty.call(intentMeta, "requestedDate")
+            ? { requestedDate: intentMeta.requestedDate }
+            : {}),
+        ...(intentMeta.dateValidationReason
+            ? { dateValidationReason: intentMeta.dateValidationReason }
+            : {}),
+        ...(semanticFallbackReason ? { semanticFallbackReason } : {}),
+        ...(intentMeta.whyMissingFieldPromptUsed
+            ? { whyMissingFieldPromptUsed: intentMeta.whyMissingFieldPromptUsed }
+            : {})
+    });
+
+    return conversationActMeta;
+}
+
+function annotateMissingFieldPrompt(conversationActMeta, reason) {
+    return annotateCurrentTurnIntent(conversationActMeta, {
+        source: conversationActMeta?.currentTurnIntentSource || "rule",
+        used: conversationActMeta?.currentTurnIntentUsed || conversationActMeta?.rule?.act || conversationActMeta?.act || ACTS.UNCLEAR,
+        whyMissingFieldPromptUsed: reason
+    });
 }
 
 async function buildConversationActShadowMetaAsync(ruleAct, classifierInput) {
@@ -1771,7 +2154,8 @@ async function returnDraftResult({
     extractedSlots,
     packageIntent,
     nextExpectedField,
-    conversationAct = null
+    conversationAct = null,
+    lastAvailabilitySuggestion = null
 }) {
     await persistDraft(sessionId, draft, missingFields);
 
@@ -1781,6 +2165,7 @@ async function returnDraftResult({
         bookingDraft: draft,
         confirmedBookingId: null,
         lastBookingFailure: null,
+        lastAvailabilitySuggestion,
         pendingDraftEdit: null,
         pendingDraftCancel: null
     });
@@ -1993,17 +2378,35 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         }
     };
     const shadowAsyncEnabled = isIntentClassifierShadowAsyncEnabled();
-    const conversationActMeta = shadowAsyncEnabled
-        ? await buildConversationActShadowMetaAsync(conversationAct, semanticClassifierInput)
+    const shouldEvaluateSemanticShadow = shouldEvaluateSemanticReadonlyShadow(
+        conversationAct,
+        { session, draft: currentDraft }
+    );
+    const conversationActMeta = shouldEvaluateSemanticShadow
+        ? (
+            shadowAsyncEnabled
+                ? await buildConversationActShadowMetaAsync(conversationAct, semanticClassifierInput)
+                : buildConversationActShadowMeta(
+                    conversationAct,
+                    classifySemanticIntent(semanticClassifierInput),
+                    {
+                        semanticShadowAvailable: true,
+                        shadowAsyncEnabled: false,
+                        shadowProvider: getProviderName()
+                    }
+                )
+        )
         : buildConversationActShadowMeta(
             conversationAct,
-            classifySemanticIntent(semanticClassifierInput),
+            null,
             {
-                semanticShadowAvailable: true,
-                shadowAsyncEnabled: false,
-                shadowProvider: getProviderName()
+                semanticShadowAvailable: false,
+                shadowAsyncEnabled: shadowAsyncEnabled,
+                shadowProvider: getProviderName(),
+                semanticShadowSkippedReason: "rule_action_not_semantic_readonly_eligible"
             }
         );
+    let currentTurnAvailabilitySuggestion = null;
     const semanticAssist = await buildSemanticReadonlyAssist({
         ruleAct: conversationAct,
         semanticShadow: conversationActMeta.semanticShadow,
@@ -2013,12 +2416,185 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         message,
         context: {
             ...semanticClassifierInput.domainContext,
-            missingFields: currentMissingFields
+            missingFields: currentMissingFields,
+            buildAvailabilityInquiryReply: async () => {
+                currentTurnAvailabilitySuggestion = await buildAvailabilityInquiryReply({
+                    message,
+                    draft: currentDraft
+                });
+                return currentTurnAvailabilitySuggestion.reply;
+            }
         }
     });
     conversationActMeta.semanticAssist = buildSemanticAssistMeta(semanticAssist);
+    const semanticFallbackReason =
+        conversationActMeta.semanticShadow?.fallbackReason ||
+        conversationActMeta.semanticShadow?.evidence?.fallbackReason ||
+        null;
+    const fallbackReadonlyIntent = !semanticAssist.enabled
+        ? scoreReadonlyCurrentTurnIntent(message, currentDraft, currentMissingFields)
+        : null;
+
+    if (semanticAssist.enabled) {
+        annotateCurrentTurnIntent(conversationActMeta, {
+            source: "semantic_shadow",
+            used: semanticAssist.assistAct,
+            reason: semanticAssist.reason
+        });
+    } else if (
+        fallbackReadonlyIntent &&
+        (
+            conversationAct.act === ACTS.UNCLEAR ||
+            SEMANTIC_READONLY_ASSIST_ACTS.has(conversationAct.act)
+        )
+    ) {
+        annotateCurrentTurnIntent(conversationActMeta, {
+            source: "fallback_policy",
+            used: fallbackReadonlyIntent.act,
+            reason: fallbackReadonlyIntent.reason,
+            evidence: fallbackReadonlyIntent.evidence
+        });
+    } else if (SEMANTIC_READONLY_ASSIST_ACTS.has(conversationAct.act)) {
+        annotateCurrentTurnIntent(conversationActMeta, {
+            source: "rule",
+            used: conversationAct.act,
+            reason: conversationAct.reason
+        });
+    } else {
+        annotateCurrentTurnIntent(conversationActMeta, {
+            source: "rule",
+            used: conversationAct.act,
+            reason: conversationAct.reason,
+            ...(semanticFallbackReason ? { semanticFallbackReason } : {})
+        });
+    }
+
+    const currentTurnDateIntent = parseDateIntentFromMessage(message);
+    const shouldHandleDateIntentFirst = Boolean(
+        currentTurnDateIntent.hasDateIntent &&
+            (currentTurnDateIntent.valid || currentTurnDateIntent.displayDate) &&
+            isActivePendingBookingSession(session) &&
+            !session.pendingDraftEdit &&
+            !session.pendingDraftCancel &&
+            (
+                !currentTurnDateIntent.valid ||
+                currentDraft.appointmentDate ||
+                currentMissingFields[0] === "appointmentDate"
+            )
+    );
+
+    if (shouldHandleDateIntentFirst && !currentTurnDateIntent.valid) {
+        annotateCurrentTurnIntent(conversationActMeta, {
+            source: currentTurnDateIntent.source || "rule",
+            used: "invalid_date",
+            reason: "current_turn_date_intent_before_field_validation",
+            previousDate: currentDraft.appointmentDate || null,
+            requestedDate: currentTurnDateIntent.displayDate || null,
+            dateValidationReason: currentTurnDateIntent.reason || "invalid_date"
+        });
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: session.status || "collecting_info",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: session.lastBookingFailure || null,
+            lastAvailabilitySuggestion: session.lastAvailabilitySuggestion || null,
+            pendingDraftEdit: null,
+            pendingDraftCancel: null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildInvalidDateReply(currentTurnDateIntent.displayDate || "bạn vừa nhập"),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: currentMissingFields[0] || null,
+                conversationAct: conversationActMeta
+            })
+        });
+    }
+
+    if (shouldHandleDateIntentFirst && currentTurnDateIntent.valid) {
+        const previousDate = currentDraft.appointmentDate || null;
+        const dateChanged = previousDate !== currentTurnDateIntent.requestedDate;
+        const dateUpdatedDraft = {
+            ...currentDraft,
+            appointmentDate: currentTurnDateIntent.requestedDate,
+            appointmentTime: dateChanged ? null : currentDraft.appointmentTime
+        };
+        const dateMissingFields = getMissingFields(dateUpdatedDraft);
+        const availabilitySuggestion = await buildAvailableSlotSuggestionReply(
+            dateUpdatedDraft,
+            { requestedDate: currentTurnDateIntent.requestedDate }
+        );
+        const dateReplyPrefix = dateChanged
+            ? `Mình đã cập nhật ngày lấy mẫu sang ${formatDisplayDate(currentTurnDateIntent.requestedDate)}.`
+            : `Mình đang giữ ngày lấy mẫu ${formatDisplayDate(currentTurnDateIntent.requestedDate)}.`;
+        const dateReply = [
+            dateReplyPrefix,
+            availabilitySuggestion.reply
+        ].filter(Boolean).join("\n");
+
+        annotateCurrentTurnIntent(conversationActMeta, {
+            source: currentTurnDateIntent.source || "rule",
+            used: "date_change",
+            reason: "current_turn_date_intent_before_field_validation",
+            previousDate,
+            requestedDate: currentTurnDateIntent.requestedDate
+        });
+
+        return returnDraftResult({
+            sessionId,
+            message,
+            status: dateMissingFields.length ? "collecting_info" : "ready_for_confirmation",
+            action: dateMissingFields.length
+                ? ACTIONS.ASK_BOOKING_INFO
+                : ACTIONS.BOOKING_READY_TO_CONFIRM,
+            reply: dateReply,
+            booking: {
+                status: dateMissingFields.length ? "draft" : "pending_confirmation",
+                draft: dateUpdatedDraft,
+                missingFields: dateMissingFields
+            },
+            draft: dateUpdatedDraft,
+            missingFields: dateMissingFields,
+            extractedSlots: {
+                appointmentDate: currentTurnDateIntent.requestedDate,
+                ...(dateChanged ? { appointmentTime: null } : {})
+            },
+            packageIntent: { type: "none", package: null },
+            nextExpectedField: dateMissingFields[0] || null,
+            conversationAct: conversationActMeta,
+            lastAvailabilitySuggestion: availabilitySuggestion
+        });
+    }
 
     if (semanticAssist.enabled && semanticAssist.reply) {
+        const updatedSession = currentTurnAvailabilitySuggestion
+            ? mockSessions.upsertSession(sessionId, {
+                currentFlow: FLOWS.BOOKING,
+                status: session.status || "collecting_info",
+                bookingDraft: currentDraft,
+                confirmedBookingId: null,
+                lastBookingFailure: session.lastBookingFailure || null,
+                lastAvailabilitySuggestion: currentTurnAvailabilitySuggestion,
+                pendingDraftEdit: session.pendingDraftEdit || null,
+                pendingDraftCancel: session.pendingDraftCancel || null
+            })
+            : session;
+
         return createChatResult({
             sessionId,
             userMessage: message,
@@ -2031,7 +2607,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 missingFields: currentMissingFields
             },
             meta: buildBookingMeta({
-                updatedSession: session,
+                updatedSession,
                 extractedSlots: {},
                 packageIntent: semanticAssist.meta?.packageIntent || { type: "none", package: null },
                 missingFields: currentMissingFields,
@@ -2039,6 +2615,126 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 conversationAct: conversationActMeta
             })
         });
+    }
+
+    if (
+        fallbackReadonlyIntent &&
+        conversationActMeta.currentTurnIntentSource === "fallback_policy"
+    ) {
+        if (fallbackReadonlyIntent.act === ACTS.INFO_DETOUR) {
+            const informationalDetour = await resolveBookingInformationalDetour(
+                message,
+                currentDraft,
+                { allowContextOnly: true }
+            );
+
+            if (informationalDetour) {
+                return returnDraftResult({
+                    sessionId,
+                    message,
+                    status: session.status || "collecting_info",
+                    action: ACTIONS.ASK_BOOKING_INFO,
+                    reply: buildInformationalDetourReply(
+                        informationalDetour.packageItem,
+                        currentDraft,
+                        currentMissingFields
+                    ),
+                    booking: {
+                        status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                        draft: currentDraft,
+                        missingFields: currentMissingFields
+                    },
+                    draft: currentDraft,
+                    missingFields: currentMissingFields,
+                    extractedSlots: {},
+                    packageIntent: informationalDetour.packageIntent,
+                    nextExpectedField: currentMissingFields[0] || null,
+                    conversationAct: conversationActMeta
+                });
+            }
+        }
+
+        if (fallbackReadonlyIntent.act === ACTS.AVAILABILITY_INQUIRY) {
+            const availabilitySuggestion = await buildAvailabilityInquiryReply({
+                message,
+                draft: currentDraft
+            });
+            await persistDraft(sessionId, currentDraft, currentMissingFields);
+            const updatedSession = mockSessions.upsertSession(sessionId, {
+                currentFlow: FLOWS.BOOKING,
+                status: session.status || "collecting_info",
+                bookingDraft: currentDraft,
+                confirmedBookingId: null,
+                lastBookingFailure: session.lastBookingFailure || null,
+                lastAvailabilitySuggestion: availabilitySuggestion,
+                pendingDraftEdit: session.pendingDraftEdit || null,
+                pendingDraftCancel: session.pendingDraftCancel || null
+            });
+
+            return createChatResult({
+                sessionId,
+                userMessage: message,
+                flow: FLOWS.BOOKING,
+                action: ACTIONS.ASK_BOOKING_INFO,
+                reply: availabilitySuggestion.reply,
+                booking: {
+                    status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                    draft: currentDraft,
+                    missingFields: currentMissingFields
+                },
+                meta: {
+                    ...buildBookingMeta({
+                        updatedSession,
+                        extractedSlots: {},
+                        packageIntent: { type: "none", package: null },
+                        missingFields: currentMissingFields,
+                        nextExpectedField: currentMissingFields[0] || null
+                    }),
+                    conversationAct: conversationActMeta
+                }
+            });
+        }
+
+        if (
+            fallbackReadonlyIntent.act === ACTS.REVIEW_DRAFT ||
+            fallbackReadonlyIntent.act === ACTS.HELP_NEXT_STEP
+        ) {
+            await persistDraft(sessionId, currentDraft, currentMissingFields);
+            const updatedSession = mockSessions.upsertSession(sessionId, {
+                currentFlow: FLOWS.BOOKING,
+                status: session.status || "collecting_info",
+                bookingDraft: currentDraft,
+                confirmedBookingId: null,
+                lastBookingFailure: session.lastBookingFailure || null,
+                pendingDraftEdit: session.pendingDraftEdit || null,
+                pendingDraftCancel: session.pendingDraftCancel || null
+            });
+
+            return createChatResult({
+                sessionId,
+                userMessage: message,
+                flow: FLOWS.BOOKING,
+                action: ACTIONS.ASK_BOOKING_INFO,
+                reply: fallbackReadonlyIntent.act === ACTS.REVIEW_DRAFT
+                    ? buildReviewDraftReply(currentDraft, currentMissingFields)
+                    : buildHelpNextStepReply(currentDraft, currentMissingFields),
+                booking: {
+                    status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                    draft: currentDraft,
+                    missingFields: currentMissingFields
+                },
+                meta: {
+                    ...buildBookingMeta({
+                        updatedSession,
+                        extractedSlots: {},
+                        packageIntent: { type: "none", package: null },
+                        missingFields: currentMissingFields,
+                        nextExpectedField: currentMissingFields[0] || null
+                    }),
+                    conversationAct: conversationActMeta
+                }
+            });
+        }
     }
 
     if (
@@ -2530,6 +3226,47 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         });
     }
 
+    if (conversationAct.act === ACTS.AVAILABILITY_INQUIRY) {
+        const availabilitySuggestion = await buildAvailabilityInquiryReply({
+            message,
+            draft: currentDraft
+        });
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: session.status || "collecting_info",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: session.lastBookingFailure || null,
+            lastAvailabilitySuggestion: availabilitySuggestion,
+            pendingDraftEdit: session.pendingDraftEdit || null,
+            pendingDraftCancel: session.pendingDraftCancel || null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: availabilitySuggestion.reply,
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: {
+                ...buildBookingMeta({
+                    updatedSession,
+                    extractedSlots: {},
+                    packageIntent: { type: "none", package: null },
+                    missingFields: currentMissingFields,
+                    nextExpectedField: currentMissingFields[0] || null
+                }),
+                conversationAct: conversationActMeta
+            }
+        });
+    }
+
     if (conversationAct.act === ACTS.REVIEW_DRAFT) {
         await persistDraft(sessionId, currentDraft, currentMissingFields);
         const updatedSession = mockSessions.upsertSession(sessionId, {
@@ -2626,11 +3363,58 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
     }
 
     if (
+        conversationAct.act === ACTS.UNCLEAR &&
+        conversationAct.reason &&
+        String(conversationAct.reason).startsWith("short_ambiguous_message")
+    ) {
+        annotateMissingFieldPrompt(
+            conversationActMeta,
+            "short_ambiguous_current_turn_no_readonly_intent"
+        );
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: session.status || "collecting_info",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: session.lastBookingFailure || null,
+            pendingDraftEdit: session.pendingDraftEdit || null,
+            pendingDraftCancel: session.pendingDraftCancel || null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: buildAmbiguousAcknowledgementReply(currentDraft, currentMissingFields),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: {
+                ...buildBookingMeta({
+                    updatedSession,
+                    extractedSlots: {},
+                    packageIntent: { type: "none", package: null },
+                    missingFields: currentMissingFields,
+                    nextExpectedField: currentMissingFields[0] || "clarifyBookingIntent"
+                }),
+                conversationAct: conversationActMeta
+            }
+        });
+    }
+
+    if (
         !(
-            session.lastBookingFailure &&
+            (session.lastBookingFailure || session.lastAvailabilitySuggestion) &&
             resolveSuggestedSlotSelection(
                 message,
-                session.lastBookingFailure.suggestedSlots || []
+                [
+                    ...(session.lastBookingFailure?.suggestedSlots || []),
+                    ...(session.lastAvailabilitySuggestion?.suggestedSlots || [])
+                ]
             )
         ) &&
         (
@@ -2639,6 +3423,10 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             conversationAct.shouldMutateDraft === false
         )
     ) {
+        annotateMissingFieldPrompt(
+            conversationActMeta,
+            "rule_unclear_or_clarification_no_readonly_current_turn_intent"
+        );
         await persistDraft(sessionId, currentDraft, currentMissingFields);
         const updatedSession = mockSessions.upsertSession(sessionId, {
             currentFlow: FLOWS.BOOKING,
@@ -2676,7 +3464,10 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
 
     const selectedSuggestedSlot = resolveSuggestedSlotSelection(
         message,
-        session.lastBookingFailure?.suggestedSlots || []
+        [
+            ...(session.lastBookingFailure?.suggestedSlots || []),
+            ...(session.lastAvailabilitySuggestion?.suggestedSlots || [])
+        ]
     );
     const {
         slots: rawExtractedSlots,
@@ -2964,6 +3755,34 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 });
             }
 
+            if (
+                missingFields[0] === "appointmentTime" &&
+                nextDraft.appointmentDate &&
+                hasDraftPackage(nextDraft)
+            ) {
+                const availabilitySuggestion = await buildAvailableSlotSuggestionReply(nextDraft);
+
+                return returnDraftResult({
+                    sessionId,
+                    message,
+                    status: "collecting_info",
+                    action: ACTIONS.ASK_BOOKING_INFO,
+                    reply: availabilitySuggestion.reply,
+                    booking: {
+                        status: "draft",
+                        draft: nextDraft,
+                        missingFields
+                    },
+                    draft: nextDraft,
+                    missingFields,
+                    extractedSlots,
+                    packageIntent,
+                    nextExpectedField: "appointmentTime",
+                    conversationAct: conversationActMeta,
+                    lastAvailabilitySuggestion: availabilitySuggestion
+                });
+            }
+
             return returnDraftResult({
                 sessionId,
                 message,
@@ -3054,6 +3873,16 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         draft: nextDraft,
         missingFields
     };
+    let lastAvailabilitySuggestion = null;
+
+    if (
+        missingFields[0] === "appointmentTime" &&
+        nextDraft.appointmentDate &&
+        hasDraftPackage(nextDraft)
+    ) {
+        lastAvailabilitySuggestion = await buildAvailableSlotSuggestionReply(nextDraft);
+        reply = lastAvailabilitySuggestion.reply;
+    }
 
     if (missingFields.length === 0) {
         status = "ready_for_confirmation";
@@ -3078,7 +3907,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         extractedSlots,
         packageIntent,
         nextExpectedField: missingFields[0] || null,
-        conversationAct: conversationActMeta
+        conversationAct: conversationActMeta,
+        lastAvailabilitySuggestion
     });
 }
 
