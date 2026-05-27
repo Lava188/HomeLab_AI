@@ -150,7 +150,7 @@ function buildPauseReply(draft, missingFields) {
 function buildHelpNextStepReply(draft, missingFields) {
     const knownFields = buildKnownFieldsText(draft);
     const knownText = knownFields.length
-        ? `Hiện mình đang giữ: ${knownFields.join("; ")}.`
+        ? `Mình đang có: ${knownFields.join("; ")}.`
         : "Hiện bản nháp chưa có đủ thông tin đặt lịch.";
 
     if (missingFields.length > 0) {
@@ -183,6 +183,21 @@ function buildReviewDraftReply(draft, missingFields) {
     return [knownText, missingText, nextText].join(" ");
 }
 
+function buildNextFieldInstruction(field) {
+    if (field === "address") return "Bạn gửi địa chỉ trước nhé.";
+    if (field === "appointmentTime") return "Bạn chọn khung giờ giúp mình nhé.";
+    if (field === "patientName") return "Bạn gửi tên người đặt giúp mình nhé.";
+    if (field === "phoneNumber") return "Bạn gửi số điện thoại liên hệ giúp mình nhé.";
+    if (field === "appointmentDate") return "Bạn chọn ngày lấy mẫu giúp mình nhé.";
+    if (field === "testType") return "Bạn chọn gói/xét nghiệm giúp mình nhé.";
+    return "Bạn gửi tiếp thông tin còn thiếu giúp mình nhé.";
+}
+
+function getPackageChoiceDisplayName(packageItem) {
+    const name = String(packageItem?.name || "").replace(/^Gói\s+/i, "").trim();
+    return name ? `${name.charAt(0).toUpperCase()}${name.slice(1)}` : name;
+}
+
 async function buildInfoDetourAssist({ message, draft = {}, missingFields, context = {} }) {
     const packageIntent = await packageCatalog.resolvePackageIntent(message || "");
     const selectedFromMessage = packageIntent.package || null;
@@ -205,9 +220,11 @@ async function buildInfoDetourAssist({ message, draft = {}, missingFields, conte
     }
 
     const detail = packageCatalog.buildPackageDetailReply(targetPackage);
-    const followUp = missingFields.length
-        ? `Mình vẫn giữ bản nháp đặt lịch. Hiện còn thiếu ${FIELD_LABELS[missingFields[0]]}.`
-        : "Mình vẫn giữ bản nháp đặt lịch. Bạn có thể xác nhận, sửa thông tin hoặc hỏi thêm.";
+    const followUp = selectedFromMessage && missingFields[0] === "testType"
+        ? `Bạn muốn chọn gói ${getPackageChoiceDisplayName(targetPackage)} cho lịch này không?`
+        : missingFields.length
+            ? `Mình vẫn giữ bản nháp đặt lịch. ${buildNextFieldInstruction(missingFields[0])}`
+            : "Mình vẫn giữ bản nháp đặt lịch. Bạn có thể xác nhận, sửa thông tin hoặc hỏi thêm.";
 
     return {
         reply: [detail, followUp].join("\n\n"),

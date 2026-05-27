@@ -396,6 +396,10 @@ function buildPackageListText() {
     return REQUIRED_PACKAGES.map((item) => summarizePackage(item).name).join(", ");
 }
 
+function trimSentencePunctuation(text) {
+    return String(text || "").trim().replace(/[.。]+$/u, "");
+}
+
 function buildAmbiguousPackageReply() {
     return `Bạn muốn chọn gói xét nghiệm nào? HomeLab hiện có: ${buildPackageListText()}.`;
 }
@@ -426,13 +430,13 @@ function buildPackageDetailReply(packageItem) {
     }
 
     const parts = [
-        `${item.name}: ${item.description}`,
+        `${item.name}: ${trimSentencePunctuation(item.description)}.`,
         `Thành phần: ${item.components.join(", ")}.`,
-        `Phù hợp: ${item.suitableFor}.`
+        `Phù hợp: ${trimSentencePunctuation(item.suitableFor)}.`
     ];
 
     if (item.preparationNotes.length > 0) {
-        parts.push(`Lưu ý: ${item.preparationNotes.join(" ")}`);
+        parts.push(`Lưu ý: ${item.preparationNotes.map(trimSentencePunctuation).join(". ")}.`);
     }
 
     return parts.join("\n");

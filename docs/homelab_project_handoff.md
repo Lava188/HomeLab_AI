@@ -31,7 +31,46 @@ The project must not stop at a keyword/template chatbot.
 
 ## Current Milestone
 
-**5I-1 Documentation refresh after completed 5G/5H booking and collector assignment flow**.
+**5M — Booking chatbot conversation stabilization**.
+
+HomeLab has improved the booking chatbot conversation behavior to understand the current user question first, rather than forcing every user message into a missing booking field. The chatbot now handles natural conversation flow interruptions more gracefully while maintaining booking draft state.
+
+5M completion summary:
+
+- When the user has selected a date and package, the bot suggests available time slots instead of asking a generic time question.
+- If the user selects a time that is not available, that time is not saved into the booking draft.
+- If the selected date has no available slots, the bot suggests the nearest available slot or asks if the user wants to change the date.
+- Invalid dates such as `32/5/2026` are reported as invalid dates, not misunderstood as addresses.
+- Questions about available time slots are not misunderstood as addresses or names.
+- Vague affirmative responses such as `vậy cũng được`, `oke nhé`, `được` are not saved as addresses/names/times.
+- Pause responses such as `để tôi hỏi lại người thân đã`, `chưa, tôi sẽ suy nghĩ thêm` keep the booking draft and respond naturally.
+- `tiếp tục đặt lịch` resumes booking at the correct missing step.
+- Questions like `còn thiếu thông tin gì` or `cho tôi xem lại thông tin` return a summary of what has and has not been provided.
+- Package information questions during booking flow answer package content first, then gently remind the next booking step.
+- Full address re-entry avoids bad merge with previous address data.
+- Booking is created only when all required information is valid, the slot is still available, and the user confirms clearly.
+- Urgent symptoms remain prioritized and are not hidden by booking flow.
+
+5M Ollama/semantic scope:
+
+- Ollama/qwen2.5 is used as read-only support for safe questions within booking conversation.
+- Ollama is not allowed to create bookings, modify bookings, cancel bookings, clear drafts, or confirm bookings.
+- Important booking mutation actions remain controlled by backend deterministic logic.
+
+5M technical boundaries:
+
+- Changes are in backend booking conversation layer and smoke tests.
+- No UI changes.
+- No schema/migration changes.
+- No `.env` changes.
+- No changes to RAG/retriever/recommendation/live package gates.
+- No changes to collector/admin assignment flows.
+
+5M validation:
+
+- **PENDING**: Final booking conversation smoke/manual verification (5M-FINAL).
+
+Previous milestone: **5I-1 Documentation refresh after completed 5G/5H booking and collector assignment flow**.
 
 HomeLab has completed the 5G/5H booking and collector assignment workflow chain as an internal/demo professional prototype. The current booking flow now requires a logged-in user/session phone before booking mutation actions such as create, reschedule, or cancel. Public health/lab questions and urgent red-flag guidance remain available without login. Booking mutations use the session phone, and cross-phone actions are rejected.
 
@@ -328,6 +367,7 @@ Next status: controlled v1.4 runtime has completed targeted 4C UX/source polish 
 
 ## Current Status
 
+- Booking chatbot conversation stabilization 5M is in progress with improved current-turn-first understanding and Ollama read-only assist integration.
 - Staff Management + Collector Workload Rules 5F-1 is complete as professional product prototype hardening for booking operations.
 - Admin staff management is available through `/admin/staff` and `/api/admin/staff`.
 - Staff workload visibility now includes `assignedToday`, `pendingToday`, `collectedToday`, `totalActiveAssigned`, and high-workload warning metadata for dispatch decisions.
@@ -381,6 +421,7 @@ Next status: controlled v1.4 runtime has completed targeted 4C UX/source polish 
 
 ## What Is Already Done
 
+- 5M booking chatbot conversation stabilization is in progress with Ollama read-only assist and current-turn-first handling. The chatbot now handles slot availability suggestions, invalid date reporting, pause responses, package information detours, and draft summary requests without forcing every user message into a missing field. Ollama supports safe read-only questions but is not allowed to mutate bookings.
 - 5G/5H booking and collector assignment chain is complete through 5H-7: patient auth gate, package selection/confirmation, urgent override, collector assignment DB foundation, collector working area/schedule, matching/admin preview, auto pending assignment, collector accept/reject, admin rejection review, manual reassign fallback, and full E2E role workflow smoke.
 - Booking mutations require user login/session phone; public health/lab education and urgent red-flag guidance remain public.
 - Package-based booking now requires concrete package selection/confirmation for vague booking requests and stores `testCatalogItemId` plus specific `testTypeText`.
@@ -429,7 +470,14 @@ Next status: controlled v1.4 runtime has completed targeted 4C UX/source polish 
 
 ## Immediate Next Step
 
-Proceed from 5F-1 staff management/workload hardening and 4D controlled regression evidence to final operations polish or thesis technical narrative packaging / khóa luận, depending on priority:
+Complete 5M-FINAL smoke/manual verification for booking conversation behavior before proceeding to thesis packaging:
+
+- Run and verify all booking conversation smokes pass.
+- Verify Ollama read-only assist does not mutate bookings.
+- Verify slot unavailable is not saved into draft.
+- Verify pause/think-more responses keep draft naturally.
+- Verify package info detours keep draft state.
+- After 5M-FINAL passes, proceed to thesis technical narrative packaging / khóa luận.
 
 - Keep v1.4 behind explicit flags only.
 - Do not promote retriever v1.4 as default/global runtime yet.
@@ -477,7 +525,9 @@ Updated 5I-1 note: 5G/5H are now complete. The next practical step is documentat
 | 21 | 5E-1 Admin Availability Slot Management UI. Done; admin can manage opened sampling slots from UI. |
 | 22 | 5E-2 Slot-aware chatbot booking UX. Done; closed/full slot messages are friendly and do not leak technical codes. |
 | 23 | 5F-1 Staff Management + Collector Workload Rules. Done; staff smoke 9/9 PASS and frontend build PASS. |
-| 24 | Thesis technical narrative packaging / khóa luận. Next if thesis is the priority. |
+| 24 | 5M Booking chatbot conversation stabilization. In progress with Ollama read-only assist and current-turn-first handling. |
+| 25 | 5M-FINAL final smoke/manual verification. Pending before thesis packaging. |
+| 26 | Thesis technical narrative packaging / khóa luận. Next after 5M-FINAL passes. |
 | 25 | Broader default/global production promotion. Future decision only. |
 
 | 26 | 5B Professional Booking & Lab Operations Runtime. Done; persistent booking chat smoke 7/7 PASS, admin booking API smoke PASS, admin dashboard manual UI OK, booking E2E product smoke 12/12 PASS. |
@@ -545,4 +595,6 @@ As of 5D-2, booking creation and reschedule are constrained by opened availabili
 
 As of 5F-1, HomeLab also has admin staff management and collector workload visibility. Admin can manage staff through `/admin/staff`, staff APIs expose workload summaries, inactive or wrong-role staff cannot receive new sample collection assignments, terminal bookings cannot be assigned again, and assignment lookup prefers phone when available.
 
-As of 5G/5H, HomeLab has a complete prototype collector assignment lifecycle layered on top of role-based booking operations. Booking mutation is gated by user/session phone, package booking requires concrete package selection/confirmation, urgent red flags override package/booking state, eligible confirmed bookings auto-create pending collector assignments, collectors can accept/reject, admin can review rejection reasons, manual reassign preserves audit by creating a new assignment, and 5H-7 validates the full user/admin/collector/lab completion flow. The recommended next step is documentation/thesis packaging and final demo polish rather than new large feature work.
+As of 5G/5H, HomeLab has a complete prototype collector assignment lifecycle layered on top of role-based booking operations. Booking mutation is gated by user/session phone, package booking requires concrete package selection/confirmation, urgent red flags override package/booking state, eligible confirmed bookings auto-create pending collector assignments, collectors can accept/reject, admin can review rejection reasons, manual reassign preserves audit by creating a new assignment, and 5H-7 validates the full user/admin/collector/lab completion flow.
+
+As of 5M, HomeLab has improved the booking chatbot conversation to understand the current user question first. The bot now handles natural conversation interruptions such as asking about package contents, checking available slots, pausing to think, and reviewing provided information without forcing every message into a missing booking field. Ollama/qwen2.5 provides read-only assist for safe questions but is not allowed to create, modify, cancel, clear drafts, or confirm bookings. Booking mutations remain controlled by backend deterministic logic. 5M-FINAL smoke/manual verification is pending before thesis packaging.

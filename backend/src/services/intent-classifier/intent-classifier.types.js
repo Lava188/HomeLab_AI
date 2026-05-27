@@ -12,11 +12,11 @@ const CONVERSATION_ACTS = {
     PAUSE_OR_HOLD: "pause_or_hold",
     RESUME_AFTER_PAUSE: "resume_after_pause",
     INFO_DETOUR: "info_detour",
+    AVAILABILITY_INQUIRY: "availability_inquiry",
     EDIT_REQUEST: "edit_request",
     CANCEL_OR_ABORT: "cancel_or_abort",
     REVIEW_DRAFT: "review_draft",
     HELP_NEXT_STEP: "help_next_step",
-    AVAILABILITY_INQUIRY: "availability_inquiry",
     FIELD_VALUE: "field_value",
     UNCLEAR: "unclear"
 };

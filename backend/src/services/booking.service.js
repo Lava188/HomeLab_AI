@@ -8,6 +8,7 @@ const { isBookingSlotError } = require("./booking-response.service");
 const {
     normalizeText,
     detectDateFromMessage,
+    detectInvalidDateFromMessage,
     detectTimeFromMessage,
     formatDisplayDate
 } = require("../utils/text.util");
@@ -26,27 +27,14 @@ const {
     buildSemanticReadonlyAssist,
     buildSemanticAssistMeta
 } = require("./booking-semantic-readonly-assist.service");
+const {
+    arbitrateBookingSemanticReadOnly,
+    buildSemanticArbitrationMeta
+} = require("./booking-semantic-arbitration.service");
 
 const NEARBY_SLOT_LOOKAHEAD_DAYS = 7;
 const NEARBY_SLOT_LIMIT = 5;
 const INTENT_CLASSIFIER_SHADOW_ASYNC_ENABLED_ENV = "HOMELAB_INTENT_CLASSIFIER_SHADOW_ASYNC_ENABLED";
-
-const SEMANTIC_READONLY_RULE_ACTS = new Set([
-    ACTS.PAUSE_OR_HOLD,
-    ACTS.INFO_DETOUR,
-    ACTS.HELP_NEXT_STEP,
-    ACTS.REVIEW_DRAFT,
-    ACTS.AVAILABILITY_INQUIRY,
-    ACTS.UNCLEAR
-]);
-
-const SEMANTIC_READONLY_ASSIST_ACTS = new Set([
-    ACTS.PAUSE_OR_HOLD,
-    ACTS.INFO_DETOUR,
-    ACTS.HELP_NEXT_STEP,
-    ACTS.REVIEW_DRAFT,
-    ACTS.AVAILABILITY_INQUIRY
-]);
 
 const REQUIRED_FIELDS = [
     "testType",
@@ -130,6 +118,15 @@ const FIELD_PROMPTS = {
     phoneNumber: "số điện thoại liên hệ. Ví dụ: 0912345678"
 };
 
+const FIELD_SHORT_PROMPTS = {
+    testType: "gói/xét nghiệm bạn muốn đặt",
+    appointmentDate: "ngày lấy mẫu",
+    appointmentTime: "giờ lấy mẫu",
+    address: "địa chỉ lấy mẫu",
+    patientName: "tên người đặt",
+    phoneNumber: "số điện thoại liên hệ"
+};
+
 const ADDRESS_KEYWORDS = {
     street: ["duong", "pho", "street", "st", "rd"],
     alley: ["ngo", "ngach", "hem", "hemm", "hep"],
@@ -140,7 +137,8 @@ const ADDRESS_KEYWORDS = {
 const MAJOR_CITIES = [
     "ha noi", "hanoi", "tp ho chi minh", "ho chi minh", "hcm",
     "da nang", "danang", "hai phong", "haiphong",
-    "can tho", "cantho", "hue", "thua thien hue"
+    "can tho", "cantho", "hue", "thua thien hue",
+    "ha tinh"
 ];
 
 function getEmptyBookingDraft() {
@@ -175,7 +173,7 @@ function shouldHandleBookingFailureFollowup(sessionId, message) {
     if (
         !session ||
         session.currentFlow !== FLOWS.BOOKING ||
-        (!session.lastBookingFailure && !session.lastAvailabilitySuggestion)
+        !session.lastBookingFailure
     ) {
         return false;
     }
@@ -187,10 +185,7 @@ function shouldHandleBookingFailureFollowup(sessionId, message) {
     if (
         resolveSuggestedSlotSelection(
             message,
-            [
-                ...(session.lastBookingFailure?.suggestedSlots || []),
-                ...(session.lastAvailabilitySuggestion?.suggestedSlots || [])
-            ]
+            session.lastBookingFailure.suggestedSlots || []
         )
     ) {
         return true;
@@ -534,6 +529,26 @@ function mergeAddressParts(partial, addition) {
     return `${base}, ${extraParts.join(", ")}`;
 }
 
+function shouldReplacePartialAddress(partial, addition, validation) {
+    if (!partial || !addition || !validation?.valid) {
+        return false;
+    }
+
+    const normalizedPartial = normalizeText(partial);
+    const normalizedAddition = normalizeText(addition);
+    const partialValidation = isLikelyAddressInput(partial);
+
+    if (normalizedAddition.includes(normalizedPartial)) {
+        return true;
+    }
+
+    return Boolean(
+        ["house_number_only", "missing_admin_division"].includes(partialValidation.reason) &&
+            validation.hasHouseNumber &&
+            validation.hasAdminKeyword
+    );
+}
+
 function getAddressMissingFields(missingFields) {
     return Array.from(new Set([...(missingFields || []), "address"]));
 }
@@ -747,6 +762,12 @@ async function extractBookingSlots(message, currentDraft) {
 
     if (appointmentDate) extracted.appointmentDate = appointmentDate;
     if (appointmentTime) extracted.appointmentTime = appointmentTime;
+    const hasStructuredBookingSlot = Boolean(
+        extracted.appointmentDate ||
+            extracted.appointmentTime ||
+            extracted.testType ||
+            extracted.testCatalogItemId
+    );
 
     let addressValidation = null;
     let addressPartialToMerge = currentDraft.addressPartial || null;
@@ -756,20 +777,26 @@ async function extractBookingSlots(message, currentDraft) {
 
         if (addressValidation.valid) {
             if (addressPartialToMerge) {
-                const mergedCandidate = mergeAddressParts(addressPartialToMerge, address);
-                const mergedValidation = isLikelyAddressInput(mergedCandidate);
-
-                if (mergedValidation.valid && hasProvinceOrCitySignal(mergedCandidate)) {
-                    extracted.address = mergedCandidate;
+                if (shouldReplacePartialAddress(addressPartialToMerge, address, addressValidation)) {
+                    extracted.address = address;
                     extracted.addressPartial = null;
-                    addressValidation = mergedValidation;
+                    addressValidation = isLikelyAddressInput(address);
                 } else {
-                    extracted.addressPartial = mergedCandidate;
-                    addressValidation = {
-                        ...mergedValidation,
-                        needsCompletion: true,
-                        reason: mergedValidation.reason || "missing_admin_division"
-                    };
+                    const mergedCandidate = mergeAddressParts(addressPartialToMerge, address);
+                    const mergedValidation = isLikelyAddressInput(mergedCandidate);
+
+                    if (mergedValidation.valid && hasProvinceOrCitySignal(mergedCandidate)) {
+                        extracted.address = mergedCandidate;
+                        extracted.addressPartial = null;
+                        addressValidation = mergedValidation;
+                    } else {
+                        extracted.addressPartial = mergedCandidate;
+                        addressValidation = {
+                            ...mergedValidation,
+                            needsCompletion: true,
+                            reason: mergedValidation.reason || "missing_admin_division"
+                        };
+                    }
                 }
             } else {
                 extracted.address = address;
@@ -805,6 +832,11 @@ async function extractBookingSlots(message, currentDraft) {
         ...extracted
     });
 
+    if (hasStructuredBookingSlot) {
+        delete contextInference.address;
+        delete contextInference.addressPartial;
+    }
+
     if (contextInference.addressPartial && !addressValidation) {
         addressValidation = isLikelyAddressInput(contextInference.addressPartial);
     }
@@ -813,23 +845,29 @@ async function extractBookingSlots(message, currentDraft) {
         addressValidation = isLikelyAddressInput(contextInference.address);
         if (addressValidation.valid) {
             if (addressPartialToMerge) {
-                const mergedCandidate = mergeAddressParts(
-                    addressPartialToMerge,
-                    contextInference.address
-                );
-                const mergedValidation = isLikelyAddressInput(mergedCandidate);
-
-                if (mergedValidation.valid && hasProvinceOrCitySignal(mergedCandidate)) {
-                    extracted.address = mergedCandidate;
+                if (shouldReplacePartialAddress(addressPartialToMerge, contextInference.address, addressValidation)) {
+                    extracted.address = contextInference.address;
                     extracted.addressPartial = null;
-                    addressValidation = mergedValidation;
+                    addressValidation = isLikelyAddressInput(contextInference.address);
                 } else {
-                    extracted.addressPartial = mergedCandidate;
-                    addressValidation = {
-                        ...mergedValidation,
-                        needsCompletion: true,
-                        reason: mergedValidation.reason || "missing_admin_division"
-                    };
+                    const mergedCandidate = mergeAddressParts(
+                        addressPartialToMerge,
+                        contextInference.address
+                    );
+                    const mergedValidation = isLikelyAddressInput(mergedCandidate);
+
+                    if (mergedValidation.valid && hasProvinceOrCitySignal(mergedCandidate)) {
+                        extracted.address = mergedCandidate;
+                        extracted.addressPartial = null;
+                        addressValidation = mergedValidation;
+                    } else {
+                        extracted.addressPartial = mergedCandidate;
+                        addressValidation = {
+                            ...mergedValidation,
+                            needsCompletion: true,
+                            reason: mergedValidation.reason || "missing_admin_division"
+                        };
+                    }
                 }
             } else {
                 extracted.address = contextInference.address;
@@ -887,7 +925,7 @@ async function extractBookingSlots(message, currentDraft) {
         }
     }
 
-    if (!extracted.address && !extracted.addressPartial) {
+    if (!hasStructuredBookingSlot && !extracted.address && !extracted.addressPartial) {
         const missingFields = getMissingFields(currentDraft);
 
         if (missingFields[0] === "address") {
@@ -937,19 +975,112 @@ function buildKnownFieldsText(draft) {
     return knownParts;
 }
 
+function buildKnownFieldsLines(draft) {
+    const lines = [];
+
+    if (draft.testType) lines.push(`- Gói: ${draft.testType}`);
+    if (draft.appointmentDate) {
+        lines.push(`- Ngày: ${formatDisplayDate(draft.appointmentDate)}`);
+    }
+    if (draft.appointmentTime) lines.push(`- Giờ: ${draft.appointmentTime}`);
+    if (draft.phoneNumber) lines.push(`- Số điện thoại: ${draft.phoneNumber}`);
+    if (draft.address) lines.push(`- Địa chỉ: ${draft.address}`);
+    if (draft.patientName) lines.push(`- Tên người đặt: ${draft.patientName}`);
+
+    return lines;
+}
+
+function buildMissingFieldsLines(missingFields) {
+    return (missingFields || []).map((field) => `- ${FIELD_LABELS[field]}`);
+}
+
+function buildNextFieldInstruction(nextField) {
+    if (nextField === "address") {
+        return "Bạn gửi địa chỉ trước nhé.";
+    }
+
+    if (nextField === "appointmentTime") {
+        return "Bạn chọn khung giờ giúp mình nhé.";
+    }
+
+    if (nextField === "patientName") {
+        return "Bạn gửi tên người đặt giúp mình nhé.";
+    }
+
+    if (nextField === "phoneNumber") {
+        return "Bạn gửi số điện thoại liên hệ giúp mình nhé.";
+    }
+
+    if (nextField === "appointmentDate") {
+        return "Bạn chọn ngày lấy mẫu giúp mình nhé.";
+    }
+
+    if (nextField === "testType") {
+        return "Bạn chọn gói/xét nghiệm giúp mình nhé.";
+    }
+
+    return "Bạn gửi tiếp thông tin còn thiếu giúp mình nhé.";
+}
+
+function buildAddressPromptReply() {
+    return [
+        "Mình đã có gói, ngày và giờ.",
+        "Bạn gửi giúp mình địa chỉ lấy mẫu rõ ràng, gồm số nhà/tên đường, quận/huyện và tỉnh/thành phố.",
+        "Ví dụ: 766 Đê La Thành, Đống Đa, Hà Nội."
+    ].join("\n");
+}
+
+function buildTimeSlotPromptReply(draft, sameDaySlots) {
+    return [
+        `Mình đã ghi nhận gói ${draft.testType} vào ngày ${formatDisplayDate(draft.appointmentDate)}.`,
+        "Ngày này còn các khung giờ:",
+        ...sameDaySlots.map((slot) => `- ${slot.timeStart}`),
+        "",
+        "Bạn muốn chọn khung nào?"
+    ].join("\n");
+}
+
+function buildDateChangedSlotReply(draft, sameDaySlots) {
+    const lines = [
+        `Mình đã đổi ngày lấy mẫu sang ${formatDisplayDate(draft.appointmentDate)}. Vì ngày thay đổi nên mình cần chọn lại giờ.`
+    ];
+
+    if (sameDaySlots.length) {
+        lines.push(
+            "Các khung giờ còn trống:",
+            ...sameDaySlots.map((slot) => `- ${slot.timeStart}`),
+            "",
+            "Bạn muốn chọn khung nào?"
+        );
+    } else {
+        lines.push("Hiện mình chưa thấy khung giờ trống trong ngày này. Bạn muốn chọn ngày khác không?");
+    }
+
+    return lines.join("\n");
+}
+
 function buildCollectingReply(draft, missingFields) {
     const knownFields = buildKnownFieldsText(draft);
     const nextField = missingFields[0];
 
-    let reply = "Mình đang hỗ trợ bạn đặt lịch xét nghiệm/lấy mẫu tại nhà.";
-
-    if (knownFields.length > 0) {
-        reply += ` Hiện mình đã ghi nhận: ${knownFields.join("; ")}.`;
+    if (
+        nextField === "address" &&
+        draft.testType &&
+        draft.appointmentDate &&
+        draft.appointmentTime
+    ) {
+        return buildAddressPromptReply();
     }
 
-    reply += ` Bạn vui lòng cung cấp thêm ${FIELD_PROMPTS[nextField]}.`;
+    if (knownFields.length > 0) {
+        return [
+            `Mình đã ghi nhận: ${knownFields.join("; ")}.`,
+            `Còn thiếu: ${FIELD_LABELS[nextField]}.`,
+            `Bạn vui lòng gửi tiếp ${FIELD_SHORT_PROMPTS[nextField]}.`
+        ].join("\n");
+    }
 
-    return reply;
+    return `Bạn vui lòng gửi ${FIELD_PROMPTS[nextField]}.`;
 }
 
 function buildReadyReply(draft) {
@@ -973,10 +1104,6 @@ function formatSuggestedSlot(slot) {
     return `${formatDisplayDate(slot.date)} lúc ${slot.timeStart}`;
 }
 
-function formatSuggestedSlotTime(slot) {
-    return slot.timeStart;
-}
-
 function buildSuggestedSlotsText(suggestedSlots) {
     if (!suggestedSlots.length) {
         return "";
@@ -988,194 +1115,140 @@ function buildSuggestedSlotsText(suggestedSlots) {
     ].join("\n");
 }
 
-function getDraftPackageName(draft = {}) {
-    return draft.selectedPackage?.name || draft.testType || null;
-}
-
-function hasDraftPackage(draft = {}) {
-    return Boolean(draft.selectedPackage || draft.testCatalogItemId || draft.testType);
-}
-
-function buildSlotSuggestionSummary(draft = {}) {
-    const parts = [];
-    const packageName = getDraftPackageName(draft);
-
-    if (draft.appointmentDate) {
-        parts.push(`ngày lấy mẫu ${formatDisplayDate(draft.appointmentDate)}`);
-    }
-    if (packageName) {
-        parts.push(`gói ${packageName}`);
-    }
-    if (draft.phoneNumber) {
-        parts.push(`số điện thoại ${draft.phoneNumber}`);
-    }
-
-    return parts.length ? `Mình đã ghi nhận ${parts.join(" và ")}.` : "";
-}
-
-function formatDateIntentDisplay(day, month, year) {
-    return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
-}
-
-function parseDateIntentFromMessage(message, baseDate = new Date()) {
-    const text = String(message || "");
-    const normalized = normalizeText(text);
-    const numericMatch = text.match(
-        /(?:ngÃ y\s*|ngày\s*|ngay\s*)?(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{4}))?/i
-    );
-
-    if (numericMatch) {
-        const day = Number(numericMatch[1]);
-        const month = Number(numericMatch[2]);
-        const year = numericMatch[3] ? Number(numericMatch[3]) : baseDate.getFullYear();
-        const parsed = detectDateFromMessage(message, baseDate);
-        const displayDate = formatDateIntentDisplay(day, month, year);
-
-        if (!parsed) {
-            return {
-                hasDateIntent: true,
-                valid: false,
-                requestedDate: null,
-                displayDate,
-                source: "numeric_date",
-                reason: "calendar_date_out_of_range"
-            };
-        }
-
-        return {
-            hasDateIntent: true,
-            valid: true,
-            requestedDate: parsed,
-            displayDate,
-            source: "numeric_date",
-            reason: null
-        };
-    }
-
-    const relativeDate = detectDateFromMessage(message, baseDate);
-
-    if (relativeDate) {
-        return {
-            hasDateIntent: true,
-            valid: true,
-            requestedDate: relativeDate,
-            displayDate: formatDisplayDate(relativeDate),
-            source: normalized.includes("hom nay") ? "relative_today" : "relative_tomorrow",
-            reason: null
-        };
-    }
-
-    const hasDateChangeWords = /\b(doi|sua|chuyen|dat|lay)\b/.test(normalized) &&
-        /\b(ngay|lich|lay mau)\b/.test(normalized);
-
-    return {
-        hasDateIntent: hasDateChangeWords,
-        valid: false,
-        requestedDate: null,
-        displayDate: null,
-        source: hasDateChangeWords ? "date_words" : null,
-        reason: hasDateChangeWords ? "date_value_missing_or_unrecognized" : null
-    };
-}
-
-function buildInvalidDateReply(dateText) {
-    return `Ngày ${dateText} không hợp lệ. Bạn vui lòng chọn lại ngày lấy mẫu hợp lệ, ví dụ 29/05/2026 hoặc 'ngày mai'.`;
-}
-
-function isSameDateSlot(slot, requestedDate) {
-    return slot?.date === requestedDate;
-}
-
-async function findAvailableSlotSuggestions(requestedDate) {
-    if (!availabilitySlotService.findAvailableNearbySlots) {
+async function findAvailableSlotsForDraftDate(draft, limit = NEARBY_SLOT_LIMIT) {
+    if (!draft?.appointmentDate) {
         return [];
     }
 
-    const slots = await availabilitySlotService.findAvailableNearbySlots({
-        requestedDate,
-        limit: 200,
-        days: NEARBY_SLOT_LOOKAHEAD_DAYS
+    return availabilitySlotService.findAvailableNearbySlots({
+        requestedDate: draft.appointmentDate,
+        area: null,
+        days: 1,
+        limit
     });
-
-    return Array.isArray(slots) ? slots : [];
 }
 
-async function buildAvailableSlotSuggestionReply(draft, options = {}) {
-    const requestedDate = options.requestedDate || draft.appointmentDate;
-    const includeCurrentSelection = Boolean(options.includeCurrentSelection && draft.appointmentTime);
+async function buildCollectingReplyWithAvailability(draft, missingFields) {
+    const reply = buildCollectingReply(draft, missingFields);
 
-    if (!hasDraftPackage(draft)) {
-        return {
-            reply: buildCollectingReply(draft, ["testType"]),
-            suggestedSlots: [],
-            reason: "missing_package"
-        };
+    if (missingFields[0] !== "appointmentTime" || !draft.appointmentDate) {
+        return reply;
     }
 
-    if (!requestedDate) {
-        return {
-            reply: buildCollectingReply(draft, ["appointmentDate"]),
-            suggestedSlots: [],
-            reason: "missing_date"
-        };
+    const sameDaySlots = (await findAvailableSlotsForDraftDate(draft))
+        .filter((slot) => slot.date === draft.appointmentDate);
+
+    if (!sameDaySlots.length) {
+        return reply;
     }
 
-    let slots = [];
-
-    try {
-        slots = await findAvailableSlotSuggestions(requestedDate);
-    } catch {
-        slots = [];
+    if (draft.testType) {
+        return buildTimeSlotPromptReply(draft, sameDaySlots);
     }
 
-    const sameDaySlots = slots
-        .filter((slot) => isSameDateSlot(slot, requestedDate))
-        .slice(0, NEARBY_SLOT_LIMIT);
-    const summary = buildSlotSuggestionSummary({ ...draft, appointmentDate: requestedDate });
+    return [reply, buildSuggestedSlotsText(sameDaySlots)].join("\n\n");
+}
+
+async function buildAvailabilityCheckReply(draft) {
+    if (!draft?.appointmentDate) {
+        return "Bạn muốn xem khung giờ trống cho ngày nào?";
+    }
+
+    const sameDaySlots = (await findAvailableSlotsForDraftDate(draft))
+        .filter((slot) => slot.date === draft.appointmentDate);
+
+    if (draft.appointmentTime) {
+        const currentSlotText = `${formatDisplayDate(draft.appointmentDate)} lúc ${draft.appointmentTime}`;
+        const slotsText = buildSuggestedSlotsText(sameDaySlots);
+
+        return [
+            `Bạn đang chọn khung ${currentSlotText}.`,
+            slotsText || `Hiện mình chưa thấy khung giờ trống khác trong ngày ${formatDisplayDate(draft.appointmentDate)}.`,
+            "Bạn muốn giữ khung giờ đang chọn hay đổi sang khung khác?"
+        ].filter(Boolean).join("\n\n");
+    }
+
+    if (!sameDaySlots.length) {
+        return `Hiện mình chưa thấy khung giờ trống trong ngày ${formatDisplayDate(draft.appointmentDate)}. Bạn muốn chọn ngày khác không?`;
+    }
+
+    return [
+        `Các khung giờ còn trống trong ngày ${formatDisplayDate(draft.appointmentDate)}:`,
+        ...sameDaySlots.map((slot) => `- ${slot.timeStart}`)
+    ].join("\n");
+}
+
+async function getAvailableSlotsForDate(date) {
+    if (!date) {
+        return [];
+    }
+
+    return (await availabilitySlotService.findAvailableNearbySlots({
+        requestedDate: date,
+        area: null,
+        days: 1,
+        limit: 50
+    })).filter((slot) => slot.date === date);
+}
+
+async function getNearbyAvailableSlots(date) {
+    if (!date) {
+        return [];
+    }
+
+    return availabilitySlotService.findAvailableNearbySlots({
+        requestedDate: date,
+        area: null,
+        days: NEARBY_SLOT_LOOKAHEAD_DAYS,
+        limit: NEARBY_SLOT_LIMIT
+    });
+}
+
+function buildUnavailableTimeReply({ requestedDate, requestedTime, sameDaySlots, nearbySlots }) {
+    const dateText = formatDisplayDate(requestedDate);
 
     if (sameDaySlots.length) {
-        return {
-            reply: [
-                includeCurrentSelection
-                    ? `Hiện bạn đang chọn ${draft.appointmentTime} ngày ${formatDisplayDate(requestedDate)}.`
-                    : null,
-                summary,
-                "Các khung giờ còn trống trong ngày này:",
-                ...sameDaySlots.map((slot) => `- ${formatSuggestedSlotTime(slot)}`),
-                includeCurrentSelection
-                    ? `Bạn muốn giữ ${draft.appointmentTime} hay đổi sang khung giờ khác?`
-                    : "Bạn muốn chọn khung giờ nào?"
-            ].filter(Boolean).join("\n"),
-            suggestedSlots: sameDaySlots,
-            reason: "same_day_slots"
-        };
+        return [
+            `Khung ${requestedTime} ngày ${dateText} hiện không khả dụng. Ngày này còn các khung:`,
+            ...sameDaySlots.map((slot) => `- ${slot.timeStart}`),
+            "",
+            `Bạn muốn chọn ${sameDaySlots.map((slot) => slot.timeStart).join(", ")} hay đổi sang ngày khác?`
+        ].join("\n");
     }
-
-    const nearbySlots = slots
-        .filter((slot) => slot.date > requestedDate)
-        .slice(0, NEARBY_SLOT_LIMIT);
 
     if (nearbySlots.length) {
-        return {
-            reply: [
-                `Ngày ${formatDisplayDate(requestedDate)} hiện chưa còn khung giờ phù hợp.`,
-                "Mình tìm thấy một số khung giờ gần nhất:",
-                ...nearbySlots.map((slot) => `- ${formatSuggestedSlot(slot)}`),
-                "Bạn muốn chọn một trong các khung giờ trên hay đổi sang ngày khác?"
-            ].join("\n"),
-            suggestedSlots: nearbySlots,
-            reason: "nearby_slots"
-        };
+        return [
+            `Ngày ${dateText} hiện không còn khung giờ phù hợp. Mình tìm thấy các khung gần nhất:`,
+            ...nearbySlots.map((slot) => `- ${formatDisplayDate(slot.date)} lúc ${slot.timeStart}`),
+            "",
+            "Bạn muốn chọn một trong các khung trên hay đổi sang ngày khác?"
+        ].join("\n");
     }
 
-    return {
-        reply: (
-            `Hiện HomeLab chưa tìm thấy khung giờ khả dụng gần ngày ${formatDisplayDate(requestedDate)}. ` +
-            "Bạn muốn thử chọn một ngày khác không?"
-        ),
-        suggestedSlots: [],
-        reason: "no_nearby_slots"
-    };
+    return `Hiện HomeLab chưa tìm thấy khung giờ khả dụng gần ngày ${dateText}. Bạn muốn chọn ngày khác không?`;
+}
+
+async function isSelectedTimeAvailable(date, time) {
+    try {
+        await availabilitySlotService.assertSlotAvailable({
+            sampleDate: date,
+            sampleTimeStart: time
+        });
+        return true;
+    } catch (error) {
+        if (error instanceof BookingRuntimeError && isBookingSlotError(error)) {
+            return false;
+        }
+
+        throw error;
+    }
+}
+
+function buildInvalidDateReply(invalidDate) {
+    const dateText = String(invalidDate?.input || "ngày bạn vừa nhập")
+        .replace(/^ngày\s+/i, "");
+
+    return `Ngày ${dateText} không hợp lệ. Bạn chọn lại ngày lấy mẫu giúp mình nhé, ví dụ 29/05/2026 hoặc 'ngày mai'.`;
 }
 
 function getSlotFailureReasonCode(error, suggestedSlots) {
@@ -1250,7 +1323,10 @@ function buildSlotFailureMessage({ error, draft, suggestedSlots }) {
         ].filter(Boolean).join("\n\n");
     }
 
-    return "Mình chưa thể tạo lịch với thông tin hiện tại. Bạn vui lòng kiểm tra lại thông tin đặt lịch hoặc liên hệ HomeLab để được hỗ trợ.";
+    return [
+        "Mình chưa thể tạo lịch vì hệ thống đang gặp lỗi khi lưu lịch.",
+        "Mình vẫn giữ bản nháp đặt lịch hiện tại của bạn. Bạn thử xác nhận lại sau ít phút hoặc liên hệ HomeLab để được hỗ trợ."
+    ].join("\n\n");
 }
 
 function buildFailureDraftSummary(draft) {
@@ -1569,136 +1645,37 @@ function buildPackageBookingConfirmationReply(draft, includePackageDetail = true
 }
 
 function buildConfirmationOnlyBlockedReply(draft, missingFields) {
-    const knownFields = buildKnownFieldsText(draft);
     const nextField = missingFields[0];
+    const missingText = nextField === "appointmentTime"
+        ? "khung giờ hợp lệ"
+        : FIELD_LABELS[nextField].toLowerCase();
 
-    return (
-        "Mình chưa thể tạo lịch vì còn thiếu " +
-        `${FIELD_LABELS[nextField]}. ` +
-        (knownFields.length > 0
-            ? `Hiện mình đã ghi nhận: ${knownFields.join("; ")}. `
-            : "") +
-        `Bạn vui lòng cung cấp thêm ${FIELD_PROMPTS[nextField]}.`
-    );
+    return [
+        "Mình hiểu. Tuy nhiên lịch vẫn chưa đủ thông tin để tạo.",
+        `Hiện còn thiếu ${missingText}.`,
+        buildNextFieldInstruction(nextField)
+    ].join(" ");
 }
 
-function buildInformationalDetourReply(packageItem, draft, missingFields) {
+function getPackageChoiceDisplayName(packageItem) {
+    const name = String(packageItem?.name || "").replace(/^Gói\s+/i, "").trim();
+    return name ? `${name.charAt(0).toUpperCase()}${name.slice(1)}` : name;
+}
+
+function buildInformationalDetourReply(packageItem, draft, missingFields, options = {}) {
     const detail = packageCatalog.buildPackageDetailReply(packageItem);
     const nextField = missingFields[0];
-    const followUp = nextField
-        ? `Mình vẫn giữ bản nháp đặt lịch của bạn. Bạn vui lòng cung cấp thêm ${FIELD_PROMPTS[nextField]}.`
-        : "Mình vẫn giữ bản nháp đặt lịch của bạn. Bạn muốn tiếp tục xác nhận lịch này hay sửa thông tin nào?";
+    const followUp = options.packageFromMessage && nextField === "testType"
+        ? `Bạn muốn chọn gói ${getPackageChoiceDisplayName(packageItem)} cho lịch này không?`
+        : nextField
+        ? `Mình vẫn giữ bản nháp đặt lịch. Nếu muốn tiếp tục, ${buildNextFieldInstruction(nextField).toLowerCase()}`
+        : "Mình vẫn giữ bản nháp đặt lịch. Nếu thông tin đã đúng, bạn trả lời 'Xác nhận đặt lịch' để mình tạo lịch.";
 
     return [detail, followUp].join("\n\n");
 }
 
-function countPhraseMatches(normalized, phrases = []) {
-    return phrases.reduce((count, phrase) => (
-        normalized.includes(phrase) ? count + 1 : count
-    ), 0);
-}
-
-function hasCurrentPackageReference(normalized, draft = {}) {
-    const packageName = normalizeText(draft.testType || draft.selectedPackage?.name || "");
-
-    return Boolean(
-        normalized.includes("goi nay") ||
-            normalized.includes("xet nghiem nay") ||
-            normalized.includes("cai nay") ||
-            normalized.includes("loai nay") ||
-            normalized.includes("goi xet nghiem") ||
-            normalized.includes("xet nghiem") ||
-            normalized.includes("goi") ||
-            (packageName && normalized.includes(packageName))
-    );
-}
-
-function scoreReadonlyCurrentTurnIntent(message, draft = {}, missingFields = []) {
-    const normalized = normalizeText(message);
-    const hasSelectedPackage = Boolean(draft.selectedPackage || draft.testType);
-    const hasPackageRef = hasCurrentPackageReference(normalized, draft);
-    const hasQuestionShape = /(\?|^(ai|cai gi|gi|nhu the nao|the nao|vi sao|tai sao|co|con|gom|kiem tra|dung de|de lam gi)\b)/i.test(normalized);
-
-    const explainScore =
-        countPhraseMatches(normalized, [
-            "noi ro", "lam ro", "ro hon", "ky hon", "hieu ky", "hieu hon",
-            "biet them", "tim hieu", "giai thich", "de hieu", "chi tiet",
-            "gom", "bao gom", "kiem tra", "dung de", "de lam gi", "la gi",
-            "y nghia", "cho toi biet"
-        ]) +
-        (hasQuestionShape ? 1 : 0) +
-        (hasPackageRef ? 2 : 0) +
-        (hasSelectedPackage ? 1 : 0);
-
-    if (hasSelectedPackage && hasPackageRef && explainScore >= 4) {
-        return {
-            act: ACTS.INFO_DETOUR,
-            confidence: Math.min(0.95, 0.55 + explainScore * 0.08),
-            reason: "fallback_policy_package_explanation_request",
-            evidence: { explainScore, hasPackageRef, hasSelectedPackage }
-        };
-    }
-
-    const availabilityScore =
-        countPhraseMatches(normalized, [
-            "khung gio", "lich trong", "gio nao", "gio trong", "con trong",
-            "slot", "lich nao", "thoi gian nao", "khi nao trong"
-        ]) +
-        (normalized.includes("trong") ? 1 : 0) +
-        (normalized.includes("hien tai") ? 1 : 0);
-
-    if (availabilityScore >= 2) {
-        return {
-            act: ACTS.AVAILABILITY_INQUIRY,
-            confidence: Math.min(0.92, 0.58 + availabilityScore * 0.1),
-            reason: "fallback_policy_availability_question",
-            evidence: { availabilityScore }
-        };
-    }
-
-    const reviewScore =
-        countPhraseMatches(normalized, [
-            "con thieu", "thieu thong tin", "xem lai", "kiem tra lai",
-            "da co thong tin gi", "thong tin hien tai", "tom tat", "nhac lai"
-        ]) +
-        (missingFields.length > 0 && normalized.includes("thieu") ? 1 : 0);
-
-    if (reviewScore >= 1) {
-        return {
-            act: normalized.includes("thieu") ? ACTS.REVIEW_DRAFT : ACTS.HELP_NEXT_STEP,
-            confidence: Math.min(0.9, 0.62 + reviewScore * 0.12),
-            reason: "fallback_policy_draft_review_or_help",
-            evidence: { reviewScore }
-        };
-    }
-
-    const pauseScore = countPhraseMatches(normalized, [
-        "khoan", "tam dung", "de sau", "can nhac", "chua dat", "giu lai"
-    ]);
-
-    if (pauseScore >= 1) {
-        return {
-            act: ACTS.PAUSE_OR_HOLD,
-            confidence: Math.min(0.88, 0.64 + pauseScore * 0.1),
-            reason: "fallback_policy_pause_or_hold",
-            evidence: { pauseScore }
-        };
-    }
-
-    if (hasQuestionShape && hasSelectedPackage && hasPackageRef) {
-        return {
-            act: ACTS.INFO_DETOUR,
-            confidence: 0.72,
-            reason: "fallback_policy_contextual_package_question",
-            evidence: { hasQuestionShape, hasPackageRef, hasSelectedPackage }
-        };
-    }
-
-    return null;
-}
-
-async function resolveBookingInformationalDetour(message, currentDraft, options = {}) {
-    if (!options.allowContextOnly && !hasInformationalDetourIntent(message)) {
+async function resolveBookingInformationalDetour(message, currentDraft) {
+    if (!hasInformationalDetourIntent(message)) {
         return null;
     }
 
@@ -1722,7 +1699,8 @@ async function resolveBookingInformationalDetour(message, currentDraft, options 
                 package: targetPackage,
                 candidates: []
             },
-        packageItem: targetPackage
+        packageItem: targetPackage,
+        packageFromMessage: Boolean(packageFromMessage)
     };
 }
 
@@ -1737,11 +1715,20 @@ function buildBookingEditIntentReply() {
     return "Bạn muốn đổi gói xét nghiệm, ngày giờ lấy mẫu, địa chỉ hay thông tin người đặt?";
 }
 
-function buildPauseReply() {
-    return (
-        "Được, mình sẽ chưa tạo lịch. Mình vẫn giữ bản nháp đặt lịch này. " +
-        "Bạn muốn sửa thông tin nào, hỏi thêm về gói xét nghiệm, hủy bản nháp, hay tiếp tục xác nhận sau?"
-    );
+function buildPauseReply(draft, missingFields) {
+    if (!missingFields.length) {
+        return "Oke, lịch chưa được tạo. Mình vẫn giữ bản nháp này; khi nào muốn đặt, bạn nhắn xác nhận đặt lịch này nhé.";
+    }
+
+    if (draft?.testType && draft?.appointmentDate && !draft?.appointmentTime) {
+        return "Oke, mình vẫn giữ thông tin gói và ngày lấy mẫu. Khi nào muốn tiếp tục, bạn có thể chọn một trong các khung giờ còn trống hoặc nhắn ngày khác.";
+    }
+
+    if (buildKnownFieldsText(draft).length > 0) {
+        return "Oke, mình vẫn giữ bản nháp đặt lịch của bạn. Khi nào muốn tiếp tục, bạn chỉ cần nhắn tiếp tục đặt lịch hoặc chọn khung giờ phù hợp nhé.";
+    }
+
+    return "Oke, mình sẽ chờ bạn. Khi nào muốn đặt lịch, bạn chỉ cần nhắn tiếp tục đặt lịch nhé.";
 }
 
 function buildPausedResumeReconfirmReply() {
@@ -1752,54 +1739,43 @@ function buildPausedResumeReconfirmReply() {
 }
 
 function buildCancelDraftConfirmReply() {
-    return "Bạn muốn hủy bản nháp đặt lịch này đúng không? Nếu đúng, hãy trả lời 'Đúng, hủy bản nháp'.";
+    return "Bạn muốn hủy bản nháp đặt lịch này đúng không? Nếu đúng, hãy trả lời 'Đúng hủy bản nháp'.";
 }
 
 function buildUnclearBookingDraftReply() {
     return "Ý bạn là muốn tiếp tục đặt lịch, sửa thông tin, hay hỏi thêm về gói xét nghiệm?";
 }
 
-function buildReviewDraftReply(draft, missingFields) {
-    const knownFields = buildKnownFieldsText(draft);
-    const knownText = knownFields.length
-        ? `Thông tin hiện tại, mình đã ghi nhận: ${knownFields.join("; ")}.`
-        : "Mình chưa ghi nhận đủ thông tin đặt lịch nào trong bản nháp này.";
-    const missingText = missingFields.length
-        ? `Còn thiếu: ${missingFields.map((field) => FIELD_LABELS[field]).join(", ")}.`
-        : "Bản nháp đã đủ thông tin, nhưng lịch chưa được tạo.";
-    const nextText = missingFields.length
-        ? `Bạn vui lòng cung cấp thêm ${FIELD_PROMPTS[missingFields[0]]}.`
-        : "Nếu muốn tạo lịch, bạn trả lời rõ 'Xác nhận đặt lịch'.";
+function buildUnclearMissingFieldReply(missingFields) {
+    const nextField = missingFields[0];
 
-    return [knownText, missingText, nextText].join(" ");
+    return [
+        "Mình hiểu. Tuy nhiên lịch vẫn chưa đủ thông tin để tạo.",
+        `Hiện còn thiếu ${FIELD_LABELS[nextField].toLowerCase()}.`,
+        buildNextFieldInstruction(nextField)
+    ].join(" ");
+}
+
+function buildReviewDraftReply(draft, missingFields) {
+    const knownLines = buildKnownFieldsLines(draft);
+    const missingLines = buildMissingFieldsLines(missingFields);
+
+    return [
+        "Mình đang có:",
+        ...(knownLines.length ? knownLines : ["- Chưa có thông tin nào"]),
+        "",
+        ...(missingLines.length
+            ? ["Còn thiếu:", ...missingLines, "", buildNextFieldInstruction(missingFields[0])]
+            : ["Bản nháp đã đủ thông tin, nhưng lịch chưa được tạo.", "Nếu muốn tạo lịch, bạn trả lời rõ 'Xác nhận đặt lịch'."])
+    ].join("\n");
 }
 
 function buildHelpNextStepReply(draft, missingFields) {
-    return buildReviewDraftReply(draft, missingFields);
-}
-
-function buildAmbiguousAcknowledgementReply(draft, missingFields) {
     if (missingFields.length > 0) {
-        const nextField = missingFields[0];
-        return (
-            `Mình hiểu. Hiện lịch chưa thể tạo vì còn thiếu ${FIELD_LABELS[nextField]}. ` +
-            `Bạn vui lòng cung cấp ${FIELD_PROMPTS[nextField]}.`
-        );
+        return buildReviewDraftReply(draft, missingFields);
     }
 
-    return (
-        "Mình đang giữ bản nháp đã đủ thông tin. " +
-        "Nếu muốn tạo lịch, bạn vui lòng trả lời rõ 'Xác nhận đặt lịch này'. Bạn cũng có thể nói thông tin muốn sửa hoặc hỏi thêm."
-    );
-}
-
-async function buildAvailabilityInquiryReply({ message, draft }) {
-    const requestedDate = detectDateFromMessage(message) || draft.appointmentDate;
-
-    return buildAvailableSlotSuggestionReply(draft, {
-        requestedDate,
-        includeCurrentSelection: true
-    });
+    return buildReviewDraftReply(draft, missingFields);
 }
 
 function buildEditTimeConfirmationReply(timeValue) {
@@ -1905,14 +1881,14 @@ function buildDifferentPhoneReply(sessionPhone) {
 
 function buildCreatedReply(booking) {
     return (
-        `Đã tạo lịch hẹn thành công. Mã đặt lịch của bạn là ${booking.bookingCode}. ` +
-        `Thông tin đã ghi nhận gồm: ` +
-        `${FIELD_LABELS.testType}: ${booking.testName || booking.testTypeText}; ` +
-        `${FIELD_LABELS.appointmentDate}: ${formatDisplayDate(booking.sampleDate)}; ` +
-        `${FIELD_LABELS.appointmentTime}: ${booking.sampleTimeStart}; ` +
-        `${FIELD_LABELS.address}: ${booking.address}; ` +
-        `${FIELD_LABELS.patientName}: ${booking.patientName}; ` +
-        `${FIELD_LABELS.phoneNumber}: ${booking.phone}.`
+        `Đã tạo lịch hẹn thành công. Mã đặt lịch của bạn là ${booking.bookingCode}.\n` +
+        "Thông tin lịch:\n" +
+        `- Gói: ${booking.testName || booking.testTypeText}\n` +
+        `- Ngày giờ: ${formatDisplayDate(booking.sampleDate)} ${booking.sampleTimeStart}\n` +
+        `- Địa chỉ: ${booking.address}\n` +
+        `- Người đặt: ${booking.patientName}\n` +
+        `- Số điện thoại: ${booking.phone}\n\n` +
+        "Bạn có thể lưu lại mã đặt lịch để tra cứu khi cần."
     );
 }
 
@@ -1974,12 +1950,26 @@ function buildBookingMeta({
     nextExpectedField,
     conversationAct = null
 }) {
+    const ruleAct = getRuleConversationAct(conversationAct);
+    const semanticShadow = conversationAct?.semanticShadow || null;
+    const semanticArbitration = conversationAct?.semanticArbitration || null;
+    const fieldPromptUsed = REQUIRED_FIELDS.includes(nextExpectedField);
+
     return {
         handledBy: "booking.service",
         sessionState: updatedSession.status,
         extractedSlots,
         missingFields,
         nextExpectedField: nextExpectedField || null,
+        currentTurnIntentUsed: ruleAct?.act || null,
+        currentTurnIntentSource: ruleAct ? "booking_conversation_act.rule" : null,
+        ...(fieldPromptUsed
+            ? { whyMissingFieldPromptUsed: `missing_${nextExpectedField}` }
+            : {}),
+        ...(semanticShadow?.fallbackReason
+            ? { semanticFallbackReason: semanticShadow.fallbackReason }
+            : {}),
+        ...(semanticArbitration ? { semanticArbitration } : {}),
         confirmedBookingId: updatedSession.confirmedBookingId || null,
         packageIntent: packageIntent?.type || null,
         packageCandidates:
@@ -2039,15 +2029,6 @@ function isIntentClassifierShadowAsyncEnabled(env = process.env) {
         .toLowerCase() === "true";
 }
 
-function shouldEvaluateSemanticReadonlyShadow(ruleAct, { session, draft } = {}) {
-    return Boolean(
-        ruleAct &&
-            SEMANTIC_READONLY_RULE_ACTS.has(ruleAct.act) &&
-            session?.currentFlow === FLOWS.BOOKING &&
-            draft
-    );
-}
-
 function buildConversationActShadowMeta(ruleAct, semanticShadow, options = {}) {
     const comparison = compareConversationActs(ruleAct, semanticShadow);
 
@@ -2065,50 +2046,8 @@ function buildConversationActShadowMeta(ruleAct, semanticShadow, options = {}) {
             : {}),
         ...(Object.prototype.hasOwnProperty.call(options, "shadowProvider")
             ? { shadowProvider: options.shadowProvider }
-            : {}),
-        ...(Object.prototype.hasOwnProperty.call(options, "semanticShadowSkippedReason")
-            ? { semanticShadowSkippedReason: options.semanticShadowSkippedReason }
             : {})
     };
-}
-
-function annotateCurrentTurnIntent(conversationActMeta, intentMeta = {}) {
-    if (!conversationActMeta) return conversationActMeta;
-
-    const semanticFallbackReason =
-        conversationActMeta.semanticShadow?.fallbackReason ||
-        conversationActMeta.semanticShadow?.evidence?.fallbackReason ||
-        null;
-
-    Object.assign(conversationActMeta, {
-        currentTurnIntentSource: intentMeta.source || conversationActMeta.currentTurnIntentSource || "rule",
-        currentTurnIntentUsed: intentMeta.used || conversationActMeta.currentTurnIntentUsed || conversationActMeta.rule?.act || conversationActMeta.act || null,
-        ...(intentMeta.reason ? { currentTurnIntentReason: intentMeta.reason } : {}),
-        ...(intentMeta.evidence ? { currentTurnIntentEvidence: intentMeta.evidence } : {}),
-        ...(Object.prototype.hasOwnProperty.call(intentMeta, "previousDate")
-            ? { previousDate: intentMeta.previousDate }
-            : {}),
-        ...(Object.prototype.hasOwnProperty.call(intentMeta, "requestedDate")
-            ? { requestedDate: intentMeta.requestedDate }
-            : {}),
-        ...(intentMeta.dateValidationReason
-            ? { dateValidationReason: intentMeta.dateValidationReason }
-            : {}),
-        ...(semanticFallbackReason ? { semanticFallbackReason } : {}),
-        ...(intentMeta.whyMissingFieldPromptUsed
-            ? { whyMissingFieldPromptUsed: intentMeta.whyMissingFieldPromptUsed }
-            : {})
-    });
-
-    return conversationActMeta;
-}
-
-function annotateMissingFieldPrompt(conversationActMeta, reason) {
-    return annotateCurrentTurnIntent(conversationActMeta, {
-        source: conversationActMeta?.currentTurnIntentSource || "rule",
-        used: conversationActMeta?.currentTurnIntentUsed || conversationActMeta?.rule?.act || conversationActMeta?.act || ACTS.UNCLEAR,
-        whyMissingFieldPromptUsed: reason
-    });
 }
 
 async function buildConversationActShadowMetaAsync(ruleAct, classifierInput) {
@@ -2154,8 +2093,7 @@ async function returnDraftResult({
     extractedSlots,
     packageIntent,
     nextExpectedField,
-    conversationAct = null,
-    lastAvailabilitySuggestion = null
+    conversationAct = null
 }) {
     await persistDraft(sessionId, draft, missingFields);
 
@@ -2165,7 +2103,6 @@ async function returnDraftResult({
         bookingDraft: draft,
         confirmedBookingId: null,
         lastBookingFailure: null,
-        lastAvailabilitySuggestion,
         pendingDraftEdit: null,
         pendingDraftCancel: null
     });
@@ -2273,6 +2210,8 @@ async function createBookingFromDraft({
             extractedSlots,
             missingFields: [],
             nextExpectedField: null,
+            currentTurnIntentUsed: getRuleConversationAct(conversationAct)?.act || null,
+            currentTurnIntentSource: conversationAct ? "booking_conversation_act.rule" : null,
             selectedPackage: confirmedDraft.selectedPackage || null,
             packageConfirmed: true,
             confirmedBookingId: createdBooking.bookingCode,
@@ -2378,120 +2317,30 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         }
     };
     const shadowAsyncEnabled = isIntentClassifierShadowAsyncEnabled();
-    const shouldEvaluateSemanticShadow = shouldEvaluateSemanticReadonlyShadow(
-        conversationAct,
-        { session, draft: currentDraft }
-    );
-    const conversationActMeta = shouldEvaluateSemanticShadow
-        ? (
-            shadowAsyncEnabled
-                ? await buildConversationActShadowMetaAsync(conversationAct, semanticClassifierInput)
-                : buildConversationActShadowMeta(
-                    conversationAct,
-                    classifySemanticIntent(semanticClassifierInput),
-                    {
-                        semanticShadowAvailable: true,
-                        shadowAsyncEnabled: false,
-                        shadowProvider: getProviderName()
-                    }
-                )
-        )
+    const conversationActMeta = shadowAsyncEnabled
+        ? await buildConversationActShadowMetaAsync(conversationAct, semanticClassifierInput)
         : buildConversationActShadowMeta(
             conversationAct,
-            null,
+            classifySemanticIntent(semanticClassifierInput),
             {
-                semanticShadowAvailable: false,
-                shadowAsyncEnabled: shadowAsyncEnabled,
-                shadowProvider: getProviderName(),
-                semanticShadowSkippedReason: "rule_action_not_semantic_readonly_eligible"
+                semanticShadowAvailable: true,
+                shadowAsyncEnabled: false,
+                shadowProvider: getProviderName()
             }
         );
-    let currentTurnAvailabilitySuggestion = null;
-    const semanticAssist = await buildSemanticReadonlyAssist({
+    const semanticArbitration = arbitrateBookingSemanticReadOnly({
         ruleAct: conversationAct,
         semanticShadow: conversationActMeta.semanticShadow,
         draft: currentDraft,
-        sessionState: session.status || null,
+        missingFields: currentMissingFields,
+        sessionStatus: session.status || null,
         lastBotAction: session.status || null,
-        message,
-        context: {
-            ...semanticClassifierInput.domainContext,
-            missingFields: currentMissingFields,
-            buildAvailabilityInquiryReply: async () => {
-                currentTurnAvailabilitySuggestion = await buildAvailabilityInquiryReply({
-                    message,
-                    draft: currentDraft
-                });
-                return currentTurnAvailabilitySuggestion.reply;
-            }
-        }
+        selectedPackage: currentDraft.selectedPackage || null
     });
-    conversationActMeta.semanticAssist = buildSemanticAssistMeta(semanticAssist);
-    const semanticFallbackReason =
-        conversationActMeta.semanticShadow?.fallbackReason ||
-        conversationActMeta.semanticShadow?.evidence?.fallbackReason ||
-        null;
-    const fallbackReadonlyIntent = !semanticAssist.enabled
-        ? scoreReadonlyCurrentTurnIntent(message, currentDraft, currentMissingFields)
-        : null;
+    conversationActMeta.semanticArbitration = buildSemanticArbitrationMeta(semanticArbitration);
+    const invalidDate = detectInvalidDateFromMessage(message);
 
-    if (semanticAssist.enabled) {
-        annotateCurrentTurnIntent(conversationActMeta, {
-            source: "semantic_shadow",
-            used: semanticAssist.assistAct,
-            reason: semanticAssist.reason
-        });
-    } else if (
-        fallbackReadonlyIntent &&
-        (
-            conversationAct.act === ACTS.UNCLEAR ||
-            SEMANTIC_READONLY_ASSIST_ACTS.has(conversationAct.act)
-        )
-    ) {
-        annotateCurrentTurnIntent(conversationActMeta, {
-            source: "fallback_policy",
-            used: fallbackReadonlyIntent.act,
-            reason: fallbackReadonlyIntent.reason,
-            evidence: fallbackReadonlyIntent.evidence
-        });
-    } else if (SEMANTIC_READONLY_ASSIST_ACTS.has(conversationAct.act)) {
-        annotateCurrentTurnIntent(conversationActMeta, {
-            source: "rule",
-            used: conversationAct.act,
-            reason: conversationAct.reason
-        });
-    } else {
-        annotateCurrentTurnIntent(conversationActMeta, {
-            source: "rule",
-            used: conversationAct.act,
-            reason: conversationAct.reason,
-            ...(semanticFallbackReason ? { semanticFallbackReason } : {})
-        });
-    }
-
-    const currentTurnDateIntent = parseDateIntentFromMessage(message);
-    const shouldHandleDateIntentFirst = Boolean(
-        currentTurnDateIntent.hasDateIntent &&
-            (currentTurnDateIntent.valid || currentTurnDateIntent.displayDate) &&
-            isActivePendingBookingSession(session) &&
-            !session.pendingDraftEdit &&
-            !session.pendingDraftCancel &&
-            (
-                !currentTurnDateIntent.valid ||
-                currentDraft.appointmentDate ||
-                currentMissingFields[0] === "appointmentDate"
-            )
-    );
-
-    if (shouldHandleDateIntentFirst && !currentTurnDateIntent.valid) {
-        annotateCurrentTurnIntent(conversationActMeta, {
-            source: currentTurnDateIntent.source || "rule",
-            used: "invalid_date",
-            reason: "current_turn_date_intent_before_field_validation",
-            previousDate: currentDraft.appointmentDate || null,
-            requestedDate: currentTurnDateIntent.displayDate || null,
-            dateValidationReason: currentTurnDateIntent.reason || "invalid_date"
-        });
+    if (invalidDate) {
         await persistDraft(sessionId, currentDraft, currentMissingFields);
         const updatedSession = mockSessions.upsertSession(sessionId, {
             currentFlow: FLOWS.BOOKING,
@@ -2499,9 +2348,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             bookingDraft: currentDraft,
             confirmedBookingId: null,
             lastBookingFailure: session.lastBookingFailure || null,
-            lastAvailabilitySuggestion: session.lastAvailabilitySuggestion || null,
-            pendingDraftEdit: null,
-            pendingDraftCancel: null
+            pendingDraftEdit: session.pendingDraftEdit || null,
+            pendingDraftCancel: session.pendingDraftCancel || null
         });
 
         return createChatResult({
@@ -2509,7 +2357,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             userMessage: message,
             flow: FLOWS.BOOKING,
             action: ACTIONS.ASK_BOOKING_INFO,
-            reply: buildInvalidDateReply(currentTurnDateIntent.displayDate || "bạn vừa nhập"),
+            reply: buildInvalidDateReply(invalidDate),
             booking: {
                 status: currentMissingFields.length ? "draft" : "pending_confirmation",
                 draft: currentDraft,
@@ -2520,81 +2368,59 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 extractedSlots: {},
                 packageIntent: { type: "none", package: null },
                 missingFields: currentMissingFields,
+                nextExpectedField: "appointmentDate",
+                conversationAct: withConversationActMeta(conversationActMeta, {
+                    currentTurnBlockedReason: "invalid_date"
+                })
+            })
+        });
+    }
+
+    if (
+        semanticArbitration.shouldUseSemantic &&
+        semanticArbitration.selectedAct === "availability_inquiry"
+    ) {
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: await buildAvailabilityCheckReply(currentDraft),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession: session,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
                 nextExpectedField: currentMissingFields[0] || null,
                 conversationAct: conversationActMeta
             })
         });
     }
 
-    if (shouldHandleDateIntentFirst && currentTurnDateIntent.valid) {
-        const previousDate = currentDraft.appointmentDate || null;
-        const dateChanged = previousDate !== currentTurnDateIntent.requestedDate;
-        const dateUpdatedDraft = {
-            ...currentDraft,
-            appointmentDate: currentTurnDateIntent.requestedDate,
-            appointmentTime: dateChanged ? null : currentDraft.appointmentTime
-        };
-        const dateMissingFields = getMissingFields(dateUpdatedDraft);
-        const availabilitySuggestion = await buildAvailableSlotSuggestionReply(
-            dateUpdatedDraft,
-            { requestedDate: currentTurnDateIntent.requestedDate }
-        );
-        const dateReplyPrefix = dateChanged
-            ? `Mình đã cập nhật ngày lấy mẫu sang ${formatDisplayDate(currentTurnDateIntent.requestedDate)}.`
-            : `Mình đang giữ ngày lấy mẫu ${formatDisplayDate(currentTurnDateIntent.requestedDate)}.`;
-        const dateReply = [
-            dateReplyPrefix,
-            availabilitySuggestion.reply
-        ].filter(Boolean).join("\n");
+    const semanticAssist = await buildSemanticReadonlyAssist({
+        ruleAct: conversationAct,
+        semanticShadow: conversationActMeta.semanticShadow,
+        draft: currentDraft,
+        sessionState: session.status || null,
+        lastBotAction: session.status || null,
+        message,
+        context: {
+            ...semanticClassifierInput.domainContext,
+            missingFields: currentMissingFields
+        }
+    });
+    conversationActMeta.semanticAssist = buildSemanticAssistMeta(semanticAssist);
 
-        annotateCurrentTurnIntent(conversationActMeta, {
-            source: currentTurnDateIntent.source || "rule",
-            used: "date_change",
-            reason: "current_turn_date_intent_before_field_validation",
-            previousDate,
-            requestedDate: currentTurnDateIntent.requestedDate
-        });
-
-        return returnDraftResult({
-            sessionId,
-            message,
-            status: dateMissingFields.length ? "collecting_info" : "ready_for_confirmation",
-            action: dateMissingFields.length
-                ? ACTIONS.ASK_BOOKING_INFO
-                : ACTIONS.BOOKING_READY_TO_CONFIRM,
-            reply: dateReply,
-            booking: {
-                status: dateMissingFields.length ? "draft" : "pending_confirmation",
-                draft: dateUpdatedDraft,
-                missingFields: dateMissingFields
-            },
-            draft: dateUpdatedDraft,
-            missingFields: dateMissingFields,
-            extractedSlots: {
-                appointmentDate: currentTurnDateIntent.requestedDate,
-                ...(dateChanged ? { appointmentTime: null } : {})
-            },
-            packageIntent: { type: "none", package: null },
-            nextExpectedField: dateMissingFields[0] || null,
-            conversationAct: conversationActMeta,
-            lastAvailabilitySuggestion: availabilitySuggestion
-        });
-    }
-
-    if (semanticAssist.enabled && semanticAssist.reply) {
-        const updatedSession = currentTurnAvailabilitySuggestion
-            ? mockSessions.upsertSession(sessionId, {
-                currentFlow: FLOWS.BOOKING,
-                status: session.status || "collecting_info",
-                bookingDraft: currentDraft,
-                confirmedBookingId: null,
-                lastBookingFailure: session.lastBookingFailure || null,
-                lastAvailabilitySuggestion: currentTurnAvailabilitySuggestion,
-                pendingDraftEdit: session.pendingDraftEdit || null,
-                pendingDraftCancel: session.pendingDraftCancel || null
-            })
-            : session;
-
+    if (
+        semanticAssist.enabled &&
+        semanticAssist.reply &&
+        conversationAct.act !== ACTS.PAUSE_OR_HOLD
+    ) {
         return createChatResult({
             sessionId,
             userMessage: message,
@@ -2607,7 +2433,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 missingFields: currentMissingFields
             },
             meta: buildBookingMeta({
-                updatedSession,
+                updatedSession: session,
                 extractedSlots: {},
                 packageIntent: semanticAssist.meta?.packageIntent || { type: "none", package: null },
                 missingFields: currentMissingFields,
@@ -2615,126 +2441,6 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 conversationAct: conversationActMeta
             })
         });
-    }
-
-    if (
-        fallbackReadonlyIntent &&
-        conversationActMeta.currentTurnIntentSource === "fallback_policy"
-    ) {
-        if (fallbackReadonlyIntent.act === ACTS.INFO_DETOUR) {
-            const informationalDetour = await resolveBookingInformationalDetour(
-                message,
-                currentDraft,
-                { allowContextOnly: true }
-            );
-
-            if (informationalDetour) {
-                return returnDraftResult({
-                    sessionId,
-                    message,
-                    status: session.status || "collecting_info",
-                    action: ACTIONS.ASK_BOOKING_INFO,
-                    reply: buildInformationalDetourReply(
-                        informationalDetour.packageItem,
-                        currentDraft,
-                        currentMissingFields
-                    ),
-                    booking: {
-                        status: currentMissingFields.length ? "draft" : "pending_confirmation",
-                        draft: currentDraft,
-                        missingFields: currentMissingFields
-                    },
-                    draft: currentDraft,
-                    missingFields: currentMissingFields,
-                    extractedSlots: {},
-                    packageIntent: informationalDetour.packageIntent,
-                    nextExpectedField: currentMissingFields[0] || null,
-                    conversationAct: conversationActMeta
-                });
-            }
-        }
-
-        if (fallbackReadonlyIntent.act === ACTS.AVAILABILITY_INQUIRY) {
-            const availabilitySuggestion = await buildAvailabilityInquiryReply({
-                message,
-                draft: currentDraft
-            });
-            await persistDraft(sessionId, currentDraft, currentMissingFields);
-            const updatedSession = mockSessions.upsertSession(sessionId, {
-                currentFlow: FLOWS.BOOKING,
-                status: session.status || "collecting_info",
-                bookingDraft: currentDraft,
-                confirmedBookingId: null,
-                lastBookingFailure: session.lastBookingFailure || null,
-                lastAvailabilitySuggestion: availabilitySuggestion,
-                pendingDraftEdit: session.pendingDraftEdit || null,
-                pendingDraftCancel: session.pendingDraftCancel || null
-            });
-
-            return createChatResult({
-                sessionId,
-                userMessage: message,
-                flow: FLOWS.BOOKING,
-                action: ACTIONS.ASK_BOOKING_INFO,
-                reply: availabilitySuggestion.reply,
-                booking: {
-                    status: currentMissingFields.length ? "draft" : "pending_confirmation",
-                    draft: currentDraft,
-                    missingFields: currentMissingFields
-                },
-                meta: {
-                    ...buildBookingMeta({
-                        updatedSession,
-                        extractedSlots: {},
-                        packageIntent: { type: "none", package: null },
-                        missingFields: currentMissingFields,
-                        nextExpectedField: currentMissingFields[0] || null
-                    }),
-                    conversationAct: conversationActMeta
-                }
-            });
-        }
-
-        if (
-            fallbackReadonlyIntent.act === ACTS.REVIEW_DRAFT ||
-            fallbackReadonlyIntent.act === ACTS.HELP_NEXT_STEP
-        ) {
-            await persistDraft(sessionId, currentDraft, currentMissingFields);
-            const updatedSession = mockSessions.upsertSession(sessionId, {
-                currentFlow: FLOWS.BOOKING,
-                status: session.status || "collecting_info",
-                bookingDraft: currentDraft,
-                confirmedBookingId: null,
-                lastBookingFailure: session.lastBookingFailure || null,
-                pendingDraftEdit: session.pendingDraftEdit || null,
-                pendingDraftCancel: session.pendingDraftCancel || null
-            });
-
-            return createChatResult({
-                sessionId,
-                userMessage: message,
-                flow: FLOWS.BOOKING,
-                action: ACTIONS.ASK_BOOKING_INFO,
-                reply: fallbackReadonlyIntent.act === ACTS.REVIEW_DRAFT
-                    ? buildReviewDraftReply(currentDraft, currentMissingFields)
-                    : buildHelpNextStepReply(currentDraft, currentMissingFields),
-                booking: {
-                    status: currentMissingFields.length ? "draft" : "pending_confirmation",
-                    draft: currentDraft,
-                    missingFields: currentMissingFields
-                },
-                meta: {
-                    ...buildBookingMeta({
-                        updatedSession,
-                        extractedSlots: {},
-                        packageIntent: { type: "none", package: null },
-                        missingFields: currentMissingFields,
-                        nextExpectedField: currentMissingFields[0] || null
-                    }),
-                    conversationAct: conversationActMeta
-                }
-            });
-        }
     }
 
     if (
@@ -2788,7 +2494,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             userMessage: message,
             flow: FLOWS.BOOKING,
             action: ACTIONS.ASK_BOOKING_INFO,
-            reply: buildPauseReply(),
+            reply: buildPauseReply(currentDraft, currentMissingFields),
             booking: {
                 status: currentMissingFields.length ? "draft" : "pending_confirmation",
                 draft: currentDraft,
@@ -2844,6 +2550,53 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
 
     if (
         conversationAct.act === ACTS.RESUME_AFTER_PAUSE &&
+        conversationAct.resumeMode === "continue"
+    ) {
+        if (currentMissingFields.length > 0) {
+            return returnDraftResult({
+                sessionId,
+                message,
+                status: "collecting_info",
+                action: ACTIONS.ASK_BOOKING_INFO,
+                reply: await buildCollectingReplyWithAvailability(currentDraft, currentMissingFields),
+                booking: {
+                    status: "draft",
+                    draft: currentDraft,
+                    missingFields: currentMissingFields
+                },
+                draft: currentDraft,
+                missingFields: currentMissingFields,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                nextExpectedField: currentMissingFields[0],
+                conversationAct: conversationActMeta
+            });
+        }
+
+        return returnDraftResult({
+            sessionId,
+            message,
+            status: "ready_for_confirmation",
+            action: ACTIONS.BOOKING_READY_TO_CONFIRM,
+            reply: buildReadyReply(currentDraft),
+            booking: {
+                status: "pending_confirmation",
+                draft: currentDraft,
+                missingFields: []
+            },
+            draft: currentDraft,
+            missingFields: [],
+            extractedSlots: {},
+            packageIntent: currentDraft.selectedPackage
+                ? { type: "selected", package: currentDraft.selectedPackage }
+                : { type: "none", package: null },
+            nextExpectedField: null,
+            conversationAct: conversationActMeta
+        });
+    }
+
+    if (
+        conversationAct.act === ACTS.RESUME_AFTER_PAUSE &&
         conversationAct.resumeMode === "explicit"
     ) {
         if (currentMissingFields.length > 0) {
@@ -2852,7 +2605,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 message,
                 status: "collecting_info",
                 action: ACTIONS.ASK_BOOKING_INFO,
-                reply: buildCollectingReply(currentDraft, currentMissingFields),
+                reply: await buildCollectingReplyWithAvailability(currentDraft, currentMissingFields),
                 booking: {
                     status: "draft",
                     draft: currentDraft,
@@ -2898,7 +2651,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 ? ACTIONS.ASK_BOOKING_INFO
                 : ACTIONS.BOOKING_READY_TO_CONFIRM,
             reply: editedMissingFields.length
-                ? buildCollectingReply(editedDraft, editedMissingFields)
+                ? await buildCollectingReplyWithAvailability(editedDraft, editedMissingFields)
                 : buildReadyReply(editedDraft),
             booking: {
                 status: editedMissingFields.length ? "draft" : "pending_confirmation",
@@ -3081,7 +2834,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 ? ACTIONS.ASK_BOOKING_INFO
                 : ACTIONS.BOOKING_READY_TO_CONFIRM,
             reply: currentMissingFields.length
-                ? buildCollectingReply(currentDraft, currentMissingFields)
+                ? await buildCollectingReplyWithAvailability(currentDraft, currentMissingFields)
                 : buildReadyReply(currentDraft),
             booking: {
                 status: currentMissingFields.length ? "draft" : "pending_confirmation",
@@ -3185,7 +2938,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 reply: buildInformationalDetourReply(
                     informationalDetour.packageItem,
                     currentDraft,
-                    currentMissingFields
+                    currentMissingFields,
+                    { packageFromMessage: informationalDetour.packageFromMessage }
                 ),
                 booking: {
                     status: currentMissingFields.length ? "draft" : "pending_confirmation",
@@ -3200,6 +2954,40 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 conversationAct: conversationActMeta
             });
         }
+    }
+
+    if (conversationAct.act === ACTS.AVAILABILITY_CHECK) {
+        await persistDraft(sessionId, currentDraft, currentMissingFields);
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: session.status || "collecting_info",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: session.lastBookingFailure || null,
+            pendingDraftEdit: session.pendingDraftEdit || null,
+            pendingDraftCancel: session.pendingDraftCancel || null
+        });
+
+        return createChatResult({
+            sessionId,
+            userMessage: message,
+            flow: FLOWS.BOOKING,
+            action: ACTIONS.ASK_BOOKING_INFO,
+            reply: await buildAvailabilityCheckReply(currentDraft),
+            booking: {
+                status: currentMissingFields.length ? "draft" : "pending_confirmation",
+                draft: currentDraft,
+                missingFields: currentMissingFields
+            },
+            meta: buildBookingMeta({
+                updatedSession,
+                extractedSlots: {},
+                packageIntent: { type: "none", package: null },
+                missingFields: currentMissingFields,
+                nextExpectedField: currentMissingFields[0] || null,
+                conversationAct: conversationActMeta
+            })
+        });
     }
 
     if (
@@ -3223,47 +3011,6 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 ? { type: "selected", package: currentDraft.selectedPackage }
                 : { type: "none", package: null },
             conversationAct: conversationActMeta
-        });
-    }
-
-    if (conversationAct.act === ACTS.AVAILABILITY_INQUIRY) {
-        const availabilitySuggestion = await buildAvailabilityInquiryReply({
-            message,
-            draft: currentDraft
-        });
-        await persistDraft(sessionId, currentDraft, currentMissingFields);
-        const updatedSession = mockSessions.upsertSession(sessionId, {
-            currentFlow: FLOWS.BOOKING,
-            status: session.status || "collecting_info",
-            bookingDraft: currentDraft,
-            confirmedBookingId: null,
-            lastBookingFailure: session.lastBookingFailure || null,
-            lastAvailabilitySuggestion: availabilitySuggestion,
-            pendingDraftEdit: session.pendingDraftEdit || null,
-            pendingDraftCancel: session.pendingDraftCancel || null
-        });
-
-        return createChatResult({
-            sessionId,
-            userMessage: message,
-            flow: FLOWS.BOOKING,
-            action: ACTIONS.ASK_BOOKING_INFO,
-            reply: availabilitySuggestion.reply,
-            booking: {
-                status: currentMissingFields.length ? "draft" : "pending_confirmation",
-                draft: currentDraft,
-                missingFields: currentMissingFields
-            },
-            meta: {
-                ...buildBookingMeta({
-                    updatedSession,
-                    extractedSlots: {},
-                    packageIntent: { type: "none", package: null },
-                    missingFields: currentMissingFields,
-                    nextExpectedField: currentMissingFields[0] || null
-                }),
-                conversationAct: conversationActMeta
-            }
         });
     }
 
@@ -3363,58 +3110,11 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
     }
 
     if (
-        conversationAct.act === ACTS.UNCLEAR &&
-        conversationAct.reason &&
-        String(conversationAct.reason).startsWith("short_ambiguous_message")
-    ) {
-        annotateMissingFieldPrompt(
-            conversationActMeta,
-            "short_ambiguous_current_turn_no_readonly_intent"
-        );
-        await persistDraft(sessionId, currentDraft, currentMissingFields);
-        const updatedSession = mockSessions.upsertSession(sessionId, {
-            currentFlow: FLOWS.BOOKING,
-            status: session.status || "collecting_info",
-            bookingDraft: currentDraft,
-            confirmedBookingId: null,
-            lastBookingFailure: session.lastBookingFailure || null,
-            pendingDraftEdit: session.pendingDraftEdit || null,
-            pendingDraftCancel: session.pendingDraftCancel || null
-        });
-
-        return createChatResult({
-            sessionId,
-            userMessage: message,
-            flow: FLOWS.BOOKING,
-            action: ACTIONS.ASK_BOOKING_INFO,
-            reply: buildAmbiguousAcknowledgementReply(currentDraft, currentMissingFields),
-            booking: {
-                status: currentMissingFields.length ? "draft" : "pending_confirmation",
-                draft: currentDraft,
-                missingFields: currentMissingFields
-            },
-            meta: {
-                ...buildBookingMeta({
-                    updatedSession,
-                    extractedSlots: {},
-                    packageIntent: { type: "none", package: null },
-                    missingFields: currentMissingFields,
-                    nextExpectedField: currentMissingFields[0] || "clarifyBookingIntent"
-                }),
-                conversationAct: conversationActMeta
-            }
-        });
-    }
-
-    if (
         !(
-            (session.lastBookingFailure || session.lastAvailabilitySuggestion) &&
+            session.lastBookingFailure &&
             resolveSuggestedSlotSelection(
                 message,
-                [
-                    ...(session.lastBookingFailure?.suggestedSlots || []),
-                    ...(session.lastAvailabilitySuggestion?.suggestedSlots || [])
-                ]
+                session.lastBookingFailure.suggestedSlots || []
             )
         ) &&
         (
@@ -3423,10 +3123,6 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             conversationAct.shouldMutateDraft === false
         )
     ) {
-        annotateMissingFieldPrompt(
-            conversationActMeta,
-            "rule_unclear_or_clarification_no_readonly_current_turn_intent"
-        );
         await persistDraft(sessionId, currentDraft, currentMissingFields);
         const updatedSession = mockSessions.upsertSession(sessionId, {
             currentFlow: FLOWS.BOOKING,
@@ -3443,7 +3139,13 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             userMessage: message,
             flow: FLOWS.BOOKING,
             action: ACTIONS.ASK_BOOKING_INFO,
-            reply: conversationAct.suggestedNextQuestion || buildUnclearBookingDraftReply(),
+            reply: currentMissingFields.length > 0 &&
+                conversationAct.act === ACTS.FINAL_CONFIRM
+                ? buildConfirmationOnlyBlockedReply(currentDraft, currentMissingFields)
+                : currentMissingFields.length > 0 &&
+                    conversationAct.act === ACTS.UNCLEAR
+                    ? buildUnclearMissingFieldReply(currentMissingFields)
+                    : conversationAct.suggestedNextQuestion || buildUnclearBookingDraftReply(),
             booking: {
                 status: currentMissingFields.length ? "draft" : "pending_confirmation",
                 draft: currentDraft,
@@ -3464,10 +3166,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
 
     const selectedSuggestedSlot = resolveSuggestedSlotSelection(
         message,
-        [
-            ...(session.lastBookingFailure?.suggestedSlots || []),
-            ...(session.lastAvailabilitySuggestion?.suggestedSlots || [])
-        ]
+        session.lastBookingFailure?.suggestedSlots || []
     );
     const {
         slots: rawExtractedSlots,
@@ -3568,7 +3267,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             message,
             status: "collecting_package",
             action: ACTIONS.ASK_BOOKING_INFO,
-            reply: buildCollectingReply(nextDraft, missingFields),
+            reply: await buildCollectingReplyWithAvailability(nextDraft, missingFields),
             booking: {
                 status: "draft",
                 draft: nextDraft,
@@ -3583,12 +3282,88 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         });
     }
 
-    const nextDraft = {
+    const appointmentDateChangedAfterTime = Boolean(
+        extractedSlots.appointmentDate &&
+            currentDraft.appointmentDate &&
+            extractedSlots.appointmentDate !== currentDraft.appointmentDate &&
+            currentDraft.appointmentTime &&
+            !extractedSlots.appointmentTime
+    );
+
+    let nextDraft = {
         ...currentDraft,
         ...extractedSlots,
         ...(sessionPhone ? { phoneNumber: sessionPhone } : {})
     };
+
+    if (appointmentDateChangedAfterTime) {
+        nextDraft = {
+            ...nextDraft,
+            appointmentTime: null
+        };
+        extractedSlots.appointmentTime = null;
+    }
     const missingFields = getMissingFields(nextDraft);
+
+    const shouldRevalidateDraftTime = Boolean(
+        nextDraft.appointmentDate &&
+            nextDraft.appointmentTime &&
+            (
+                extractedSlots.appointmentDate ||
+                extractedSlots.appointmentTime ||
+                extractedSlots.testType ||
+                extractedSlots.testCatalogItemId ||
+                selectedSuggestedSlot
+            )
+    );
+
+    if (shouldRevalidateDraftTime) {
+        const isAvailable = await isSelectedTimeAvailable(
+            nextDraft.appointmentDate,
+            nextDraft.appointmentTime
+        );
+
+        if (!isAvailable) {
+            const sameDaySlots = await getAvailableSlotsForDate(nextDraft.appointmentDate);
+            const nearbySlots = sameDaySlots.length
+                ? []
+                : await getNearbyAvailableSlots(nextDraft.appointmentDate);
+            const draftWithoutInvalidTime = {
+                ...nextDraft,
+                appointmentTime: null
+            };
+            const invalidTimeMissingFields = getMissingFields(draftWithoutInvalidTime);
+
+            return returnDraftResult({
+                sessionId,
+                message,
+                status: "collecting_info",
+                action: ACTIONS.ASK_BOOKING_INFO,
+                reply: buildUnavailableTimeReply({
+                    requestedDate: nextDraft.appointmentDate,
+                    requestedTime: nextDraft.appointmentTime,
+                    sameDaySlots,
+                    nearbySlots
+                }),
+                booking: {
+                    status: "draft",
+                    draft: draftWithoutInvalidTime,
+                    missingFields: invalidTimeMissingFields
+                },
+                draft: draftWithoutInvalidTime,
+                missingFields: invalidTimeMissingFields,
+                extractedSlots: {
+                    ...extractedSlots,
+                    appointmentTime: null
+                },
+                packageIntent,
+                nextExpectedField: "appointmentTime",
+                conversationAct: withConversationActMeta(conversationActMeta, {
+                    currentTurnBlockedReason: "unavailable_appointment_time"
+                })
+            });
+        }
+    }
 
     if (nextDraft.address) {
         const nextAddressValidation = isLikelyAddressInput(nextDraft.address);
@@ -3756,18 +3531,18 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             }
 
             if (
-                missingFields[0] === "appointmentTime" &&
-                nextDraft.appointmentDate &&
-                hasDraftPackage(nextDraft)
+                appointmentDateChangedAfterTime &&
+                missingFields[0] === "appointmentTime"
             ) {
-                const availabilitySuggestion = await buildAvailableSlotSuggestionReply(nextDraft);
+                const sameDaySlots = (await findAvailableSlotsForDraftDate(nextDraft))
+                    .filter((slot) => slot.date === nextDraft.appointmentDate);
 
                 return returnDraftResult({
                     sessionId,
                     message,
                     status: "collecting_info",
                     action: ACTIONS.ASK_BOOKING_INFO,
-                    reply: availabilitySuggestion.reply,
+                    reply: buildDateChangedSlotReply(nextDraft, sameDaySlots),
                     booking: {
                         status: "draft",
                         draft: nextDraft,
@@ -3777,9 +3552,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                     missingFields,
                     extractedSlots,
                     packageIntent,
-                    nextExpectedField: "appointmentTime",
-                    conversationAct: conversationActMeta,
-                    lastAvailabilitySuggestion: availabilitySuggestion
+                    nextExpectedField: missingFields[0],
+                    conversationAct: conversationActMeta
                 });
             }
 
@@ -3788,7 +3562,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 message,
                 status: "collecting_info",
                 action: ACTIONS.ASK_BOOKING_INFO,
-                reply: buildCollectingReply(nextDraft, missingFields),
+                reply: await buildCollectingReplyWithAvailability(nextDraft, missingFields),
                 booking: {
                     status: "draft",
                     draft: nextDraft,
@@ -3867,22 +3641,12 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
 
     let status = "collecting_info";
     let action = ACTIONS.ASK_BOOKING_INFO;
-    let reply = buildCollectingReply(nextDraft, missingFields);
+    let reply = await buildCollectingReplyWithAvailability(nextDraft, missingFields);
     let booking = {
         status: "draft",
         draft: nextDraft,
         missingFields
     };
-    let lastAvailabilitySuggestion = null;
-
-    if (
-        missingFields[0] === "appointmentTime" &&
-        nextDraft.appointmentDate &&
-        hasDraftPackage(nextDraft)
-    ) {
-        lastAvailabilitySuggestion = await buildAvailableSlotSuggestionReply(nextDraft);
-        reply = lastAvailabilitySuggestion.reply;
-    }
 
     if (missingFields.length === 0) {
         status = "ready_for_confirmation";
@@ -3893,6 +3657,15 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
             draft: nextDraft,
             missingFields: []
         };
+    }
+
+    if (
+        appointmentDateChangedAfterTime &&
+        missingFields[0] === "appointmentTime"
+    ) {
+        const sameDaySlots = (await findAvailableSlotsForDraftDate(nextDraft))
+            .filter((slot) => slot.date === nextDraft.appointmentDate);
+        reply = buildDateChangedSlotReply(nextDraft, sameDaySlots);
     }
 
     return returnDraftResult({
@@ -3907,8 +3680,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         extractedSlots,
         packageIntent,
         nextExpectedField: missingFields[0] || null,
-        conversationAct: conversationActMeta,
-        lastAvailabilitySuggestion
+        conversationAct: conversationActMeta
     });
 }
 

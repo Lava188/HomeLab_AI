@@ -52,6 +52,7 @@
 | Booking Status Transition/Audit Hardening 5D-1 | `node backend/scripts/smoke_booking_status_transition_5d1.js` plus 5B/5C regression smokes | 5D-1 transition smoke 12/12 PASS; 5C5 15/15 PASS; 5C2 6/6 PASS; 5C3 6/6 PASS; 5B4 9/9 PASS; 5B6 12/12 PASS. Prototype workflow hardening only. |
 | Availability Slot/Capacity Enforcement 5D-2 | `node backend/scripts/smoke_booking_slot_capacity_5d2.js` plus 5D/5C/5B regression smokes | 5D-2 slot capacity smoke 10/10 PASS; 5D-1 12/12 PASS; 5C5 15/15 PASS; 5C2 6/6 PASS; 5C3 6/6 PASS; 5B4 9/9 PASS; 5B6 12/12 PASS. Prototype scheduling hardening only. |
 | Staff Management + Collector Workload Rules 5F-1 | `node backend/scripts/smoke_staff_management_workload_5f1.js` plus product regression smokes and frontend build | 5F-1 staff management workload smoke 9/9 PASS; 5E-3 full slot-role product demo 13/13 PASS; 5D-2 slot capacity 10/10 PASS; 5C5 role-based E2E 15/15 PASS; frontend `npm run build` PASS. Prototype operations hardening only. |
+| 5M Booking Conversation Stabilization | Booking conversation smokes and manual UI verification | PENDING FINAL RUN. Improved current-turn-first handling, Ollama read-only assist, slot availability suggestions, invalid date reporting, pause responses, package info detours, and draft summary requests. Controlled conversation validation only. |
 
 ## Key Metrics Found In Repo
 
@@ -309,6 +310,44 @@ Interpretation: 5D-2 is suitable evidence for professional prototype hardening o
 - Regression smokes for the slot-aware product flow, slot capacity, and role-based E2E remain green.
 
 Interpretation: 5F-1 is suitable evidence for professional product prototype hardening of staff operations and collector workload visibility. It does not claim production workforce optimization, route planning, notification delivery, production RBAC, or payment readiness.
+
+## 5M Booking Conversation Smoke Results
+
+5M validates booking chatbot conversation stabilization with improved current-turn-first understanding and Ollama read-only assist. These checks verify the chatbot handles natural conversation flow without forcing every user message into a missing booking field.
+
+| Smoke / Check | Status | Coverage |
+| --- | --- | --- |
+| `smoke_booking_response_polish_5m9.js` | PENDING RUN | Response polish for booking conversation. |
+| `smoke_current_turn_first_booking_5m7.js` | PENDING RUN | Current-turn-first handling before missing-field extraction. |
+| `smoke_semantic_arbitration_5m8.js` | PENDING RUN | Semantic arbitration for safe vs mutation intents. |
+| `smoke_booking_conversation_act_5l1.js` | PENDING RUN | Updated conversation act handling. |
+| `smoke_package_catalog_confirmation_5g2.js` | PENDING RUN | Package catalog confirmation behavior. |
+| `smoke_booking_slot_capacity_5d2.js` | PASS from 5D-2 | Slot availability and capacity enforcement. |
+| `smoke_urgent_overrides_package_state_5g2b.js` | PENDING RUN | Urgent red flags override booking/package state. |
+| `smoke_chat_booking_auth_gate_5g1.js` | PASS from 5G-1 | Booking mutation requires auth/session phone. |
+| `smoke_semantic_readonly_assist_5m5a.js` | PENDING RUN | Ollama read-only assist for safe questions. |
+| `smoke_ollama_intent_provider_5m5b.js` | PENDING RUN | Ollama intent provider integration. |
+| `smoke_full_collector_assignment_e2e_5h7.js` | PASS from 5H-7 | Full collector assignment E2E workflow. |
+
+5M manual UI cases to verify (PENDING):
+
+| Case | Expected behavior |
+| --- | --- |
+| Slot unavailable not saved into draft | User selecting an unavailable time sees the time as unavailable; draft does not save the unavailable time. |
+| Pause/think-more keeps draft | Responses like `để tôi hỏi lại người thân đã` or `chưa, tôi sẽ suy nghĩ thêm` keep the booking draft and respond naturally. |
+| Package info detour keeps draft | Asking about package contents during booking flow answers package info first, then gently reminds the next booking step without losing draft state. |
+| Availability inquiry returns slots | Questions like `khung giờ nào trống` return available time slots when date and package are known. |
+| Invalid date reports invalid date | Invalid dates like `32/5/2026` are reported as invalid dates, not misunderstood as addresses. |
+| Address full replacement avoids bad merge | Re-entering a full address replaces the old address cleanly without bad merge artifacts. |
+| Final confirmation creates booking only with valid slot | Booking is created only when all required info is valid, the slot is still available, and the user confirms clearly. |
+
+5M scope boundaries:
+
+- 5M does not change RAG/retrieval metrics.
+- 5M does not change recommendation runtime behavior.
+- 5M does not change collector/admin assignment flows.
+- 5M does not change UI, schema, migrations, or `.env`.
+- 5M does not claim production readiness; it validates controlled conversation behavior only.
 
 ## 5G/5H Booking And Collector Assignment Metrics
 

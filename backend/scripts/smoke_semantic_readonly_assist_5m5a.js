@@ -170,7 +170,7 @@ function loadBookingService(asyncClassifier) {
     return require(bookingServicePath);
 }
 
-async function runCase({ label, message, draft = makeReadyDraft(), shadow, status = "collecting_info" }) {
+async function runCase({ label, message, draft = makeReadyDraft(), shadow, status = "collecting_info", expectedRuleAct = "unclear" }) {
     const sessionId = uniqueId(label);
     const originalDraft = clone(draft);
     seedSession(sessionId, draft, status);
@@ -190,7 +190,7 @@ async function runCase({ label, message, draft = makeReadyDraft(), shadow, statu
     }));
 
     const session = mockSessions.getSession(sessionId);
-    assert(data.meta?.conversationAct?.rule?.act === "unclear", `${label}: rule must stay unclear`);
+    assert(data.meta?.conversationAct?.rule?.act === expectedRuleAct, `${label}: rule must stay ${expectedRuleAct}`);
     assert(bookingRuntime.__createdCount === beforeCreated, `${label}: must not create booking`);
     assert(bookingRuntime.__clearedCount === beforeCleared, `${label}: must not clear draft`);
     assert(
@@ -310,6 +310,7 @@ async function main() {
         const provider = await runCase({
             label: "J_provider_blocked",
             message: "mình cân nhắc thêm",
+            expectedRuleAct: "pause_or_hold",
             shadow: makeOllamaShadow({
                 conversationAct: "pause_or_hold",
                 providerUsed: "cloud_shadow",

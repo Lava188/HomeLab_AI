@@ -73,6 +73,32 @@ function detectDateFromMessage(message, baseDate = new Date()) {
     return formatDateToISO(year, month, day);
 }
 
+function detectInvalidDateFromMessage(message, baseDate = new Date()) {
+    const dateMatch = String(message || "").match(
+        /(?:ngày\s*)?(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{4}))?/i
+    );
+
+    if (!dateMatch) {
+        return null;
+    }
+
+    const day = Number(dateMatch[1]);
+    const month = Number(dateMatch[2]);
+    const year = dateMatch[3] ? Number(dateMatch[3]) : baseDate.getFullYear();
+    const isoDate = formatDateToISO(year, month, day);
+
+    if (isoDate) {
+        return null;
+    }
+
+    return {
+        input: dateMatch[0],
+        day,
+        month,
+        year
+    };
+}
+
 function detectTimeFromMessage(message) {
     const text = String(message || "");
     const normalizedMessage = normalizeText(message);
@@ -127,6 +153,7 @@ module.exports = {
     formatDateToISO,
     formatDisplayDate,
     detectDateFromMessage,
+    detectInvalidDateFromMessage,
     detectTimeFromMessage,
     extractBookingId
 };

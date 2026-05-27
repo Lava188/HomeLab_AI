@@ -108,8 +108,12 @@ function assertPackageConfirmation(payload, label) {
     assert(
         normalizedReply.includes("xac nhan chon") ||
             data.meta?.nextExpectedField === "packageConfirmation" ||
-            data.action === "BOOKING_READY_TO_CONFIRM",
-        `${label}: package confirmation did not continue`
+            data.action === "BOOKING_READY_TO_CONFIRM" ||
+            (
+                data.meta?.nextExpectedField === "appointmentTime" &&
+                normalizedReply.includes("khong kha dung")
+            ),
+        `${label}: package confirmation did not continue: ${data.reply || ""} ${JSON.stringify(data.meta || {})}`
     );
     assert(
         data.meta?.intentGroup !== "urgent_health" &&

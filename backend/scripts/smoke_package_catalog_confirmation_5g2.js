@@ -4,8 +4,6 @@ const { normalizeText } = require("../src/utils/text.util");
 
 const API_BASE_URL = process.env.HOMELAB_API_BASE_URL || "http://localhost:5000";
 const CHAT_URL = process.env.HOMELAB_CHAT_API_URL || `${API_BASE_URL}/api/chat`;
-const REQUEST_TIMEOUT_MS = 90000;
-let lastChatTrace = null;
 
 function uniqueId(prefix) {
     return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -81,7 +79,7 @@ async function request(path, options = {}) {
             "Content-Type": "application/json",
             ...(options.headers || {})
         },
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+        signal: AbortSignal.timeout(20000)
     });
     const payload = await parseJsonResponse(response);
 
@@ -89,46 +87,18 @@ async function request(path, options = {}) {
 }
 
 async function postChat(message, sessionId, headers = {}) {
-    lastChatTrace = { message, sessionId, headers };
     const response = await fetch(CHAT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...headers },
         body: JSON.stringify({ message, sessionId }),
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+        signal: AbortSignal.timeout(20000)
     });
     const payload = await parseJsonResponse(response);
-    lastChatTrace = {
-        ...lastChatTrace,
-        status: response.status,
-        success: payload.success,
-        reply: payload.data?.reply || null,
-        booking: payload.data?.booking || null,
-        meta: payload.data?.meta || null
-    };
 
     return { response, payload };
 }
 
 async function createSlot({ date, timeStart, timeEnd, capacity = 4 }) {
-    const existing = await request(
-        `/api/admin/availability-slots?date=${encodeURIComponent(date)}&active=true`,
-        { method: "GET", headers: adminHeaders() }
-    );
-    const existingSlot = (existing.payload.data?.slots || []).find(
-        (slot) => slot.date === date && slot.timeStart === timeStart
-    );
-
-    if (existingSlot) {
-        const updated = await request(`/api/admin/availability-slots/${existingSlot.id}`, {
-            method: "PATCH",
-            headers: adminHeaders(),
-            body: JSON.stringify({ capacity: Math.max(capacity, 50), active: true })
-        });
-
-        assert(updated.response.status === 200 && updated.payload.success, "slot update failed");
-        return;
-    }
-
     const { response, payload } = await request("/api/admin/availability-slots", {
         method: "POST",
         headers: adminHeaders(),
@@ -192,20 +162,6 @@ async function runCase(id, fn, state) {
         return { id, passed: true };
     } catch (error) {
         console.error(`FAIL ${id}: ${error.message}`);
-        console.error(JSON.stringify({
-            case: id,
-            expected: error.message,
-            actual: {
-                request: lastChatTrace?.message || null,
-                responseStatus: lastChatTrace?.status || null,
-                success: lastChatTrace?.success || null,
-                reply: lastChatTrace?.reply || null,
-                bookingStatus: lastChatTrace?.booking?.status || null,
-                draft: lastChatTrace?.booking?.draft || null,
-                missingFields: lastChatTrace?.booking?.missingFields || null,
-                meta: lastChatTrace?.meta || null
-            }
-        }, null, 2));
         return { id, passed: false, error };
     }
 }
@@ -335,7 +291,12 @@ async function main() {
                 assert(second.response.status === 200 && second.payload.success, "detail detour failed");
                 assert(normalizedReply.includes("chuc nang gan"), "detour missing package name");
                 assert(normalizedReply.includes("alt") && normalizedReply.includes("ast"), "detour missing ALT/AST");
-                assert(normalizedReply.includes("gio lay mau"), "detour did not ask for missing time");
+                assert(
+                    normalizedReply.includes("gio lay mau") ||
+                        normalizedReply.includes("khung gio") ||
+                        normalizedReply.includes("chon khung"),
+                    "detour did not ask for missing time"
+                );
                 assert(data.booking?.draft?.testType, "draft lost package");
                 assert(data.booking?.draft?.appointmentDate, "draft lost date");
                 assert(data.booking?.draft?.phoneNumber === state.phone, "draft lost session phone");
@@ -495,7 +456,7 @@ async function main() {
     const passed = results.filter((result) => result.passed).length;
     const failed = results.length - passed;
 
-    console.log(`TOTAL ${results.length} PASSED ${passed} FAILED ${failed}`);
+    console.log(`RESULT passed=${passed} failed=${failed} total=${results.length}`);
 
     if (failed > 0) {
         process.exitCode = 1;
