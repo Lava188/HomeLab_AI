@@ -717,8 +717,8 @@ async function rejectCollectorAssignment(assignmentId, collectorId, reason, opti
     }
 
     const trimmedReason = String(reason || "").trim();
-    if (trimmedReason.length < 5) {
-        throw new BookingRuntimeError("Vui lòng cung cấp lý do từ chối tối thiểu 5 ký tự.", {
+    if (trimmedReason.length < 50) {
+        throw new BookingRuntimeError("Vui lòng cung cấp lý do từ chối tối thiểu 50 ký tự.", {
             code: "COLLECTOR_REJECT_REASON_REQUIRED",
             statusCode: 400
         });

@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { FormEvent, ReactNode, useState } from 'react';
 import {
   CalendarClock,
   CalendarDays,
@@ -7,10 +7,13 @@ import {
   Home,
   LogOut,
   MessageCircle,
+  Save,
   ShieldCheck,
   Truck,
+  UserCog,
   UserRound,
   UsersRound,
+  X,
 } from 'lucide-react';
 import {
   DEMO_ROLES,
@@ -18,8 +21,10 @@ import {
   getDemoSession,
   getLoginPathForRole,
   logoutDemoRole,
+  updateUserSessionProfile,
 } from '../auth/demoAuth';
 import UserHeader from './UserHeader';
+import NotificationBell from './NotificationBell';
 
 const ROLE_LABELS: Record<DemoRole, string> = {
   USER: 'Người dùng/Bệnh nhân',
@@ -45,7 +50,6 @@ function getNavItems(role: DemoRole) {
       { href: '/admin/bookings', label: 'Quản lý lịch hẹn', title: 'Vận hành lịch hẹn', icon: ClipboardList },
       { href: '/admin/availability-slots', label: 'Quản lý khung giờ', title: 'Khung giờ lấy mẫu', icon: CalendarClock },
       { href: '/admin/staff', label: 'Quản lý nhân viên', title: 'Nhân viên lấy mẫu', icon: UsersRound },
-      { href: '/', label: 'Chatbot', title: 'Chatbot', icon: MessageCircle },
     ];
   }
 
@@ -53,7 +57,6 @@ function getNavItems(role: DemoRole) {
     return [
       { href: '/collector/dashboard', label: 'Tổng quan', title: 'Lịch lấy mẫu', icon: Home },
       { href: '/collector/dashboard#assigned', label: 'Lịch được giao', title: 'Lịch được giao', icon: Truck },
-      { href: '/', label: 'Chatbot', title: 'Chatbot', icon: MessageCircle },
     ];
   }
 
@@ -78,6 +81,11 @@ export default function RoleLayout({
 }) {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const session = getDemoSession();
+  const [accountName, setAccountName] = useState(session.displayName);
+  const [accountEmail, setAccountEmail] = useState(session.email);
+  const [draftName, setDraftName] = useState(session.displayName);
+  const [draftEmail, setDraftEmail] = useState(session.email);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const navItems = getNavItems(role);
   const activeNavItem = navItems.find((item) => window.location.pathname === item.href.split('#')[0]);
   const pageTitle = activeNavItem?.title || title;
@@ -88,6 +96,24 @@ export default function RoleLayout({
   function handleLogout() {
     logoutDemoRole();
     window.location.href = getLoginPathForRole(role);
+  }
+
+  function openEditProfile() {
+    setDraftName(accountName);
+    setDraftEmail(accountEmail);
+    setIsAccountOpen(false);
+    setIsEditOpen(true);
+  }
+
+  function handleSaveProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    updateUserSessionProfile({
+      displayName: draftName,
+      email: draftEmail,
+    });
+    setAccountName(draftName.trim());
+    setAccountEmail(draftEmail.trim().toLowerCase());
+    setIsEditOpen(false);
   }
 
   return (
@@ -126,7 +152,8 @@ export default function RoleLayout({
                 </div>
               </div>
 
-              <div className="relative flex items-center justify-end">
+              <div className="relative flex items-center justify-end gap-2">
+                {(isAdmin || isCollector) && <NotificationBell role={isAdmin ? 'ADMIN' : 'COLLECTOR'} />}
                 <button
                   type="button"
                   onClick={() => setIsAccountOpen((current) => !current)}
@@ -137,7 +164,7 @@ export default function RoleLayout({
                   </span>
                   <span className="hidden min-w-0 sm:block">
                     <span className="block truncate font-semibold text-slate-900">
-                      {session.displayName || ROLE_FALLBACK_NAMES[role]}
+                      {accountName || ROLE_FALLBACK_NAMES[role]}
                     </span>
                     <span className="block truncate text-xs text-slate-500">{ROLE_LABELS[role]}</span>
                   </span>
@@ -147,11 +174,20 @@ export default function RoleLayout({
                   <div className={`absolute right-0 top-full z-50 mt-2 w-72 rounded-2xl border bg-white p-3 ${isCollector ? 'border-emerald-100 shadow-[0_20px_50px_rgba(16,185,129,0.16)]' : 'border-sky-100 shadow-[0_20px_50px_rgba(14,165,233,0.16)]'}`}>
                     <div className={`rounded-xl px-3 py-3 text-sm ${isCollector ? 'bg-emerald-50' : 'bg-sky-50'}`}>
                       <div className="font-semibold text-slate-900">
-                        {session.displayName || ROLE_FALLBACK_NAMES[role]}
+                        {accountName || ROLE_FALLBACK_NAMES[role]}
                       </div>
                       <div className="mt-1 text-xs text-slate-500">{ROLE_LABELS[role]}</div>
                       {session.phone ? <div className="mt-2 text-xs text-slate-500">Số điện thoại: {session.phone}</div> : null}
                     </div>
+                    {accountEmail ? <div className="mt-2 truncate text-xs text-slate-500">Email: {accountEmail}</div> : null}
+                    <button
+                      type="button"
+                      onClick={openEditProfile}
+                      className={`mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-semibold transition ${isCollector ? 'border-emerald-100 bg-white text-emerald-800 hover:bg-yellow-50' : 'border-sky-100 bg-white text-sky-700 hover:bg-sky-50'}`}
+                    >
+                      <UserCog className="h-4 w-4" />
+                      Chỉnh sửa thông tin
+                    </button>
                     <button
                       onClick={handleLogout}
                       className={`mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold shadow-sm transition ${isCollector ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-gradient-to-r from-sky-500 to-teal-500 text-white hover:from-sky-600 hover:to-teal-600'}`}
@@ -200,6 +236,79 @@ export default function RoleLayout({
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+
+      {isEditOpen && role !== DEMO_ROLES.USER ? (
+        <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${isCollector ? 'bg-emerald-950/30' : 'bg-sky-950/30'}`}>
+          <form
+            onSubmit={handleSaveProfile}
+            className={`w-full max-w-lg rounded-2xl border bg-white p-5 shadow-2xl ${isCollector ? 'border-emerald-100' : 'border-sky-100'}`}
+          >
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Chỉnh sửa thông tin</h2>
+                <p className="mt-1 text-sm text-slate-500">{ROLE_LABELS[role]}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditOpen(false)}
+                className={`rounded-lg p-2 text-slate-500 ${isCollector ? 'hover:bg-yellow-50' : 'hover:bg-sky-50'}`}
+                aria-label="Đóng chỉnh sửa thông tin"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-sm font-semibold text-slate-700">
+                Họ tên
+                <input
+                  value={draftName}
+                  onChange={(event) => setDraftName(event.target.value)}
+                  className={`mt-2 w-full rounded-xl border px-3 py-3 text-sm outline-none transition ${isCollector ? 'border-emerald-100 bg-emerald-50/50 focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100' : 'border-sky-100 bg-sky-50/50 focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100'}`}
+                  placeholder={ROLE_FALLBACK_NAMES[role]}
+                />
+              </label>
+
+              <label className="block text-sm font-semibold text-slate-700">
+                Email
+                <input
+                  type="email"
+                  value={draftEmail}
+                  onChange={(event) => setDraftEmail(event.target.value)}
+                  className={`mt-2 w-full rounded-xl border px-3 py-3 text-sm outline-none transition ${isCollector ? 'border-emerald-100 bg-emerald-50/50 focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100' : 'border-sky-100 bg-sky-50/50 focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100'}`}
+                  placeholder="name@example.com"
+                />
+              </label>
+
+              <label className="block text-sm font-semibold text-slate-700">
+                Số điện thoại
+                <input
+                  value={session.phone || ''}
+                  readOnly
+                  className="mt-2 w-full rounded-xl border border-slate-100 bg-slate-50 px-3 py-3 text-sm text-slate-500 outline-none"
+                />
+              </label>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsEditOpen(false)}
+                className={`rounded-xl border bg-white px-4 py-3 text-sm font-semibold transition ${isCollector ? 'border-emerald-100 text-emerald-800 hover:bg-yellow-50' : 'border-sky-100 text-sky-700 hover:bg-sky-50'}`}
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-sm transition ${isCollector ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-gradient-to-r from-sky-500 to-teal-500 hover:from-sky-600 hover:to-teal-600'}`}
+              >
+                <Save className="h-4 w-4" />
+                Lưu thay đổi
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : null}
     </div>
   );
 }

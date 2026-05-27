@@ -5,7 +5,9 @@ const { retrieveTopChunks } = require("./health-rag/retriever.service");
 const { loadArtifacts } = require("./health-rag/artifact-loader.service");
 const { choosePolicyMode } = require("./health-rag/policy.service");
 const { composeGroundedAnswer } = require("./health-rag/answer.service");
+const { analyzeHealthConsultationContext } = require("./health-rag/health-consultation-context.service");
 const { runSemanticBridge } = require("./health-rag/semantic-bridge.service");
+const mockSessions = require("../data/mockSessions");
 const {
     isRecommendationRuntimeEnabled,
     runRecommendationRuntime
@@ -754,12 +756,29 @@ function shouldRunRecommendationRuntime(intentGroup) {
     );
 }
 
-function shouldSkipRecommendationForAnswer({ message, intentGroup, policyDecision }) {
-    return (
+function shouldSkipRecommendationForAnswer({ message, intentGroup, policyDecision, topChunks }) {
+    if (
         intentGroup === "test_advice" &&
         policyDecision?.primaryMode === "lab_explanation" &&
         isLabTestExplanationAnswerQuery(message)
-    );
+    ) {
+        return true;
+    }
+
+    if (intentGroup !== "test_advice") {
+        return false;
+    }
+
+    if (policyDecision?.primaryMode === "medical_review_boundary") {
+        return false;
+    }
+
+    const consultationContext = analyzeHealthConsultationContext({
+        message,
+        retrievedChunks: topChunks
+    });
+
+    return consultationContext.canSuggestPackages && consultationContext.isComplete;
 }
 
 function shouldSuppressDdimersForUrgentCase(message, intentGroup) {
@@ -997,6 +1016,9 @@ function keepSourcesById(meta, allowedSourceIds) {
 
 async function answerHealthQuery({ message, sessionId }) {
     try {
+        const session = mockSessions.getSession(sessionId);
+        const sessionContext = session?.chatContext || { recentMessages: [] };
+
         const retrievalResult = retrieveTopChunks({
             message,
             topK: 3
@@ -1031,12 +1053,14 @@ async function answerHealthQuery({ message, sessionId }) {
         const groundedReply = composeGroundedAnswer({
             message,
             policyDecision,
-            topChunks
+            topChunks,
+            sessionContext
         });
         const skipRecommendation = shouldSkipRecommendationForAnswer({
             message,
             intentGroup,
-            policyDecision
+            policyDecision,
+            topChunks
         });
         const recommendationDecision =
             !skipRecommendation && shouldRunRecommendationRuntime(intentGroup)

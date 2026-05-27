@@ -204,6 +204,32 @@ function isBookingEditOrNegativeText(message) {
     );
 }
 
+function isReadOnlyConsultationRequest(message) {
+    const normalizedMessage = normalizeText(message);
+    const readOnlySignals = [
+        "chi hoi truoc",
+        "hoi truoc",
+        "chua muon dat",
+        "chưa muốn đặt",
+        "chua dat lich",
+        "chưa đặt lịch",
+        "chua muon kham",
+        "chưa muốn khám",
+        "chua muon xet nghiem",
+        "chưa muốn xét nghiệm",
+        "chi tu van",
+        "chỉ tư vấn",
+        "chi hoi thong tin",
+        "chỉ hỏi thông tin",
+        "tim hieu truoc",
+        "tim hiểu trước"
+    ];
+
+    return readOnlySignals.some((signal) =>
+        normalizedMessage.includes(signal)
+    );
+}
+
 function isBookingStatusQuestion(message) {
     const normalizedMessage = normalizeText(message);
     const statusQuestionPatterns = [
@@ -509,10 +535,17 @@ function rememberConversationContext({ sessionId, message, result, packageIntent
     }
 
     const previous = getConversationContext(sessionId);
+    const existingMessages = Array.isArray(previous?.recentMessages)
+        ? previous.recentMessages
+        : [];
     const nextContext = {
         ...previous,
         lastIntentGroup: result?.meta?.intentGroup || previous.lastIntentGroup || null,
-        lastUserMessage: message
+        lastUserMessage: message,
+        recentMessages: [
+            ...existingMessages.slice(-9),
+            { role: "user", content: message, timestamp: new Date().toISOString() }
+        ]
     };
 
     if (packageIntent?.type === "listing") {
@@ -827,7 +860,8 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
 
     if (
         bookingService.hasActiveBookingSession(sessionId) &&
-        isBookingEditOrNegativeText(message)
+        isBookingEditOrNegativeText(message) &&
+        !isReadOnlyConsultationRequest(message)
     ) {
         if (!isAuthenticatedUserSession(userSession)) {
             return buildAuthRequiredResult({

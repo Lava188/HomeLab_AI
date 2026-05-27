@@ -54,6 +54,18 @@ const ROUTER_SYNONYM_RULES = [
     {
         pattern: /\bdi ung nang\b|\bsoc phan ve\b/g,
         expansions: ["phan ve"]
+    },
+    {
+        pattern: /\buong ruou|uong bia|uong nhieu|tieu khang|gam ran/g,
+        expansions: ["kiem tra gan", "men gan"]
+    },
+    {
+        pattern: /\btieu it|phui chan|tieu kho|loc cau than/g,
+        expansions: ["kiem tra than", "chuc nang than"]
+    },
+    {
+        pattern: /\btim kiem tra|kiem tra co the|kiem tra suc khoe|muon biet suc khoe|biet co benh khong/g,
+        expansions: ["tu van suc khoe", "xet nghiem tong quat"]
     }
 ];
 
@@ -132,7 +144,40 @@ const INTENT_DEFINITIONS = [
             "co cung",
             "yeu liet",
             "non ra mau",
-            "phan den"
+            "phan den",
+            "gan",
+            "men gan",
+            "kiem tra gan",
+            "chuc nang gan",
+            "than",
+            "kiem tra than",
+            "chuc nang than",
+            "khong on",
+            "toi that",
+            "that nguoi",
+            "kho cop",
+            "met moi",
+            "alt",
+            "ast",
+            "creatinine",
+            "creatinin",
+            "egfr",
+            "nghiem trọng",
+            "nguy hiem",
+            "nguy hiểm",
+            "nghiêm trọng",
+            "nghiem trong",
+            "co nguy hiem khong",
+            "co nghiêm trọng khong",
+            "co nghiem trong khong",
+            "cao",
+            "thap",
+            "suc giam",
+            "chan an",
+            "chi hoi truoc",
+            "hoi truoc",
+            "chua muon dat",
+            "chi tu van"
         ],
         exemplars: [
             "xet nghiem mo mau co can nhin an khong",
@@ -140,7 +185,13 @@ const INTENT_DEFINITIONS = [
             "em nhuc dau may ngay nay",
             "toi bi ngat lap lai",
             "toi nghi bi phan ve",
-            "toi kho tho sau khi an hai san"
+            "toi kho tho sau khi an hai san",
+            "toi uong ruous nhieu muon kiem tra men gan",
+            "alt ast cao thi co nghiem trong khong",
+            "men gan cao co nguy hiem khong",
+            "toi khong on lam",
+            "toi muon kiem tra chuc nang than",
+            "toi chi hoi truoc"
         ]
     }
 ];
@@ -268,7 +319,13 @@ const LAB_RESULT_BOUNDARY_SIGNALS = [
     "bat thuong co phai",
     "suy than",
     "benh gan nang",
-    "ung thu mau"
+    "ung thu mau",
+    "co nghiêm trọng không",
+    "co nguy hiem khong",
+    "co dang lo không",
+    "dang lo",
+    "nghiem trọng",
+    "nguy hiem"
 ];
 
 const TEST_ADVICE_SIGNALS = [
@@ -581,6 +638,39 @@ function getShortRiskClarifyingReply(expandedMessage) {
     );
 }
 
+function isHealthConsultationRequest(expandedMessage) {
+    const healthVagueSignals = [
+        "khong on",
+        "toi that",
+        "that nguoi",
+        "kho cop",
+        "met moi",
+        "suc giam",
+        "chan an",
+        "dau chung",
+        "that nguoi"
+    ];
+    const healthSpecificSignals = [
+        "kiem tra",
+        "xet nghiem",
+        "tu van",
+        "dau",
+        "met",
+        "chong mat",
+        "buon non",
+        "nhuc dau"
+    ];
+
+    const hasVagueSignal = healthVagueSignals.some((signal) =>
+        expandedMessage.includes(signal)
+    );
+    const hasHealthSignal = healthSpecificSignals.some((signal) =>
+        expandedMessage.includes(signal)
+    );
+
+    return hasVagueSignal && !expandedMessage.includes("dat lich") && !expandedMessage.includes("huy lich");
+}
+
 function isAmbiguousUrgentQuery(expandedMessage, tokenCount) {
     const asksUrgentDisposition =
         expandedMessage.includes("di vien") ||
@@ -627,6 +717,26 @@ function isCustomerTestSafetyQuery(expandedMessage) {
 
 function detectFlow(message) {
     const rewritten = rewriteForRouting(message);
+
+    if (isLabResultBoundaryQuery(rewritten.expandedMessage)) {
+        return {
+            flow: FLOWS.HEALTH_RAG,
+            routerDebug: {
+                normalizedMessage: rewritten.normalizedMessage,
+                expandedMessage: rewritten.expandedMessage,
+                expansions: rewritten.expansions,
+                classifierMode: "tfidf_prototype_intent_router",
+                intentGroup: "test_advice",
+                customerTestSafetyGate: false,
+                lowConfidenceGuard: {
+                    triggered: false,
+                    reason: "lab_result_boundary_early_detection"
+                },
+                scoredIntents: []
+            }
+        };
+    }
+
     const { vocabIndex, idfByToken, prototypeVectors } = buildClassifierCache();
     const queryTokens = tokenize(rewritten.expandedMessage);
     const queryVector = vectorizeTokens(queryTokens, vocabIndex, idfByToken);
@@ -775,6 +885,28 @@ function detectFlow(message) {
             topIntent.score < 0.28 ||
             (nextIntent && topIntent.score - nextIntent.score < 0.08))
     ) {
+        if (isLabResultBoundaryQuery(rewritten.expandedMessage)) {
+            return {
+                flow: FLOWS.HEALTH_RAG,
+                routerDebug: {
+                    normalizedMessage: rewritten.normalizedMessage,
+                    expandedMessage: rewritten.expandedMessage,
+                    expansions: rewritten.expansions,
+                    classifierMode: "tfidf_prototype_intent_router",
+                    intentGroup: "test_advice",
+                    customerTestSafetyGate: customerTestSafetyQuery,
+                    lowConfidenceGuard: {
+                        triggered: false,
+                        tokenCount,
+                        topScore: topIntent.score,
+                        nextScore: nextIntent?.score || null,
+                        reason: "lab_result_boundary_query_exempted"
+                    },
+                    scoredIntents
+                }
+            };
+        }
+
         return {
             flow: FLOWS.FALLBACK,
             action: ACTIONS.FALLBACK_RESPONSE,

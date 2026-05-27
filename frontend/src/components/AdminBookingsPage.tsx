@@ -596,12 +596,6 @@ export default function AdminBookingsPage({ embedded = false }: { embedded?: boo
                 <p className="text-sm text-slate-500">Bảng quản trị lịch hẹn và lấy mẫu</p>
               </div>
             </div>
-            <a
-              href="/"
-              className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-sky-50/70"
-            >
-              Chatbot
-            </a>
           </div>
         </header>
       )}
@@ -821,7 +815,7 @@ export default function AdminBookingsPage({ embedded = false }: { embedded?: boo
                     <td colSpan={8} className="px-5 py-12 text-center">
                       <ClipboardCheck className="mx-auto h-10 w-10 text-sky-600" />
                       <h4 className="mt-4 font-semibold">Chưa có lịch hẹn phù hợp</h4>
-                      <p className="mt-2 text-sm text-slate-500">Thử đặt lại bộ lọc hoặc tạo lịch hẹn mới qua Chatbot.</p>
+                      <p className="mt-2 text-sm text-slate-500">Thử đặt lại bộ lọc để xem lịch hẹn phù hợp.</p>
                     </td>
                   </tr>
                 ) : (

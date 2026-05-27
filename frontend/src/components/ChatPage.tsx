@@ -299,38 +299,38 @@ export default function ChatPage() {
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-10">
-        <section className="flex flex-col justify-between gap-8 py-2 lg:min-h-[calc(100vh-8rem)]">
-          <div>
+      <main className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[0.65fr_1.35fr] lg:px-8 lg:py-10">
+        <section className="flex flex-col justify-between gap-6 py-2 lg:min-h-[calc(100vh-8rem)]">
+          <div className="pr-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-teal-100 bg-white/80 px-3 py-1.5 text-sm font-semibold text-teal-700 shadow-sm">
               <ShieldCheck className="h-4 w-4" />
               Hỗ trợ an toàn trước khi đặt lịch
             </div>
-            <h1 className="mt-6 max-w-2xl text-4xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-5xl">
-              Trợ lý xét nghiệm tại nhà HomeLab
+            <h1 className="mt-5 max-w-xl text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">
+              Trợ lý tư vấn và xét nghiệm tại nhà
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-              Hỏi thông tin xét nghiệm, kiểm tra triệu chứng ban đầu và đặt lịch lấy mẫu tại nhà một cách an toàn.
+            <p className="mt-4 max-w-xl text-base leading-7 text-slate-600">
+              Hỏi thông tin xét nghiệm, kiểm tra triệu chứng và đặt lịch lấy mẫu tại nhà một cách an toàn.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
               <button
                 onClick={handleBookingCta}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-600/20 hover:bg-teal-700"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-600/20 hover:bg-teal-700"
               >
                 <CalendarPlus className="h-5 w-5" />
                 Đặt lịch xét nghiệm
               </button>
               <a
                 href={userBookingsPath}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-sky-200 bg-white px-5 py-3 text-sm font-semibold text-sky-700 shadow-sm hover:bg-sky-50"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-sky-200 bg-white px-4 py-2.5 text-sm font-semibold text-sky-700 shadow-sm hover:bg-sky-50"
               >
                 <CalendarCheck className="h-5 w-5" />
                 Theo dõi lịch hẹn
               </a>
               <button
                 onClick={() => focusChat('Tôi muốn hỏi về xét nghiệm.')}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
               >
                 <MessageCircle className="h-5 w-5" />
                 Hỏi về xét nghiệm
@@ -338,20 +338,20 @@ export default function ChatPage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/80 bg-white/75 p-5 shadow-sm backdrop-blur">
+          <div className="rounded-3xl border border-white/80 bg-white/75 p-4 shadow-sm backdrop-blur">
             <div className="flex items-center gap-3">
-              <span className="rounded-2xl bg-teal-50 p-3 text-teal-700">
+              <span className="rounded-2xl bg-teal-50 p-2.5 text-teal-700">
                 <HeartPulse className="h-5 w-5" />
               </span>
               <div>
-                <h2 className="font-semibold text-slate-950">HomeLab hỗ trợ</h2>
-                <p className="text-sm text-slate-500">Thông tin rõ ràng cho người dùng trước và sau khi đặt lịch.</p>
+                <h2 className="font-semibold text-slate-950 text-base">HomeLab hỗ trợ</h2>
+                <p className="text-sm text-slate-500">Thông tin rõ ràng trước và sau khi đặt lịch.</p>
               </div>
             </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
               {[
                 'Giải thích xét nghiệm',
-                'Kiểm tra dấu hiệu cần đi khám/cấp cứu',
+                'Kiểm tra dấu hiệu cần đi khám',
                 'Đặt lịch lấy mẫu tại nhà',
                 'Theo dõi tiến trình lịch hẹn',
               ].map((item) => (
@@ -364,14 +364,14 @@ export default function ChatPage() {
           </div>
         </section>
 
-        <section className="flex min-h-[680px] flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-2xl shadow-sky-900/10 lg:max-h-[calc(100vh-8rem)]">
+        <section className="flex min-h-[720px] flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-2xl shadow-sky-900/10 lg:max-h-[calc(100vh-6rem)]">
           <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4">
             <div className="flex items-center gap-3">
               <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-50 text-sky-700">
                 <Bot className="h-5 w-5" />
               </span>
               <div>
-                <h2 className="font-semibold text-slate-950">Tư vấn với HomeLab</h2>
+                <h2 className="font-semibold text-slate-950 text-base">Tư vấn với HomeLab</h2>
                 <div className="mt-1 flex items-center gap-2 text-xs font-semibold text-teal-700">
                   <span className="h-2 w-2 rounded-full bg-teal-500" />
                   Sẵn sàng hỗ trợ
@@ -387,13 +387,13 @@ export default function ChatPage() {
             </button>
           </div>
 
-          <div className="border-b border-slate-100 px-5 py-4">
+          <div className="border-b border-slate-100 px-5 py-3">
             <div className="flex flex-wrap gap-2">
               {SUGGESTED_PROMPTS.map((prompt) => (
                 <button
                   key={prompt}
                   onClick={() => focusChat(prompt)}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
+                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
                 >
                   {prompt}
                 </button>
@@ -401,7 +401,7 @@ export default function ChatPage() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto bg-slate-50/70 px-5 py-5">
+          <div className="flex-1 overflow-y-auto bg-slate-50/70 px-5 py-4">
             {messages.length === 0 ? (
               <div className="flex h-full min-h-[280px] flex-col items-center justify-center text-center">
                 <div className="rounded-3xl bg-white p-4 text-teal-600 shadow-sm">

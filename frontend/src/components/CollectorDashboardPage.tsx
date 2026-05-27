@@ -10,7 +10,7 @@ import {
   Truck,
   X,
 } from 'lucide-react';
-import { getCollectorSession, logoutDemoRole } from '../auth/demoAuth';
+import { getCollectorSession } from '../auth/demoAuth';
 import {
   CollectorBooking,
   CollectorAssignment,
@@ -61,7 +61,6 @@ const STATUS_STYLES: Record<string, string> = {
 
 const collectorPanelClass = 'rounded-2xl border border-emerald-100 bg-white/95 shadow-[0_14px_36px_rgba(16,185,129,0.08)]';
 const collectorPanelHeaderClass = 'border-b border-emerald-100 bg-gradient-to-r from-emerald-50 to-yellow-50/70 px-5 py-4';
-const collectorSubtleButtonClass = 'inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-100 bg-white px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:border-yellow-200 hover:bg-yellow-50 disabled:opacity-60';
 
 const EMPTY_AREA_FORM = {
   province: 'Hà Nội',
@@ -421,11 +420,6 @@ export default function CollectorDashboardPage() {
     { label: 'Đã lấy mẫu', value: summary.collected, icon: CheckCircle2, tone: 'bg-teal-50 text-teal-900 border-teal-100' },
   ];
 
-  function handleLogout() {
-    logoutDemoRole();
-    window.location.href = '/collector/login';
-  }
-
   if (!session.phone) {
     return null;
   }
@@ -442,20 +436,6 @@ export default function CollectorDashboardPage() {
             <p className="mt-2 text-sm text-slate-500">
               Số điện thoại nhân viên lấy mẫu đang dùng: <span className="font-semibold text-slate-700">{session.phone}</span>
             </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <a
-              href="/"
-              className="inline-flex items-center justify-center rounded-xl bg-yellow-100 px-4 py-3 text-sm font-semibold text-emerald-900 shadow-sm transition hover:bg-yellow-200"
-            >
-              Quay lại Chatbot
-            </a>
-            <button
-              onClick={handleLogout}
-              className={collectorSubtleButtonClass}
-            >
-              Đăng xuất
-            </button>
           </div>
         </div>
       </section>

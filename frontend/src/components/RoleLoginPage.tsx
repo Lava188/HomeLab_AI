@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import { ArrowRight, FlaskConical, KeyRound, Mail, MessageCircle, Phone, UserRound } from 'lucide-react';
+import { ArrowRight, ChevronDown, FlaskConical, KeyRound, Mail, MessageCircle, Phone, UserRound } from 'lucide-react';
 import {
   DEMO_ROLES,
   DemoRole,
@@ -186,6 +186,19 @@ export default function RoleLoginPage({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRoleSwitchOpen, setIsRoleSwitchOpen] = useState(false);
+
+  const roleSwitchOptions = role === DEMO_ROLES.ADMIN
+    ? [
+        { href: '/user/login', label: 'Người dùng' },
+        { href: '/collector/login', label: 'Nhân viên lấy mẫu' },
+      ]
+    : role === DEMO_ROLES.COLLECTOR
+      ? [
+          { href: '/user/login', label: 'Người dùng' },
+          { href: '/admin/login', label: 'Quản trị viên' },
+        ]
+      : [];
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -295,6 +308,41 @@ export default function RoleLoginPage({
           HomeLab
         </a>
         {role === DEMO_ROLES.USER ? <OperationsAccessMenu compact /> : null}
+        {roleSwitchOptions.length > 0 ? (
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsRoleSwitchOpen((current) => !current)}
+              className={`inline-flex items-center gap-2 rounded-xl border bg-white px-3 py-2 text-sm font-semibold shadow-sm transition ${
+                role === DEMO_ROLES.ADMIN
+                  ? 'border-blue-100 text-blue-700 hover:bg-blue-50'
+                  : 'border-emerald-100 text-emerald-700 hover:bg-emerald-50'
+              }`}
+            >
+              Chuyển sang
+              <ChevronDown className="h-4 w-4" />
+            </button>
+            {isRoleSwitchOpen ? (
+              <div className={`absolute right-0 z-20 mt-2 w-56 rounded-2xl border bg-white p-2 shadow-xl ${
+                role === DEMO_ROLES.ADMIN ? 'border-blue-100' : 'border-emerald-100'
+              }`}>
+                {roleSwitchOptions.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className={`block rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 transition ${
+                      role === DEMO_ROLES.ADMIN
+                        ? 'hover:bg-blue-50 hover:text-blue-700'
+                        : 'hover:bg-emerald-50 hover:text-emerald-700'
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center">

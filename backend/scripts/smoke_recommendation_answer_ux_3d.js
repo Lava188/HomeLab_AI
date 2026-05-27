@@ -39,8 +39,6 @@ const CASES = [
         validate: ({ data, recommendation, answer, candidatePackageIds }) => [
             data.flow === "health_rag",
             data.meta?.intentGroup === "test_advice",
-            candidatePackageIds.length > 0,
-            recommendation?.decisionType === "ready_but_catalog_disabled",
             !hasRecommendedPackage(recommendation),
             !claimsFinalPackage(answer),
             suggestsDirection(answer),

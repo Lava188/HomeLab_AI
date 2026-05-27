@@ -1,4 +1,6 @@
 const { normalizeText } = require("../../utils/text.util");
+const { analyzeHealthConsultationContext, extractPreviousSymptoms } = require("./health-consultation-context.service");
+const { analyzeHealthConsultationWithOllama, mergeSemanticWithContext } = require("./health-consultation-semantic.service");
 
 function getLeadSentence(text) {
     const cleanText = String(text || "").replace(/\s+/g, " ").trim();
@@ -9,6 +11,172 @@ function getLeadSentence(text) {
 
     const sentences = cleanText.split(/(?<=[.!?])\s+/);
     return sentences.slice(0, 2).join(" ").trim();
+}
+
+function isLifestyleHealthAdviceQuery(normalizedMessage) {
+    const lifestyleAdvicePatterns = [
+        "ha huyet ap",
+        "giam huyet ap",
+        "kiem tra huyet ap",
+        "huyet ap cao",
+        "giam mo mau",
+        "giam chi so mo mau",
+        "mo mau cao",
+        "giam duong huyet",
+        "kiem tra duong huyet",
+        "duong huyet cao",
+        "tieu duong",
+        "dai thao duong",
+        "kiem soát tiểu đường",
+        "kiem soat tieu duong",
+        "giam can",
+        "giu can",
+        "kiem can",
+        "sống khỏe",
+        "sống khoe"
+    ];
+
+    return lifestyleAdvicePatterns.some((pattern) =>
+        normalizedMessage.includes(pattern)
+    );
+}
+
+function isLabResultSeverityQuery(normalizedMessage) {
+    const labTerms = [
+        "alt", "ast", "men gan",
+        "creatinine", "creatinin", "egfr", "gfr",
+        "cholesterol", "triglyceride", "mo mau",
+        "cbc", "cong thuc mau", "bach cau"
+    ];
+
+    const hasLabTerm = labTerms.some((term) => normalizedMessage.includes(term));
+
+    const hasSeverityIndicator = [
+        "cao", "thap", "bat thuong", "tang", "giam"
+    ].some((ind) => normalizedMessage.includes(ind));
+
+    const hasSeverityQuestion = [
+        "nghiem trọng",
+        "nguy hiem",
+        "nguy hiểm",
+        "dang lo",
+        "co",
+        "khong",
+        "an toan"
+    ].some((q) => normalizedMessage.includes(q));
+
+    const hasQuestionMark = normalizedMessage.includes("?") ||
+                           normalizedMessage.includes(" co") ||
+                           normalizedMessage.includes(" khong");
+
+    return hasLabTerm && hasSeverityIndicator && (hasSeverityQuestion || hasQuestionMark);
+}
+
+function isReadOnlyConsultationSignal(normalizedMessage) {
+    const readOnlySignals = [
+        "chi hoi truoc",
+        "hoi truoc",
+        "chua muon dat",
+        "chua muon đặt",
+        "chua dat lich",
+        "chưa đặt lịch",
+        "chua muon kham",
+        "chưa muốn khám",
+        "chua muon xet nghiem",
+        "chưa muốn xét nghiệm",
+        "chi tu van",
+        "chỉ tư vấn",
+        "chi hoi thong tin",
+        "chỉ hỏi thông tin",
+        "tim hieu truoc",
+        "tim hiểu trước"
+    ];
+
+    return readOnlySignals.some((signal) =>
+        normalizedMessage.includes(signal)
+    );
+}
+
+function buildLifestyleAdviceReply(message) {
+    const normalizedMessage = normalizeText(message);
+    let adviceParts = [];
+
+    if (
+        normalizedMessage.includes("huyet ap") ||
+        normalizedMessage.includes("ha huyet ap")
+    ) {
+        adviceParts.push(
+            "Để kiểm soát huyết áp: ăn giảm muối, hạn chế đồ ăn mặn và đồ chiên, duy trì cân nặng hợp lý, vận động 30 phút mỗi ngày, hạn chế rượu bia, quản lý stress và ngủ đủ giấc. Bạn nên theo dõi huyết áp tại nhà hoặc khám nếu chỉ số cao kéo dài."
+        );
+    }
+
+    if (
+        normalizedMessage.includes("mo mau") ||
+        normalizedMessage.includes("giam chi so mo mau")
+    ) {
+        adviceParts.push(
+            "Để cải thiện mỡ máu: hạn chế chất béo bão hòa (đồ chiên, mỡ động vật), tăng chất xơ (rau, quả, ngũ cốc), giảm đường và tinh bột tinh chế, vận động đều đặn, hạn chế rượu."
+        );
+    }
+
+    if (
+        normalizedMessage.includes("duong huyet") ||
+        normalizedMessage.includes("tieu duong") ||
+        normalizedMessage.includes("dai thao duong")
+    ) {
+        adviceParts.push(
+            "Để kiểm soát đường huyết: kiểm soát cân nặng, ăn đều đặn và đúng giờ, hạn chế đồ ngọt và nước ngọt, vận động đều đặn, kiểm tra đường huyết định kỳ."
+        );
+    }
+
+    const adviceText = adviceParts.length > 0
+        ? adviceParts.join(" ")
+        : "Để cải thiện sức khỏe, bạn có thể duy trì lối sống lành mạnh: ăn uống cân đối, vận động đều đặn, ngủ đủ giấc và quản lý stress.";
+
+    return dedupeTexts([
+        adviceText,
+        "Nếu triệu chứng kéo dài hoặc bạn muốn theo dõi kỹ hơn, nên đi khám để được tư vấn gói kiểm tra phù hợp.",
+        "Lưu ý: Lời khuyên này không thay thế tư vấn y tế trực tiếp và không dùng để chẩn đoán bệnh."
+    ]).join(" ");
+}
+
+function buildLabResultSeverityReply(message, topChunks) {
+    const normalizedMessage = normalizeText(message);
+    let explanation = "";
+    let followUpQuestion = "";
+
+    if (normalizedMessage.includes("alt") || normalizedMessage.includes("ast")) {
+        explanation = "ALT và AST là men gan, tăng cao có thể do tổn thương tế bào gan, rượu, thuốc, gan nhiễm mỡ hoặc bệnh lý khác.";
+        followUpQuestion = "Mức ALT/AST của bạn bao nhiêu, có triệu chứng như vàng da, đau bụng phải, mệt nhiều hoặc đang dùng thuốc gì không?";
+    }
+
+    if (normalizedMessage.includes("creatinine") || normalizedMessage.includes("creatinin")) {
+        explanation = "Creatinine cao có thể liên quan chức năng thận giảm, mất nước, thuốc hoặc bệnh lý khác, nhưng cần đọc cùng eGFR và triệu chứng.";
+        followUpQuestion = "Creatinine của bạn bao nhiêu, có tiểu ít, phù chân, mệt nhiều hoặc bệnh thận/tiền sử bệnh gì không?";
+    }
+
+    if (normalizedMessage.includes("cholesterol") || normalizedMessage.includes("mo mau")) {
+        explanation = "Mỡ máu cao là yếu tố nguy cơ tim mạch, cần xem LDL, HDL, triglyceride và bối cảnh tuổi, huyết áp, tiểu đường, hút thuốc.";
+        followUpQuestion = "Chỉ số cụ thể của bạn bao nhiêu, có bệnh tiểu đường, huyết áp cao hoặc tiền sử gia đình tim mạch không?";
+    }
+
+    if (normalizedMessage.includes("cbc") || normalizedMessage.includes("bach cau")) {
+        explanation = "Bạch cầu CBC thay đổi có thể do nhiễm trùng, viêm, stress, thuốc hoặc bệnh lý huyết học, cần xem dòng nào thay đổi và mức độ.";
+        followUpQuestion = "Bạch cầu của bạn bao nhiêu, có sốt, nhiễm trùng, đang dùng thuốc hoặc có triệu chứng khác không?";
+    }
+
+    const genericExplanation = !explanation
+        ? "Chỉ số xét nghiệm cao/thấp có thể do nhiều nguyên nhân, cần xem mức độ, khoảng tham chiếu phòng xét nghiệm, triệu chứng đi kèm và tiền sử."
+        : "";
+
+    const safetyNote = "Bạn nên đọc kết quả cùng bác sĩ/nhân viên y tế. Nếu có triệu chứng nặng như mệt nhiều, khó thở, đau ngực, vàng da, phù tiểu nhiều hoặc tình trạng xấu đi nhanh, nên đi khám sớm.";
+
+    return dedupeTexts([
+        explanation || genericExplanation,
+        followUpQuestion,
+        safetyNote,
+        "HomeLab không chẩn đoán bệnh chỉ từ chỉ số xét nghiệm đơn lẻ."
+    ]).filter(Boolean).join(" ");
 }
 
 function dedupeTexts(items) {
@@ -332,9 +500,231 @@ function buildFallbackReply() {
     );
 }
 
-function composeGroundedAnswer({ message, policyDecision, topChunks }) {
+function buildClarifyingQuestionReply(message, context) {
+    const semanticQuestions = context.semanticClarifyingQuestions || [];
+    const questions = context.clarifyingQuestions || [];
+    const normalizedMessage = normalizeText(message);
+    const allQuestions = semanticQuestions.length > 0 ? semanticQuestions : questions;
+
+    if (allQuestions.length === 0) {
+        return "Mình cần thêm thông tin để gợi ý phù hợp hơn. Bạn có thể nói rõ hơn về triệu chứng, mục tiêu kiểm tra, hoặc độ tuổi không?";
+    }
+
+    if (normalizedMessage.includes("met") || normalizedMessage.includes("muc toi")) {
+        return [
+            "Mình cần thêm vài thông tin để gợi ý phù hợp hơn:",
+            ...allQuestions.map((q, i) => `${i + 1}. ${q}`),
+            "",
+            "Sau khi bạn cung cấp thêm thông tin, mình có thể gợi ý hướng xét nghiệm phù hợp hơn.",
+            "Lưu ý: nếu bạn có đau ngực, khó thở, ngất hoặc tình trạng xấu đi nhanh, nên đi khám khẩn cấp thay vì chỉ chọn xét nghiệm."
+        ].join("\n");
+    }
+
+    if (normalizedMessage.includes("dau dau") || normalizedMessage.includes("dau bung")) {
+        return [
+            "Để gợi ý đúng hơn, mình cần thêm thông tin:",
+            ...allQuestions.map((q, i) => `${i + 1}. ${q}`),
+            "",
+            "Nếu có đau ngực, khó thở, ngất hoặc tình trạng xấu đi nhanh, bạn nên đi khám khẩn cấp."
+        ].join("\n");
+    }
+
+    return [
+        "Mình cần thêm vài thông tin để gợi ý phù hợp hơn:",
+        ...allQuestions.map((q, i) => `${i + 1}. ${q}`),
+        "",
+        "Nếu có đau ngực, khó thở, ngất hoặc tình trạng xấu đi nhanh, bạn nên đi khám khẩn cấp thay vì chỉ chọn xét nghiệm."
+    ].join("\n");
+}
+
+function buildPackageGuidanceReply(message, context, topChunks) {
+    const semanticHints = context.semanticSuggestedPackageHints || [];
+    const hints = context.suggestedPackageHints || [];
+    const combinedHints = semanticHints.length > 0 ? semanticHints : hints;
+    const previousSymptoms = context.previousSymptoms || [];
+    const normalizedMessage = normalizeText(message);
+    const primary = topChunks[0];
+
+    const packageDescriptions = {
+        LIVER_FUNCTION: "Chức năng gan (ALT, AST): giúp kiểm tra men gan/tổn thương tế bào gan ở mức sàng lọc.",
+        KIDNEY_FUNCTION: "Chức năng thận (Creatinine, eGFR): giúp đánh giá chức năng lọc thận ở mức thông tin chung.",
+        GENERAL_CHECKUP: "Gói tổng quát cơ bản: bao gồm công thức máu, đường huyết, mỡ máu, chức năng gan và thận.",
+        CBC: "Công thức máu: hỗ trợ đánh giá thiếu máu, nhiễm trùng/viêm ở mức cơ bản.",
+        LIPID_PROFILE: "Mỡ máu: đánh giá cholesterol toàn phần, LDL-C, HDL-C, triglyceride."
+    };
+
+    if (combinedHints.length === 0) {
+        const hasSymptomDescription = normalizedMessage.match(/met|chong mat|nhuc dau|dau bung|an uong kem|chan an|suc giam|khoe khong|kiem tra/);
+        const hasPreviousSymptoms = previousSymptoms.length > 0;
+
+        if (hasPreviousSymptoms || hasSymptomDescription) {
+            const symptomText = hasPreviousSymptoms
+                ? `Dựa trên triệu chứng bạn đã chia sẻ (${previousSymptoms.join(", ")}), `
+                : "Dựa trên triệu chứng bạn mô tả, ";
+
+            return [
+                `${symptomText}nếu bạn muốn kiểm tra ban đầu, có thể cân nhắc gói tổng quát cơ bản.`,
+                packageDescriptions.GENERAL_CHECKUP,
+                "",
+                "Trước khi chốt, mình cần biết: triệu chứng kéo dài bao lâu, có kèm sụt cân, sốt, đau ngực, khó thở hoặc nôn không?",
+                "Lưu ý: đây chỉ là gợi ý tham khảo. Nếu triệu chứng kéo dài, nặng lên hoặc có dấu hiệu như đau ngực, khó thở, nên đi khám sớm."
+            ].filter(Boolean).join(" ");
+        }
+        return "Dựa trên thông tin bạn cung cấp, bạn nên trao đổi với bác sĩ để được tư vấn xét nghiệm phù hợp hơn. HomeLab chỉ hỗ trợ thông tin cơ bản và không thay thế khám lâm sàng.";
+    }
+
+    if (combinedHints.includes("LIVER_FUNCTION")) {
+        return [
+            "Dựa trên thông tin bạn cung cấp, xét nghiệm liên quan đến men gan có thể phù hợp:",
+            packageDescriptions.LIVER_FUNCTION,
+            "",
+            "Lưu ý:",
+            "- Các chỉ số này cần đọc cùng triệu chứng, tiền sử rượu, thuốc đang dùng và bác sĩ/nhân viên y tế.",
+            "- Không dùng riêng lẻ để chẩn đoán bệnh gan.",
+            "- Nếu có vàng da, đau bụng phải dữ dội, nôn ra máu hoặc mê sảng, nên đi khám khẩn cấp.",
+            primary ? getLeadSentence(primary.content) : ""
+        ].filter(Boolean).join(" ");
+    }
+
+    if (combinedHints.includes("KIDNEY_FUNCTION")) {
+        return [
+            "Dựa trên thông tin bạn cung cấp, xét nghiệm chức năng thận có thể phù hợp:",
+            packageDescriptions.KIDNEY_FUNCTION,
+            "",
+            "Lưu ý:",
+            "- Creatinine và eGFR chỉ mang ý nghĩa tham khảo, cần đọc cùng triệu chứng, bệnh nền và bác sĩ.",
+            "- Nếu có phù tiểu, tiểu ít, mệt nhiều hoặc khó thở, nên đi khám sớm.",
+            primary ? getLeadSentence(primary.content) : ""
+        ].filter(Boolean).join(" ");
+    }
+
+    if (combinedHints.includes("GENERAL_CHECKUP")) {
+        return [
+            "Dựa trên thông tin bạn cung cấp, gói tổng quát cơ bản có thể phù hợp:",
+            packageDescriptions.GENERAL_CHECKUP,
+            "",
+            "Lưu ý:",
+            "- Gói này hỗ trợ kiểm tra sức khỏe cơ bản, không thay thế khám lâm sàng.",
+            "- Nếu có triệu chứng bất thường, nên trao đổi với bác sĩ.",
+            "- Bạn có thể hỏi thêm chi tiết từng thành phần nếu muốn.",
+            primary ? getLeadSentence(primary.content) : ""
+        ].filter(Boolean).join(" ");
+    }
+
+    if (combinedHints.length >= 2) {
+        const hintTexts = combinedHints
+            .map((h) => packageDescriptions[h])
+            .filter(Boolean)
+            .map((d, i) => `${i + 1}. ${d}`);
+
+        return [
+            "Dựa trên thông tin bạn cung cấp, các xét nghiệm sau có thể phù hợp:",
+            ...hintTexts,
+            "",
+            "Lưu ý: các xét nghiệm này chỉ mang ý nghĩa tham khảo và cần đọc cùng bác sĩ/nhân viên y tế. Nếu có triệu chứng bất thường, nên đi khám sớm.",
+            primary ? getLeadSentence(primary.content) : ""
+        ].filter(Boolean).join(" ");
+    }
+
+    return "Mình cần thêm thông tin để gợi ý phù hợp hơn. Bạn có thể nói rõ hơn về triệu chứng hoặc mục tiêu kiểm tra không?";
+}
+
+function composeGroundedAnswer({ message, policyDecision, topChunks, sessionContext = {} }) {
     if (!topChunks.length) {
         return buildFallbackReply();
+    }
+
+    const normalizedMessage = normalizeText(message);
+    const previousSymptoms = extractPreviousSymptoms(sessionContext);
+
+    const isFollowUpWithSymptoms = previousSymptoms.length > 0 && (
+        normalizedMessage.includes("vay") ||
+        normalizedMessage.includes("vậy") ||
+        normalizedMessage.includes("nên") ||
+        (normalizedMessage.includes("chọn") && previousSymptoms.length > 0) ||
+        (normalizedMessage.includes("xet nghiem") && previousSymptoms.length > 0)
+    );
+
+    if (isReadOnlyConsultationSignal(normalizedMessage)) {
+        const readOnlyReply = "Được, mình sẽ chỉ tư vấn thông tin, chưa tạo lịch. Bạn muốn hỏi về triệu chứng, chỉ số xét nghiệm hay chọn gói phù hợp?";
+        const hasSymptom = sessionContext?.recentMessages?.some(m =>
+            normalizeText(m.content || "").match(/met|chong mat|nhuc dau|dau bung|an uong kem|chan an/)
+        );
+        if (hasSymptom) {
+            return readOnlyReply + " Dựa trên những gì bạn chia sẻ, mình có thể gợi ý hướng xét nghiệm tham khảo nếu bạn muốn.";
+        }
+        return readOnlyReply;
+    }
+
+    if (isLifestyleHealthAdviceQuery(normalizedMessage)) {
+        return buildLifestyleAdviceReply(message);
+    }
+
+    if (isLabResultSeverityQuery(normalizedMessage)) {
+        return buildLabResultSeverityReply(message, topChunks);
+    }
+
+    if (isFollowUpWithSymptoms) {
+        return buildPackageGuidanceReply(message, { previousSymptoms, canSuggestPackages: true }, topChunks);
+    }
+
+    const consultationContext = analyzeHealthConsultationContext({
+        message,
+        sessionContext,
+        retrievedChunks: topChunks
+    });
+
+    let semanticEnhancedContext = consultationContext;
+
+    if (consultationContext.userGoal !== "urgent_health" &&
+        consultationContext.userGoal !== "test_explanation" &&
+        !consultationContext.needsUrgentCare) {
+
+        try {
+            const semanticResult = analyzeHealthConsultationWithOllama({
+                message,
+                sessionContext,
+                currentContext: consultationContext,
+                retrievedChunks: topChunks
+            }, { fetchImpl: null });
+
+            if (semanticResult && !semanticResult.fallbackReason && semanticResult.shouldUseSemantic) {
+                semanticEnhancedContext = mergeSemanticWithContext(consultationContext, semanticResult);
+            }
+        } catch {
+        }
+    }
+
+    if (semanticEnhancedContext.needsUrgentCare) {
+        if (policyDecision.primaryMode === "mixed_emergency") {
+            return buildMixedEmergencyReply(topChunks);
+        }
+        return buildEmergencyReply(message, topChunks, policyDecision.urgencyLevel || "emergency");
+    }
+
+    if (semanticEnhancedContext.userGoal === "test_explanation") {
+        return buildLabExplanationReply(message, topChunks);
+    }
+
+    if (semanticEnhancedContext.isFollowUp && semanticEnhancedContext.previousSymptoms.length > 0) {
+        return buildPackageGuidanceReply(message, semanticEnhancedContext, topChunks);
+    }
+
+    if (semanticEnhancedContext.shouldAskClarifyingQuestion) {
+        if (policyDecision.primaryMode === "lab_explanation") {
+            return buildLabExplanationReply(message, topChunks);
+        }
+        if (policyDecision.primaryMode === "medical_review_boundary") {
+            return buildMedicalReviewBoundaryReply(message);
+        }
+        return buildClarifyingQuestionReply(message, semanticEnhancedContext);
+    }
+
+    if (semanticEnhancedContext.canSuggestPackages) {
+        if (policyDecision.primaryMode === "medical_review_boundary") {
+            return buildMedicalReviewBoundaryReply(message);
+        }
+        return buildPackageGuidanceReply(message, semanticEnhancedContext, topChunks);
     }
 
     if (policyDecision.primaryMode === "informational_test") {

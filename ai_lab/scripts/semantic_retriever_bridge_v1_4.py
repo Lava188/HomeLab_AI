@@ -350,10 +350,16 @@ class SemanticRetrieverV14:
         self.artifact_dir = artifact_dir.resolve()
         self.loaded_at = time.time()
 
-        with contextlib.redirect_stdout(io.StringIO()):
-            import faiss  # type: ignore
-            from sentence_transformers import SentenceTransformer  # type: ignore
+        sys.stderr.write("[DEBUG] Importing faiss...\n")
+        sys.stderr.flush()
+        import faiss  # type: ignore
 
+        sys.stderr.write("[DEBUG] Importing sentence_transformers...\n")
+        sys.stderr.flush()
+        from sentence_transformers import SentenceTransformer  # type: ignore
+
+        sys.stderr.write("[DEBUG] Loading manifest and config...\n")
+        sys.stderr.flush()
         manifest_path = self.artifact_dir / "retriever_manifest.json"
         if not manifest_path.exists():
             raise FileNotFoundError(f"retriever_manifest.json not found under {self.artifact_dir}")
@@ -369,6 +375,9 @@ class SemanticRetrieverV14:
             if isinstance(item, dict) and item.get("chunk_id")
         }
 
+        sys.stderr.write(f"[DEBUG] Loaded {len(self.chunks)} chunks\n")
+        sys.stderr.flush()
+
         faiss_index_path = self.artifact_dir / self.manifest.get("faiss_index_file", "faiss.index")
         if not faiss_index_path.exists():
             raise FileNotFoundError(f"faiss.index not found under {faiss_index_path}")
@@ -377,19 +386,25 @@ class SemanticRetrieverV14:
         if not self.model_name:
             raise ValueError("model_name missing from embedding_config.json and retriever_manifest.json")
 
-        with contextlib.redirect_stdout(io.StringIO()):
-            self.index = faiss.read_index(str(faiss_index_path))
-            self.model = SentenceTransformer(self.model_name)
+        sys.stderr.write(f"[DEBUG] Loading FAISS index from {faiss_index_path}...\n")
+        sys.stderr.flush()
+        self.index = faiss.read_index(str(faiss_index_path))
+
+        sys.stderr.write(f"[DEBUG] Loading SentenceTransformer model: {self.model_name}...\n")
+        sys.stderr.flush()
+        self.model = SentenceTransformer(self.model_name)
+
+        sys.stderr.write("[DEBUG] Retriever initialization complete\n")
+        sys.stderr.flush()
             
     def _search_candidates(self, query: str, candidate_top_k: int) -> list[dict[str, Any]]:
-        with contextlib.redirect_stdout(io.StringIO()):
-            query_text = self.config.get("query_prefix", "query: ") + query.strip()
-            query_embedding = self.model.encode(
-                [query_text],
-                convert_to_numpy=True,
-                normalize_embeddings=bool(self.config.get("normalized", True)),
-                show_progress_bar=False,
-            ).astype("float32")
+        query_text = self.config.get("query_prefix", "query: ") + query.strip()
+        query_embedding = self.model.encode(
+            [query_text],
+            convert_to_numpy=True,
+            normalize_embeddings=bool(self.config.get("normalized", True)),
+            show_progress_bar=False,
+        ).astype("float32")
 
         scores, indices = self.index.search(query_embedding, max(1, int(candidate_top_k)))
         candidates = []
@@ -590,12 +605,20 @@ def make_handler(retriever: SemanticRetrieverV14) -> type[BaseHTTPRequestHandler
 
 
 def run_server(args: argparse.Namespace) -> None:
+    sys.stderr.write(f"[DEBUG] Loading retriever from {args.artifact_dir}...\n")
+    sys.stderr.flush()
     retriever = SemanticRetrieverV14(Path(args.artifact_dir))
+    sys.stderr.write(f"[DEBUG] Retriever loaded, model={retriever.model_name}\n")
+    sys.stderr.flush()
+    sys.stderr.write(f"[DEBUG] Creating HTTP server on {args.host}:{args.port}...\n")
+    sys.stderr.flush()
     server = ThreadingHTTPServer((args.host, args.port), make_handler(retriever))
+    server.allow_reuse_address = True
     sys.stderr.write(
         f"Semantic bridge v1_4 server listening on http://{args.host}:{args.port} "
         f"with {retriever.model_name}\n"
     )
+    sys.stderr.flush()
     server.serve_forever()
 
 
