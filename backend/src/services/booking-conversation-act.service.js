@@ -54,7 +54,20 @@ const SIGNALS = {
         "chua dat voi",
         "tu tu",
         "tam dung",
-        "dung lai"
+        "dung lai",
+        "de toi ban lai voi nguoi nha",
+        "ban lai voi nha",
+        "ban voi nha",
+        "ban voi nguoi than",
+        "de roi tinh",
+        "roi tinh",
+        "de toi tinh",
+        "roi se tra loi",
+        "tu minh se noi",
+        "chua chot ngay",
+        "chua chot ngay",
+        "de toi xem xet",
+        "doi mot chut"
     ],
     info: [
         "la gi",
@@ -66,7 +79,17 @@ const SIGNALS = {
         "y nghia",
         "noi ro",
         "xem chi tiet",
-        "chi tiet"
+        "chi tiet",
+        "cai goi nay",
+        "goi nay",
+        "noi ki hon",
+        "giai thich ki hon",
+        "chi tiet hon ve",
+        "nhieu hon ve",
+        "cu the hon ve",
+        "tim hieu ve",
+        "biet them ve",
+        "thong tin ve"
     ],
     availability: [
         "khung gio nao trong",
@@ -78,7 +101,16 @@ const SIGNALS = {
         "khung nao khac",
         "gio nao khac",
         "lich nao trong",
-        "slot nao trong"
+        "slot nao trong",
+        "con ca nao",
+        "co ca nao",
+        "ca nao con",
+        "ca lay mau nao",
+        "lay mau luc nao",
+        "gio nao lay mau duoc",
+        "khung nao con trong",
+        "van còn khung",
+        "van con ca"
     ],
     edit: [
         "doi sang",
@@ -114,7 +146,20 @@ const SIGNALS = {
         "cho toi xem lai",
         "tom tat lai",
         "thong tin hien tai",
-        "lich nay dang co thong tin gi"
+        "lich nay dang co thong tin gi",
+        "nhac lai toi",
+        "nhac giup toi",
+        "toi dang nhap toi dau",
+        "toi dang o dau",
+        "tien do the nao",
+        "da nhap gi roi",
+        "dang co gi",
+        "thong tin dang co",
+        "ban nhap hien tai",
+        "nhap den gio",
+        "xem lại giúp tôi",
+        "cho tôi xem lại",
+        "tóm tắt giúp tôi"
     ],
     help: [
         "can lam gi",
@@ -123,7 +168,14 @@ const SIGNALS = {
         "tiep theo lam gi",
         "con thieu gi",
         "con thieu thong tin gi",
-        "can bo sung gi"
+        "can bo sung gi",
+        "toi con phai dua them thong tin gi",
+        "can them gi nua",
+        "phai cung cap them gi",
+        "can gi them",
+        "thieu gi nua",
+        "con phai nhap gi",
+        "toi phai nhap them gi"
     ]
 };
 
@@ -140,7 +192,21 @@ const VAGUE_FIELD_VALUE_SIGNALS = [
     "tiep tuc di",
     "nhu tren",
     "de sau",
-    "hoi lai da"
+    "hoi lai da",
+    "de toi ban lai voi nguoi nha",
+    "ban voi nha",
+    "ban voi nguoi than",
+    "de toi tinh",
+    "roi se tra loi",
+    "toi con phai dua them thong tin gi",
+    "con thieu gi",
+    "toi can lam gi",
+    "nhac lai toi",
+    "toi dang nhap toi dau",
+    "toi muon hoi them",
+    "toi van chua chac",
+    "chua chac",
+    "de toi suy nghi"
 ];
 
 const PENDING_CANCEL_REJECT_SIGNALS = [

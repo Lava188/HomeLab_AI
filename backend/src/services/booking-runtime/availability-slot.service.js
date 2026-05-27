@@ -1,5 +1,6 @@
 const repository = require("./booking.repository");
 const BookingRuntimeError = require("./booking-runtime-error");
+const syncService = require("./availability-slot-sync.service");
 
 const ACTIVE_CAPACITY_STATUSES = [
     "CONFIRMED",
@@ -127,6 +128,18 @@ async function assertSlotAvailable({
     assertValidDateTime(date, "sampleDate");
     assertValidDateTime(startTime, "sampleTimeStart");
 
+    const today = todayUtcDateOnly();
+
+    if (date < today) {
+        throw new BookingRuntimeError("Không thể đặt lịch cho ngày trong quá khứ.", {
+            code: "BOOKING_SLOT_PAST_DATE",
+            statusCode: 409,
+            details: {
+                sampleDate: formatDateOnly(date)
+            }
+        });
+    }
+
     const slot = await repository.findAvailabilitySlotByDateTime({
         date,
         startTime,
@@ -141,6 +154,17 @@ async function assertSlotAvailable({
                 sampleDate: formatDateOnly(date),
                 sampleTimeStart: formatTimeOnly(startTime),
                 area: area || null
+            }
+        });
+    }
+
+    if (!slot.active) {
+        throw new BookingRuntimeError("Khung giờ này hiện không mở để đặt lịch.", {
+            code: "BOOKING_SLOT_CLOSED",
+            statusCode: 409,
+            details: {
+                sampleDate: formatDateOnly(date),
+                sampleTimeStart: formatTimeOnly(startTime)
             }
         });
     }
@@ -194,6 +218,54 @@ function parseLimit(value) {
     return Math.min(Math.floor(parsed), 200);
 }
 
+function todayUtcDateOnly() {
+    const now = new Date();
+    return new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate()
+    ));
+}
+
+function isSlotPastOrClosed(slot) {
+    if (!slot) return true;
+
+    const slotDate = parseDateOnly(slot.date);
+    const today = todayUtcDateOnly();
+
+    if (slotDate < today) return true;
+    if (!slot.active) return true;
+    if (slot.capacity <= 0) return true;
+
+    return false;
+}
+
+function isSlotAvailable(slot) {
+    if (!slot) return false;
+    if (isSlotPastOrClosed(slot)) return false;
+
+    const remainingCapacity = slot.remainingCapacity ?? (slot.capacity - slot.bookedCount);
+    return remainingCapacity > 0;
+}
+
+async function isSelectedTimeAvailable(date, time) {
+    try {
+        await assertSlotAvailable({
+            sampleDate: date,
+            sampleTimeStart: time
+        });
+        return true;
+    } catch (error) {
+        if (error instanceof BookingRuntimeError) {
+            const code = error.code || "";
+            if (code.includes("BOOKING_SLOT") || code === "BOOKING_SLOT_PAST_DATE") {
+                return false;
+            }
+        }
+        throw error;
+    }
+}
+
 async function listAvailabilitySlots(filter = {}) {
     const slots = await repository.listAvailabilitySlots({
         where: buildSlotWhere(filter),
@@ -201,11 +273,30 @@ async function listAvailabilitySlots(filter = {}) {
     });
 
     const normalized = [];
+    const today = todayUtcDateOnly();
 
     for (const slot of slots) {
         const activeBookingCount = await getSlotUsage(slot);
-        normalized.push(normalizeSlot(slot, activeBookingCount));
+        const normalizedSlot = normalizeSlot(slot, activeBookingCount);
+
+        const slotDate = parseDateOnly(slot.date);
+        const isPast = slotDate < today;
+
+        normalizedSlot.isPast = isPast;
+        normalizedSlot.isClosed = !slot.active || normalizedSlot.remainingCapacity <= 0;
+
+        normalized.push(normalizedSlot);
     }
+
+    normalized.sort((a, b) => {
+        if (a.isPast !== b.isPast) return a.isPast ? 1 : -1;
+        if (a.isClosed !== b.isClosed) return a.isClosed ? 1 : -1;
+
+        const dateCompare = a.date.localeCompare(b.date);
+        if (dateCompare !== 0) return dateCompare;
+
+        return a.timeStart.localeCompare(b.timeStart);
+    });
 
     return normalized;
 }
@@ -222,16 +313,40 @@ async function findAvailableNearbySlots({
     const endDate = new Date(startDate);
     endDate.setUTCDate(startDate.getUTCDate() + Math.max(Number(days) || 7, 1));
 
-    const slots = await listAvailabilitySlots({
-        dateFrom: formatDateOnly(startDate),
-        dateTo: formatDateOnly(endDate),
-        area,
-        active: true,
-        limit: 200
+    const today = todayUtcDateOnly();
+
+    const slots = await repository.listAvailabilitySlots({
+        where: {
+            ...buildSlotWhere({
+                dateFrom: formatDateOnly(startDate),
+                dateTo: formatDateOnly(endDate),
+                area,
+                active: true
+            }),
+            active: true
+        },
+        take: 200
     });
 
-    return slots
-        .filter((slot) => slot.active && Number(slot.remainingCapacity) > 0)
+    const enrichedSlots = [];
+
+    for (const slot of slots) {
+        const slotDate = parseDateOnly(slot.date);
+
+        if (slotDate < today) continue;
+
+        const activeBookingCount = await getSlotUsage(slot);
+        const remainingCapacity = Math.max(slot.capacity - activeBookingCount, 0);
+
+        if (remainingCapacity <= 0) continue;
+
+        enrichedSlots.push({
+            ...normalizeSlot(slot, activeBookingCount),
+            remainingCapacity
+        });
+    }
+
+    return enrichedSlots
         .sort((left, right) => {
             const leftKey = `${left.date}T${left.timeStart}`;
             const rightKey = `${right.date}T${right.timeStart}`;
@@ -315,5 +430,9 @@ module.exports = {
     parseDateOnly,
     parseTimeOnly,
     formatDateOnly,
-    formatTimeOnly
+    formatTimeOnly,
+    isSlotAvailable,
+    isSlotPastOrClosed,
+    todayUtcDateOnly,
+    isSelectedTimeAvailable
 };

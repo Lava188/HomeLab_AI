@@ -4,6 +4,7 @@ const BookingRuntimeError = require("../booking-runtime/booking-runtime-error");
 const {
     assertBookingStatusTransition
 } = require("../booking-runtime/booking-status-transition.service");
+const notificationService = require("../notification.service");
 
 const TERMINAL_BOOKING_STATUSES = new Set([
     "CANCELLED",
@@ -191,6 +192,11 @@ async function autoCreateCollectorAssignmentForBooking(bookingIdOrBooking, optio
         reason: options.reason || "AUTO_ASSIGNMENT_CREATED",
         metadata: options.metadata,
         historyMetadata: options.historyMetadata
+    });
+
+    // Fire-and-forget notification for auto assignment
+    notificationService.notifyAutoAssignmentCreated(booking, assignment, selectedCandidate.collectorName).catch((err) => {
+        console.error("[Notification] Failed to notify auto assignment:", err);
     });
 
     return {
@@ -530,6 +536,11 @@ async function manualReassignCollector(bookingCode, input = {}, options = {}) {
         return nextAssignment;
     });
 
+    // Fire-and-forget notification for manual assignment
+    notificationService.notifyManualAssignmentCreated(booking, assignment, collector.fullName).catch((err) => {
+        console.error("[Notification] Failed to notify manual assignment:", err);
+    });
+
     return {
         assignment,
         booking,
@@ -724,7 +735,19 @@ async function rejectCollectorAssignment(assignmentId, collectorId, reason, opti
             rejectedAt: now,
             rejectReason: trimmedReason,
             reviewStatus: "PENDING"
+        },
+        include: {
+            collector: {
+                select: {
+                    fullName: true
+                }
+            }
         }
+    });
+
+    // Fire-and-forget notification for assignment rejection
+    notificationService.notifyAssignmentRejected(updatedAssignment, assignment.booking, updatedAssignment.collector.fullName).catch((err) => {
+        console.error("[Notification] Failed to notify assignment rejection:", err);
     });
 
     await prisma.collectorAssignmentHistory.create({

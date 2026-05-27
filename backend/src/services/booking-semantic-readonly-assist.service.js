@@ -207,7 +207,25 @@ async function buildInfoDetourAssist({ message, draft = {}, missingFields, conte
         context.selectedPackage ||
         context.testCatalogItem ||
         null;
-    const targetPackage = selectedFromMessage || selectedFromDraft;
+    const selectedFromSession = context.lastDiscussedPackage || null;
+
+    const normalizedMessage = (message || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    const hasReferencePhrase =
+        normalizedMessage.includes("cai goi nay") ||
+        normalizedMessage.includes("goi nay") ||
+        normalizedMessage.includes("cai nay") ||
+        normalizedMessage.includes("no") ||
+        normalizedMessage.includes("cai goi vua roi") ||
+        normalizedMessage.includes("goi vua roi") ||
+        normalizedMessage.includes("goi do");
+
+    let targetPackage = selectedFromMessage || selectedFromDraft;
+    let fromSessionContext = false;
+
+    if (!targetPackage && hasReferencePhrase && selectedFromSession) {
+        targetPackage = selectedFromSession;
+        fromSessionContext = true;
+    }
 
     if (!targetPackage) {
         return {
@@ -220,7 +238,7 @@ async function buildInfoDetourAssist({ message, draft = {}, missingFields, conte
     }
 
     const detail = packageCatalog.buildPackageDetailReply(targetPackage);
-    const followUp = selectedFromMessage && missingFields[0] === "testType"
+    const followUp = (selectedFromMessage || fromSessionContext) && missingFields[0] === "testType"
         ? `Bạn muốn chọn gói ${getPackageChoiceDisplayName(targetPackage)} cho lịch này không?`
         : missingFields.length
             ? `Mình vẫn giữ bản nháp đặt lịch. ${buildNextFieldInstruction(missingFields[0])}`
@@ -230,11 +248,18 @@ async function buildInfoDetourAssist({ message, draft = {}, missingFields, conte
         reply: [detail, followUp].join("\n\n"),
         packageIntent: selectedFromMessage
             ? { ...packageIntent, type: "detail_question" }
-            : {
-                type: "detail_question",
-                package: targetPackage,
-                candidates: []
-            }
+            : fromSessionContext
+                ? {
+                    type: "detail_question",
+                    package: targetPackage,
+                    candidates: []
+                }
+                : {
+                    type: "detail_question",
+                    package: targetPackage,
+                    candidates: []
+                },
+        fromSessionContext
     };
 }
 

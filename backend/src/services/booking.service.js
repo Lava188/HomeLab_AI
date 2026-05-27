@@ -375,6 +375,14 @@ function isLikelyAddressInput(message) {
         (hasStreetLikeAddress && hasAdminDivision) ||
         (hasVillageKeyword && hasAdminKeyword);
 
+    if (process.env.DEBUG_5M11) {
+        console.log(`DEBUG_5M11 isLikelyAddressInput "${text}":`);
+        console.log(`  hasHouseNumber=${hasHouseNumber}, hasStreetKeyword=${hasStreetKeyword}, hasAlleyKeyword=${hasAlleyKeyword}, hasVillageKeyword=${hasVillageKeyword}`);
+        console.log(`  hasAdminKeyword=${hasAdminKeyword}, hasMajorCity=${hasMajorCity}`);
+        console.log(`  hasSpecificLocation=${hasSpecificLocation}, hasAdminDivision=${hasAdminDivision}`);
+        console.log(`  hasAddressLikeContent=${hasAddressLikeContent}`);
+    }
+
     if (!hasAddressLikeContent) {
         if (hasAdminDivision && !hasSpecificLocation && !hasStreetLikeAddress) {
             return {
@@ -702,6 +710,14 @@ function inferSingleFieldByContext(message, currentDraft) {
         return {};
     }
 
+    const isQOrP = isQuestionOrPausePhrase(trimmedMessage);
+    if (process.env.DEBUG_5M11) {
+        console.log(`DEBUG_5M11 inferSingleFieldByContext "${trimmedMessage}": isQuestionOrPausePhrase=${isQOrP}, firstMissingField=${firstMissingField}`);
+    }
+    if (isQOrP) {
+        return {};
+    }
+
     if (firstMissingField === "address") {
         const normalized = normalizeText(trimmedMessage);
 
@@ -715,6 +731,10 @@ function inferSingleFieldByContext(message, currentDraft) {
         }
 
         const addressValidation = isLikelyAddressInput(trimmedMessage);
+
+        if (process.env.DEBUG_5M11) {
+            console.log(`DEBUG_5M11 addressValidation:`, JSON.stringify(addressValidation));
+        }
 
         if (addressValidation.valid) {
             return { address: trimmedMessage };
@@ -739,6 +759,47 @@ function inferSingleFieldByContext(message, currentDraft) {
     return {};
 }
 
+function isQuestionOrPausePhrase(message) {
+    const normalized = normalizeText(message);
+    const trimmed = normalized.trim();
+
+    if (!trimmed || trimmed.length < 3) {
+        return false;
+    }
+
+    // Check if it's a real address input (has numbers and address-like structure)
+    // Addresses typically have: numbers + (administrative units OR multiple commas OR city names)
+    const hasNumber = /\d/.test(message);
+    const hasCommaStructure = (message.match(/,/g) || []).length >= 2;
+    const hasAddressKeyword = /(?:quận|huyện|xã|phường|thành phố|tp\.|đường|phố)/i.test(message);
+    const hasMajorCity = /(?:hà nội|hồ chí minh|đà nẵng|hai phong|cần thơ|hải phòng)/i.test(message);
+
+    const hasStreetLike = hasCommaStructure || hasAddressKeyword || hasMajorCity;
+    if (hasNumber && hasStreetLike) {
+        return false;
+    }
+
+    const questionPatterns = [
+        / toi con phai|phải cung cấp|can bo sung|con thieu|thieu gi|can lam gi|tiep theo/,
+        / nhac lai|xem lai|tom tat|toi dang nhap|toi o dau|tien do|da nhap gi|thong tin dang co/,
+        / ban nhap|nhap den gio|cho toi xem|xem giúp|tom tat|giải thích|noi ro|bao gom|la gi$/,
+        / chi tiet|noi ki|giai thich ki|biet them|tim hieu|thong tin ve|cai goi nay|goi nay/
+    ];
+
+    const pausePatterns = [
+        / de toi (ban lai|hoi|tinh|suy nghi|can nhac|xem xet|cho chut|doi chut)/,
+        / ban voi (nha|nguoi than)/,
+        / roi se (tra loi|noi)|roi tinh|cho toi noi/,
+        / chua chot|chua dat|tam dung|khoan|toi muon hoi them|van chua chac/,
+        / de sau|lat nua|tu minh se|doi mot chut/
+    ];
+
+    const isQuestion = questionPatterns.some(pattern => pattern.test(normalized));
+    const isPause = pausePatterns.some(pattern => pattern.test(normalized));
+
+    return isQuestion || isPause;
+}
+
 async function extractBookingSlots(message, currentDraft) {
     const extracted = {};
 
@@ -748,6 +809,23 @@ async function extractBookingSlots(message, currentDraft) {
             packageIntent: { type: "none", package: null },
             addressValidation: null
         };
+    }
+
+    if (isQuestionOrPausePhrase(message)) {
+        if (process.env.DEBUG_5M11) {
+            console.log(`DEBUG_5M11 extractBookingSlots: blocked by isQuestionOrPausePhrase for "${message}"`);
+        }
+        return {
+            slots: {},
+            packageIntent: { type: "none", package: null },
+            addressValidation: null,
+            blockedByQuestionOrPause: true
+        };
+    }
+
+    const detectResult = detectAddress(message);
+    if (process.env.DEBUG_5M11) {
+        console.log(`DEBUG_5M11 extractBookingSlots: detectAddress("${message}") returned "${detectResult}"`);
     }
 
     const { intent: packageIntent, slots: packageSlots } =
@@ -843,6 +921,9 @@ async function extractBookingSlots(message, currentDraft) {
 
     if (contextInference.address && !extracted.address) {
         addressValidation = isLikelyAddressInput(contextInference.address);
+        if (process.env.DEBUG_5M11) {
+            console.log(`DEBUG_5M11 contextInference.address="${contextInference.address}", addressValidation.valid=${addressValidation.valid}, addressPartialToMerge="${addressPartialToMerge}"`);
+        }
         if (addressValidation.valid) {
             if (addressPartialToMerge) {
                 if (shouldReplacePartialAddress(addressPartialToMerge, contextInference.address, addressValidation)) {
@@ -1674,7 +1755,7 @@ function buildInformationalDetourReply(packageItem, draft, missingFields, option
     return [detail, followUp].join("\n\n");
 }
 
-async function resolveBookingInformationalDetour(message, currentDraft) {
+async function resolveBookingInformationalDetour(message, currentDraft, session = null) {
     if (!hasInformationalDetourIntent(message)) {
         return null;
     }
@@ -1682,7 +1763,23 @@ async function resolveBookingInformationalDetour(message, currentDraft) {
     const packageIntent = await packageCatalog.resolvePackageIntent(message);
     const packageFromMessage = packageIntent.package || null;
     const packageFromDraft = currentDraft.selectedPackage || null;
-    const targetPackage = packageFromMessage || packageFromDraft;
+    const packageFromSession = session?.lastDiscussedPackage || null;
+
+    const normalizedMessage = normalizeText(message);
+    const hasReferencePhrase =
+        normalizedMessage.includes("cai goi nay") ||
+        normalizedMessage.includes("goi nay") ||
+        normalizedMessage.includes("cai nay") ||
+        normalizedMessage.includes("no") ||
+        normalizedMessage.includes("cai goi vua roi") ||
+        normalizedMessage.includes("goi vua roi") ||
+        normalizedMessage.includes("goi do");
+
+    let targetPackage = packageFromMessage || packageFromDraft;
+
+    if (!targetPackage && hasReferencePhrase && packageFromSession) {
+        targetPackage = packageFromSession;
+    }
 
     if (!targetPackage) {
         return null;
@@ -1700,7 +1797,8 @@ async function resolveBookingInformationalDetour(message, currentDraft) {
                 candidates: []
             },
         packageItem: targetPackage,
-        packageFromMessage: Boolean(packageFromMessage)
+        packageFromMessage: Boolean(packageFromMessage),
+        packageFromSession: Boolean(packageFromSession && !packageFromMessage && hasReferencePhrase)
     };
 }
 
@@ -2411,7 +2509,8 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         message,
         context: {
             ...semanticClassifierInput.domainContext,
-            missingFields: currentMissingFields
+            missingFields: currentMissingFields,
+            lastDiscussedPackage: session?.lastDiscussedPackage || null
         }
     });
     conversationActMeta.semanticAssist = buildSemanticAssistMeta(semanticAssist);
@@ -2421,6 +2520,19 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
         semanticAssist.reply &&
         conversationAct.act !== ACTS.PAUSE_OR_HOLD
     ) {
+        const updatedSession = mockSessions.upsertSession(sessionId, {
+            currentFlow: FLOWS.BOOKING,
+            status: session.status || "collecting_info",
+            bookingDraft: currentDraft,
+            confirmedBookingId: null,
+            lastBookingFailure: session.lastBookingFailure || null,
+            pendingDraftEdit: session.pendingDraftEdit || null,
+            pendingDraftCancel: session.pendingDraftCancel || null,
+            lastDiscussedPackage: semanticAssist.assistAct === "info_detour"
+                ? (semanticAssist.meta?.packageIntent?.package || semanticAssist.meta?.packageIntent?.packageItem || null)
+                : (session?.lastDiscussedPackage || null)
+        });
+
         return createChatResult({
             sessionId,
             userMessage: message,
@@ -2433,7 +2545,7 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                 missingFields: currentMissingFields
             },
             meta: buildBookingMeta({
-                updatedSession: session,
+                updatedSession,
                 extractedSlots: {},
                 packageIntent: semanticAssist.meta?.packageIntent || { type: "none", package: null },
                 missingFields: currentMissingFields,
@@ -2926,14 +3038,31 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
     if (conversationAct.act === ACTS.INFO_DETOUR) {
         const informationalDetour = await resolveBookingInformationalDetour(
             message,
-            currentDraft
+            currentDraft,
+            session
         );
 
+        if (process.env.DEBUG_5M11) {
+            console.log(`DEBUG_5M11 INFO_DETOUR: informationalDetour=${JSON.stringify(informationalDetour)}`);
+            console.log(`DEBUG_5M11 INFO_DETOUR: hasInfoDetourIntent=${hasInformationalDetourIntent(message)}`);
+        }
+
         if (informationalDetour) {
-            return returnDraftResult({
-                sessionId,
-                message,
+            const updatedSession = mockSessions.upsertSession(sessionId, {
+                currentFlow: FLOWS.BOOKING,
                 status: session.status || "collecting_info",
+                bookingDraft: currentDraft,
+                confirmedBookingId: null,
+                lastBookingFailure: session.lastBookingFailure || null,
+                pendingDraftEdit: session.pendingDraftEdit || null,
+                pendingDraftCancel: session.pendingDraftCancel || null,
+                lastDiscussedPackage: informationalDetour.packageItem || null
+            });
+
+            return createChatResult({
+                sessionId,
+                userMessage: message,
+                flow: FLOWS.BOOKING,
                 action: ACTIONS.ASK_BOOKING_INFO,
                 reply: buildInformationalDetourReply(
                     informationalDetour.packageItem,
@@ -2946,12 +3075,14 @@ async function handleBookingMessage({ message, sessionId, userSession = {} }) {
                     draft: currentDraft,
                     missingFields: currentMissingFields
                 },
-                draft: currentDraft,
-                missingFields: currentMissingFields,
-                extractedSlots: {},
-                packageIntent: informationalDetour.packageIntent,
-                nextExpectedField: currentMissingFields[0] || null,
-                conversationAct: conversationActMeta
+                meta: buildBookingMeta({
+                    updatedSession,
+                    extractedSlots: {},
+                    packageIntent: informationalDetour.packageIntent,
+                    missingFields: currentMissingFields,
+                    nextExpectedField: currentMissingFields[0] || null,
+                    conversationAct: conversationActMeta
+                })
             });
         }
     }
@@ -3691,5 +3822,8 @@ module.exports = {
     hasActiveBookingSession,
     isIntentClassifierShadowAsyncEnabled,
     shouldHandleBookingFailureFollowup,
-    suspendActiveBookingSession
+    suspendActiveBookingSession,
+    isSelectedTimeAvailable,
+    getAvailableSlotsForDate,
+    getNearbyAvailableSlots
 };

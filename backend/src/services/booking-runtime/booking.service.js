@@ -12,6 +12,7 @@ const {
 const availabilitySlotService = require("./availability-slot.service");
 const { buildWorkload } = require("../admin-staff.service");
 const collectorAssignmentService = require("../collector-assignment/collector-assignment.service");
+const notificationService = require("../notification.service");
 
 const BOOKING_CODE_MAX_RETRIES = 5;
 
@@ -314,6 +315,10 @@ async function createConfirmedBooking(input, context = {}) {
         metadata: {
             sessionId: context.sessionId || null
         }
+    });
+    // Fire-and-forget notification for booking created
+    notificationService.notifyBookingCreated(booking).catch((err) => {
+        console.error("[Notification] Failed to notify booking created:", err);
     });
 
     if (context.sessionId) {

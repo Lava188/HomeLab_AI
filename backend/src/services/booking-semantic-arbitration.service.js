@@ -194,10 +194,14 @@ function arbitrateBookingSemanticReadOnly({
         };
     }
 
+    const ruleConfidence = Number(rule?.confidence || 0);
+    const SEMANTIC_OVERRIDE_THRESHOLD = 0.75;
+
     if (
         rule?.act === ACTS.UNCLEAR ||
         isMissingFieldFallback(rule) ||
-        !ruleIsReadOnly
+        !ruleIsReadOnly ||
+        (ruleIsReadOnly && semanticConfidence >= SEMANTIC_OVERRIDE_THRESHOLD && semanticConfidence > ruleConfidence)
     ) {
         return {
             ...base,
@@ -205,7 +209,7 @@ function arbitrateBookingSemanticReadOnly({
             selectedSource: SOURCE_SEMANTIC,
             source: SOURCE_SEMANTIC,
             confidence: semanticConfidence,
-            reason: "semantic_readonly_wins_over_unclear_or_field_prompt",
+            reason: "semantic_readonly_wins_over_unclear_or_low_confidence_rule",
             shouldUseSemantic: true,
             safeReadOnly: true,
             semanticBlockedReason: null,
@@ -247,10 +251,69 @@ function buildSemanticArbitrationMeta(arbitration) {
     };
 }
 
+function isReadOnlySemanticAct(act) {
+    const canonical = canonicalAct(act);
+    return READ_ONLY_ACTS.has(canonical);
+}
+
+function isMutationSensitiveAct(act) {
+    const canonical = canonicalAct(act);
+    return MUTATION_SENSITIVE_ACTS.has(canonical);
+}
+
+function shouldUseSemanticReadOnly({ ruleAct, semanticShadow, draft, context }) {
+    if (!semanticShadow) {
+        return false;
+    }
+
+    const semanticProvider = getSemanticProvider(semanticShadow);
+    if (semanticProvider !== PROVIDERS.OLLAMA_SHADOW) {
+        return false;
+    }
+
+    if (semanticShadow.fallbackReason != null) {
+        return false;
+    }
+
+    const semanticConfidence = Number(semanticShadow?.confidence || 0);
+    if (semanticConfidence < MIN_SEMANTIC_CONFIDENCE) {
+        return false;
+    }
+
+    if (semanticShadow.shouldMutateDraft === true) {
+        return false;
+    }
+
+    const semanticAct = semanticShadow?.conversationAct || null;
+    if (!isReadOnlySemanticAct(semanticAct)) {
+        return false;
+    }
+
+    if (
+        ![
+            SAFETY_DECISIONS.ALLOW_READ_ONLY,
+            SAFETY_DECISIONS.ASK_CLARIFICATION
+        ].includes(semanticShadow.safetyDecision)
+    ) {
+        return false;
+    }
+
+    const rule = getRuleAct(ruleAct);
+    const canonicalRuleAct = canonicalAct(rule?.act);
+    if (MUTATION_SENSITIVE_ACTS.has(canonicalRuleAct)) {
+        return false;
+    }
+
+    return true;
+}
+
 module.exports = {
     MIN_SEMANTIC_CONFIDENCE,
     READ_ONLY_ACTS,
     MUTATION_SENSITIVE_ACTS,
     arbitrateBookingSemanticReadOnly,
-    buildSemanticArbitrationMeta
+    buildSemanticArbitrationMeta,
+    isReadOnlySemanticAct,
+    isMutationSensitiveAct,
+    shouldUseSemanticReadOnly
 };

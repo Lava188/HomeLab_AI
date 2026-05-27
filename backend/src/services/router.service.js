@@ -204,6 +204,17 @@ function isBookingEditOrNegativeText(message) {
     );
 }
 
+function isBookingStatusQuestion(message) {
+    const normalizedMessage = normalizeText(message);
+    const statusQuestionPatterns = [
+        / nhac lai|xem lai|tom tat|toi dang nhap|toi o dau|tien do|da nhap gi|dang co gi|thong tin dang co/,
+        / ban nhap|nhap den gio|xem giúp|cho toi xem/,
+        / toi con phai|con thieu|can lam gi|tiep theo|phai cung cap|can bo sung|can them/
+    ];
+
+    return statusQuestionPatterns.some(pattern => pattern.test(normalizedMessage));
+}
+
 function shouldKeepActiveBookingContext(message, routeResult) {
     const normalizedMessage = normalizeText(message);
     const contextSignals = [
@@ -840,6 +851,66 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
                     bookingContinuationResult,
                     gateDebug
                 ),
+                safetyResult.meta,
+                routeResult
+            )
+        };
+    }
+
+    if (
+        bookingService.hasActiveBookingSession(sessionId) &&
+        isBookingStatusQuestion(message)
+    ) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
+        const bookingContinuationResult =
+            await bookingService.handleBookingMessage({
+                message,
+                sessionId,
+                userSession
+            });
+
+        return {
+            ...bookingContinuationResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(
+                    bookingContinuationResult,
+                    gateDebug
+                ),
+                safetyResult.meta,
+                routeResult
+            )
+        };
+    }
+
+    if (
+        isBookingStatusQuestion(message) &&
+        !bookingService.hasActiveBookingSession(sessionId)
+    ) {
+        if (!isAuthenticatedUserSession(userSession)) {
+            return buildAuthRequiredResult({
+                message,
+                sessionId,
+                flow: FLOWS.BOOKING
+            });
+        }
+
+        const bookingResult = await bookingService.handleBookingMessage({
+            message,
+            sessionId,
+            userSession
+        });
+
+        return {
+            ...bookingResult,
+            meta: mergeRouterMeta(
+                attachSemanticRouterGateDebug(bookingResult, gateDebug),
                 safetyResult.meta,
                 routeResult
             )

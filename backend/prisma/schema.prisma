@@ -99,6 +99,7 @@ model StaffProfile {
   workingAreas         CollectorWorkingArea[]
   workingSchedules     CollectorWorkingSchedule[]
   collectorAssignments CollectorAssignment[]
+  notifications        Notification[]
 }
 
 model AvailabilitySlot {
@@ -143,6 +144,7 @@ model Booking {
   assignedStaff        StaffProfile?          @relation(fields: [assignedStaffId], references: [id])
   statusHistory        BookingStatusHistory[]
   collectorAssignments CollectorAssignment[]
+  notifications        Notification[]
 
   @@index([patientId])
   @@index([testCatalogItemId])
@@ -239,6 +241,7 @@ model CollectorAssignment {
   createdAt          DateTime                     @default(now())
   updatedAt          DateTime                     @updatedAt
   assignmentHistory  CollectorAssignmentHistory[]
+  notifications      Notification[]
 
   @@index([bookingId])
   @@index([collectorId])
@@ -261,5 +264,46 @@ model CollectorAssignmentHistory {
 
   @@index([assignmentId])
   @@index([toStatus])
+  @@index([createdAt])
+}
+
+enum NotificationRoleTarget {
+  ADMIN
+  COLLECTOR
+}
+
+enum NotificationType {
+  BOOKING_CREATED
+  ASSIGNMENT_AUTO_CREATED
+  ASSIGNMENT_MANUAL_CREATED
+  ASSIGNMENT_REJECTED
+  COLLECTOR_TASK_ASSIGNED
+}
+
+model Notification {
+  id             String                @id @default(cuid())
+  roleTarget     NotificationRoleTarget
+  userId         String?
+  staffProfileId String?
+  staffProfile   StaffProfile?         @relation(fields: [staffProfileId], references: [id], onDelete: SetNull)
+  type           NotificationType
+  title          String
+  message        String                @db.Text
+  bookingId      String?
+  booking        Booking?              @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  assignmentId   String?
+  assignment     CollectorAssignment?  @relation(fields: [assignmentId], references: [id], onDelete: SetNull)
+  metadata       String?               @db.Text
+  readAt         DateTime?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@index([roleTarget])
+  @@index([userId])
+  @@index([staffProfileId])
+  @@index([type])
+  @@index([bookingId])
+  @@index([assignmentId])
+  @@index([readAt])
   @@index([createdAt])
 }
