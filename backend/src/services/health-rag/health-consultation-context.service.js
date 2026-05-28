@@ -666,5 +666,8 @@ function analyzeHealthConsultationContext({
 
 module.exports = {
     CONTEXT_VERSION,
-    analyzeHealthConsultationContext
+    analyzeHealthConsultationContext,
+    extractPreviousSymptoms,
+    buildSessionSummary,
+    isFollowUpQuestion
 };
