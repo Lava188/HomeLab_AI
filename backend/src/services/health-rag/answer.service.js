@@ -1,5 +1,5 @@
 const { normalizeText } = require("../../utils/text.util");
-const { analyzeHealthConsultationContext, extractPreviousSymptoms } = require("./health-consultation-context.service");
+const { analyzeHealthConsultationContext, extractPreviousSymptoms, isFollowUpAnswer } = require("./health-consultation-context.service");
 const { analyzeHealthConsultationWithOllama, mergeSemanticWithContext } = require("./health-consultation-semantic.service");
 
 function getLeadSentence(text) {
@@ -493,7 +493,22 @@ function buildMixedEmergencyReply(topChunks) {
     ].join(" ");
 }
 
-function buildFallbackReply() {
+function buildFallbackReply(message = "", sessionContext = {}) {
+    const normalizedMessage = normalizeText(message);
+    const previousSymptoms = extractPreviousSymptoms(sessionContext);
+    const hasContext = previousSymptoms.length > 0;
+    const isFollowUpAns = isFollowUpAnswer(normalizedMessage, previousSymptoms);
+
+    if (hasContext && isFollowUpAns) {
+        const symptomList = previousSymptoms.join(", ");
+        return `Dựa trên triệu chứng bạn đã chia sẻ (${symptomList}) và thông tin bổ sung: "${message}", mình cần hỏi thêm một chút để tư vấn phù hợp hơn. Bạn có thể cho biết có kèm theo các dấu hiệu khác như sốt, sụt cân, đau ngực, khó thở, nôn mửa hoặc tình trạng xấu đi nhanh không?`;
+    }
+
+    if (hasContext) {
+        const symptomList = previousSymptoms.join(", ");
+        return `Dựa trên triệu chứng bạn đã chia sẻ (${symptomList}), bạn có thể cho biết thêm chi tiết như: bao lâu rồi, có kèm theo dấu hiệu khác không, hoặc đang lo vấn đề gì cụ thể?`;
+    }
+
     return (
         "Mình chưa đủ chắc chắn để trả lời an toàn dựa trên knowledge base hiện tại. " +
         "Bạn có thể mô tả rõ hơn tên xét nghiệm, triệu chứng, hoặc dấu hiệu đang lo ngại để mình tìm đúng thông tin hơn không?"
@@ -631,7 +646,7 @@ function buildPackageGuidanceReply(message, context, topChunks) {
 
 function composeGroundedAnswer({ message, policyDecision, topChunks, sessionContext = {} }) {
     if (!topChunks.length) {
-        return buildFallbackReply();
+        return buildFallbackReply(message, sessionContext);
     }
 
     const normalizedMessage = normalizeText(message);
@@ -644,6 +659,8 @@ function composeGroundedAnswer({ message, policyDecision, topChunks, sessionCont
         (normalizedMessage.includes("chọn") && previousSymptoms.length > 0) ||
         (normalizedMessage.includes("xet nghiem") && previousSymptoms.length > 0)
     );
+
+    const isFollowUpAns = isFollowUpAnswer(normalizedMessage, previousSymptoms);
 
     if (isReadOnlyConsultationSignal(normalizedMessage)) {
         const readOnlyReply = "Được, mình sẽ chỉ tư vấn thông tin, chưa tạo lịch. Bạn muốn hỏi về triệu chứng, chỉ số xét nghiệm hay chọn gói phù hợp?";
@@ -666,6 +683,16 @@ function composeGroundedAnswer({ message, policyDecision, topChunks, sessionCont
 
     if (isFollowUpWithSymptoms) {
         return buildPackageGuidanceReply(message, { previousSymptoms, canSuggestPackages: true }, topChunks);
+    }
+
+    if (isFollowUpAns && previousSymptoms.length > 0) {
+        const symptomList = previousSymptoms.join(", ");
+        return [
+            `Dựa trên triệu chứng ${symptomList} và thông tin bạn vừa bổ sung, mình ghi nhận:`,
+            ...buildContextualFollowUpReply(normalizedMessage, previousSymptoms, topChunks),
+            "",
+            "Lưu ý: Đây chỉ là gợi ý tham khảo và không thay thế khám lâm sàng. Nếu có dấu hiệu như đau ngực, khó thở, ngất hoặc tình trạng xấu đi nhanh, bạn nên đi khám khẩn cấp."
+        ].filter(Boolean).join(" ");
     }
 
     const consultationContext = analyzeHealthConsultationContext({
@@ -755,7 +782,7 @@ function composeGroundedAnswer({ message, policyDecision, topChunks, sessionCont
         return buildMixedEmergencyReply(topChunks);
     }
 
-    return buildFallbackReply();
+    return buildFallbackReply(message, sessionContext);
 }
 
 module.exports = {
