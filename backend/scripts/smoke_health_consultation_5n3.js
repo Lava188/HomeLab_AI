@@ -60,7 +60,9 @@ const CASES = [
         validate: ({ data, answer }) => [
             data.flow === "health_rag",
             answer.includes("ALT") || answer.includes("AST") || answer.includes("men gan"),
-            answer.toLowerCase().includes("chưa") || answer.toLowerCase().includes("cần"),
+            normalize(answer).includes("chua") ||
+                normalize(answer).includes("can") ||
+                normalize(answer).includes("bao nhieu"),
             !answer.includes("Triệu chứng nào"),
             !answer.includes("Bạn đang lo")
         ]
@@ -82,7 +84,7 @@ const CASES = [
             data.flow === "health_rag" || data.flow === "fallback",
             !answer.includes("hủy bản nháp"),
             !answer.includes("Xác nhận hủy"),
-            !meta?.debug?.semanticRouterGate?.originalFlow === "cancel"
+            meta?.debug?.semanticRouterGate?.originalFlow !== "cancel"
         ]
     },
     {

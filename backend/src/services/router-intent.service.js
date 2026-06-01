@@ -422,6 +422,13 @@ function includesAny(text, signals) {
     return signals.some((signal) => text.includes(signal));
 }
 
+function removeNegatedUrgentSignals(expandedMessage) {
+    return expandedMessage
+        .replace(/\bkhong\s+(dau nguc|kho tho|ngat|lo mo|sot cao|yeu mot ben|yeu nua nguoi|liet nua nguoi)\b/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
 function hasNeurologicalRedFlag(expandedMessage) {
     return (
         includesAny(expandedMessage, [
@@ -486,11 +493,13 @@ function isTestAdviceQuery(expandedMessage) {
 }
 
 function getIntentGroup(expandedMessage) {
-    if (hasNeurologicalRedFlag(expandedMessage)) {
+    const urgentMessage = removeNegatedUrgentSignals(expandedMessage);
+
+    if (hasNeurologicalRedFlag(urgentMessage)) {
         return "urgent_health";
     }
 
-    if (includesAny(expandedMessage, URGENT_HEALTH_INTENT_SIGNALS)) {
+    if (includesAny(urgentMessage, URGENT_HEALTH_INTENT_SIGNALS)) {
         return "urgent_health";
     }
 

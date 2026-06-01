@@ -6,6 +6,11 @@ const cancelService = require("./cancel.service");
 const packageCatalog = require("./booking-package-catalog.service");
 const { detectFlow } = require("./router-intent.service");
 const { runSemanticBridge } = require("./health-rag/semantic-bridge.service");
+const {
+    extractCurrentHealthDetails,
+    extractPreviousSymptoms,
+    mergeHealthConsultationState
+} = require("./health-rag/health-consultation-context.service");
 const { normalizeText } = require("../utils/text.util");
 const mockSessions = require("../data/mockSessions");
 
@@ -529,6 +534,21 @@ function buildContextAwareHealthMessage(message, conversationContext) {
     return message;
 }
 
+function shouldRouteHealthConsultationFollowUp(message, conversationContext = {}) {
+    const details = extractCurrentHealthDetails(message);
+    const previousSymptoms = extractPreviousSymptoms(conversationContext);
+    const normalizedMessage = normalizeText(message);
+    const asksForGuidance =
+        normalizedMessage.includes("xet nghiem gi") ||
+        normalizedMessage.includes("chon goi nao") ||
+        normalizedMessage.includes("goi nao phu hop");
+
+    return (
+        (previousSymptoms.length > 0 && (details.hasFollowUpDetail || asksForGuidance)) ||
+        (previousSymptoms.length === 0 && Boolean(details.duration))
+    );
+}
+
 function rememberConversationContext({ sessionId, message, result, packageIntent }) {
     if (!sessionId || result?.flow === FLOWS.BOOKING) {
         return result;
@@ -542,6 +562,7 @@ function rememberConversationContext({ sessionId, message, result, packageIntent
         ...previous,
         lastIntentGroup: result?.meta?.intentGroup || previous.lastIntentGroup || null,
         lastUserMessage: message,
+        healthConsultation: mergeHealthConsultationState(previous, message),
         recentMessages: [
             ...existingMessages.slice(-9),
             { role: "user", content: message, timestamp: new Date().toISOString() }
@@ -718,6 +739,23 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
     let routeResult = detectFlow(message);
     const packageIntent = await packageCatalog.resolvePackageIntent(message);
     const conversationContext = getConversationContext(sessionId);
+    const healthConsultationFollowUp = shouldRouteHealthConsultationFollowUp(
+        message,
+        conversationContext
+    );
+    if (
+        routeResult.flow === FLOWS.FALLBACK &&
+        healthConsultationFollowUp
+    ) {
+        routeResult = {
+            flow: FLOWS.HEALTH_RAG,
+            routerDebug: {
+                ...(routeResult.routerDebug || {}),
+                intentGroup: "test_advice",
+                healthConsultationFollowUpOverride: true
+            }
+        };
+    }
     const healthMessage = buildContextAwareHealthMessage(
         message,
         conversationContext
@@ -986,6 +1024,7 @@ async function routeMessage({ message, sessionId, userSession = {} }) {
     if (
         [FLOWS.HEALTH_RAG, FLOWS.FALLBACK].includes(routeResult.flow) &&
         routeResult.routerDebug?.intentGroup !== "urgent_health" &&
+        !healthConsultationFollowUp &&
         ["listing", "ambiguous", "detail_question"].includes(packageIntent.type)
     ) {
         const catalogResult = buildCatalogInfoResult({

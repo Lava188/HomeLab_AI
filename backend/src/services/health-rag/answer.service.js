@@ -1,5 +1,13 @@
 const { normalizeText } = require("../../utils/text.util");
-const { analyzeHealthConsultationContext, extractPreviousSymptoms, isFollowUpAnswer } = require("./health-consultation-context.service");
+const {
+    analyzeHealthConsultationContext,
+    extractPreviousSymptoms,
+    extractCurrentHealthDetails,
+    isFollowUpQuestion,
+    isFollowUpAnswer,
+    isHealthFollowUpDetail,
+    buildSessionSummary
+} = require("./health-consultation-context.service");
 const { analyzeHealthConsultationWithOllama, mergeSemanticWithContext } = require("./health-consultation-semantic.service");
 
 function getLeadSentence(text) {
@@ -644,13 +652,96 @@ function buildPackageGuidanceReply(message, context, topChunks) {
     return "Mình cần thêm thông tin để gợi ý phù hợp hơn. Bạn có thể nói rõ hơn về triệu chứng hoặc mục tiêu kiểm tra không?";
 }
 
+function buildContextAwareSymptomReply({ message, sessionContext }) {
+    const previousSymptoms = extractPreviousSymptoms(sessionContext);
+    const currentDetails = extractCurrentHealthDetails(message);
+    const consultationState = sessionContext.healthConsultation || {};
+    const followUpQuestion = isFollowUpQuestion(message, previousSymptoms);
+    const followUpDetail = isHealthFollowUpDetail(message, sessionContext);
+
+    if (!previousSymptoms.length) {
+        return null;
+    }
+
+    if (currentDetails.redFlags.length > 0) {
+        return null;
+    }
+
+    const symptomText = previousSymptoms.join(", ");
+    const hasDuration = Boolean(currentDetails.duration);
+    const severeWeakness = Boolean(currentDetails.severeWeakness);
+    const pregnancyText = currentDetails.pregnancyNegative ? ", không mang thai" : "";
+    const negativeFlags = [
+        ...(Array.isArray(consultationState.negativeFlags) ? consultationState.negativeFlags : []),
+        ...currentDetails.negativeFlags
+    ];
+    const hasMinimumSafetyInfo = negativeFlags.includes("no_chest_pain") &&
+        negativeFlags.includes("no_breathlessness");
+
+    if (followUpDetail) {
+        const lines = [];
+
+        lines.push(`Mình ghi nhận thêm: bạn đang có ${symptomText}${hasDuration ? ` khoảng ${currentDetails.duration}` : ""}${pregnancyText}${severeWeakness ? ", và đang yếu hơn nhiều" : ""}.`);
+
+        if (severeWeakness) {
+            lines.push(
+                "Việc bạn thấy yếu hơn nhiều là thông tin cần chú ý. Bạn có đau ngực, khó thở, ngất hoặc lơ mơ, yếu liệt một bên, sốt cao, không tự đi lại được hay tình trạng xấu nhanh không? Nếu có, bạn nên đi khám sớm hoặc liên hệ cơ sở y tế ngay thay vì chỉ tự theo dõi tại nhà."
+            );
+            return lines.join("\n\n");
+        }
+
+        lines.push(
+            "Để kiểm tra an toàn trước khi gợi ý xét nghiệm, bạn cho biết thêm: bạn có đau ngực, khó thở, ngất hoặc lơ mơ, yếu liệt một bên, sốt cao, không tự đi lại được hay tình trạng xấu nhanh không?"
+        );
+
+        return lines.join("\n\n");
+    }
+
+    if (followUpQuestion) {
+        if (!hasMinimumSafetyInfo) {
+            return [
+                `Mình đang dựa trên các triệu chứng bạn đã chia sẻ: ${symptomText}.`,
+                "Trước khi gợi ý gói hoặc xét nghiệm, bạn cho biết thêm: tình trạng kéo dài bao lâu, có đau ngực, khó thở, ngất hoặc lơ mơ, sốt cao hay xấu đi nhanh không?"
+            ].join("\n\n");
+        }
+
+        return [
+            `Dựa trên thông tin trước đó bạn đã nói là ${symptomText}, mình chưa nên chốt một nguyên nhân cụ thể.`,
+            "Hướng kiểm tra ban đầu có thể cân nhắc: Công thức máu để tham khảo thiếu máu/nhiễm trùng; đường huyết hoặc HbA1c nếu cần đánh giá liên quan đường huyết; chức năng gan, chức năng thận; hoặc Gói tổng quát cơ bản nếu bạn muốn kiểm tra rộng hơn.",
+            "Đây là gợi ý tham khảo, không phải chẩn đoán và cũng chưa phải chốt một gói duy nhất."
+        ].join("\n\n");
+    }
+
+    return null;
+}
+
 function composeGroundedAnswer({ message, policyDecision, topChunks, sessionContext = {} }) {
+    const standaloneDetails = extractCurrentHealthDetails(message);
+    const previousSymptoms = extractPreviousSymptoms(sessionContext);
+
+    if (
+        !previousSymptoms.length &&
+        standaloneDetails.duration &&
+        !standaloneDetails.symptoms.length &&
+        !standaloneDetails.redFlags.length
+    ) {
+        return "Mình ghi nhận thông tin bổ sung, nhưng chưa rõ bạn đang nói triệu chứng nào kéo dài hoặc thay đổi. Bạn cho biết triệu chứng cụ thể đang gặp là gì?";
+    }
+
+    const contextAwareReply = buildContextAwareSymptomReply({
+        message,
+        sessionContext
+    });
+
+    if (contextAwareReply) {
+        return contextAwareReply;
+    }
+
     if (!topChunks.length) {
         return buildFallbackReply(message, sessionContext);
     }
 
     const normalizedMessage = normalizeText(message);
-    const previousSymptoms = extractPreviousSymptoms(sessionContext);
 
     const isFollowUpWithSymptoms = previousSymptoms.length > 0 && (
         normalizedMessage.includes("vay") ||

@@ -5,7 +5,7 @@ const DEFAULT_BASE_URL = "http://localhost:11434";
 const DEFAULT_MODEL = "qwen2.5:3b";
 const DEFAULT_TIMEOUT_MS = 60000;
 
-const SEMANTIC_VERSION = "health_consultation_semantic_v5n2";
+const SEMANTIC_VERSION = "health_consultation_semantic_v5n4";
 
 const USER_GOAL_TYPES = [
     "symptom_advice",
@@ -103,6 +103,7 @@ function buildHealthConsultationPrompt(input = {}) {
         "- Nếu đủ thông tin an toàn, có thể gợi ý hướng xét nghiệm/gói từ catalog.",
         "",
         "TASK: Phân tích câu hỏi tư vấn sức khỏe và trả về JSON với schema sau:",
+        "Determine whether current user message is a follow-up answer to previous health questions.",
         JSON.stringify({
             version: SEMANTIC_VERSION,
             provider: PROVIDER_NAME,
@@ -112,6 +113,11 @@ function buildHealthConsultationPrompt(input = {}) {
             clarifyingQuestions: "array of 1-3 string, câu hỏi làm rõ (tiếng Việt, ngắn gọn)",
             canSuggestPackages: "boolean, có thể gợi ý gói/xét nghiệm không",
             suggestedPackageHints: "array of string, mã gói từ catalog: CBC, LIVER_FUNCTION, KIDNEY_FUNCTION, GENERAL_CHECKUP, LIPID_PROFILE, HBA1C",
+            isFollowUpAnswer: "boolean, tin nhắn hiện tại bổ sung cho câu hỏi sức khỏe trước đó",
+            mergedSymptoms: "array of string, triệu chứng đã merge từ lịch sử và tin nhắn hiện tại",
+            addedInfo: "object, thông tin mới như duration, pregnancyStatus, severity, negativeFlags",
+            riskFlags: "array of string, dấu hiệu nguy hiểm cần lưu ý",
+            packageSuggestionReady: "boolean, đủ ngữ cảnh tối thiểu để gợi ý hướng xét nghiệm/gói",
             safetyNotes: "array of string, ghi chú an toàn (nếu có)",
             shouldUseSemantic: "boolean, kết quả này có nên dùng không",
             reason: "string, lý do ngắn",
@@ -160,6 +166,8 @@ function buildHealthConsultationPrompt(input = {}) {
         "- Nếu thiếu thông tin: set missingInfo, clarifyingQuestions, canSuggestPackages=false.",
         "- Nếu chỉ hỏi giải thích: set userGoal=test_explanation.",
         "- Nếu đủ thông tin và an toàn: set canSuggestPackages=true, thêm suggestedPackageHints.",
+        "- Với câu trả lời bổ sung ngắn như 'kéo dài 2 tuần', 'không mang thai', 'không sốt', hãy set isFollowUpAnswer=true và merge vào addedInfo/mergedSymptoms.",
+        "- Chỉ đọc hiểu và tóm tắt. Không tự chẩn đoán, không tự booking, không tự chốt một gói duy nhất.",
         "",
         "Trả về MỘT JSON object, không có gì khác."
     ].join("\n");
@@ -179,6 +187,8 @@ function normalizeSemanticOutput(raw, input = {}) {
         ? raw.suggestedPackageHints.filter(Boolean)
         : [];
     const safetyNotes = Array.isArray(raw.safetyNotes) ? raw.safetyNotes.filter(Boolean) : [];
+    const mergedSymptoms = Array.isArray(raw.mergedSymptoms) ? raw.mergedSymptoms.filter(Boolean) : [];
+    const riskFlags = Array.isArray(raw.riskFlags) ? raw.riskFlags.filter(Boolean) : [];
     const confidence = typeof raw.confidence === "number" ? raw.confidence : 0.5;
 
     return {
@@ -190,6 +200,11 @@ function normalizeSemanticOutput(raw, input = {}) {
         clarifyingQuestions,
         canSuggestPackages: Boolean(raw.canSuggestPackages),
         suggestedPackageHints,
+        isFollowUpAnswer: Boolean(raw.isFollowUpAnswer),
+        mergedSymptoms,
+        addedInfo: raw.addedInfo && typeof raw.addedInfo === "object" ? raw.addedInfo : {},
+        riskFlags,
+        packageSuggestionReady: Boolean(raw.packageSuggestionReady),
         safetyNotes,
         shouldUseSemantic: raw.shouldUseSemantic !== false,
         reason: String(raw.reason || "semantic_analysis_completed"),
@@ -208,6 +223,11 @@ function buildFallbackOutput(fallbackReason, extra = {}) {
         clarifyingQuestions: [],
         canSuggestPackages: false,
         suggestedPackageHints: [],
+        isFollowUpAnswer: false,
+        mergedSymptoms: [],
+        addedInfo: {},
+        riskFlags: [],
+        packageSuggestionReady: false,
         safetyNotes: [],
         shouldUseSemantic: false,
         reason: fallbackReason,

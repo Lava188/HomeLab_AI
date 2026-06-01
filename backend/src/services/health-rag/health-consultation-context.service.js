@@ -479,257 +479,217 @@ function suggestPackageHints(userGoal, normalizedMessage) {
     return [];
 }
 
-function extractPreviousSymptoms(sessionContext) {
-    const symptoms = new Set();
+function getRecentHealthMessages(sessionContext = {}) {
+    const candidates = [
+        sessionContext.recentHealthMessages,
+        sessionContext.healthMessages,
+        sessionContext.recentMessages,
+        sessionContext.messages,
+        sessionContext.chatHistory
+    ];
 
-    const recentMessages = Array.isArray(sessionContext?.recentMessages)
-        ? sessionContext.recentMessages.slice(-5)
+    for (const item of candidates) {
+        if (Array.isArray(item)) {
+            return item
+                .map((m) => ({
+                    role: m.role || m.sender || "unknown",
+                    content: m.content || m.message || m.text || ""
+                }))
+                .filter((m) => m.content);
+        }
+    }
+
+    return [];
+}
+
+function extractSymptomsFromText(value = "") {
+    const text = normalizeText(value);
+    const symptoms = [];
+
+    if (/\b(met|moi|duoi suc|yeu nguoi|yeu hon)\b/.test(text)) symptoms.push("mệt");
+    if (/\b(chong mat|choang|xay xam|hoa mat)\b/.test(text)) symptoms.push("chóng mặt");
+    if (/\b(an uong kem|chan an|an kem|sut can)\b/.test(text)) symptoms.push("ăn uống kém");
+    if (/\b(dau dau|nhuc dau)\b/.test(text)) symptoms.push("đau đầu");
+    if (/\b(dau bung)\b/.test(text)) symptoms.push("đau bụng");
+    if (/\b(buon non|hay non)\b/.test(text)) symptoms.push("buồn nôn");
+    if (/\b(mat ngu|kho ngu)\b/.test(text)) symptoms.push("mất ngủ");
+
+    return symptoms;
+}
+
+function extractPreviousSymptoms(sessionContext = {}) {
+    const stateSymptoms = Array.isArray(sessionContext.healthConsultation?.symptoms)
+        ? sessionContext.healthConsultation.symptoms
         : [];
+    const messages = getRecentHealthMessages(sessionContext);
+    const messageSymptoms = extractSymptomsFromText(messages
+        .filter((m) => m.role !== "assistant")
+        .map((m) => m.content)
+        .join(" "));
+    const lastSymptoms = extractSymptomsFromText(sessionContext.lastSymptomMessage || "");
 
-    console.log(`[DEBUG] extractPreviousSymptoms: recentMessages count=${recentMessages.length}`);
+    return [...new Set([...stateSymptoms, ...messageSymptoms, ...lastSymptoms])];
+}
 
-    for (const msg of recentMessages) {
-        if (msg.role === "user") {
-            const content = normalizeText(msg.content || "");
-            if (content.includes("met")) symptoms.add("mệt");
-            if (content.includes("chong mat")) symptoms.add("chóng mặt");
-            if (content.includes("nhuc dau") || content.includes("dau dau")) symptoms.add("đau đầu");
-            if (content.includes("dau bung")) symptoms.add("đau bụng");
-            if (content.includes("an uong kem") || content.includes("chan an")) symptoms.add("ăn uống kém");
-            if (content.includes("buon non") || content.includes("hay non")) symptoms.add("buồn nôn");
+function extractHealthInfo(message = "") {
+    const text = normalizeText(message);
+    const durationMatch = text.match(/(\d+)\s*(ngay|tuan|thang|nam)/);
+    const negativeFlags = [];
+    const redFlags = [];
+    const flagPatterns = [
+        ["sot", "fever"],
+        ["dau nguc", "chest_pain"],
+        ["kho tho", "breathlessness"],
+        ["ngat", "fainting"],
+        ["lo mo", "confusion"],
+        ["yeu mot ben", "one_sided_weakness"],
+        ["khong tu di lai duoc", "cannot_walk"]
+    ];
+
+    for (const [pattern, flag] of flagPatterns) {
+        if (text.includes(`khong ${pattern}`)) {
+            negativeFlags.push(`no_${flag}`);
+        } else if (text.includes(pattern)) {
+            redFlags.push(flag);
         }
     }
 
-    if (symptoms.size === 0 && sessionContext?.lastSymptomMessage) {
-        const content = normalizeText(sessionContext.lastSymptomMessage || "");
-        console.log(`[DEBUG] Using lastSymptomMessage: ${content}`);
-        if (content.includes("met")) symptoms.add("mệt");
-        if (content.includes("chong mat")) symptoms.add("chóng mặt");
-        if (content.includes("nhuc dau") || content.includes("dau dau")) symptoms.add("đau đầu");
-        if (content.includes("dau bung")) symptoms.add("đau bụng");
-        if (content.includes("an uong kem") || content.includes("chan an")) symptoms.add("ăn uống kém");
-        if (content.includes("buon non") || content.includes("hay non")) symptoms.add("buồn nôn");
-    }
-
-    const result = Array.from(symptoms);
-    console.log(`[DEBUG] extractPreviousSymptoms result: ${result.join(",")}`);
-    return result;
-}
-
-function isFollowUpQuestion(normalizedMessage, previousSymptoms) {
-    if (previousSymptoms.length === 0) {
-        return false;
-    }
-
-    const followUpSignals = [
-        "vay",
-        "vậy",
-        "theo ban",
-        "theo bạn",
-        "theo",
-        "nen",
-        "nên",
-        "chon",
-        "chọn",
-        "goi",
-        "gói",
-        "xet nghiem",
-        "xét nghiệm",
-        "kiem tra",
-        "kiểm tra"
-    ];
-
-    const hasFollowUpSignal = followUpSignals.some((signal) =>
-        normalizedMessage.includes(signal)
-    );
-
-    const isAskingForGuidance =
-        normalizedMessage.includes("nên") ||
-        normalizedMessage.includes("chọn") ||
-        normalizedMessage.includes("xet nghiem") ||
-        normalizedMessage.includes("gói");
-
-    return hasFollowUpSignal && isAskingForGuidance;
-}
-
-/**
- * Detect if current message is a follow-up ANSWER to previous health questions.
- * Examples: "kéo dài khoảng 2 tuần rồi", "không mang thai", "yếu hơn nhiều", "không sốt"
- */
-function isFollowUpAnswer(normalizedMessage, previousSymptoms) {
-    if (previousSymptoms.length === 0) {
-        return false;
-    }
-
-    const durationAnswerSignals = [
-        "kéo dai",
-        "kéo dài",
-        "tuần rồi",
-        "tuan roi",
-        "tháng rồi",
-        "thang roi",
-        "ngày rồi",
-        "ngay roi",
-        "khoảng",
-        "khoang",
-        "được",
-        "duoc",
-        "hôm nay",
-        "hom nay",
-        "hôm qua",
-        "hom qua"
-    ];
-
-    const negativeAnswerSignals = [
-        "không mang thai",
-        "khong mang thai",
-        "không sốt",
-        "khong sot",
-        "không đau ngực",
-        "khong dau nguc",
-        "không khó thở",
-        "khong kho tho",
-        "không ho",
-        "khong ho",
-        "không nôn",
-        "khong non",
-        "không ",
-        "khong "
-    ];
-
-    const severityWorseningSignals = [
-        "yếu hơn",
-        "yeu hon",
-        "nặng hơn",
-        "nang hon",
-        "tồi hơn",
-        "toi hon",
-        "xấu đi",
-        "xau di"
-    ];
-
-    const improvementSignals = [
-        "khỏe hơn",
-        "khoe hon",
-        "tốt hơn",
-        "tot hon",
-        "giảm",
-        "giam",
-        "hết"
-    ];
-
-    const hasDurationSignal = durationAnswerSignals.some((signal) =>
-        normalizedMessage.includes(signal)
-    );
-
-    const hasNegativeSignal = negativeAnswerSignals.some((signal) =>
-        normalizedMessage.includes(signal)
-    );
-
-    const hasWorseningSignal = severityWorseningSignals.some((signal) =>
-        normalizedMessage.includes(signal)
-    );
-
-    const hasImprovementSignal = improvementSignals.some((signal) =>
-        normalizedMessage.includes(signal)
-    );
-
-    const hasTimeUnit = /(\d+)(ngay|tuan|thang|nam)/.test(normalizedMessage);
-
-    return hasDurationSignal || hasNegativeSignal || hasWorseningSignal ||
-           hasImprovementSignal || hasTimeUnit;
-}
-
-/**
- * Extract structured health information from a message.
- * Used to merge follow-up answers into consultation context.
- */
-function extractHealthInfo(normalizedMessage) {
-    const info = {
-        duration: null,
-        pregnancyStatus: null,
-        severity: null,
-        redFlags: [],
-        negativeFlags: []
-    };
-
-    if (normalizedMessage.match(/(\d+)\s*(ngay|tuan|thang|nam)/)) {
-        const match = normalizedMessage.match(/(\d+)\s*(ngay|tuan|thang|nam)/);
-        if (match) {
-            const value = match[1];
-            const unit = match[2];
-            info.duration = `${value} ${unit === 'ngay' ? 'ngày' : unit === 'tuan' ? 'tuần' : unit === 'thang' ? 'tháng' : 'năm'}`;
-        }
-    } else if (normalizedMessage.includes("kéo dài")) {
-        info.duration = "kéo dài";
-    }
-
-    if (normalizedMessage.includes("mang thai")) {
-        if (normalizedMessage.includes("không") || normalizedMessage.includes("khong")) {
-            info.pregnancyStatus = "not_pregnant";
-        } else {
-            info.pregnancyStatus = "pregnant";
-        }
-    }
-
-    if (normalizedMessage.includes("yếu hơn") || normalizedMessage.includes("yeu hon") ||
-        normalizedMessage.includes("nặng hơn") || normalizedMessage.includes("nang hon")) {
-        info.severity = "worsening";
-    } else if (normalizedMessage.includes("khỏe hơn") || normalizedMessage.includes("khoe hon") ||
-               normalizedMessage.includes("tốt hơn") || normalizedMessage.includes("tot hon")) {
-        info.severity = "improving";
-    }
-
-    const negativePatterns = [
-        { pattern: "không sốt", flag: "no_fever" },
-        { pattern: "khong sot", flag: "no_fever" },
-        { pattern: "không đau ngực", flag: "no_chest_pain" },
-        { pattern: "khong dau nguc", flag: "no_chest_pain" },
-        { pattern: "không khó thở", flag: "no_breathlessness" },
-        { pattern: "khong kho tho", flag: "no_breathlessness" },
-        { pattern: "không ho", flag: "no_cough" },
-        { pattern: "khong ho", flag: "no_cough" }
-    ];
-
-    for (const { pattern, flag } of negativePatterns) {
-        if (normalizedMessage.includes(pattern)) {
-            info.negativeFlags.push(flag);
-        }
-    }
-
-    return info;
-}
-
-/**
- * Merge follow-up answer into existing consultation context.
- * Returns augmented message and extracted info.
- */
-function mergeAnswerIntoContext(normalizedMessage, previousSymptoms, sessionContext = {}) {
-    const healthInfo = extractHealthInfo(normalizedMessage);
-    const augmentedMessage = normalizedMessage;
-
-    let augmentedWithSymptoms = normalizedMessage;
-    if (previousSymptoms.length > 0) {
-        augmentedWithSymptoms = `${normalizedMessage} ${previousSymptoms.join(" ")}`;
+    if (text.includes("xau di nhanh") || text.includes("nang len nhanh")) {
+        redFlags.push("rapid_worsening");
     }
 
     return {
-        augmentedMessage: augmentedWithSymptoms,
+        symptoms: extractSymptomsFromText(text),
+        duration: durationMatch
+            ? `${durationMatch[1]} ${{
+                ngay: "ngày",
+                tuan: "tuần",
+                thang: "tháng",
+                nam: "năm"
+            }[durationMatch[2]]}`
+            : null,
+        pregnancyStatus: text.includes("khong mang thai") || text.includes("khong co thai")
+            ? "not_pregnant"
+            : text.includes("mang thai") || text.includes("co thai")
+                ? "pregnant"
+                : null,
+        severity: text.includes("yeu hon nhieu") || text.includes("met hon nhieu") ||
+            text.includes("duoi suc hon") || text.includes("nang hon")
+            ? "worsening"
+            : null,
+        negativeFlags: [...new Set(negativeFlags)],
+        redFlags: [...new Set(redFlags)],
+        userGoal: text.includes("chon goi") || text.includes("goi nao")
+            ? "package_guidance"
+            : text.includes("xet nghiem gi") || text.includes("can xet nghiem")
+                ? "test_guidance"
+                : null
+    };
+}
+
+function extractCurrentHealthDetails(message = "") {
+    const info = extractHealthInfo(message);
+
+    return {
+        ...info,
+        pregnancyNegative: info.pregnancyStatus === "not_pregnant",
+        severeWeakness: info.severity === "worsening",
+        hasFollowUpDetail: Boolean(
+            info.duration ||
+            info.pregnancyStatus ||
+            info.severity ||
+            info.negativeFlags.length ||
+            info.redFlags.length
+        )
+    };
+}
+
+function isFollowUpQuestion(message = "", previousSymptoms = []) {
+    const text = normalizeText(message);
+    const asksForGuidance =
+        text.includes("xet nghiem gi") ||
+        text.includes("chon goi nao") ||
+        text.includes("goi nao phu hop") ||
+        text.includes("toi can lam gi") ||
+        text.includes("tiep theo lam gi") ||
+        text.includes("co can xet nghiem");
+
+    return previousSymptoms.length > 0 && asksForGuidance;
+}
+
+function isFollowUpAnswer(message = "", previousSymptoms = []) {
+    if (!previousSymptoms.length) {
+        return false;
+    }
+
+    return extractCurrentHealthDetails(message).hasFollowUpDetail;
+}
+
+function isHealthFollowUpDetail(message = "", sessionContext = {}) {
+    const previousSymptoms = extractPreviousSymptoms(sessionContext);
+    const currentDetails = extractCurrentHealthDetails(message);
+
+    return previousSymptoms.length > 0 && currentDetails.hasFollowUpDetail;
+}
+
+function mergeHealthConsultationState(sessionContext = {}, message = "") {
+    const previous = sessionContext.healthConsultation || {};
+    const info = extractHealthInfo(message);
+
+    return {
+        symptoms: [...new Set([
+            ...(Array.isArray(previous.symptoms) ? previous.symptoms : []),
+            ...extractPreviousSymptoms(sessionContext),
+            ...info.symptoms
+        ])],
+        duration: info.duration || previous.duration || null,
+        severity: info.severity || previous.severity || null,
+        pregnancyStatus: info.pregnancyStatus || previous.pregnancyStatus || null,
+        negativeFlags: [...new Set([
+            ...(Array.isArray(previous.negativeFlags) ? previous.negativeFlags : []),
+            ...info.negativeFlags
+        ])],
+        redFlags: [...new Set([
+            ...(Array.isArray(previous.redFlags) ? previous.redFlags : []),
+            ...info.redFlags
+        ])],
+        userGoal: info.userGoal || previous.userGoal || null,
+        updatedAt: new Date().toISOString()
+    };
+}
+
+function mergeAnswerIntoContext(message, previousSymptoms, sessionContext = {}) {
+    const healthInfo = extractHealthInfo(message);
+
+    return {
+        augmentedMessage: [normalizeText(message), ...previousSymptoms].join(" "),
         healthInfo,
         previousSymptoms,
-        hasDuration: !!healthInfo.duration,
-        hasPregnancyInfo: healthInfo.pregnancyStatus !== null,
-        hasSeverityInfo: healthInfo.severity !== null,
+        state: mergeHealthConsultationState(sessionContext, message),
+        hasDuration: Boolean(healthInfo.duration),
+        hasPregnancyInfo: Boolean(healthInfo.pregnancyStatus),
+        hasSeverityInfo: Boolean(healthInfo.severity),
         hasNegativeInfo: healthInfo.negativeFlags.length > 0
     };
 }
 
-function buildSessionSummary(sessionContext) {
-    const symptoms = extractPreviousSymptoms(sessionContext);
-    if (symptoms.length === 0) {
+function buildSessionSummary(sessionContext = {}) {
+    const state = sessionContext.healthConsultation || {};
+    const previousSymptoms = extractPreviousSymptoms(sessionContext);
+
+    if (!previousSymptoms.length) {
         return "";
     }
-    return `Người dùng đã mô tả các triệu chứng: ${symptoms.join(", ")}`;
+
+    return [
+        `Người dùng đã mô tả: ${previousSymptoms.join(", ")}`,
+        state.duration ? `thời gian ${state.duration}` : "",
+        state.pregnancyStatus === "not_pregnant" ? "không mang thai" : "",
+        state.severity === "worsening" ? "đang yếu hơn/nặng hơn" : "",
+        Array.isArray(state.negativeFlags) && state.negativeFlags.length
+            ? `đã phủ nhận ${state.negativeFlags.join(", ")}`
+            : ""
+    ].filter(Boolean).join("; ");
 }
 
 function analyzeHealthConsultationContext({
@@ -740,99 +700,30 @@ function analyzeHealthConsultationContext({
     const normalizedMessage = normalizeText(message);
     const previousSymptoms = extractPreviousSymptoms(sessionContext);
     const hasPreviousSymptoms = previousSymptoms.length > 0;
-    const isFollowUp = isFollowUpQuestion(normalizedMessage, previousSymptoms);
-    const isFollowUpAns = isFollowUpAnswer(normalizedMessage, previousSymptoms);
-
-    let augmentedMessage = normalizedMessage;
-    let healthInfo = null;
-    let mergedContext = null;
-
-    if (isFollowUpAns && hasPreviousSymptoms) {
-        mergedContext = mergeAnswerIntoContext(normalizedMessage, previousSymptoms, sessionContext);
-        augmentedMessage = mergedContext.augmentedWithSymptoms;
-        healthInfo = mergedContext.healthInfo;
-    } else if (hasPreviousSymptoms) {
-        augmentedMessage = `${normalizedMessage} ${previousSymptoms.join(" ")}`;
-    }
-
+    const isFollowUp = isFollowUpQuestion(message, previousSymptoms);
+    const isFollowUpAns = isFollowUpAnswer(message, previousSymptoms);
+    const mergedContext = mergeAnswerIntoContext(message, previousSymptoms, sessionContext);
+    const state = mergedContext.state;
+    const augmentedMessage = mergedContext.augmentedMessage;
     const userGoal = detectUserGoal(augmentedMessage);
-    const needsUrgentCare = hasUrgentRedFlag(normalizedMessage);
-
-    let missingInfo = [];
-    let isComplete = false;
-    let detailScore = 0;
-
-    const { isComplete: baseComplete, missingInfo: baseMissing, detailScore: baseScore } = assessInformationCompleteness(
-        augmentedMessage,
-        userGoal
+    const needsUrgentCare = hasUrgentRedFlag(normalizedMessage) || mergedContext.healthInfo.redFlags.some(
+        (flag) => ["chest_pain", "breathlessness", "fainting", "confusion", "one_sided_weakness", "cannot_walk", "rapid_worsening"].includes(flag)
     );
-
-    if (hasPreviousSymptoms) {
-        detailScore = baseScore + 2;
-
-        if (isFollowUpAns && healthInfo) {
-            if (healthInfo.duration) detailScore += 1;
-            if (healthInfo.pregnancyStatus) detailScore += 1;
-            if (healthInfo.severity) detailScore += 1;
-            if (healthInfo.negativeFlags.length > 0) detailScore += 1;
-        }
-
-        if (baseMissing.includes("symptom_or_goal")) {
-            missingInfo = baseMissing.filter(m => m !== "symptom_or_goal");
-        } else {
-            missingInfo = baseMissing;
-        }
-
-        if ((isFollowUp || isFollowUpAns) && missingInfo.length <= 1) {
-            isComplete = true;
-            missingInfo = [];
-        } else {
-            isComplete = missingInfo.length === 0 || baseComplete;
-        }
-    } else {
-        missingInfo = baseMissing;
-        isComplete = baseComplete;
-        detailScore = baseScore;
-    }
-
+    const base = assessInformationCompleteness(augmentedMessage, userGoal);
+    const hasSafetyInfo = state.negativeFlags.length > 0;
+    const hasMinimumGuidanceContext = state.symptoms.length > 0 && Boolean(state.duration || hasSafetyInfo);
+    const isComplete = base.isComplete || (hasPreviousSymptoms && hasMinimumGuidanceContext);
+    const missingInfo = isComplete ? [] : base.missingInfo;
     const shouldAskClarifyingQuestion = !needsUrgentCare && !isComplete && !isFollowUp && !isFollowUpAns;
     const clarifyingQuestions = shouldAskClarifyingQuestion
         ? generateClarifyingQuestions(userGoal, missingInfo, normalizedMessage)
         : [];
-
     const canSuggestPackages =
         !needsUrgentCare &&
-        ((isComplete && userGoal === "liver_specific_inquiry") ||
-            (isComplete && userGoal === "kidney_specific_inquiry") ||
-            (isComplete && userGoal === "package_recommendation_ready") ||
-            (isComplete && userGoal === "symptom_advice") ||
-            (userGoal === "symptom_advice" && hasPreviousSymptoms && detailScore >= 4) ||
-            ((isFollowUp || isFollowUpAns) && hasPreviousSymptoms));
-
-    const suggestedPackageHints = suggestPackageHints(userGoal, normalizedMessage);
-
-    let reason;
-    if (needsUrgentCare) {
-        reason = "urgent_red_flag_detected";
-    } else if (shouldAskClarifyingQuestion) {
-        reason = `insufficient_context_missing_${missingInfo.join("_")}`;
-    } else if (canSuggestPackages) {
-        reason = "sufficient_context_for_package_guidance";
-    } else if (userGoal === "test_explanation") {
-        reason = "test_explanation_query";
-    } else if (userGoal === "lifestyle_health_guidance") {
-        reason = "lifestyle_health_guidance_query";
-    } else if (userGoal === "lab_result_severity") {
-        reason = "lab_result_severity_query";
-    } else if (userGoal === "read_only_consultation") {
-        reason = "read_only_consultation_signal";
-    } else {
-        reason = "general_health_inquiry";
-    }
-
-    if ((isFollowUp || isFollowUpAns) && hasPreviousSymptoms) {
-        console.log(`[DEBUG] Follow-up detected: question=${isFollowUp}, answer=${isFollowUpAns}, symptoms=${previousSymptoms.join(",")}, isComplete=${isComplete}, canSuggest=${canSuggestPackages}`);
-    }
+        (
+            ((isComplete || isFollowUp) && state.symptoms.length > 0) ||
+            (isComplete && ["liver_specific_inquiry", "kidney_specific_inquiry", "package_recommendation_ready"].includes(userGoal))
+        );
 
     return {
         version: CONTEXT_VERSION,
@@ -840,18 +731,25 @@ function analyzeHealthConsultationContext({
         needsUrgentCare,
         isComplete,
         missingInfo,
-        detailScore,
+        detailScore: base.detailScore + state.symptoms.length + (state.duration ? 1 : 0) + state.negativeFlags.length,
         shouldAskClarifyingQuestion,
         clarifyingQuestions,
         canSuggestPackages,
-        suggestedPackageHints,
-        summary: buildSessionSummary(sessionContext),
+        suggestedPackageHints: suggestPackageHints(userGoal, augmentedMessage),
+        summary: buildSessionSummary({ ...sessionContext, healthConsultation: state }),
         previousSymptoms,
         isFollowUp: isFollowUp || isFollowUpAns,
         isFollowUpAnswer: isFollowUpAns,
-        healthInfo,
+        healthInfo: mergedContext.healthInfo,
         mergedContext,
-        reason,
+        state,
+        reason: needsUrgentCare
+            ? "urgent_red_flag_detected"
+            : canSuggestPackages
+                ? "sufficient_context_for_package_guidance"
+                : shouldAskClarifyingQuestion
+                    ? `insufficient_context_missing_${missingInfo.join("_")}`
+                    : "general_health_inquiry",
         analyzedAt: new Date().toISOString()
     };
 }
@@ -859,10 +757,14 @@ function analyzeHealthConsultationContext({
 module.exports = {
     CONTEXT_VERSION,
     analyzeHealthConsultationContext,
+    getRecentHealthMessages,
     extractPreviousSymptoms,
-    buildSessionSummary,
+    extractCurrentHealthDetails,
     isFollowUpQuestion,
     isFollowUpAnswer,
+    isHealthFollowUpDetail,
     extractHealthInfo,
-    mergeAnswerIntoContext
+    mergeAnswerIntoContext,
+    mergeHealthConsultationState,
+    buildSessionSummary
 };

@@ -5,7 +5,10 @@ const { retrieveTopChunks } = require("./health-rag/retriever.service");
 const { loadArtifacts } = require("./health-rag/artifact-loader.service");
 const { choosePolicyMode } = require("./health-rag/policy.service");
 const { composeGroundedAnswer } = require("./health-rag/answer.service");
-const { analyzeHealthConsultationContext } = require("./health-rag/health-consultation-context.service");
+const {
+    analyzeHealthConsultationContext,
+    mergeHealthConsultationState
+} = require("./health-rag/health-consultation-context.service");
 const { runSemanticBridge } = require("./health-rag/semantic-bridge.service");
 const mockSessions = require("../data/mockSessions");
 const {
@@ -756,7 +759,7 @@ function shouldRunRecommendationRuntime(intentGroup) {
     );
 }
 
-function shouldSkipRecommendationForAnswer({ message, intentGroup, policyDecision, topChunks }) {
+function shouldSkipRecommendationForAnswer({ message, intentGroup, policyDecision, topChunks, sessionContext }) {
     if (
         intentGroup === "test_advice" &&
         policyDecision?.primaryMode === "lab_explanation" &&
@@ -775,10 +778,15 @@ function shouldSkipRecommendationForAnswer({ message, intentGroup, policyDecisio
 
     const consultationContext = analyzeHealthConsultationContext({
         message,
+        sessionContext,
         retrievedChunks: topChunks
     });
 
-    return consultationContext.canSuggestPackages && consultationContext.isComplete;
+    return (
+        consultationContext.isFollowUp ||
+        consultationContext.previousSymptoms.length > 0 ||
+        (consultationContext.canSuggestPackages && consultationContext.isComplete)
+    );
 }
 
 function shouldSuppressDdimersForUrgentCase(message, intentGroup) {
@@ -1017,7 +1025,17 @@ function keepSourcesById(meta, allowedSourceIds) {
 async function answerHealthQuery({ message, sessionId }) {
     try {
         const session = mockSessions.getSession(sessionId);
-        const sessionContext = session?.chatContext || { recentMessages: [] };
+        const sessionContext = session?.chatContext || {};
+        const healthConsultation = mergeHealthConsultationState(sessionContext, message);
+
+        if (sessionId) {
+            mockSessions.upsertSession(sessionId, {
+                chatContext: {
+                    ...sessionContext,
+                    healthConsultation
+                }
+            });
+        }
 
         const retrievalResult = retrieveTopChunks({
             message,
@@ -1050,6 +1068,7 @@ async function answerHealthQuery({ message, sessionId }) {
             message,
             retrievedChunks: topChunks
         }), intentGroup, message);
+
         const groundedReply = composeGroundedAnswer({
             message,
             policyDecision,
@@ -1060,7 +1079,8 @@ async function answerHealthQuery({ message, sessionId }) {
             message,
             intentGroup,
             policyDecision,
-            topChunks
+            topChunks,
+            sessionContext
         });
         const recommendationDecision =
             !skipRecommendation && shouldRunRecommendationRuntime(intentGroup)
