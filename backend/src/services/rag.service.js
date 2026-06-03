@@ -9,7 +9,14 @@ const {
     analyzeHealthConsultationContext,
     mergeHealthConsultationState
 } = require("./health-rag/health-consultation-context.service");
+const {
+    evaluateHealthSafetyGate
+} = require("./health-rag/health-safety-gate.service");
 const { runSemanticBridge } = require("./health-rag/semantic-bridge.service");
+const {
+    buildExpandedRetrievalQuery,
+    expandUserQueryWithOllama
+} = require("./health-rag/query-expansion.service");
 const mockSessions = require("../data/mockSessions");
 const {
     isRecommendationRuntimeEnabled,
@@ -752,6 +759,19 @@ function applyIntentGroupPolicy(policyDecision, intentGroup, message) {
     };
 }
 
+function applyHealthSafetyGatePolicy(policyDecision, safetyDecision) {
+    if (!safetyDecision?.shouldEscalate) {
+        return policyDecision;
+    }
+
+    return {
+        ...policyDecision,
+        primaryMode: "emergency_or_urgent",
+        urgencyLevel: safetyDecision.riskLevel === "emergency" ? "emergency" : "urgent",
+        reason: `health_safety_gate_${safetyDecision.reason}`
+    };
+}
+
 function shouldRunRecommendationRuntime(intentGroup) {
     return (
         intentGroup === "test_advice" &&
@@ -1037,13 +1057,22 @@ async function answerHealthQuery({ message, sessionId }) {
             });
         }
 
-        const retrievalResult = retrieveTopChunks({
+        const semanticQueryExpansion = await expandUserQueryWithOllama(
             message,
+            sessionContext
+        );
+        const retrievalQuery = buildExpandedRetrievalQuery(
+            message,
+            semanticQueryExpansion
+        );
+
+        const retrievalResult = retrieveTopChunks({
+            message: retrievalQuery,
             topK: 3
         });
         const semanticRetrievalEnabled = isSemanticRetrievalEnabled();
         const semanticBridgeResult = await runSemanticBridge({
-            message,
+            message: retrievalQuery,
             topK: 3,
             force: semanticRetrievalEnabled
         });
@@ -1064,16 +1093,30 @@ async function answerHealthQuery({ message, sessionId }) {
             topChunks: selectedRetrieval.topChunks
         });
         const topChunks = sourceAligned.topChunks.map(normalizeChunkSourceMetadata);
-        const policyDecision = applyIntentGroupPolicy(choosePolicyMode({
+        const consultationContext = analyzeHealthConsultationContext({
+            message,
+            sessionContext,
+            retrievedChunks: topChunks
+        });
+        const healthSafetyGate = await evaluateHealthSafetyGate({
+            message,
+            healthConsultationContext: consultationContext,
+            sessionContext,
+            semanticResult: semanticBridgeResult,
+            topChunks
+        });
+        const policyDecision = applyHealthSafetyGatePolicy(applyIntentGroupPolicy(choosePolicyMode({
             message,
             retrievedChunks: topChunks
-        }), intentGroup, message);
+        }), intentGroup, message), healthSafetyGate);
 
         const groundedReply = composeGroundedAnswer({
             message,
             policyDecision,
             topChunks,
-            sessionContext
+            sessionContext,
+            safetyDecision: healthSafetyGate,
+            consultationContext
         });
         const skipRecommendation = shouldSkipRecommendationForAnswer({
             message,
@@ -1081,7 +1124,7 @@ async function answerHealthQuery({ message, sessionId }) {
             policyDecision,
             topChunks,
             sessionContext
-        });
+        }) || healthSafetyGate.shouldBlockRecommendation;
         const recommendationDecision =
             !skipRecommendation && shouldRunRecommendationRuntime(intentGroup)
             ? runRecommendationRuntime({
@@ -1122,12 +1165,14 @@ async function answerHealthQuery({ message, sessionId }) {
                     detectedAliasGroups: retrievalMeta.detectedAliasGroups,
                     queryExpansionTerms: retrievalMeta.queryExpansionTerms,
                     expandedQuery: retrievalMeta.expandedQuery,
+                    semanticQueryExpansion,
                     semanticBridgeStatus:
                         retrievalMeta.semanticBridgeStatus,
                     runtimePromoted: retrievalMeta.runtimePromoted,
                     runtimeDefaultChanged:
                         retrievalMeta.runtimeDefaultChanged,
                     intentGroup,
+                    healthSafetyGate,
                     selectedRetrievalMode:
                         selectedRetrieval.debug.selectedRetrievalMode,
                     requestedRetrieverVersion:
@@ -1141,12 +1186,15 @@ async function answerHealthQuery({ message, sessionId }) {
                         legacyLexicalRuntimeMode:
                             retrievalResult.runtimeMode || null,
                         intentGroup,
+                        healthSafetyGate,
                         semanticRetrieval: selectedRetrieval.debug,
                         queryExpansions: retrievalResult.queryExpansions || [],
                         queryRewriteRules: retrievalResult.queryRewriteRules || [],
                         topicIntent: retrievalResult.topicIntent || null,
                         rewrittenQuery: retrievalResult.rewrittenQuery || retrievalResult.normalizedQuery,
                         semanticBridge: semanticBridgeResult,
+                        semanticQueryExpansion,
+                        retrievalQuery,
                         sourceAlignment: sourceAligned.sourceAlignment
                     },
                     topChunks: []
@@ -1194,10 +1242,12 @@ async function answerHealthQuery({ message, sessionId }) {
                 detectedAliasGroups: retrievalMeta.detectedAliasGroups,
                 queryExpansionTerms: retrievalMeta.queryExpansionTerms,
                 expandedQuery: retrievalMeta.expandedQuery,
+                semanticQueryExpansion,
                 semanticBridgeStatus: retrievalMeta.semanticBridgeStatus,
                 runtimePromoted: retrievalMeta.runtimePromoted,
                 runtimeDefaultChanged: retrievalMeta.runtimeDefaultChanged,
                 intentGroup,
+                healthSafetyGate,
                 selectedRetrievalMode:
                     selectedRetrieval.debug.selectedRetrievalMode,
                 requestedRetrieverVersion:
@@ -1211,12 +1261,15 @@ async function answerHealthQuery({ message, sessionId }) {
                     legacyLexicalRuntimeMode:
                         retrievalResult.runtimeMode || null,
                     intentGroup,
+                    healthSafetyGate,
                     semanticRetrieval: selectedRetrieval.debug,
                     queryExpansions: retrievalResult.queryExpansions || [],
                     queryRewriteRules: retrievalResult.queryRewriteRules || [],
                     topicIntent: retrievalResult.topicIntent || null,
                     rewrittenQuery: retrievalResult.rewrittenQuery || retrievalResult.normalizedQuery,
                     semanticBridge: semanticBridgeResult,
+                    semanticQueryExpansion,
+                    retrievalQuery,
                     sourceAlignment: sourceAligned.sourceAlignment
                 },
                 topChunks: topChunks.map((chunk) => ({

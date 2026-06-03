@@ -5,12 +5,15 @@ import argparse
 import contextlib
 import io
 import json
+import os
 import sys
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
+from urllib.request import Request, urlopen
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,6 +21,13 @@ ARTIFACT_DIR = ROOT / "ai_lab" / "artifacts" / "retriever_v1_4"
 RETRIEVAL_STRATEGY = "expanded_query_topic_aware_rerank"
 DEFAULT_CANDIDATE_TOP_K = 20
 DEFAULT_FINAL_TOP_K = 5
+DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434"
+DEFAULT_OLLAMA_MODEL = "qwen2.5:3b"
+DEFAULT_OLLAMA_TIMEOUT_MS = 3000
+OLLAMA_EXISTING_SCORE_WEIGHT = 0.6
+OLLAMA_SEMANTIC_SCORE_WEIGHT = 0.4
+OLLAMA_CONFIDENCE_THRESHOLD = 0.3
+OLLAMA_FALLBACK_REASON = "ollama_fallback_deterministic"
 
 RESULT_BOUNDARY_TOPICS = {
     "result_interpretation",
@@ -345,6 +355,209 @@ def topic_aware_rerank_score(
     }
 
 
+def clamp_unit_score(value: Any, default: float = 0.0) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return default
+    if not (number == number):
+        return default
+    return max(0.0, min(1.0, number))
+
+
+def strip_json_fence(raw_text: str) -> str:
+    text = str(raw_text or "").strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if lines and lines[0].strip().lower() in {"```", "```json"}:
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        return "\n".join(lines).strip()
+    return text
+
+
+def ollama_config() -> dict[str, Any]:
+    timeout_raw = (
+        os.environ.get("HOMELAB_RETRIEVER_OLLAMA_TIMEOUT_MS")
+        or os.environ.get("HOMELAB_INTENT_CLASSIFIER_TIMEOUT_MS")
+        or DEFAULT_OLLAMA_TIMEOUT_MS
+    )
+    try:
+        timeout_ms = int(timeout_raw)
+    except (TypeError, ValueError):
+        timeout_ms = DEFAULT_OLLAMA_TIMEOUT_MS
+
+    return {
+        "baseUrl": str(os.environ.get("HOMELAB_OLLAMA_BASE_URL") or DEFAULT_OLLAMA_BASE_URL).rstrip("/"),
+        "model": os.environ.get("HOMELAB_RETRIEVER_OLLAMA_MODEL")
+        or os.environ.get("HOMELAB_INTENT_CLASSIFIER_MODEL")
+        or DEFAULT_OLLAMA_MODEL,
+        "timeoutMs": timeout_ms,
+    }
+
+
+def build_ollama_semantic_prompt(query: str, chunks: list[dict[str, Any]]) -> str:
+    candidate_payload = []
+    for index, chunk in enumerate(chunks):
+        candidate_payload.append(
+            {
+                "index": index,
+                "chunk_id": chunk.get("chunk_id") or chunk.get("kb_id") or str(index),
+                "title": chunk.get("title"),
+                "topic": chunk.get("topic"),
+                "medical_scope": chunk.get("medical_scope"),
+                "intended_use": chunk.get("intended_use"),
+                "content": content_preview(chunk.get("content") or chunk.get("chunk_text"), 700),
+            }
+        )
+
+    return "\n".join(
+        [
+            "You are a read-only semantic relevance scorer for HomeLab retrieval.",
+            "Return JSON only. Do not include markdown, prose, code, tool calls, or instructions.",
+            "Safety: do not diagnose, recommend treatment, create bookings, update drafts, mutate records, or take actions.",
+            "Task: score each candidate chunk for relevance to the user query.",
+            "Use only the provided query and candidate chunk text.",
+            "Return this exact JSON schema:",
+            json.dumps(
+                {
+                    "scores": [
+                        {
+                            "index": 0,
+                            "relevance": "number from 0 to 1",
+                            "confidence": "number from 0 to 1",
+                            "reason": "short string",
+                        }
+                    ]
+                },
+                ensure_ascii=False,
+            ),
+            "",
+            "USER_QUERY:",
+            query,
+            "",
+            "CANDIDATE_CHUNKS_JSON:",
+            json.dumps(candidate_payload, ensure_ascii=False),
+        ]
+    )
+
+
+def parse_ollama_semantic_scores(payload: dict[str, Any], candidate_count: int) -> dict[int, dict[str, Any]]:
+    raw_response = payload.get("response")
+    if not isinstance(raw_response, str) or not raw_response.strip():
+        raise ValueError("empty_ollama_response")
+
+    parsed = json.loads(strip_json_fence(raw_response))
+    if not isinstance(parsed, dict) or not isinstance(parsed.get("scores"), list):
+        raise ValueError("invalid_ollama_schema")
+
+    scores: dict[int, dict[str, Any]] = {}
+    for item in parsed["scores"]:
+        if not isinstance(item, dict):
+            continue
+        try:
+            index = int(item.get("index"))
+        except (TypeError, ValueError):
+            continue
+        if index < 0 or index >= candidate_count:
+            continue
+        scores[index] = {
+            "relevance": clamp_unit_score(item.get("relevance")),
+            "confidence": clamp_unit_score(item.get("confidence")),
+            "reason": str(item.get("reason") or "")[:160],
+        }
+    return scores
+
+
+def score_chunks_with_ollama(query: str, chunks: list[dict[str, Any]]) -> tuple[dict[int, dict[str, Any]], str | None]:
+    if not chunks:
+        return {}, None
+
+    config = ollama_config()
+    request_payload = {
+        "model": config["model"],
+        "prompt": build_ollama_semantic_prompt(query, chunks),
+        "stream": False,
+        "format": "json",
+        "options": {"temperature": 0},
+    }
+    request = Request(
+        f"{config['baseUrl']}/api/generate",
+        data=json.dumps(request_payload, ensure_ascii=False).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    try:
+        with urlopen(request, timeout=max(0.1, float(config["timeoutMs"]) / 1000.0)) as response:
+            response_body = response.read().decode("utf-8")
+        payload = json.loads(response_body)
+        return parse_ollama_semantic_scores(payload, len(chunks)), None
+    except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, ValueError, OSError):
+        return {}, OLLAMA_FALLBACK_REASON
+
+
+def combine_topic_rerank_with_ollama(
+    query: str,
+    chunks: list[dict[str, Any]],
+    *,
+    existing_weight: float = OLLAMA_EXISTING_SCORE_WEIGHT,
+    semantic_weight: float = OLLAMA_SEMANTIC_SCORE_WEIGHT,
+    scorer: Any = score_chunks_with_ollama,
+) -> list[dict[str, Any]]:
+    if not chunks:
+        return chunks
+
+    ollama_scores, scorer_fallback = scorer(query, chunks)
+    for index, chunk in enumerate(chunks):
+        existing_score = float(chunk.get("_rerank_score") or 0.0)
+        shadow = ollama_scores.get(index) if isinstance(ollama_scores, dict) else None
+        semantic_shadow_score = 0.0
+        semantic_shadow_used = False
+        fallback_reason = scorer_fallback
+
+        if isinstance(shadow, dict):
+            confidence = clamp_unit_score(shadow.get("confidence"))
+            relevance = clamp_unit_score(shadow.get("relevance"))
+            if confidence >= OLLAMA_CONFIDENCE_THRESHOLD:
+                semantic_shadow_score = relevance
+                semantic_shadow_used = True
+                fallback_reason = None
+            else:
+                fallback_reason = OLLAMA_FALLBACK_REASON
+        elif not fallback_reason:
+            fallback_reason = OLLAMA_FALLBACK_REASON
+
+        combined_score = (
+            existing_score * existing_weight + semantic_shadow_score * semantic_weight
+            if semantic_shadow_used
+            else existing_score
+        )
+
+        debug = dict(chunk.get("_rerank_debug") or {})
+        debug.update(
+            {
+                "existingScore": round(existing_score, 6),
+                "semanticShadowScore": round(semantic_shadow_score, 6),
+                "semanticShadowUsed": semantic_shadow_used,
+                "fallbackReason": fallback_reason,
+                "scoreWeights": {
+                    "existing": existing_weight,
+                    "semanticShadow": semantic_weight,
+                },
+            }
+        )
+        chunk["_existing_rerank_score"] = existing_score
+        chunk["_ollama_semantic_score"] = semantic_shadow_score
+        chunk["_semantic_shadow_used"] = semantic_shadow_used
+        chunk["_fallback_reason"] = fallback_reason
+        chunk["_rerank_score"] = float(combined_score)
+        chunk["_rerank_debug"] = debug
+
+    return chunks
+
+
 class SemanticRetrieverV14:
     def __init__(self, artifact_dir: Path) -> None:
         self.artifact_dir = artifact_dir.resolve()
@@ -442,6 +655,9 @@ class SemanticRetrieverV14:
             "intended_use": chunk.get("intended_use") or meta.get("intended_use"),
             "semanticScore": float(chunk.get("_semantic_score") or 0),
             "rerankScore": float(chunk.get("_rerank_score") or 0),
+            "semanticShadowScore": float(chunk.get("_ollama_semantic_score") or 0),
+            "semanticShadowUsed": bool(chunk.get("_semantic_shadow_used")),
+            "fallbackReason": chunk.get("_fallback_reason"),
             "rankBeforeRerank": int(chunk.get("_rank_before_rerank") or 0),
             "rankAfterRerank": rank_after_rerank,
             "rerankDebug": chunk.get("_rerank_debug") or {},
@@ -469,6 +685,7 @@ class SemanticRetrieverV14:
             chunk["_rerank_debug"] = debug
             reranked.append(chunk)
 
+        combine_topic_rerank_with_ollama(query, reranked)
         reranked.sort(key=lambda item: float(item.get("_rerank_score") or 0), reverse=True)
         top_chunks = [
             self._format_chunk(chunk, rank)
@@ -620,6 +837,73 @@ def run_server(args: argparse.Namespace) -> None:
     )
     sys.stderr.flush()
     server.serve_forever()
+
+
+def test_ollama_topic_rerank() -> None:
+    query = "cholesterol cao có nguy hiểm không"
+    candidates = [
+        {
+            "chunk_id": "chunk_lipid",
+            "title": "Lipid panel",
+            "topic": "result_interpretation",
+            "content": "Cholesterol, LDL, HDL and triglyceride results help assess cardiovascular risk.",
+            "_semantic_score": 0.72,
+            "_rank_before_rerank": 1,
+        },
+        {
+            "chunk_id": "chunk_prepare",
+            "title": "Chuẩn bị xét nghiệm",
+            "topic": "preparation",
+            "content": "Some blood tests require fasting before the sample is collected.",
+            "_semantic_score": 0.7,
+            "_rank_before_rerank": 2,
+        },
+        {
+            "chunk_id": "chunk_cbc",
+            "title": "Complete blood count",
+            "topic": "test_meaning",
+            "content": "CBC measures white blood cells, red blood cells, platelets, and hemoglobin.",
+            "_semantic_score": 0.68,
+            "_rank_before_rerank": 3,
+        },
+    ]
+
+    reranked = []
+    for chunk in candidates:
+        existing_score, debug = topic_aware_rerank_score(
+            original_query=query,
+            chunk=chunk,
+            meta={},
+            semantic_score=float(chunk.get("_semantic_score") or 0),
+        )
+        chunk["_rerank_score"] = existing_score
+        chunk["_rerank_debug"] = debug
+        reranked.append(chunk)
+
+    def mock_scorer(_query: str, _chunks: list[dict[str, Any]]) -> tuple[dict[int, dict[str, Any]], str | None]:
+        return {
+            0: {"relevance": 0.95, "confidence": 0.9, "reason": "lipid result match"},
+            1: {"relevance": 0.25, "confidence": 0.85, "reason": "preparation only"},
+            2: {"relevance": 0.4, "confidence": 0.2, "reason": "low confidence unrelated"},
+        }, None
+
+    combine_topic_rerank_with_ollama(query, reranked, scorer=mock_scorer)
+    reranked.sort(key=lambda item: float(item.get("_rerank_score") or 0), reverse=True)
+
+    for chunk in reranked:
+        print(
+            json.dumps(
+                {
+                    "chunk_id": chunk.get("chunk_id"),
+                    "existing_score": round(float(chunk.get("_existing_rerank_score") or 0), 4),
+                    "ollama_semantic_score": round(float(chunk.get("_ollama_semantic_score") or 0), 4),
+                    "combined_final_score": round(float(chunk.get("_rerank_score") or 0), 4),
+                    "semanticShadowUsed": bool(chunk.get("_semantic_shadow_used")),
+                    "fallbackReason": chunk.get("_fallback_reason"),
+                },
+                ensure_ascii=False,
+            )
+        )
 
 
 def main() -> None:

@@ -715,9 +715,41 @@ function buildContextAwareSymptomReply({ message, sessionContext }) {
     return null;
 }
 
-function composeGroundedAnswer({ message, policyDecision, topChunks, sessionContext = {} }) {
+function buildSafetyGateUrgentReply(message, safetyDecision = {}) {
+    const evidence = safetyDecision.evidence || {};
+    const semanticSummary = evidence.semanticRisk?.result?.redFlagSummary || "";
+    const bestMatchTerms = evidence.similarityRisk?.bestMatch?.matchedTerms || [];
+    const ruleSignals = evidence.ruleSignals || [];
+    const riskText = safetyDecision.riskLevel === "emergency"
+        ? "tình huống cần được đánh giá y tế khẩn cấp"
+        : "dấu hiệu cần được nhân viên y tế đánh giá sớm";
+    const signalText = semanticSummary ||
+        bestMatchTerms.slice(0, 3).join(", ") ||
+        ruleSignals.slice(0, 2).join(", ");
+
+    return dedupeTexts([
+        signalText
+            ? `Những dấu hiệu bạn mô tả (${signalText}) có thể là ${riskText}.`
+            : `Những dấu hiệu bạn mô tả có thể là ${riskText}.`,
+        "HomeLab không nên xử lý theo hướng lấy mẫu tại nhà trong trường hợp này.",
+        "Bạn nên liên hệ cấp cứu hoặc đến cơ sở y tế gần nhất ngay để được đánh giá phù hợp."
+    ]).join(" ");
+}
+
+function composeGroundedAnswer({
+    message,
+    policyDecision,
+    topChunks,
+    sessionContext = {},
+    safetyDecision = null,
+    consultationContext = null
+}) {
     const standaloneDetails = extractCurrentHealthDetails(message);
     const previousSymptoms = extractPreviousSymptoms(sessionContext);
+
+    if (safetyDecision?.shouldEscalate) {
+        return buildSafetyGateUrgentReply(message, safetyDecision);
+    }
 
     if (
         !previousSymptoms.length &&
@@ -786,28 +818,28 @@ function composeGroundedAnswer({ message, policyDecision, topChunks, sessionCont
         ].filter(Boolean).join(" ");
     }
 
-    const consultationContext = analyzeHealthConsultationContext({
+    const analyzedConsultationContext = consultationContext || analyzeHealthConsultationContext({
         message,
         sessionContext,
         retrievedChunks: topChunks
     });
 
-    let semanticEnhancedContext = consultationContext;
+    let semanticEnhancedContext = analyzedConsultationContext;
 
-    if (consultationContext.userGoal !== "urgent_health" &&
-        consultationContext.userGoal !== "test_explanation" &&
-        !consultationContext.needsUrgentCare) {
+    if (analyzedConsultationContext.userGoal !== "urgent_health" &&
+        analyzedConsultationContext.userGoal !== "test_explanation" &&
+        !analyzedConsultationContext.needsUrgentCare) {
 
         try {
             const semanticResult = analyzeHealthConsultationWithOllama({
                 message,
                 sessionContext,
-                currentContext: consultationContext,
+                currentContext: analyzedConsultationContext,
                 retrievedChunks: topChunks
             }, { fetchImpl: null });
 
             if (semanticResult && !semanticResult.fallbackReason && semanticResult.shouldUseSemantic) {
-                semanticEnhancedContext = mergeSemanticWithContext(consultationContext, semanticResult);
+                semanticEnhancedContext = mergeSemanticWithContext(analyzedConsultationContext, semanticResult);
             }
         } catch {
         }
